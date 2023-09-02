@@ -31,12 +31,15 @@ namespace DXLib_ref {
 
 		GraphHandle MAIN_Screen;	//描画スクリーン
 
-		GraphHandle ColorScreen_;	//描画スクリーン
-		GraphHandle NormalScreen_;	//描画スクリーン
-		GraphHandle DummyScreen_;	//描画スクリーン
-		GraphHandle	DepthScreen;								//深度を取得するスクリーン
-		shaders		DepthDraw;									//シェーダー
-		shaders		Depth;										//シェーダー
+		GraphHandle ColorScreen;	//そのままのGバッファ
+		GraphHandle NormalScreen;	//法線のGバッファ
+		GraphHandle	DepthScreen;	//深度のGバッファ
+		//
+		GraphHandle SSRScreen;		//描画スクリーン
+		//
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderUseClass		m_SSR;										// シェーダー
+		ShaderUseClass		DepthDraw;									// シェーダー
 
 		int r_brt = 255;
 		int g_brt = 255;
@@ -51,20 +54,15 @@ namespace DXLib_ref {
 			b_brt = std::clamp(b, 0, 255);
 		}
 	private:
-		//被写体深度描画
-		void near_dof(std::function<void()> sky_doing, std::function<void()> doing, const Camera3DInfo& cams, bool update_effekseer = true);
-	private:
 		PostPassEffect(void);
 		~PostPassEffect(void) noexcept;
 	public:
 		//
-		void BUF_Draw(std::function<void()> sky_doing, std::function<void()> doing, const Camera3DInfo& cams, bool update_effekseer = true);
+		void BUF_Draw(std::function<void()> sky_doing, std::function<void()> doing, const Camera3DInfo& cams);
 		//
 		void FlipBuftoMain(void) noexcept;
 		//
 		void SetPostpassEffect(void) noexcept;
-		//深度書き込み
-		void SetDepth(const Camera3DInfo& camInfo, std::function<void()> doing) noexcept;
 		//書き込んだ深度に応じて対応
 		void DrawByDepth(std::function<void()> doing) noexcept;
 	};

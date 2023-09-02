@@ -393,12 +393,14 @@ namespace DXLib_ref {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*シェーダー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	//シェーダー
-	class shaders {
+	//シェーダーを使用する際の補助クラス
+	class ShaderUseClass {
 	public:
-		class shader_Vertex {
-			VERTEX3DSHADER Screen_vertex[6] = { 0.0f };
+		//2Dにシェーダーを適用する際に使用する画面サイズの頂点情報
+		class ScreenVertex {
+			VERTEX3DSHADER Screen_vertex[6] = {};
 		public:
+			// 頂点データの取得
 			const auto*		GetScreenVertex() noexcept { return Screen_vertex; }
 			// 頂点データの準備
 			void			SetScreenVertex(int dispx, int dispy) noexcept {
@@ -423,60 +425,90 @@ namespace DXLib_ref {
 			}
 		};
 	private:
+		//シェーダーハンドル
 		int m_VertexShaderhandle{ -1 };
-		int m_VertexShadercbhandle{ -1 };
-
 		int m_PixelShaderhandle{ -1 };
-		int m_PixelShadercbhandle{ -1 };
-		int m_PixelShadercbhandle2{ -1 };
+		//シェーダーに渡す追加パラメーターを配するハンドル
+		std::array<int, 4> m_VertexShadercbhandle{ -1 };
+		int m_PixelShaderSendDispSizeHandle{ -1 };
+		std::array<int, 4> m_PixelShadercbhandle{ -1 };
 	public:
-		void			Init(std::string VertexShader, std::string PixelShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
-			this->m_VertexShadercbhandle = CreateShaderConstantBuffer(sizeof(float) * 4);
-			this->m_VertexShaderhandle = LoadVertexShader(("shader/" + VertexShader).c_str());		// 頂点シェーダーバイナリコードの読み込み
-			this->m_PixelShadercbhandle = CreateShaderConstantBuffer(sizeof(float) * 4);
-			this->m_PixelShadercbhandle2 = CreateShaderConstantBuffer(sizeof(float) * 4);
-			this->m_PixelShaderhandle = LoadPixelShader(("shader/" + PixelShader).c_str());			// ピクセルシェーダーバイナリコードの読み込み
+		ShaderUseClass() {
+			//シェーダーハンドル
+			m_VertexShaderhandle = -1;
+			m_PixelShaderhandle = -1;
+			//シェーダーに渡す追加パラメーターを配するハンドル
+			for (auto& h : m_VertexShadercbhandle) { h = -1; }
+			m_PixelShaderSendDispSizeHandle = -1;
+			for (auto& h : m_PixelShadercbhandle) { h = -1; }
 		}
-		//
-		void			SetVertexParam(float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
+		~ShaderUseClass() {
+			Dispose();
+		}
+	public:
+		//初期化
+		void			Init(const char* VertexShader, const char* PixelShader) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			//頂点シェーダー周り
+			for (auto& h : m_VertexShadercbhandle) {
+				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
-			FLOAT4* f4 = (FLOAT4 *)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
+			this->m_VertexShaderhandle = LoadVertexShader(VertexShader);		// 頂点シェーダーバイナリコードの読み込み
+			//ピクセルシェーダ―周り
+			this->m_PixelShaderSendDispSizeHandle = CreateShaderConstantBuffer(sizeof(float) * 4);
+			for (auto& h : m_PixelShadercbhandle) {
+				h = CreateShaderConstantBuffer(sizeof(float) * 4);
+			}
+			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);			// ピクセルシェーダーバイナリコードの読み込み
+		}
+		//後始末
+		void			Dispose() noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			//頂点シェーダー周り
+			for (auto& h : m_VertexShadercbhandle) {
+				DeleteShaderConstantBuffer(h);
+			}
+			DeleteShader(this->m_VertexShaderhandle);
+			//ピクセルシェーダ―周り
+			DeleteShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);
+			for (auto& h : m_PixelShadercbhandle) {
+				DeleteShaderConstantBuffer(h);
+			}
+			DeleteShader(this->m_PixelShaderhandle);
+		}
+	public:
+		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			FLOAT4* f4 = (FLOAT4 *)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle[0]);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
 			f4->w = param4;
-			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_VertexShadercbhandle, DX_SHADERTYPE_VERTEX, 4);			// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
+			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle[0]);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
+			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
-		//
+		//ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
 		void			SetPixelDispSize(int dispx, int dispy) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
-			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
 			dispsize->u = (float)dispx;
 			dispsize->v = (float)dispy;
-			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle);								// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_PixelShadercbhandle, DX_SHADERTYPE_PIXEL, 2);			// ピクセルシェーダー用の定数バッファを定数バッファレジスタ2にセット
+			UpdateShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);									// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
+			SetShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle, DX_SHADERTYPE_PIXEL, 2);				// ピクセルシェーダー用の定数バッファを定数バッファレジスタ2にセット
 		}
-		void			SetPixelParam(float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle2);		// ピクセルシェーダー用の定数バッファのアドレスを取得
+		//ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
+		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle[0]);				// ピクセルシェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
 			f4->w = param4;
-			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle2);								// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_PixelShadercbhandle2, DX_SHADERTYPE_PIXEL, 3);			// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
+			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle[0]);											// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
+			SetShaderConstantBuffer(this->m_PixelShadercbhandle[0], DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
 		}
-
+		//3D空間に適用する場合の関数(引数に3D描画のラムダ式を代入)
 		void			Draw_lamda(std::function<void()> doing) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
 				doing();
@@ -490,10 +522,9 @@ namespace DXLib_ref {
 			SetUseVertexShader(-1);
 			SetUsePixelShader(-1);
 		}
-		void			Draw(shader_Vertex& Screenvertex) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+		//2D画像に適用する場合の関数
+		void			Draw(ScreenVertex& Screenvertex) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
 	};

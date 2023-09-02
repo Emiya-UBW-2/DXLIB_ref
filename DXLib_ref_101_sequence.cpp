@@ -32,8 +32,8 @@ namespace DXLib_ref {
 	SceneControl::SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		this->m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);								// 頂点データの準備
-		this->m_Shader2D[0].Init("VS_lens.vso", "PS_lens.pso");																//レンズ
-		this->m_Shader2D[1].Init("DepthVS.vso", "DepthPS.pso");						//レンズ
+		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
+		this->m_Shader2D[1].Init("shader/DepthVS.vso", "shader/DepthPS.pso");						//レンズ
 		this->m_ScenesPtr = ptr;
 	}
 	SceneControl::~SceneControl(void) noexcept {
@@ -42,6 +42,7 @@ namespace DXLib_ref {
 	//開始
 	void SceneControl::StartScene(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		auto* Pad = PadControl::Instance();
 		SetUseMaskScreenFlag(FALSE);//←一部画面でエフェクトが出なくなるため入れる
 		this->m_ScenesPtr->Set();
 		//遠影をセット
@@ -52,6 +53,7 @@ namespace DXLib_ref {
 			2);
 		this->m_SelEnd = false;
 		this->m_SelPause = false;
+		Pad->SetGuideUpdate();
 	}
 	//
 	bool SceneControl::Execute(void) noexcept {
@@ -64,10 +66,10 @@ namespace DXLib_ref {
 		m_SelEnd = this->m_ScenesPtr->GetisEnd();
 		//音位置指定
 		Set3DSoundListenerPosAndFrontPosAndUpVec(this->m_ScenesPtr->GetMainCamera().GetCamPos().get(), this->m_ScenesPtr->GetMainCamera().GetCamVec().get(), this->m_ScenesPtr->GetMainCamera().GetCamUp().get());
-#ifdef _USE_OPENVR_
-		//VR空間に適用
+		//
 		DXDraw::Instance()->Execute();
-#endif
+		OptionWindowClass::Instance()->Execute();
+		//
 		return SelEnd || m_SelEnd;
 	}
 	//描画
@@ -84,17 +86,14 @@ namespace DXLib_ref {
 			this->m_ScenesPtr->GetMainCamera().GetCamPos() + (this->m_ScenesPtr->GetMiddleShadowMax() + this->m_ScenesPtr->GetMiddleShadowMin()) / 2,
 			(this->m_ScenesPtr->GetMiddleShadowMax() - this->m_ScenesPtr->GetMiddleShadowMin()) / 2,
 			1);
-		//深度描画
-		PostPassParts->SetDepth(this->m_ScenesPtr->GetMainCamera(), [&] {this->m_ScenesPtr->Depth_Draw(); });	//深度書き込み
 		//画面に反映
 		DrawParts->Draw(
 			this->m_ScenesPtr->GetMainCamera(),
 			[&]() { this->m_ScenesPtr->BG_Draw(); },
 			[&]() {
 			this->m_ScenesPtr->MainDraw();
-			PostPassParts->DrawByDepth([&] {
-				this->m_ScenesPtr->MainDrawbyDepth();
-			});
+			//何か描画する必要のあるものができたら修正して有効に
+			//PostPassParts->DrawByDepth([&] { this->m_ScenesPtr->MainDrawbyDepth(); });
 		},
 			[&]() { this->m_ScenesPtr->DrawUI_Base(); },
 			[&]() { this->m_ScenesPtr->DrawUI_In(); },
@@ -105,7 +104,7 @@ namespace DXLib_ref {
 					//レンズ描画
 					if (this->m_ScenesPtr->is_lens()) {
 						this->m_Shader2D[0].SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
-						this->m_Shader2D[0].SetPixelParam(this->m_ScenesPtr->xp_lens(), this->m_ScenesPtr->yp_lens(), this->m_ScenesPtr->size_lens(), this->m_ScenesPtr->zoom_lens());
+						this->m_Shader2D[0].SetPixelParam(3, this->m_ScenesPtr->xp_lens(), this->m_ScenesPtr->yp_lens(), this->m_ScenesPtr->size_lens(), this->m_ScenesPtr->zoom_lens());
 						PostPassParts->Get_BUF_Screen().SetDraw_Screen(false);
 						{
 							this->m_Shader2D[0].Draw(this->m_ScreenVertex);
@@ -115,7 +114,7 @@ namespace DXLib_ref {
 					//描画
 					if (this->m_ScenesPtr->is_Blackout()) {
 						this->m_Shader2D[1].SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
-						this->m_Shader2D[1].SetPixelParam(this->m_ScenesPtr->Per_Blackout(), 0, 0, 0);
+						this->m_Shader2D[1].SetPixelParam(3, this->m_ScenesPtr->Per_Blackout(), 0, 0, 0);
 						PostPassParts->Get_BUF_Screen().SetDraw_Screen(false);
 						{
 							this->m_Shader2D[1].Draw(this->m_ScreenVertex);
@@ -125,6 +124,7 @@ namespace DXLib_ref {
 					SetUseTextureToShader(0, -1);
 				}
 		});
+		OptionWindowClass::Instance()->Draw();
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {

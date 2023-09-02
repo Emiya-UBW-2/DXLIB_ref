@@ -125,8 +125,8 @@ namespace DXLib_ref {
 		bool					m_SelEnd{ false };
 		bool					m_SelPause{ true };
 		std::shared_ptr<TEMPSCENE> m_ScenesPtr{ nullptr };
-		shaders::shader_Vertex	m_ScreenVertex;								// 頂点データ
-		std::array<shaders, 2>	m_Shader2D;
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;								// 頂点データ
+		std::array<ShaderUseClass, 2>	m_Shader2D;
 	public:
 		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept;
 		~SceneControl(void) noexcept;

@@ -172,6 +172,7 @@
     <ClInclude Include="DXLib_ref_06_MV1Handle.hpp" />
     <ClInclude Include="DXLib_ref_07_EffekseerEffectHandle.hpp" />
     <ClInclude Include="DXLib_ref_08_Etc.hpp" />
+    <ClInclude Include="DXLib_ref_09_KeyControl.hpp" />
     <ClInclude Include="DXLib_ref_100_PostPass.hpp" />
     <ClInclude Include="DXLib_ref_101_sequence.hpp" />
     <ClInclude Include="DXLib_ref_10_Option.hpp" />
@@ -188,6 +189,7 @@
     <ClCompile Include="DXLib_ref_06_MV1Handle.cpp" />
     <ClCompile Include="DXLib_ref_07_EffekseerEffectHandle.cpp" />
     <ClCompile Include="DXLib_ref_08_Etc.cpp" />
+    <ClCompile Include="DXLib_ref_09_KeyControl.cpp" />
     <ClCompile Include="DXLib_ref_100_PostPass.cpp" />
     <ClCompile Include="DXLib_ref_101_sequence.cpp" />
     <ClCompile Include="DXLib_ref_10_Option.cpp" />

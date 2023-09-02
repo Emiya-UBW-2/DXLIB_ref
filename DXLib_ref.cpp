@@ -28,22 +28,22 @@ namespace DXLib_ref {
 #ifdef _USE_OPENVR_
 		VR_Init();
 #endif // _USE_OPENVR_
-		SetOutApplicationLogValidFlag(true ? TRUE : FALSE);			//log
+		SetOutApplicationLogValidFlag(TRUE);						//log
 		SetMainWindowText(title);									//タイトル
 		ChangeWindowMode(TRUE);										//窓表示
 		SetUseDirect3DVersion(OptionParts->Get_DirectXVer());		//directX ver
-
 		SetUseDirectInputFlag(TRUE);								//
 		SetDirectInputMouseMode(TRUE);								//
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
-		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		//SetFullSceneAntiAliasingMode(4, 3);							//アンチエイリアス
-		//SetEnableXAudioFlag(TRUE);									//
+		//SetEnableXAudioFlag(TRUE);									//Xaudio(ロードが長いとロストするので必要に応じて)
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->Get_Vsync() ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
 		DxLib_Init();												//
+		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
+		//SetCreateDrawValidGraphMultiSample(4, 3);					//アンチエイリアス
 		if (GetUseDirect3DVersion() != OptionParts->Get_DirectXVer()) {
 			MessageBox(NULL, "DirectXのバージョンが適用していません。古いバージョンで動作しています", "", MB_OK);
 		}
@@ -78,7 +78,14 @@ namespace DXLib_ref {
 #endif // DEBUG
 		EffectResource::Create();						//エフェクト
 		SoundPool::Create();							//サウンド
+		PadControl::Create();							//キー
+		OptionWindowClass::Create();
+		OptionWindowClass::Instance()->Init();
 
+		auto* SE = SoundPool::Instance();
+		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
+		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/hit.wav", false);
+		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/cancel.wav", false);
 		//影生成
 		Create_Shadow();
 	}
@@ -171,6 +178,9 @@ namespace DXLib_ref {
 #ifdef _USE_OPENVR_
 		VR_Execute();		//VR空間に適用
 #endif
+		if (EffectResource::Instance()->Update_effect_f) {
+			UpdateEffekseer3D();
+		}
 	}
 	void			DXDraw::Draw(
 		const Camera3DInfo&  cams,
@@ -186,20 +196,20 @@ namespace DXLib_ref {
 			PostPassParts->BUF_Draw(
 				doingBG3D,
 				[&] {
-				//影を追加して描画
-				if (OptionParts->Get_Shadow()) {
-					SetUseShadowMap(0, m_FarShadowHandle);
-					SetUseShadowMap(1, m_MiddleShadowHandle);
-					SetUseShadowMap(2, m_NearShadowHandle);
-				}
-				doingMain3D();
-				if (OptionParts->Get_Shadow()) {
-					SetUseShadowMap(0, -1);
-					SetUseShadowMap(1, -1);
-					SetUseShadowMap(2, -1);
-				}
-			},
-				tmp_cam, EffectResource::Instance()->Update_effect_f);	//描画
+					//影を追加して描画
+					if (OptionParts->Get_Shadow()) {
+						SetUseShadowMap(0, m_FarShadowHandle);
+						SetUseShadowMap(1, m_MiddleShadowHandle);
+						SetUseShadowMap(2, m_NearShadowHandle);
+					}
+					doingMain3D();
+					if (OptionParts->Get_Shadow()) {
+						SetUseShadowMap(0, -1);
+						SetUseShadowMap(1, -1);
+						SetUseShadowMap(2, -1);
+					}
+				},
+				tmp_cam);												//描画
 			PostPassParts->SetPostpassEffect();							//ポストパスエフェクトの適用
 			doingAfterScreen();											//完成した画面に対して後処理
 		};
