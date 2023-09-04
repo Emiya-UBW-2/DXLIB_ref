@@ -25,6 +25,7 @@ namespace DXLib_ref {
 
 		GraphHandle SkyScreen;		//空描画
 		GraphHandle FarScreen_;		//描画スクリーン
+		GraphHandle DoFScreen;		//描画スクリーン
 		GraphHandle NearScreen_;	//描画スクリーン
 
 		GraphHandle BackScreen;		//描画スクリーン
@@ -40,6 +41,7 @@ namespace DXLib_ref {
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderUseClass		m_SSR;										// シェーダー
 		ShaderUseClass		DepthDraw;									// シェーダー
+		ShaderUseClass		m_DoF;										// シェーダー
 
 		int r_brt = 255;
 		int g_brt = 255;

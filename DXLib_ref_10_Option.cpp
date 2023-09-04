@@ -130,24 +130,9 @@ namespace DXLib_ref {
 		};
 		//
 		template <typename... Args>
-		static bool ClickCheckBox(int xp1, int yp1, int xp2, int yp2, bool IsActive, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			auto* Pad = PadControl::Instance();
-			unsigned int color = defaultcolor;
-			bool isHit = false;
-			if (IsActive) {
-				color = White;
-				if (Pad->GetOKKey().press()) {
-					if (Pad->GetOKKey().trigger()) {
-						isHit = true;
-					}
-					color = Black;
-				}
-				HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
-				SetCursor(hCursor);
-			}
-			SetBox(xp1, yp1, xp2, yp2, color);
+		static void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
 			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
-			return isHit;
 		};
 
 		static void CheckBox(int xp1, int yp1, bool switchturn) {
@@ -282,7 +267,7 @@ namespace DXLib_ref {
 		{
 			xp1 = xpos + (y_r(200) + y_r(12)) * m_id;
 			yp1 = ypos;
-			WindowSystem::ClickCheckBox(xp1, yp1 + y_r(5), xp1 + y_r(200), yp1 + LineHeight * 2 - y_r(5), true, isActive ? Gray25 : Gray75, m_name);
+			WindowSystem::SetMsgBox(xp1, yp1 + y_r(5), xp1 + y_r(200), yp1 + LineHeight * 2 - y_r(5), isActive ? Gray25 : Gray75, m_name);
 		}
 		//内容
 		if (isActive) {
@@ -418,7 +403,7 @@ namespace DXLib_ref {
 			[&]() {
 			auto* SE = SoundPool::Instance();
 			auto* OptionParts = OPTION::Instance();
-			OptionParts->Set_Vsync(OptionParts->Get_Vsync() ^ 1);
+			OptionParts->Set_SSAO(OptionParts->Get_SSAO() ^ 1);
 			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 		},
 			[&]() {
@@ -532,6 +517,26 @@ namespace DXLib_ref {
 			[&](int xpos, int ypos) {
 			auto* OptionParts = OPTION::Instance();
 			WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_aberration());
+		}
+		);
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("DoF", "遠近のピンボケの有効無効を指定します",
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_DoF(OptionParts->Get_DoF() ^ 1);
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_DoF(OptionParts->Get_DoF() ^ 1);
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {},
+			[&](int xpos, int ypos) {
+			auto* OptionParts = OPTION::Instance();
+			WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_DoF());
 		}
 		);
 	}

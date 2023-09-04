@@ -16,9 +16,13 @@ namespace DXLib_ref {
 		//環境光と影の初期化
 		auto* DrawParts = DXDraw::Instance();
 		DrawParts->SetAmbientLight(GetLightVec(), GetLightColorF());
+		DXDraw::Instance()->m_PauseActive.Set(true);
 	}
-	bool TEMPSCENE::Update(bool* isPause) noexcept {
-		auto ans = Update_Sub(isPause);
+	bool TEMPSCENE::Update() noexcept {
+		auto* Pad = PadControl::Instance();
+		Pad->Execute();
+		DXDraw::Instance()->m_PauseActive.Execute(Pad->GetOptionKey().press());		//ポーズ
+		auto ans = Update_Sub();
 		m_IsFirstLoop = false;
 		return ans;
 	}
@@ -52,7 +56,6 @@ namespace DXLib_ref {
 			(this->m_ScenesPtr->GetFarShadowMax() - this->m_ScenesPtr->GetFarShadowMin()) / 2,
 			2);
 		this->m_SelEnd = false;
-		this->m_SelPause = false;
 		Pad->SetGuideUpdate();
 	}
 	//
@@ -60,9 +63,8 @@ namespace DXLib_ref {
 #ifdef DEBUG
 		//auto* DebugParts = DebugClass::Instance();
 #endif // DEBUG
-		this->m_SelPause = false;
 		//更新
-		auto SelEnd = !this->m_ScenesPtr->Update(&this->m_SelPause);
+		auto SelEnd = !this->m_ScenesPtr->Update();
 		m_SelEnd = this->m_ScenesPtr->GetisEnd();
 		//音位置指定
 		Set3DSoundListenerPosAndFrontPosAndUpVec(this->m_ScenesPtr->GetMainCamera().GetCamPos().get(), this->m_ScenesPtr->GetMainCamera().GetCamVec().get(), this->m_ScenesPtr->GetMainCamera().GetCamUp().get());
@@ -125,11 +127,21 @@ namespace DXLib_ref {
 				}
 		});
 		OptionWindowClass::Instance()->Draw();
+		KeyGuideClass::Instance()->Draw();
+		if (DXDraw::Instance()->IsPause()) {
+			if (m_PauseFlashCount > 0.25f) {
+				auto* Fonts = FontPool::Instance();
+				Fonts->Get(FontPool::FontType::HUD_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(255, 255, 255), GetColor(0, 0, 0), "Pause");
+			}
+			m_PauseFlashCount += 1.f / GetFPS();
+			if (m_PauseFlashCount > 0.5f) { m_PauseFlashCount = 0.f; }
+		}
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {
 		this->m_ScenesPtr->Dispose();							//解放
 		this->m_ScenesPtr = this->m_ScenesPtr->Get_Next();		//遷移
+		KeyGuideClass::Instance()->Reset();
 	}
 	//
 };

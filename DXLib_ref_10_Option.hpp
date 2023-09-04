@@ -45,6 +45,7 @@ namespace DXLib_ref {
 		const auto		Get_SSR()const noexcept { return SSR && !useVR; }
 	public:
 		void			Set_grass_level(int value) noexcept { grass_level = value; }
+		void			Set_DoF(bool use) { DoF = use; }
 		void			Set_Bloom(bool value) noexcept { Bloom = value; }
 		void			Set_Shadow(bool value) noexcept { Shadow = value; }
 		void			Set_useVR(bool use) { useVR = use; }

@@ -83,7 +83,7 @@ namespace DXLib_ref {
 		void Load(void) noexcept { Load_Sub(); }
 
 		void Set(void) noexcept;
-		bool Update(bool* isPause) noexcept;
+		bool Update() noexcept;
 		void Dispose(void) noexcept;
 
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
@@ -100,7 +100,7 @@ namespace DXLib_ref {
 		virtual void Load_Sub(void) noexcept {}
 
 		virtual void Set_Sub(void) noexcept {}
-		virtual bool Update_Sub(bool*) noexcept { return true; }
+		virtual bool Update_Sub(void) noexcept { return true; }
 		virtual void Dispose_Sub(void) noexcept {}
 
 		virtual void BG_Draw_Sub(void) noexcept {
@@ -123,18 +123,16 @@ namespace DXLib_ref {
 	//
 	class SceneControl {
 		bool					m_SelEnd{ false };
-		bool					m_SelPause{ true };
 		std::shared_ptr<TEMPSCENE> m_ScenesPtr{ nullptr };
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;								// 頂点データ
 		std::array<ShaderUseClass, 2>	m_Shader2D;
+
+		float					m_PauseFlashCount{ 0.f };
 	public:
 		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept;
 		~SceneControl(void) noexcept;
 	public:
 		const auto& isEnd(void) const noexcept { return this->m_SelEnd; }
-		const auto& isPause(void) const noexcept { return this->m_SelPause; }
-	public:
-		void		SetPause(void) noexcept { this->m_SelPause = true; }
 	public:
 		void StartScene(void) noexcept;		//開始
 		bool Execute(void) noexcept;		//

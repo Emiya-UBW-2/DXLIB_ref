@@ -82,6 +82,8 @@ namespace DXLib_ref {
 		OptionWindowClass::Create();
 		OptionWindowClass::Instance()->Init();
 
+		KeyGuideClass::Create();
+
 		auto* SE = SoundPool::Instance();
 		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/hit.wav", false);

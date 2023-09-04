@@ -323,11 +323,12 @@ namespace DXLib_ref {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		SkyScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);							//空描画
+		FarScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);						//描画スクリーン
 		NearScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 		SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 		//DoF用
 		if (OptionParts->Get_DoF()) {
-			FarScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);						//描画スクリーン
+			DoFScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 		}
 		//最終描画用
 		BackScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
@@ -352,7 +353,7 @@ namespace DXLib_ref {
 		m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);							// 頂点データの準備
 		m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		DepthDraw.Init("shader/NormalMesh_PointLightVS.vso", "shader/NormalMesh_PointLightPS.pso");
-
+		m_DoF.Init("shader/VS_DoF.vso", "shader/PS_DoF.pso");					// DoF
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
 		m_PostPass.emplace_back(std::make_unique<PostPassLevelCorrect>());
 		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
@@ -401,30 +402,28 @@ namespace DXLib_ref {
 				sky_doing();
 			}
 			//遠距離
+			G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
+				SkyScreen.DrawGraph(0, 0, FALSE);
+				doing();
+			});
+			//遠距離の強烈なぼかし
 			if (OptionParts->Get_DoF()) {
-				G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
-					SkyScreen.DrawGraph(0, 0, FALSE);
-					doing();
-				});
 				GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
 			}
 			//中間
-			{
-				G_Draw(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
-					FarScreen_.DrawGraph(0, 0, false);
-					Effekseer_Sync3DSetting();
-					doing();
-					DrawEffekseer3D();
-				});
-			}
+			G_Draw(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
+				FarScreen_.DrawGraph(0, 0, false);
+				Effekseer_Sync3DSetting();
+				doing();
+				DrawEffekseer3D();
+			});
 			//至近
-			if (OptionParts->Get_DoF()) {
-				G_Draw(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
-					Effekseer_Sync3DSetting();
-					doing();
-					DrawEffekseer3D();
-				});
-			}
+			G_Draw(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
+				Effekseer_Sync3DSetting();
+				doing();
+				DrawEffekseer3D();
+			});
+			//そのままの出力
 			//SSAO
 			if (OptionParts->Get_SSAO()) {
 				ColorScreen.SetDraw_Screen();
@@ -433,7 +432,6 @@ namespace DXLib_ref {
 				}
 				GraphFilterBlt(NormalScreen.get(), NearScreen_.get(), DX_GRAPH_FILTER_SSAO, ColorScreen.get(), 120.f, 0.004f, 0.01f, 0.9f, GetColor(0, 0, 0), 20.f);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-
 			}
 			//SSR
 			if (OptionParts->Get_SSR()) {
@@ -441,22 +439,19 @@ namespace DXLib_ref {
 				{
 					NearScreen_.DrawGraph(0, 0, false);
 				}
-				//SSRシェーダーを適用
 				SSRScreen.SetDraw_Screen();
 				{
 					int RayInterval = 50;//レイの分割間隔
 					float SSRScale = 12.5f;
 					float DepthThreshold = 8.f;
-
-
 					SetUseTextureToShader(0, ColorScreen.get());	//使用するテクスチャをセット
 					SetUseTextureToShader(1, NormalScreen.get());
 					SetUseTextureToShader(2, DepthScreen.get());
 					m_SSR.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
 					m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(cams.GetCamFov() / 2.f), DepthThreshold);
-
-					m_SSR.Draw(m_ScreenVertex);
-
+					{
+						m_SSR.Draw(m_ScreenVertex);
+					}
 					SetUseTextureToShader(0, -1);
 					SetUseTextureToShader(1, -1);
 					SetUseTextureToShader(2, -1);
@@ -464,6 +459,28 @@ namespace DXLib_ref {
 				NearScreen_.SetDraw_Screen(false);
 				{
 					SSRScreen.DrawGraph(0, 0, true);
+				}
+			}
+			//距離ぼかし
+			if (OptionParts->Get_DoF()) {
+				ColorScreen.SetDraw_Screen();
+				{
+					NearScreen_.DrawGraph(0, 0, false);
+				}
+				GraphFilterBlt(NearScreen_.get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
+				NearScreen_.SetDraw_Screen();
+				{
+					SetUseTextureToShader(0, ColorScreen.get());	//使用するテクスチャをセット
+					SetUseTextureToShader(1, DoFScreen.get());
+					SetUseTextureToShader(2, DepthScreen.get());
+					m_DoF.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+					m_DoF.SetPixelParam(3, cams.GetCamFar() / 2.f, cams.GetCamFar() / 2.f, cams.GetCamNear(), cams.GetCamFar());
+					{
+						m_DoF.Draw(m_ScreenVertex);
+					}
+					SetUseTextureToShader(0, -1);
+					SetUseTextureToShader(1, -1);
+					SetUseTextureToShader(2, -1);
 				}
 			}
 		}
