@@ -94,6 +94,14 @@ namespace DXLib_ref {
 			}
 		}
 
+		void DrawRotaGraph3(int posx, int posy,
+			int cx, int cy,
+			float ExtRateX, float ExtRateY, float rad, bool trns) const noexcept {
+			if (IsActive()) {
+				DxLib::DrawRotaGraph3(posx, posy, cx, cy, double(ExtRateX), double(ExtRateY), double(rad), this->handle_, (trns ? TRUE : FALSE));
+			}
+		}
+
 		void DrawExtendGraph(int posx1, int posy1, int posx2, int posy2, bool trns) const noexcept {
 			if (IsActive()) {
 				DxLib::DrawExtendGraph(posx1, posy1, posx2, posy2, this->handle_, (trns ? TRUE : FALSE));

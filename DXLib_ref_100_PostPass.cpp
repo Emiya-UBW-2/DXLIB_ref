@@ -123,7 +123,8 @@ namespace DXLib_ref {
 	class PostPassMotionBlur : public PostPassBase {
 	private:
 		class BlurScreen {
-			GraphHandle m_screen[2];
+			static const int MAX = 3;
+			GraphHandle m_screen[MAX];
 			int m_current{ 0 };
 			int m_alpha{ 0 };
 			int m_screenWidth{ 0 }, m_screenHeight{ 0 };
@@ -133,7 +134,7 @@ namespace DXLib_ref {
 			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) {
 				auto* DrawParts = DXDraw::Instance();
 
-				for (int i = 0; i < 2; ++i) {
+				for (int i = 0; i < MAX; ++i) {
 					m_screen[i] = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
 				}
 				m_current = 0;
@@ -146,27 +147,29 @@ namespace DXLib_ref {
 				m_notBlendDraw = 0;
 			}
 			void Release() {
-				for (int i = 0; i < 2; ++i)
+				for (int i = 0; i < MAX; ++i)
 				{
 					m_screen[i].Dispose();
 				}
 			}
 		public:
-			void PreRenderBlurScreen() {
-				m_screen[m_current].SetDraw_Screen(true);
-			}
-			auto* PostRenderBlurScreen() {
+			auto* PostRenderBlurScreen(std::function<void()> doing) {
 				auto* DrawParts = DXDraw::Instance();
-				int drawMode = GetDrawMode();
-				SetDrawMode(DX_DRAWMODE_BILINEAR);
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
-				if (m_notBlendDraw++ > 2) {
-					m_screen[1 - m_current].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->m_DispXSize + m_offsetX2, DrawParts->m_DispYSize + offsetY2, false);
+				auto next = (m_current != 0) ? (m_current - 1) : MAX - 1;
+				m_screen[m_current].SetDraw_Screen();
+				{
+					doing();
+					if (m_notBlendDraw++ > MAX) {
+						int drawMode = GetDrawMode();
+						SetDrawMode(DX_DRAWMODE_BILINEAR);
+						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
+						m_screen[next].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->m_DispXSize + m_offsetX2, DrawParts->m_DispYSize + offsetY2, false);
+						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+						SetDrawMode(drawMode);
+					}
 				}
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-				SetDrawMode(drawMode);
 				auto Cur = m_current;
-				m_current = 1 - m_current;
+				m_current = next;
 				return &m_screen[Cur];
 			}
 		};
@@ -182,9 +185,9 @@ namespace DXLib_ref {
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph) noexcept {
 			if (true) {
-				m_BlurScreen.PreRenderBlurScreen();
-				TargetGraph->DrawGraph(0, 0, false);
-				GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen();
+				GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen([&]() {
+					TargetGraph->DrawGraph(0, 0, false);
+				});
 				TargetGraph->SetDraw_Screen(false);
 				{
 					buf->DrawGraph(0, 0, false);
@@ -325,11 +328,54 @@ namespace DXLib_ref {
 		SkyScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);							//空描画
 		FarScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);						//描画スクリーン
 		NearScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
-		SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+
+		//SSR
+		SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, true);							//描画スクリーン
+		SSRScreen2 = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+		{
+			bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);							//ふち黒
+			bkScreen2.SetDraw_Screen(true);
+			{
+				int xr = DrawParts->m_DispXSize / EXTEND * 30 / 100;
+				int yr = DrawParts->m_DispYSize / EXTEND * 60 / 100;
+
+				DrawBox(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, GetColor(0, 0, 0), TRUE);
+				DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr, yr, GetColor(255, 255, 255), TRUE);
+
+				int r = 0, c = 0, p = 2;
+
+				p = 1;
+				for (r = 0; r < 255; r += p) {
+					c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
+
+					DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+				}
+			}
+		}
+		{
+			SSRColorScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);
+			SSRNormalScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, true);			// 法線
+			{
+				// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
+				auto prevMip = GetCreateDrawValidGraphChannelNum();
+				auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
+				auto prevBit = GetCreateGraphChannelBitDepth();
+				SetCreateDrawValidGraphChannelNum(2);
+				SetDrawValidFloatTypeGraphCreateFlag(TRUE);
+				SetCreateGraphChannelBitDepth(32);
+				SSRDepthScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);
+				SetCreateDrawValidGraphChannelNum(prevMip);
+				SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
+				SetCreateGraphChannelBitDepth(prevBit);
+			}
+		}
+		m_SSRScreenVertex.SetScreenVertex(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND);	// 頂点データの準備
+		m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		//DoF用
 		if (OptionParts->Get_DoF()) {
 			DoFScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 		}
+		m_DoF.Init("shader/VS_DoF.vso", "shader/PS_DoF.pso");					// DoF
 		//最終描画用
 		BackScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 		MAIN_Screen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);							//描画スクリーン
@@ -351,9 +397,7 @@ namespace DXLib_ref {
 		}
 		//
 		m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);							// 頂点データの準備
-		m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		DepthDraw.Init("shader/NormalMesh_PointLightVS.vso", "shader/NormalMesh_PointLightPS.pso");
-		m_DoF.Init("shader/VS_DoF.vso", "shader/PS_DoF.pso");					// DoF
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
 		m_PostPass.emplace_back(std::make_unique<PostPassLevelCorrect>());
 		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
@@ -435,6 +479,9 @@ namespace DXLib_ref {
 			}
 			//SSR
 			if (OptionParts->Get_SSR()) {
+				GraphFilterBlt(ColorScreen.get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+				GraphFilterBlt(NormalScreen.get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+				GraphFilterBlt(DepthScreen.get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				ColorScreen.SetDraw_Screen();
 				{
 					NearScreen_.DrawGraph(0, 0, false);
@@ -443,44 +490,54 @@ namespace DXLib_ref {
 				{
 					int RayInterval = 50;//レイの分割間隔
 					float SSRScale = 12.5f;
-					float DepthThreshold = 8.f;
-					SetUseTextureToShader(0, ColorScreen.get());	//使用するテクスチャをセット
-					SetUseTextureToShader(1, NormalScreen.get());
-					SetUseTextureToShader(2, DepthScreen.get());
-					m_SSR.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+					float DepthThreshold = 7.f;
+					SetUseTextureToShader(0, SSRColorScreen.get());	//使用するテクスチャをセット
+					SetUseTextureToShader(1, SSRNormalScreen.get());
+					SetUseTextureToShader(2, SSRDepthScreen.get());
+					m_SSR.SetPixelDispSize(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND);
 					m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(cams.GetCamFov() / 2.f), DepthThreshold);
 					{
-						m_SSR.Draw(m_ScreenVertex);
+						m_SSR.Draw(m_SSRScreenVertex);
 					}
 					SetUseTextureToShader(0, -1);
 					SetUseTextureToShader(1, -1);
 					SetUseTextureToShader(2, -1);
 				}
+				SSRScreen2.SetDraw_Screen();
+				{
+					NearScreen_.DrawGraph(0, 0, true);
+					SSRScreen.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
+					//DrawBox(0, 0, 1920, 1080, GetColor(255, 0, 0), TRUE);
+				}
+				GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+					DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 				NearScreen_.SetDraw_Screen(false);
 				{
-					SSRScreen.DrawGraph(0, 0, true);
+					SSRScreen2.DrawGraph(0, 0, true);
 				}
 			}
 			//距離ぼかし
 			if (OptionParts->Get_DoF()) {
-				ColorScreen.SetDraw_Screen();
-				{
-					NearScreen_.DrawGraph(0, 0, false);
-				}
-				GraphFilterBlt(NearScreen_.get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
-				NearScreen_.SetDraw_Screen();
-				{
-					SetUseTextureToShader(0, ColorScreen.get());	//使用するテクスチャをセット
-					SetUseTextureToShader(1, DoFScreen.get());
-					SetUseTextureToShader(2, DepthScreen.get());
-					m_DoF.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
-					m_DoF.SetPixelParam(3, cams.GetCamFar() / 2.f, cams.GetCamFar() / 2.f, cams.GetCamNear(), cams.GetCamFar());
+				if (GetUseDirect3DVersion() == DX_DIRECT3D_11) {
+					ColorScreen.SetDraw_Screen();
 					{
-						m_DoF.Draw(m_ScreenVertex);
+						NearScreen_.DrawGraph(0, 0, false);
 					}
-					SetUseTextureToShader(0, -1);
-					SetUseTextureToShader(1, -1);
-					SetUseTextureToShader(2, -1);
+					GraphFilterBlt(NearScreen_.get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 2000);
+					NearScreen_.SetDraw_Screen();
+					{
+						SetUseTextureToShader(0, ColorScreen.get());	//使用するテクスチャをセット
+						SetUseTextureToShader(1, DoFScreen.get());
+						SetUseTextureToShader(2, DepthScreen.get());
+						m_DoF.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+						m_DoF.SetPixelParam(3, near_DoF, far_DoF, near_DoFMax, far_DoFMin);
+						{
+							m_DoF.Draw(m_ScreenVertex);
+						}
+						SetUseTextureToShader(0, -1);
+						SetUseTextureToShader(1, -1);
+						SetUseTextureToShader(2, -1);
+					}
 				}
 			}
 		}

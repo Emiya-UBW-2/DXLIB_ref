@@ -79,6 +79,7 @@ namespace DXLib_ref {
 		}
 		void			Update(const VECTOR_ref& campos_t) noexcept {
 			campos = campos_t;
+			/*
 			for (auto& h : handles) {
 				if (h.handle.get() != -1) {
 					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30) {
@@ -86,6 +87,7 @@ namespace DXLib_ref {
 					}
 				}
 			}
+			//*/
 		}
 	};
 };

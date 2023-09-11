@@ -111,7 +111,7 @@ namespace DXLib_ref {
 				this->m_ShotKey.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 				this->OKKey.Execute(CheckHitKeyWithCheck(KEY_INPUT_SPACE) != 0);
-				this->NGKey.Execute(CheckHitKeyWithCheck(KEY_INPUT_X) != 0);
+				this->NGKey.Execute((CheckHitKeyWithCheck(KEY_INPUT_X) != 0) || (CheckHitKeyWithCheck(KEY_INPUT_C) != 0));
 				this->m_AccelKey.Execute(CheckHitKeyWithCheck(KEY_INPUT_R) != 0);
 				this->m_BrakeKey.Execute(CheckHitKeyWithCheck(KEY_INPUT_F) != 0);
 			}

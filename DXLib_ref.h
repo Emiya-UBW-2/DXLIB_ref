@@ -184,6 +184,11 @@ namespace DXLib_ref {
 		//LONGLONG		m_StartTime{ 0 };
 		DESIGNVECTOR	m_Font1;
 		DESIGNVECTOR	m_Font2;
+
+		std::array<VECTOR_ref,3>		m_ShadowVec;
+		VECTOR_ref		m_LightVec;
+		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
+
 	private://コンストラクタ
 		DXDraw(const char* title, int dispx, int dispy) noexcept;
 		~DXDraw(void) noexcept;
@@ -197,6 +202,8 @@ namespace DXLib_ref {
 
 
 	public:
+		void			SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept;
+
 		void			SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, const VECTOR_ref& size, int shadowSelect) noexcept;
 		//

@@ -72,6 +72,7 @@ namespace DXLib_ref {
 			int Set_vol = 255;
 			float vol_rate = 1.f;
 		public:
+			const auto&		GetHandles(void)const noexcept { return shandle; }
 			const auto&		Get_ID(void)const noexcept { return ID; }
 			void			Set(int ID_t, size_t buffersize, std::string path_t, bool is3Dsound = true) {
 				if (path_t == "") { return; }

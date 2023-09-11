@@ -36,8 +36,8 @@ namespace DXLib_ref {
 		SetDirectInputMouseMode(TRUE);								//
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
-		//SetFullSceneAntiAliasingMode(4, 3);							//アンチエイリアス
-		//SetEnableXAudioFlag(TRUE);									//Xaudio(ロードが長いとロストするので必要に応じて)
+		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
+		SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->Get_Vsync() ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
@@ -52,7 +52,7 @@ namespace DXLib_ref {
 		}
 		else {
 			SetWindowStyleMode(4);
-			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
+			SetWindowPos(GetMainWindowHandle(), HWND_TOP, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		Effekseer_Init(8000);										//Effekseer
 		SetSysCommandOffFlag(TRUE);									//
@@ -146,7 +146,12 @@ namespace DXLib_ref {
 		}
 	}
 	//
+	void			DXDraw::SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept {
+		m_ShadowVec[shadowSelect] = Vec;
+	}
 	void			DXDraw::SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept {
+		m_LightVec = AmbientLightVec;
+		m_LightColorF = LightColor;
 		SetGlobalAmbientLight(LightColor);
 		SetLightDirection(AmbientLightVec.get());
 	}
@@ -167,7 +172,7 @@ namespace DXLib_ref {
 				break;
 			}
 			if (handle != -1) {
-				SetShadowMapLightDirection(handle, GetLightDirection());
+				SetShadowMapLightDirection(handle, m_ShadowVec[shadowSelect].get());
 				SetShadowMapDrawArea(handle, (CenterPos - size).get(), (CenterPos + size).get());
 				ShadowMap_DrawSetup(handle);
 				doing();

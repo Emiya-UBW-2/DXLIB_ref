@@ -14,13 +14,19 @@ namespace DXLib_ref {
 		auto* OptionParts = OPTION::Instance();
 		m_MainCamera.SetCamInfo(deg2rad(OptionParts->Get_useVR() ? 120 : OptionParts->Get_Fov()), 0.05f, 200.f);//1P
 		//ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
-		auto* DrawParts = DXDraw::Instance();
-		DrawParts->SetAmbientLight(GetLightVec(), GetLightColorF());
 		DXDraw::Instance()->m_PauseActive.Set(true);
 	}
 	bool TEMPSCENE::Update() noexcept {
 		auto* Pad = PadControl::Instance();
 		Pad->Execute();
+		//ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
+		auto* DrawParts = DXDraw::Instance();
+		DrawParts->SetAmbientLight(GetLightVec(), GetLightColorF());
+		DrawParts->SetShadowDir(GetShadowVec(0), 0);
+		DrawParts->SetShadowDir(GetShadowVec(1), 1);
+		DrawParts->SetShadowDir(GetShadowVec(2), 2);
+
+
 		DXDraw::Instance()->m_PauseActive.Execute(Pad->GetOptionKey().press());		//ƒ|[ƒY
 		auto ans = Update_Sub();
 		m_IsFirstLoop = false;
@@ -60,6 +66,7 @@ namespace DXLib_ref {
 	}
 	//
 	bool SceneControl::Execute(void) noexcept {
+		SetisUpdateFarShadow(this->m_ScenesPtr->GetisUpdateFarShadow());
 #ifdef DEBUG
 		//auto* DebugParts = DebugClass::Instance();
 #endif // DEBUG
@@ -88,6 +95,12 @@ namespace DXLib_ref {
 			this->m_ScenesPtr->GetMainCamera().GetCamPos() + (this->m_ScenesPtr->GetMiddleShadowMax() + this->m_ScenesPtr->GetMiddleShadowMin()) / 2,
 			(this->m_ScenesPtr->GetMiddleShadowMax() - this->m_ScenesPtr->GetMiddleShadowMin()) / 2,
 			1);
+		if (m_isUpdateFarShadow) {
+			DrawParts->Update_Shadow([&]() {this->m_ScenesPtr->ShadowDraw_Far(); },
+				this->m_ScenesPtr->GetMainCamera().GetCamPos() + (this->m_ScenesPtr->GetFarShadowMax() + this->m_ScenesPtr->GetFarShadowMin()) / 2,
+				(this->m_ScenesPtr->GetFarShadowMax() - this->m_ScenesPtr->GetFarShadowMin()) / 2,
+				2);
+		}
 		//‰æ–Ê‚É”½‰f
 		DrawParts->Draw(
 			this->m_ScenesPtr->GetMainCamera(),

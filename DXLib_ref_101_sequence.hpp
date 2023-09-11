@@ -8,6 +8,7 @@ namespace DXLib_ref {
 		std::shared_ptr<TEMPSCENE> Next_ptr{ nullptr };
 		bool			m_IsUpdateDraw{ true };
 
+		std::array<VECTOR_ref, 3>		m_ShadowVec;
 		VECTOR_ref		m_NearShadowMax, m_NearShadowMin;
 		VECTOR_ref		m_MiddleShadowMax, m_MiddleShadowMin;
 		VECTOR_ref		m_FarShadowMax, m_FarShadowMin;
@@ -17,6 +18,7 @@ namespace DXLib_ref {
 		std::array<shaderparam, 2> m_ShaderParam;		//シェーダーパラメーター
 		Camera3DInfo	m_MainCamera;					//カメラ
 		bool			m_IsFirstLoop{ true };			//初回チェック
+		bool					m_isUpdateFarShadow{ false };
 	public://ゲッター
 		void			Set_Next(const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr = Next_scenes_ptr_t; }
 		auto&			Get_Next(void) noexcept { return Next_ptr; }
@@ -24,6 +26,9 @@ namespace DXLib_ref {
 		void			SetAmbientLight(const VECTOR_ref& Lightvec, const COLOR_F& LightColor) noexcept {
 			m_LightVec = Lightvec;
 			m_LightColorF = LightColor;//GetColorF(0.12f, 0.11f, 0.10f, 0.0f)
+		}
+		void			SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept {
+			m_ShadowVec[shadowSelect] = Vec;
 		}
 
 		void			SetFarShadow(const VECTOR_ref& FarShadowMinSize, const VECTOR_ref& FarShadowMaxSize) noexcept {
@@ -38,6 +43,7 @@ namespace DXLib_ref {
 			m_NearShadowMax = NearShadowMaxSize;
 			m_NearShadowMin = NearShadowMinSize;
 		}
+		const auto&		GetShadowVec(int shadowSelect) const noexcept { return m_ShadowVec[shadowSelect]; }
 		const auto&		GetNearShadowMax(void) const noexcept { return m_NearShadowMax; }
 		const auto&		GetNearShadowMin(void) const noexcept { return m_NearShadowMin; }
 		const auto&		GetMiddleShadowMax(void) const noexcept { return m_MiddleShadowMax; }
@@ -75,6 +81,9 @@ namespace DXLib_ref {
 
 		const auto&		GetIsUpdateDraw(void) const noexcept { return this->m_IsUpdateDraw; }
 		void			SetIsUpdateDraw(bool value) noexcept { this->m_IsUpdateDraw = value; }
+
+		const auto&		GetisUpdateFarShadow(void) const noexcept { return this->m_isUpdateFarShadow; }
+		void SetisUpdateFarShadow(bool value) noexcept { m_isUpdateFarShadow = value; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept;
 		~TEMPSCENE(void) noexcept;
@@ -128,11 +137,14 @@ namespace DXLib_ref {
 		std::array<ShaderUseClass, 2>	m_Shader2D;
 
 		float					m_PauseFlashCount{ 0.f };
+		bool					m_isUpdateFarShadow{ false };
 	public:
 		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept;
 		~SceneControl(void) noexcept;
 	public:
 		const auto& isEnd(void) const noexcept { return this->m_SelEnd; }
+		void SetisUpdateFarShadow(bool value) noexcept { m_isUpdateFarShadow = value; }
+		
 	public:
 		void StartScene(void) noexcept;		//開始
 		bool Execute(void) noexcept;		//
