@@ -86,136 +86,96 @@ const int32_t desky{ (int32_t)(GetSystemMetrics(SM_CYSCREEN)) / 1 };
 #include "DXLib_ref_09_KeyControl.hpp"
 #include "DXLib_ref_10_Option.hpp"
 #include "DXLib_ref_20_Debug.hpp"
+#include "DXLib_ref_30_Box2D.hpp"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*必須オブジェクト																															*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-//Box2D拡張
-namespace std {
-	template <>
-	struct default_delete<b2Body> {
-		void		operator()(b2Body* body) const {
-			body->GetWorld()->DestroyBody(body);
-		}
-	};
-}; // namespace std
-//
 namespace DXLib_ref {
-	//BOX2D
-	static auto* CreateB2Body(std::shared_ptr<b2World>& world, b2BodyType type, float32 x_, float32 y_, float angle = 0) noexcept {
-		b2BodyDef f_bodyDef;
-		f_bodyDef.type = type;
-		f_bodyDef.position.Set(x_, y_);
-		f_bodyDef.angle = angle;
-		return world->CreateBody(&f_bodyDef);
-	}
-	class b2Pats {
-	private:
-		b2FixtureDef				fixtureDef;				//動的ボディフィクスチャを定義します
-		std::unique_ptr<b2Body>		body;					//
-		b2Fixture*					playerfix{ nullptr };	//
+	class ShadowControl {
+		int				m_ShadowHandle{ -1 };
+		VECTOR_ref		m_ShadowVec;
 	public:
-		VECTOR_ref					pos;//仮
+		const auto&		GetHandle(void) const noexcept { return m_ShadowHandle; }
+		void			SetDir(const VECTOR_ref& Vec) noexcept { m_ShadowVec = Vec; }
 	public:
-		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) {
-			fixtureDef.shape = dynamicBox;								//
-			fixtureDef.density = 1.0f;									//ボックス密度をゼロ以外に設定すると、動的になる
-			fixtureDef.friction = 0.3f;									//デフォルトの摩擦をオーバーライド
-			this->body.reset(body_ptr);									//
-			this->playerfix = this->body->CreateFixture(&fixtureDef);	//シェイプをボディに追加
+		void			Init() noexcept {
+			auto size = int(pow(2, 13));
+			//近
+			if (m_ShadowHandle == -1) {
+				m_ShadowHandle = MakeShadowMap(size, size);
+			}
+			SetShadowMapAdjustDepth(m_ShadowHandle, 0.0005f);
 		}
-
-		void		SetLinearVelocity(const b2Vec2& position) {
-			this->body->SetLinearVelocity(position);
-		}
-
-		void		Execute(const VECTOR_ref& add, float yradadd) {
-			this->body->SetLinearVelocity(b2Vec2(add.x(), add.z()));
-			this->body->SetAngularVelocity(yradadd);
-		}
-
-
-		void		Dispose(void) noexcept {
-			if (this->playerfix != nullptr) {
-				delete this->playerfix->GetUserData();
-				this->playerfix->SetUserData(nullptr);
+		void			Update(std::function<void()> doing, const VECTOR_ref& MaxPos, const VECTOR_ref& MinPos) noexcept {
+			if (m_ShadowHandle != -1) {
+				SetShadowMapLightDirection(m_ShadowHandle, m_ShadowVec.get());
+				SetShadowMapDrawArea(m_ShadowHandle, MinPos.get(), MaxPos.get());
+				ShadowMap_DrawSetup(m_ShadowHandle);
+				doing();
+				ShadowMap_DrawEnd();
 			}
 		}
-
-		const auto	Get(void) noexcept { return body.get(); }
-		const auto	Pos(void) noexcept { return body->GetPosition(); }
-		const auto	Rad(void) noexcept { return body->GetAngle(); }
-		const auto	Speed(void) noexcept { return std::hypot(this->body->GetLinearVelocity().x, this->body->GetLinearVelocity().y); }
-		void		SetTransform(const b2Vec2& position, float32 angle) {
-			body->SetTransform(position, angle);
+		void			Dispose() noexcept {
+			if (m_ShadowHandle != -1) {
+				DeleteShadowMap(m_ShadowHandle);
+				m_ShadowHandle = -1;
+			}
 		}
-	};
-
-	//共通のサウンドEnum
-	enum class SoundEnumCommon {
-		UI_Select,
-		UI_OK,
-		UI_NG,
-		Num,
 	};
 	//main
-	class DXDraw {
-	private:		//シングルトン化
-		static DXDraw* m_Singleton;
-	public:
-		static void Create(const char* title, int dispx = -1, int dispy = -1) noexcept {
-			m_Singleton = new DXDraw(title, dispx, dispy);
-		}
-		static DXDraw* Instance(void) noexcept {
-			if (m_Singleton == nullptr) {
-				m_Singleton = new DXDraw("Error!", 640, 480);
-			}
-			return m_Singleton;
-		}
-		//本体
+	class DXDraw : public SingletonBase<DXDraw> {
+	private:
+		friend class SingletonBase<DXDraw>;
 	public:
 		int				m_DispXSize{ deskx };
 		int				m_DispYSize{ desky };
-		switchs			m_PauseActive;
 	private:
-		int				m_NearShadowHandle{ -1 };		//近影
-		int				m_MiddleShadowHandle{ -1 };		//中影
-		int				m_FarShadowHandle{ -1 };		//遠影
-
+		switchs			m_PauseActive;
 		//LONGLONG		m_StartTime{ 0 };
-		DESIGNVECTOR	m_Font1;
-		DESIGNVECTOR	m_Font2;
-
-		std::array<VECTOR_ref,3>		m_ShadowVec;
+		std::array<ShadowControl,3>		m_Shadow;
 		VECTOR_ref		m_LightVec;
 		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
-
+		//
+		Camera3DInfo	m_MainCamera;					//カメラ
+		std::vector<FontInstallClass> m_FontInstallClass;
 	private://コンストラクタ
-		DXDraw(const char* title, int dispx, int dispy) noexcept;
+		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
 	public:
-		void			Create_Shadow(void) noexcept;
-		void			Delete_Shadow(void) noexcept;
+		const auto		IsPause() const noexcept { return m_PauseActive.on(); }
+		const auto		IsPauseSwitch() const noexcept { return m_PauseActive.trigger(); }
+		void			PauseExit() noexcept {
+			if (IsPause()) {
+				m_PauseActive.Execute(true);
+			}
+		}
+
+		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
+		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
 	public:
-		const auto IsPause() const noexcept { return !m_PauseActive.on(); }
+		void			SetUseShadow(void) noexcept {
+			for (auto& s : m_Shadow) {
+				SetUseShadowMap((int)(&s - &m_Shadow.front()), s.GetHandle());
+			}
+		}
+		void			ResetUseShadow(void) noexcept {
+			for (auto& s : m_Shadow) {
+				SetUseShadowMap((int)(&s - &m_Shadow.front()), -1);
+			}
+		}
+		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& MaxPos, const VECTOR_ref& MinPos, int shadowSelect) noexcept;
 
-		void PauseChange() noexcept { return m_PauseActive.Execute(true); }
-
-
-	public:
-		void			SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept;
-
+		void			SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept { m_Shadow[shadowSelect].SetDir(Vec); }
 		void			SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, const VECTOR_ref& size, int shadowSelect) noexcept;
-		//
+
 		void			Execute(void) noexcept;
 		void			Draw(
-			const Camera3DInfo&  cams,
-			std::function<void()> doingBG3D,
-			std::function<void()> doingMain3D,
+			std::function<void(const Camera3DInfo&)> doing,
 			std::function<void()> doingUI,
-			std::function<void()> doingUI2,
-			std::function<void()> doingAfterScreen) noexcept;
+			std::function<void()> doingUI2
+		) noexcept;
 		bool			Screen_Flip(void) noexcept;
+
 		//VR
 #ifdef _USE_OPENVR_
 	public:
@@ -232,9 +192,6 @@ namespace DXLib_ref {
 			VECTOR_ref					m_TouchPadPoint{ VECTOR_ref::zero() };
 			VECTOR_ref					m_pos;
 			MATRIX_ref					m_mat;
-			//表示時の画面
-			std::array<GraphHandle, 2> m_OutScreen;			//スクリーンバッファ
-			GraphHandle UI_Screen;							//UI
 		public:
 			const auto&		GetID(void) noexcept { return m_ID; }
 			const auto&		GetPos(void) noexcept { return m_pos; }
@@ -307,6 +264,9 @@ namespace DXLib_ref {
 		bool						m_VR_PrevHMDIsActive{ false };
 		bool						m_VR_HMD_StartFlag{ true };
 		MATRIX_ref					m_VR_HMD_StartPoint;
+		//表示時の画面
+		std::array<GraphHandle, 2>	m_OutScreen;			//スクリーンバッファ
+		GraphHandle					UI_Screen;				//UI
 	public:
 		auto*			Get_VR_DeviceList(void) noexcept { return &m_VR_DeviceInfo; }
 		const auto&		Get_VR_HMDID(void) noexcept { return m_VR_HMDID; }
@@ -341,7 +301,7 @@ namespace DXLib_ref {
 	private:
 		void			VR_Init(void) noexcept;
 		void			VR_Execute(void) noexcept;							//更新
-		void			VR_Draw(std::function<void()> doing, const Camera3DInfo& cams) noexcept;
+		void			VR_Draw(std::function<void()> doing) noexcept;
 		void			VR_WaitSync(void) noexcept;
 		void			VR_Dispose(void) noexcept;
 #endif // _USE_OPENVR_

@@ -177,6 +177,7 @@
     <ClInclude Include="DXLib_ref_101_sequence.hpp" />
     <ClInclude Include="DXLib_ref_10_Option.hpp" />
     <ClInclude Include="DXLib_ref_20_Debug.hpp" />
+    <ClInclude Include="DXLib_ref_30_Box2D.hpp" />
     <ClInclude Include="json.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +195,7 @@
     <ClCompile Include="DXLib_ref_101_sequence.cpp" />
     <ClCompile Include="DXLib_ref_10_Option.cpp" />
     <ClCompile Include="DXLib_ref_20_Debug.cpp" />
+    <ClCompile Include="DXLib_ref_30_Box2D.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

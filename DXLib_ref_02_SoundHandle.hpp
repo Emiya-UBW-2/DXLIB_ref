@@ -7,6 +7,14 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
+	//共通のサウンドEnum
+	enum class SoundEnumCommon {
+		UI_Select,
+		UI_OK,
+		UI_NG,
+		Num,
+	};
+	//
 	class SoundHandle {
 	private:
 		int handle_;

@@ -16,7 +16,6 @@ namespace DXLib_ref {
 		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
 
 		std::array<shaderparam, 2> m_ShaderParam;		//シェーダーパラメーター
-		Camera3DInfo	m_MainCamera;					//カメラ
 		bool			m_IsFirstLoop{ true };			//初回チェック
 		bool					m_isUpdateFarShadow{ false };
 	public://ゲッター
@@ -70,9 +69,6 @@ namespace DXLib_ref {
 
 		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
-
-		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
-		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
 
 		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 

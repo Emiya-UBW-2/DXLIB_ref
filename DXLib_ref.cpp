@@ -1,35 +1,23 @@
 ﻿#include "DXLib_ref.h"
 
-DXLib_ref::DXDraw* DXLib_ref::DXDraw::m_Singleton = nullptr;
 namespace DXLib_ref {
+	const DXDraw* SingletonBase<DXDraw>::m_Singleton = nullptr;
 	//
-	DXDraw::DXDraw(const char* title, int dispx, int dispy) noexcept {
+	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
 		auto* OptionParts = OPTION::Instance();
-
-		LPCSTR font_path;
-		font_path = "data/x14y24pxHeadUpDaisy.ttf"; // 読み込むフォントファイルのパス
-		if (AddFontResourceEx(font_path, FR_PRIVATE, &m_Font1) == 0) {
-			MessageBox(NULL, "フォント読込失敗", "", MB_OK);
-		}
-		font_path = "data/DSFetteGotisch.ttf"; // 読み込むフォントファイルのパス
-		if (AddFontResourceEx(font_path, FR_PRIVATE, &m_Font2) == 0) {
-			MessageBox(NULL, "フォント読込失敗", "", MB_OK);
-		}
+		//フォント
+		m_FontInstallClass.resize(2);
+		m_FontInstallClass.at(0).Install("data/x14y24pxHeadUpDaisy.ttf");
+		m_FontInstallClass.at(1).Install("data/DSFetteGotisch.ttf");
 		//解像度設定
 		this->m_DispXSize = deskx;
 		this->m_DispYSize = desky;
-		if (dispx != -1) {
-			this->m_DispXSize = dispx;
-		}
-		if (dispy != -1) {
-			this->m_DispYSize = dispy;
-		}
 #ifdef _USE_OPENVR_
 		VR_Init();
 #endif // _USE_OPENVR_
 		SetOutApplicationLogValidFlag(TRUE);						//log
-		SetMainWindowText(title);									//タイトル
+		SetMainWindowText("Loading...");							//タイトル
 		ChangeWindowMode(TRUE);										//窓表示
 		SetUseDirect3DVersion(OptionParts->Get_DirectXVer());		//directX ver
 		SetUseDirectInputFlag(TRUE);								//
@@ -89,23 +77,22 @@ namespace DXLib_ref {
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/hit.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/cancel.wav", false);
 		//影生成
-		Create_Shadow();
+		for (auto& s : m_Shadow) {
+			s.Init();
+		}
+		//Init
+		m_PauseActive.Set(false);
 	}
 	DXDraw::~DXDraw(void) noexcept {
-		LPCSTR font_path;
-
-		font_path = "data/x14y24pxHeadUpDaisy.ttf"; // 読み込むフォントファイルのパス
-		if (RemoveFontResourceEx(font_path, FR_PRIVATE, &m_Font1) == 0) {
-			MessageBox(NULL, "フォント読込失敗", "", MB_OK);
-		}
-
-		font_path = "data/DSFetteGotisch.ttf"; // 読み込むフォントファイルのパス
-		if (RemoveFontResourceEx(font_path, FR_PRIVATE, &m_Font2) == 0) {
-			MessageBox(NULL, "フォント読込失敗", "", MB_OK);
-		}
-
+		//フォント
+		m_FontInstallClass.at(0).Remove();
+		m_FontInstallClass.at(1).Remove();
+		m_FontInstallClass.clear();
 		//影削除
-		Delete_Shadow();
+		for (auto& s : m_Shadow) {
+			s.Dispose();
+		}
+		//
 #ifdef _USE_OPENVR_
 		VR_Dispose();
 #endif // _USE_OPENVR_
@@ -113,72 +100,17 @@ namespace DXLib_ref {
 		DxLib_End();
 	}
 	//
-	void			DXDraw::Create_Shadow(void) noexcept {
-		auto size = int(pow(2, 13));
-		//近
-		if (m_NearShadowHandle == -1) {
-			m_NearShadowHandle = MakeShadowMap(size, size);
-		}
-		SetShadowMapAdjustDepth(m_NearShadowHandle, 0.0005f);
-		//中
-		if (m_MiddleShadowHandle == -1) {
-			m_MiddleShadowHandle = MakeShadowMap(size, size);
-		}
-		SetShadowMapAdjustDepth(m_MiddleShadowHandle, 0.0005f);
-		//遠
-		if (m_FarShadowHandle == -1) {
-			m_FarShadowHandle = MakeShadowMap(size, size);
-		}
-		SetShadowMapAdjustDepth(m_FarShadowHandle, 0.0003f);
-	}
-	void			DXDraw::Delete_Shadow(void) noexcept {
-		if (m_NearShadowHandle != -1) {
-			DeleteShadowMap(m_NearShadowHandle);
-			m_NearShadowHandle = -1;
-		}
-		if (m_MiddleShadowHandle != -1) {
-			DeleteShadowMap(m_MiddleShadowHandle);
-			m_MiddleShadowHandle = -1;
-		}
-		if (m_FarShadowHandle != -1) {
-			DeleteShadowMap(m_FarShadowHandle);
-			m_FarShadowHandle = -1;
+	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& MaxPos, const VECTOR_ref& MinPos, int shadowSelect) noexcept {
+		if (OPTION::Instance()->Get_Shadow()) {
+			m_Shadow[shadowSelect].Update(doing, MaxPos, MinPos);
 		}
 	}
 	//
-	void			DXDraw::SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept {
-		m_ShadowVec[shadowSelect] = Vec;
-	}
 	void			DXDraw::SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept {
 		m_LightVec = AmbientLightVec;
 		m_LightColorF = LightColor;
 		SetGlobalAmbientLight(LightColor);
 		SetLightDirection(AmbientLightVec.get());
-	}
-	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, const VECTOR_ref& size, int shadowSelect) noexcept {
-		if (OPTION::Instance()->Get_Shadow()) {
-			int handle = -1;
-			switch (shadowSelect) {
-			case 0:
-				handle = m_NearShadowHandle;
-				break;
-			case 1:
-				handle = m_MiddleShadowHandle;
-				break;
-			case 2:
-				handle = m_FarShadowHandle;
-				break;
-			default:
-				break;
-			}
-			if (handle != -1) {
-				SetShadowMapLightDirection(handle, m_ShadowVec[shadowSelect].get());
-				SetShadowMapDrawArea(handle, (CenterPos - size).get(), (CenterPos + size).get());
-				ShadowMap_DrawSetup(handle);
-				doing();
-				ShadowMap_DrawEnd();
-			}
-		}
 	}
 	//
 	void			DXDraw::Execute(void) noexcept {
@@ -188,73 +120,51 @@ namespace DXLib_ref {
 		if (EffectResource::Instance()->Update_effect_f) {
 			UpdateEffekseer3D();
 		}
+		auto* Pad = PadControl::Instance();
+		m_PauseActive.Execute(Pad->GetOptionKey().press());
 	}
 	void			DXDraw::Draw(
-		const Camera3DInfo&  cams,
-		std::function<void()> doingBG3D,
-		std::function<void()> doingMain3D,
+		std::function<void(const Camera3DInfo&)> doing,
 		std::function<void()> doingUI,
-		std::function<void()> doingUI2,
-		std::function<void()> doingAfterScreen) noexcept {
+		std::function<void()> doingUI2
+		) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-
-		auto doing = [&](const Camera3DInfo& tmp_cam) {
-			PostPassParts->BUF_Draw(
-				doingBG3D,
-				[&] {
-					//影を追加して描画
-					if (OptionParts->Get_Shadow()) {
-						SetUseShadowMap(0, m_FarShadowHandle);
-						SetUseShadowMap(1, m_MiddleShadowHandle);
-						SetUseShadowMap(2, m_NearShadowHandle);
-					}
-					doingMain3D();
-					if (OptionParts->Get_Shadow()) {
-						SetUseShadowMap(0, -1);
-						SetUseShadowMap(1, -1);
-						SetUseShadowMap(2, -1);
-					}
-				},
-				tmp_cam);												//描画
-			PostPassParts->SetPostpassEffect();							//ポストパスエフェクトの適用
-			doingAfterScreen();											//完成した画面に対して後処理
-		};
 		//画面に映す
 		if (OptionParts->Get_useVR()) {
 			//VRに移す
 #ifdef _USE_OPENVR_
-			VR_Draw([&] {
-				auto tmp = GetDrawScreen();
-				Camera3DInfo tmp_cam = cams;
-				tmp_cam.SetNowCamPos();
-				doing(tmp_cam);
-				UI_Screen.SetDraw_Screen();	//UIをスクリーンに描画しておく
-				{
-					doingUI();
-				}
-				GraphHandle::SetDraw_Screen(tmp, tmp_cam, true);//描画対象を戻す
-				{
-					//結果を描画
-					PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);	//デフォ描画
-					//視差に対応しているUI
+				VR_Draw([&] {
+					auto tmp = GetDrawScreen();
+					Camera3DInfo tmp_cam = GetMainCamera();
+					tmp_cam.SetNowCamPos();
+					doing(tmp_cam);
+					UI_Screen.SetDraw_Screen();	//UIをスクリーンに描画しておく
 					{
-						SetCameraNearFar(0.01f, 2.f);
-						SetUseZBuffer3D(FALSE);												//zbufuse
-						SetWriteZBuffer3D(FALSE);											//zbufwrite
-						{
-							DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).Norm()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
-						}
-						SetUseZBuffer3D(TRUE);												//zbufuse
-						SetWriteZBuffer3D(TRUE);											//zbufwrite
+						doingUI();
 					}
-					doingUI2();										//UI2
-				}
-			}, cams);
+					GraphHandle::SetDraw_Screen(tmp, tmp_cam, true);//描画対象を戻す
+					{
+						//結果を描画
+						PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);	//デフォ描画
+						//視差に対応しているUI
+						{
+							SetCameraNearFar(0.01f, 2.f);
+							SetUseZBuffer3D(FALSE);												//zbufuse
+							SetWriteZBuffer3D(FALSE);											//zbufwrite
+							{
+								DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).Norm()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
+							}
+							SetUseZBuffer3D(TRUE);												//zbufuse
+							SetWriteZBuffer3D(TRUE);											//zbufwrite
+						}
+						doingUI2();										//UI2
+					}
+				});
 #endif
 		}
 		else {
-			doing(cams);
+			doing(GetMainCamera());
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			{
@@ -414,10 +324,10 @@ namespace DXLib_ref {
 			}
 		}
 	}
-	void			DXDraw::VR_Draw(std::function<void()> doing, const Camera3DInfo& cams) noexcept {
+	void			DXDraw::VR_Draw(std::function<void()> doing) noexcept {
 		if (OPTION::Instance()->Get_useVR()) {
 			for (char i = 0; i < 2; i++) {
-				m_OutScreen[i].SetDraw_Screen(cams.GetCamPos() + this->Get_VR_EyePosition_minVR(i), cams.GetCamVec() + this->Get_VR_EyePosition_minVR(i), cams.GetCamUp(), cams.GetCamFov(), cams.GetCamNear(), cams.GetCamFar());
+				m_OutScreen[i].SetDraw_Screen(GetMainCamera().GetCamPos() + this->Get_VR_EyePosition_minVR(i), GetMainCamera().GetCamVec() + this->Get_VR_EyePosition_minVR(i), GetMainCamera().GetCamUp(), GetMainCamera().GetCamFov(), GetMainCamera().GetCamNear(), GetMainCamera().GetCamFar());
 				{
 					doing();
 				}

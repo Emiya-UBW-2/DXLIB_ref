@@ -2,6 +2,11 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
+	enum class ControlType :int {
+		PS4,
+		PC,
+	};
+
 	class PadControl : public SingletonBase<PadControl> {
 	private:
 		friend class SingletonBase<PadControl>;
@@ -27,9 +32,9 @@ namespace DXLib_ref {
 		switchs NGKey;
 		switchs m_AccelKey;
 		switchs m_BrakeKey;
-		//
-		bool m_IsPad{ false };
-		bool m_IsUpdate{ true };
+		//ガイド等のコントロール
+		bool		m_IsUpdate{ true };
+		ControlType	m_ControlType{ ControlType::PC };
 	private:
 		PadControl() {
 			m_IsUpdate = true;

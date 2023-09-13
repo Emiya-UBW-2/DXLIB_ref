@@ -20,7 +20,11 @@ namespace DXLib_ref {
 			m_Singleton = new T();
 		}
 		static T* Instance(void) {
-			if (m_Singleton == nullptr) { m_Singleton = new T(); }
+			if (m_Singleton == nullptr) {
+				MessageBox(NULL, "Failed Instance Create", "", MB_OK);
+				exit(-1);
+			}
+			//if (m_Singleton == nullptr) { m_Singleton = new T(); }
 			return (T*)m_Singleton;
 		}
 	protected:
@@ -246,6 +250,25 @@ namespace DXLib_ref {
 			break;
 		default:
 			break;
+		}
+	};
+	//--------------------------------------------------------------------------------------------------
+	// フォントファイル管理
+	//--------------------------------------------------------------------------------------------------
+	class FontInstallClass {
+		DESIGNVECTOR	m_Font;
+		std::string		m_Path;
+	public:
+		void Install(LPCSTR font_path) {
+			m_Path = font_path;
+			if (AddFontResourceEx(m_Path.c_str(), FR_PRIVATE, &m_Font) == 0) {
+				MessageBox(NULL, "フォント読込失敗", "", MB_OK);
+			}
+		}
+		void Remove() {
+			if (RemoveFontResourceEx(m_Path.c_str(), FR_PRIVATE, &m_Font) == 0) {
+				MessageBox(NULL, "フォント読込削除", "", MB_OK);
+			}
 		}
 	};
 }
