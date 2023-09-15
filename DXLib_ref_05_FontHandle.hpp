@@ -217,10 +217,6 @@ namespace DXLib_ref {
 		enum class FontType {
 			Nomal_Edge,		//MSゴシック、エッジ付き細
 			Nomal_EdgeL,	//MSゴシック、エッジ付き太
-			HUD_Edge,		//HeadUpDaisy、エッジ付き細
-			HUD_EdgeL,		//HeadUpDaisy、エッジ付き太
-			Fette_Edge,		//DSFetteGotisch、エッジ付き
-			Fette_AA,		//DSFetteGotisch、AA
 			Nomal_AA,		//MSゴシック、AA
 		};
 		class Fonthave {
@@ -285,26 +281,6 @@ namespace DXLib_ref {
 					else {
 						this->m_Handle = FontHandle::Create(this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE_8X8, -1, 3);
 					}
-					break;
-				case FontType::HUD_Edge:
-					this->m_size = 18;
-					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create("x14y24pxHeadUpDaisy", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_EDGE, -1, 1);
-					break;
-				case FontType::HUD_EdgeL:
-					this->m_size = 24;
-					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create("x14y24pxHeadUpDaisy", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_EDGE, -1, 3);
-					break;
-				case FontType::Fette_Edge:
-					this->m_size = 36;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					this->m_Handle = FontHandle::Create("DS Fette Gotisch", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_EDGE, -1, 1);
-					break;
-				case FontType::Fette_AA:
-					this->m_size = 92;
-					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create("DS Fette Gotisch", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1, true);
 					break;
 				case FontType::Nomal_AA:
 					this->m_size = 92;

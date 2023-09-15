@@ -10,24 +10,19 @@ namespace DXLib_ref {
 		//Gバッファ
 		GraphHandle* m_NormalScreenPtr{ nullptr };
 		GraphHandle* m_DepthScreenPtr{ nullptr };
-		GraphHandle ColorScreen;	//そのまま透過なしにしたスクリーン
 	public:
-		PostPassBase(void);
+		PostPassBase(void) {}
 		virtual ~PostPassBase(void) {}
 	protected:
-		virtual void SetEffect_Sub(GraphHandle*) noexcept {}
+		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*) noexcept {}
 	public:
 		void SetPtr(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
 			m_NormalScreenPtr = NormalPtr;
 			m_DepthScreenPtr = DepthPtr;
 		}
 	public:
-		void SetEffect(GraphHandle* TargetGraph) noexcept {
-			ColorScreen.SetDraw_Screen();
-			{
-				TargetGraph->DrawGraph(0, 0, false);
-			}
-			SetEffect_Sub(TargetGraph);
+		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
+			SetEffect_Sub(TargetGraph, ColorGraph);
 		}
 	};
 	//
@@ -38,16 +33,16 @@ namespace DXLib_ref {
 
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
 
-		GraphHandle SkyScreen;		//空描画
 		GraphHandle FarScreen_;		//描画スクリーン
 		GraphHandle NearScreen_;	//描画スクリーン
 
 		GraphHandle MAIN_Screen;	//描画スクリーン
 
+		GraphHandle ColorScreen;	//そのまま透過なしにしたスクリーン
 		GraphHandle NormalScreen;	//法線のGバッファ
 		GraphHandle	DepthScreen;	//深度のGバッファ
 		//
-		ShaderUseClass		DepthDraw;									// シェーダー
+		//ShaderUseClass		DepthDraw;									// シェーダー
 		//
 		float fov = 0.f;
 		float near_DoF = 0.f;
@@ -68,7 +63,7 @@ namespace DXLib_ref {
 		auto& Get_far_DoFMin(void) noexcept { return far_DoFMin; }
 	public:
 		//ボケ始める場所を指定(完全にボケるのはニアファーの限度)
-		void Set_DoFNearFar(float near_d,float far_d, float near_m, float far_m) {
+		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) {
 			near_DoF = near_d;
 			far_DoF = far_d;
 			near_DoFMax = near_m;
@@ -93,7 +88,3 @@ namespace DXLib_ref {
 		void DrawByDepth(std::function<void()> doing) noexcept;
 	};
 };
-
-
-
-

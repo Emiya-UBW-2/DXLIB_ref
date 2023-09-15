@@ -137,7 +137,6 @@ namespace DXLib_ref {
 		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
 		//
 		Camera3DInfo	m_MainCamera;					//カメラ
-		std::vector<FontInstallClass> m_FontInstallClass;
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;

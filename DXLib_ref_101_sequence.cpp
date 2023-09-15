@@ -141,7 +141,7 @@ namespace DXLib_ref {
 		if (DXDraw::Instance()->IsPause()) {
 			if (m_PauseFlashCount > 0.5f) {
 				auto* Fonts = FontPool::Instance();
-				Fonts->Get(FontPool::FontType::HUD_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
+				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
 			}
 			m_PauseFlashCount += 1.f / GetFPS();
 			if (m_PauseFlashCount > 1.f) { m_PauseFlashCount = 0.f; }

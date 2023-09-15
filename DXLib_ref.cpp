@@ -6,10 +6,6 @@ namespace DXLib_ref {
 	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
 		auto* OptionParts = OPTION::Instance();
-		//フォント
-		m_FontInstallClass.resize(2);
-		m_FontInstallClass.at(0).Install("data/x14y24pxHeadUpDaisy.ttf");
-		m_FontInstallClass.at(1).Install("data/DSFetteGotisch.ttf");
 		//解像度設定
 		this->m_DispXSize = deskx;
 		this->m_DispYSize = desky;
@@ -66,10 +62,10 @@ namespace DXLib_ref {
 #endif // DEBUG
 		EffectResource::Create();						//エフェクト
 		SoundPool::Create();							//サウンド
+		FontPool::Create();
 		PadControl::Create();							//キー
 		OptionWindowClass::Create();
 		OptionWindowClass::Instance()->Init();
-
 		KeyGuideClass::Create();
 
 		auto* SE = SoundPool::Instance();
@@ -84,10 +80,6 @@ namespace DXLib_ref {
 		m_PauseActive.Set(false);
 	}
 	DXDraw::~DXDraw(void) noexcept {
-		//フォント
-		m_FontInstallClass.at(0).Remove();
-		m_FontInstallClass.at(1).Remove();
-		m_FontInstallClass.clear();
 		//影削除
 		for (auto& s : m_Shadow) {
 			s.Dispose();
