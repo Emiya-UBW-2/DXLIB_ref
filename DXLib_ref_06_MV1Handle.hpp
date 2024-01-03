@@ -31,12 +31,12 @@ namespace DXLib_ref {
 				this->time = 0.f;
 			}
 
-			void set(MV1* model, int AnimIndex, MV1* model_haveanim = nullptr) {
-				if (model_haveanim == nullptr) {
-					this->handle = MV1AttachAnim(model->get(), AnimIndex);
+			void set(MV1* model, int AnimIndex, const MV1* model_haveanim = nullptr) {
+				if (model_haveanim && (model->get() != model_haveanim->get())) {
+					this->handle = MV1AttachAnim(model->get(), AnimIndex, model_haveanim->get());
 				}
 				else {
-					this->handle = MV1AttachAnim(model->get(), AnimIndex, model_haveanim->get());
+					this->handle = MV1AttachAnim(model->get(), AnimIndex);
 				}
 				this->Reset();
 				if (this->per_prev != this->per) {
@@ -44,20 +44,6 @@ namespace DXLib_ref {
 					this->per_prev = this->per;
 				}
 				this->alltime = MV1GetAttachAnimTotalTime(model->get(), this->handle);
-			}
-			void set(MV1& model, int AnimIndex, MV1* model_haveanim = nullptr) {
-				if (model_haveanim == nullptr) {
-					this->handle = MV1AttachAnim(model.get(), AnimIndex);
-				}
-				else {
-					this->handle = MV1AttachAnim(model.get(), AnimIndex, model_haveanim->get());
-				}
-				this->Reset();
-				if (this->per_prev != this->per) {
-					MV1SetAttachAnimBlendRate(model.get(), this->handle, this->per);
-					this->per_prev = this->per;
-				}
-				this->alltime = MV1GetAttachAnimTotalTime(model.get(), this->handle);
 			}
 
 			void Update(const bool& loop, float speed) {
@@ -175,6 +161,7 @@ namespace DXLib_ref {
 			return true;
 		}
 		auto& get_anime(const size_t& p1) noexcept { return this->anime[std::clamp<size_t>(p1, 0, this->anime.size() - 1)]; }
+		auto& getanime(const size_t& p1) const noexcept { return this->anime[std::clamp<size_t>(p1, 0, this->anime.size() - 1)]; }
 		const auto& get_anime(void) const noexcept { return this->anime; }
 
 		bool work_anime(const size_t& p1) noexcept {
@@ -244,7 +231,7 @@ namespace DXLib_ref {
 			_ModelHandle->anime.resize(MV1GetAnimNum(_Have_Anim.get()));
 			if (_ModelHandle->anime.size() > 0) {
 				for (int i = 0; i < int(_ModelHandle->anime.size()); i++) {
-					_ModelHandle->anime[i].set(_ModelHandle, i);
+					_ModelHandle->anime[i].set(_ModelHandle, i, &_Have_Anim);
 				}
 			}
 			return;

@@ -196,18 +196,26 @@ namespace DXLib_ref {
 	//キー押し判定
 	class switchs {
 		bool		m_on{ false };//オンオフ判定
-		uint8_t		m_press{ 0 };//プッシュ判定
+		bool		m_press{ false };//オンオフ判定
+		int8_t		m_presscount{ 0 };//プッシュ判定
 	public:
 		switchs(void) noexcept {
 			Set(false);
-			m_press = 0;
+			m_presscount = 0;
+			m_press = false;
 		};
 		~switchs(void) noexcept { }
 		//使用前の用意
 		void			Set(bool on) noexcept { m_on = on; }
 		//更新
 		void			Execute(bool key) noexcept {
-			m_press = std::clamp<uint8_t>(m_press + 1, 0, (key ? 2 : 0));
+			m_press = key;
+			if (m_press) {
+				m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
+			}
+			else {
+				m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
+			}
 			if (trigger()) {
 				m_on ^= 1;
 			}
@@ -215,11 +223,13 @@ namespace DXLib_ref {
 		//オンオフの取得
 		const bool on(void) const noexcept { return m_on; }
 		//押した瞬間
-		const bool trigger(void) const noexcept { return m_press == 1; }
+		const bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
 		//押している間
-		const bool press(void) const noexcept { return m_press != 0; }
+		const bool press(void) const noexcept { return m_press; }
+		//離した瞬間
+		const bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
 		//離している間
-		const bool release(void) const noexcept { return m_press == 0; }
+		const bool release(void) const noexcept { return !m_press; }
 	};
 
 	//--------------------------------------------------------------------------------------------------

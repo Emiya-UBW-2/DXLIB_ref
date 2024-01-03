@@ -78,6 +78,7 @@ namespace DXLib_ref {
 		auto ys_f = (int)(m_PointSel + 3 + 1) * FontSize + 3;
 		DrawBox(xp_f - 1, yp_f - 1, xp_f + xs_f + 1, yp_f + ys_f + 1, black, TRUE);
 		DrawBox(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, white, FALSE);
+
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
 			"AsyncCount :%d", GetASyncLoadNum()); yp_f += FontSize;
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,

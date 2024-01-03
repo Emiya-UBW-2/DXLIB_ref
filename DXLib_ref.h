@@ -3,7 +3,7 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*ビルド設定																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-#define DEBUG
+//#define DEBUG
 //#define _USE_OPENVR_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -64,6 +64,8 @@ constexpr float M_GR{ -122.5f };				/*重力加速度*/
 //constexpr float M_GR{ -9.8f };				/*重力加速度*/
 
 //DPIを反映するデスクトップサイズ
+//const int32_t deskx{ (int32_t)(950) / 1 };
+//const int32_t desky{ (int32_t)(950 * 9 / 16) / 1 };
 const int32_t deskx{ (int32_t)(GetSystemMetrics(SM_CXSCREEN)) / 1 };
 const int32_t desky{ (int32_t)(GetSystemMetrics(SM_CYSCREEN)) / 1 };
 
@@ -132,25 +134,31 @@ namespace DXLib_ref {
 	private:
 		switchs			m_PauseActive;
 		//LONGLONG		m_StartTime{ 0 };
-		std::array<ShadowControl,3>		m_Shadow;
+		std::array<ShadowControl, 3>		m_Shadow;
 		VECTOR_ref		m_LightVec;
 		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
 		//
 		Camera3DInfo	m_MainCamera;					//カメラ
+		//カメラシェイク
+		bool						m_SendCamShake{ false };
+		float						m_SendCamShakeTime{ 1.f };
+		float						m_SendCamShakePower{ 1.f };
+		float						m_CamShake{ 0.f };
+		VECTOR_ref					m_CamShake1;
+		VECTOR_ref					m_CamShake2;
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
 	public:
 		const auto		IsPause() const noexcept { return m_PauseActive.on(); }
 		const auto		IsPauseSwitch() const noexcept { return m_PauseActive.trigger(); }
-		void			PauseExit() noexcept {
-			if (IsPause()) {
-				m_PauseActive.Execute(true);
-			}
-		}
+		void			PauseIn() noexcept;
+		void			PauseExit() noexcept;
 
 		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
 		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
+
+		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
 	public:
 		void			SetUseShadow(void) noexcept {
 			for (auto& s : m_Shadow) {
@@ -163,9 +171,15 @@ namespace DXLib_ref {
 			}
 		}
 		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& MaxPos, const VECTOR_ref& MinPos, int shadowSelect) noexcept;
-
 		void			SetShadowDir(const VECTOR_ref& Vec, int shadowSelect) noexcept { m_Shadow[shadowSelect].SetDir(Vec); }
 		void			SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept;
+
+		void			SetCamShake(float time, float power) noexcept {
+			this->m_SendCamShake = true;
+			this->m_SendCamShakeTime = time;
+			this->m_SendCamShakePower = power;
+		}
+	public:
 
 		void			Execute(void) noexcept;
 		void			Draw(

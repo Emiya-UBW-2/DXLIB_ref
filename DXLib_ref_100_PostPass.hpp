@@ -49,7 +49,11 @@ namespace DXLib_ref {
 		float far_DoF = 0.f;
 		float near_DoFMax = 0.f;
 		float far_DoFMin = 0.f;
-
+		//
+		int InColorPerMin = 20;
+		int InColorPerMax = 255;
+		float InColorGamma = 1.1f;
+		//
 		int r_brt = 255;
 		int g_brt = 255;
 		int b_brt = 255;
@@ -73,6 +77,12 @@ namespace DXLib_ref {
 			r_brt = std::clamp(r, 0, 255);
 			g_brt = std::clamp(g, 0, 255);
 			b_brt = std::clamp(b, 0, 255);
+		}
+
+		void SetLevelFilter(int inMin, int inMax, float gamma) {
+			InColorPerMin = std::clamp(inMin, 0, 255);
+			InColorPerMax = std::clamp(inMax, 0, 255);
+			InColorGamma = std::max(1.f, gamma);
 		}
 	private:
 		PostPassEffect(void);

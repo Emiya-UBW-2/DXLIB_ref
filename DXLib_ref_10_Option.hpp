@@ -26,6 +26,7 @@ namespace DXLib_ref {
 		bool	aberration{ true };
 		int		DirectXVer{ DX_DIRECT3D_11 };
 		bool	SSR{ true };
+		bool	MotionBlur{ true };
 	public:
 		//VRでは使えない機能は　 && !useVR
 		const auto		Get_grass_level()const noexcept { return grass_level; }
@@ -43,6 +44,7 @@ namespace DXLib_ref {
 		const auto		Get_aberration()const noexcept { return aberration; }
 		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_SSR()const noexcept { return SSR && !useVR; }
+		const auto		Get_MotionBlur()const noexcept { return MotionBlur; }
 	public:
 		void			Set_grass_level(int value) noexcept { grass_level = value; }
 		void			Set_DoF(bool use) { DoF = use; }
@@ -50,7 +52,7 @@ namespace DXLib_ref {
 		void			Set_Shadow(bool value) noexcept { Shadow = value; }
 		void			Set_useVR(bool use) { useVR = use; }
 		void			Set_SSAO(bool use) { SSAO = use; }
-
+		void			Set_Fov(float per) noexcept { Fov = per; }
 		void			Set_Vsync(bool value) noexcept { Vsync = value; }
 		void			Set_SE(float per) noexcept { SE = per; }
 		void			Set_VOICE(float per)noexcept { VOICE = per; }
@@ -58,6 +60,7 @@ namespace DXLib_ref {
 		void			Set_aberration(bool value) noexcept { aberration = value; }
 		void			Set_DirectXVer(int value) noexcept { DirectXVer = value; }
 		void			Set_SSR(bool use) { SSR = use; }
+		void			Set_MotionBlur(bool use) { MotionBlur = use; }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -135,7 +138,7 @@ namespace DXLib_ref {
 		float m_ActivePer{ 0.f };
 	private:
 	public:
-		void SetActive() noexcept { m_isActive = true; }
+		void SetActive() noexcept;
 		const auto& IsActive() const noexcept { return m_isActive; }
 	public:
 		void Init() noexcept;

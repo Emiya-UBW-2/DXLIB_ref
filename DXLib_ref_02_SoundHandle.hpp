@@ -108,6 +108,12 @@ namespace DXLib_ref {
 				}
 
 			}
+			void			Delete() {
+				for (auto& h : shandle) {
+					h.handle.clear();
+				}
+				shandle.clear();
+			}
 			void			StopAll(int Sel_t) {
 				for (auto& h : shandle[Sel_t].handle) {
 					h.stop();
@@ -126,7 +132,7 @@ namespace DXLib_ref {
 				++now %= shandle[Sel_t].handle.size();
 				return (int)ans;
 			}
-			int 		Play_3D(int Sel_t, const VECTOR_ref& pos_t, float radius, int vol_t = -1, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			int 			Play_3D(int Sel_t, const VECTOR_ref& pos_t, float radius, int vol_t = -1, int type_t = DX_PLAYTYPE_BACK) noexcept {
 				bool isplay = true;
 				{
 					//距離内にいない場合鳴らさない
@@ -171,7 +177,13 @@ namespace DXLib_ref {
 	private:
 		std::vector<Soundhave> havehandle;
 	public:
-		size_t Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) {
+		void			SetVol(float vol) {
+			for (auto& h : this->havehandle) {
+				h.SetVol(vol);
+			}
+		}
+	public:
+		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) {
 			for (auto& h : this->havehandle) {
 				if (h.Get_ID() == ID_t) {
 					h.Set(ID_t, buffersize, path_t, is3Dsound);
@@ -182,11 +194,16 @@ namespace DXLib_ref {
 			this->havehandle.back().Set(ID_t, buffersize, path_t, is3Dsound);
 			return this->havehandle.size() - 1;
 		}
-		Soundhave& Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
-
-		void			SetVol(float vol) {
-			for (auto& h : this->havehandle) {
-				h.SetVol(vol);
+		Soundhave&		Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
+		void			Delete(int ID_t) {
+			for (int i = 0; i < (int)this->havehandle.size(); i++) {
+				auto& h = this->havehandle[i];
+				if (h.Get_ID() == ID_t) {
+					h.Delete();
+					std::swap(h, this->havehandle.back());
+					this->havehandle.pop_back();
+					i--;
+				}
 			}
 		}
 	};

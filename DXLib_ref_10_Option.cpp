@@ -38,7 +38,7 @@ namespace DXLib_ref {
 			}
 		}
 		SSR = getparams::_bool(mdata);
-
+		MotionBlur = getparams::_bool(mdata);
 		FileRead_close(mdata);
 		SetOutApplicationLogValidFlag(TRUE);
 	}
@@ -71,6 +71,7 @@ namespace DXLib_ref {
 			break;
 		}
 		outputfile << "SSR=" + std::string((SSR) ? "true" : "false") + "\n";
+		outputfile << "MotionBlur=" + std::string((MotionBlur) ? "true" : "false") + "\n";
 		outputfile.close();
 	}
 
@@ -329,6 +330,26 @@ namespace DXLib_ref {
 	}
 	void OptionWindowClass::GraphicTabsInfo::Init_Sub() noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Fov", "垂直視野角を変更します",
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_Fov(std::clamp(OptionParts->Get_Fov() - 5.f, 45.f, 110.f));
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_Fov(std::clamp(OptionParts->Get_Fov() + 5.f, 45.f, 110.f));
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {},
+			[&](int xpos, int ypos) {
+			auto* OptionParts = OPTION::Instance();
+			WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->Get_Fov() + 0.5f), 45, 110);
+		}
+		);
+		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("V Sync", "垂直同期の有効無効を指定します(反映は再起動後にされます)",
 			[&]() {
 			auto* SE = SoundPool::Instance();
@@ -419,7 +440,7 @@ namespace DXLib_ref {
 		}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SSR", "画面ベースの鏡面反射の有効無効を指定します DirectX11でのみ有効です",
+		this->m_Elements.back().Init("SSR", "画面ベースの鏡面反射の有効無効を指定します DirectX11のみ有効",
 			[&]() {
 			auto* SE = SoundPool::Instance();
 			auto* OptionParts = OPTION::Instance();
@@ -539,8 +560,33 @@ namespace DXLib_ref {
 			WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_DoF());
 		}
 		);
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("MotionBlur", "モーションブラーの有効無効を指定します",
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_MotionBlur(OptionParts->Get_MotionBlur() ^ 1);
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {
+			auto* SE = SoundPool::Instance();
+			auto* OptionParts = OPTION::Instance();
+			OptionParts->Set_MotionBlur(OptionParts->Get_MotionBlur() ^ 1);
+			SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		},
+			[&]() {},
+			[&](int xpos, int ypos) {
+			auto* OptionParts = OPTION::Instance();
+			WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_MotionBlur());
+		}
+		);
 	}
 	//
+	void OptionWindowClass::SetActive() noexcept {
+		auto* Pad = PadControl::Instance();
+		Pad->SetGuideUpdate();
+		m_isActive = true;
+	}
 	void OptionWindowClass::Init() noexcept {
 		m_tabsel = 0;
 		m_select = 0;
@@ -557,6 +603,26 @@ namespace DXLib_ref {
 		if (m_isActive) {
 			auto* Pad = PadControl::Instance();
 			auto* SE = SoundPool::Instance();
+
+			Pad->ChangeGuide(
+				[&]() {
+					auto* KeyGuide = KeyGuideClass::Instance();
+					KeyGuide->Reset();
+					KeyGuide->AddGuide("ng.png", "決定");
+					KeyGuide->AddGuide("ok.png", "戻る");
+					KeyGuide->AddGuide("R_stick.png", "上下選択,調整");
+				},
+				[&]() {
+					auto* KeyGuide = KeyGuideClass::Instance();
+					KeyGuide->Reset();
+					KeyGuide->AddGuide("none.jpg", "決定");
+					KeyGuide->AddGuide("X.jpg", "戻る");
+					KeyGuide->AddGuide("W.jpg", "");
+					KeyGuide->AddGuide("S.jpg", "上下選択");
+					KeyGuide->AddGuide("A.jpg", "");
+					KeyGuide->AddGuide("D.jpg", "調整");
+				}
+			);
 			/*
 			//呼び出しもとで呼んでなければこれを渡す
 			Pad->Execute(
@@ -584,6 +650,7 @@ namespace DXLib_ref {
 				m_isActive = false;
 			}
 			if (!m_isActive) {
+				Pad->SetGuideUpdate();
 				OPTION::Instance()->Save();
 			}
 		}

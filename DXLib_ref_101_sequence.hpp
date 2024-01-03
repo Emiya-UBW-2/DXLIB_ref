@@ -138,6 +138,7 @@ namespace DXLib_ref {
 		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept;
 		~SceneControl(void) noexcept;
 	public:
+		const auto& GetNowScene(void) const noexcept { return this->m_ScenesPtr; }
 		const auto& isEnd(void) const noexcept { return this->m_SelEnd; }
 		void SetisUpdateFarShadow(bool value) noexcept { m_isUpdateFarShadow = value; }
 		

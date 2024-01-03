@@ -103,7 +103,7 @@ namespace DXLib_ref {
 				{
 					int RayInterval = 50;//レイの分割間隔
 					float SSRScale = 12.5f;
-					float DepthThreshold = 7.f;
+					float DepthThreshold = 8.f;
 					SetUseTextureToShader(0, SSRColorScreen.get());	//使用するテクスチャをセット
 					SetUseTextureToShader(1, SSRNormalScreen.get());
 					SetUseTextureToShader(2, SSRDepthScreen.get());
@@ -320,7 +320,8 @@ namespace DXLib_ref {
 		}
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept {
-			if (true) {
+			auto* OptionParts = OPTION::Instance();
+			if (OptionParts->Get_MotionBlur()) {
 				GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen([&]() {
 					TargetGraph->DrawGraph(0, 0, false);
 				});
@@ -440,6 +441,196 @@ namespace DXLib_ref {
 			}
 		}
 	};
+
+	class PostPassDistortion : public PostPassBase {
+	private:
+		GraphHandle	BufScreen;
+	public:
+		PostPassDistortion(void) {
+			auto* DrawParts = DXDraw::Instance();
+			BufScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+		}
+		~PostPassDistortion(void) {
+			BufScreen.Dispose();
+		}
+	private:
+		// 画面を歪ませながら描画する関数
+		void DrawCircleScreen(
+			int CenterX,			// 円の中心座標X
+			int CenterY,			// 円の中心座標Y
+			float Radius,			// 円のサイズ
+			float Absorption,		// 内側の円に引き込まれるドット数
+			const GraphHandle& ScreenHandle// 画面グラフィックハンドル
+		)
+		{
+			auto* DrawParts = DXDraw::Instance();
+			const int CIRCLE_ANGLE_VERTEX_NUM = 16;			// 円周の頂点数
+			const int CIRCLE_RADIUS_VERTEX_NUM = 8;			// 半径の頂点数
+
+			float CenterDistance;
+			float GraphCenterDistance;
+			float AbsorptionDistance;
+			float AbsorptionMoveX, AbsorptionMoveY;
+			float Angle;
+			float Sin, Cos;
+			COLOR_U8 DiffuseColor;
+			int i;
+			VERTEX2D *Vert;
+			WORD *Ind;
+			float AngleCosTable[CIRCLE_ANGLE_VERTEX_NUM];
+			float AngleSinTable[CIRCLE_ANGLE_VERTEX_NUM];
+			float InCircleCosTable[CIRCLE_RADIUS_VERTEX_NUM];
+
+			// スタックに積むには大きいので static 配列にしました
+			static VERTEX2D Vertex[CIRCLE_RADIUS_VERTEX_NUM * CIRCLE_ANGLE_VERTEX_NUM];
+			static WORD Index[CIRCLE_ANGLE_VERTEX_NUM * 6 * (CIRCLE_RADIUS_VERTEX_NUM - 1)];
+
+			// 最初に普通に描画
+			DrawGraph(0, 0, ScreenHandle.get(), FALSE);
+
+			// 描画カラーを作成しておく
+			DiffuseColor = GetColorU8(255, 255, 255, 255);
+
+			// 外周部分用の Sin, Cos テーブルを作成する
+			Angle = 0.0f;
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM)
+			{
+				AngleSinTable[i] = (float)sin((double)Angle);
+				AngleCosTable[i] = (float)cos((double)Angle);
+			}
+
+			// 内側の盛り上がっているように見せる箇所で使用する Cos テーブルを作成する
+			Angle = 0.0f;
+			for (i = 0; i < CIRCLE_RADIUS_VERTEX_NUM; i++, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1))
+			{
+				InCircleCosTable[i] = (float)cos((double)Angle);
+			}
+
+			// ポリゴン頂点インデックスの準備
+			Ind = Index;
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++)
+			{
+				for (WORD j = 0; j < CIRCLE_RADIUS_VERTEX_NUM - 1; j++, Ind += 6)
+				{
+					Ind[0] = (WORD)(i * CIRCLE_RADIUS_VERTEX_NUM + j);
+					Ind[1] = Ind[0] + 1;
+					if (i == CIRCLE_ANGLE_VERTEX_NUM - 1)
+					{
+						Ind[2] = j;
+						Ind[3] = j + 1;
+					}
+					else
+					{
+						Ind[2] = Ind[0] + CIRCLE_RADIUS_VERTEX_NUM;
+						Ind[3] = Ind[0] + 1 + CIRCLE_RADIUS_VERTEX_NUM;
+					}
+					Ind[4] = Ind[2];
+					Ind[5] = Ind[1];
+				}
+			}
+
+			// バイリニア補間描画にする
+			SetDrawMode(DX_DRAWMODE_BILINEAR);
+
+
+			// 外側のドーナツ部分を描画
+
+			// 中心に向かうにしたがって中心方向にテクスチャ座標をずらす
+			Vert = Vertex;
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++)
+			{
+				// 使用する Sin, Cos の値をセット
+				Sin = AngleSinTable[i];
+				Cos = AngleCosTable[i];
+
+				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; j++, Vert++)
+				{
+					// 円の中心までの距離を算出
+					CenterDistance = Radius;
+
+					// 中心に引き込まれる距離を算出
+					AbsorptionDistance = Absorption * j / (CIRCLE_RADIUS_VERTEX_NUM - 1);
+
+					// 中心に向かって移動する距離を算出
+					AbsorptionMoveX = Cos * AbsorptionDistance;
+					AbsorptionMoveY = Sin * AbsorptionDistance;
+
+					// スクリーン座標の決定
+					Vert->pos.x = Cos * CenterDistance + CenterX;
+					Vert->pos.y = Sin * CenterDistance + CenterY;
+					Vert->pos.z = 0.0f;
+
+					// テクスチャ座標のセット
+					Vert->u = (Vert->pos.x + AbsorptionMoveX) / DrawParts->m_DispXSize;
+					Vert->v = (Vert->pos.y + AbsorptionMoveY) / DrawParts->m_DispYSize;
+
+					// その他のパラメータをセット
+					Vert->rhw = 1.0f;
+					Vert->dif = DiffuseColor;
+				}
+			}
+
+			// 歪んだドーナツの描画
+			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
+
+
+			// 内側の盛り上がっているように見える部分を描画
+
+			// Cosテーブルにしたがってテクスチャ座標をずらす
+			Vert = Vertex;
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++)
+			{
+				// 使用する Sin, Cos の値をセット
+				Sin = AngleSinTable[i];
+				Cos = AngleCosTable[i];
+
+				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; j++, Vert++)
+				{
+					// 円の中心までの距離を算出
+					CenterDistance = InCircleCosTable[j] * Radius;
+
+					// 画像座標視点での円の中心までの距離を算出
+					GraphCenterDistance = ((CIRCLE_RADIUS_VERTEX_NUM - 1) - j) * (Absorption + Radius) / (CIRCLE_RADIUS_VERTEX_NUM - 1);
+
+					// スクリーン座標の決定
+					Vert->pos.x = Cos * CenterDistance + CenterX;
+					Vert->pos.y = Sin * CenterDistance + CenterY;
+					Vert->pos.z = 0.0f;
+
+					// テクスチャ座標のセット
+					Vert->u = (Cos * GraphCenterDistance + CenterX) / DrawParts->m_DispXSize;
+					Vert->v = (Sin * GraphCenterDistance + CenterY) / DrawParts->m_DispYSize;
+
+					// その他のパラメータをセット
+					Vert->rhw = 1.0f;
+					Vert->dif = DiffuseColor;
+				}
+			}
+
+			// 中心の盛り上がって見える部分を描画
+			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
+		}
+	public:
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept {
+			auto* DrawParts = DXDraw::Instance();
+
+			BufScreen.SetDraw_Screen();
+			{
+				TargetGraph->DrawGraph(0, 0, true);
+			}
+
+			TargetGraph->SetDraw_Screen();
+			{
+				// 画面を歪ませて描画
+				DrawCircleScreen(
+					DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2,	// 中心座標
+					(float)(DrawParts->m_DispXSize * 2 / 3),	// 円のサイズ
+					120.0f,	// 内側に引き込まれるドット数
+					BufScreen);
+				//BufScreen.DrawGraph(0, 0, true);
+			}
+		}
+	};
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -472,11 +663,13 @@ namespace DXLib_ref {
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
 		m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
+		m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
 		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
 		m_PostPass.emplace_back(std::make_unique<PostPassMotionBlur>());
 		m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
 		m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
+		
 		for (auto& P : m_PostPass) {
 			P->SetPtr(&NormalScreen, &DepthScreen);
 		}
@@ -492,6 +685,13 @@ namespace DXLib_ref {
 		//nearに描画
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
+		//全ての画面を初期化
+		{
+			NormalScreen.SetDraw_Screen();//リセット替わり
+			DepthScreen.SetDraw_Screen();//リセット替わり
+			FarScreen_.SetDraw_Screen();//リセット替わり
+			NearScreen_.SetDraw_Screen();//リセット替わり
+		}
 		//Gバッファに描画
 		auto G_Draw = [&](GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done) {
 			// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
@@ -510,15 +710,8 @@ namespace DXLib_ref {
 			SetRenderTargetToShader(2, -1);
 			//SetRenderTargetToShader(3, -1);
 		};
-		//全ての画面を初期化
-		{
-			NormalScreen.SetDraw_Screen();//リセット替わり
-			DepthScreen.SetDraw_Screen();//リセット替わり
-			FarScreen_.SetDraw_Screen();//リセット替わり
-			NearScreen_.SetDraw_Screen();//リセット替わり
-		}
 		//空
-		G_Draw(&FarScreen_, 10000.0f, 50000.0f, [&]() {
+		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() {
 			sky_doing();
 		});
 		//遠距離
@@ -578,13 +771,16 @@ namespace DXLib_ref {
 		MAIN_Screen.SetDraw_Screen();
 		{
 			NearScreen_.DrawGraph(0, 0, false);
-
-			//NormalScreen.DrawExtendGraph(0, 0, 960, 540, false);
-			//DepthScreen.DrawExtendGraph(0, 0, 960, 540, false);
 		}
 	}
 	//
 	void PostPassEffect::SetPostpassEffect(void) noexcept {
+		//色味補正
+		{
+			int output_low = 0;
+			int output_high = 255;
+			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
+		}
 		//bufに描画
 		for (auto& P : m_PostPass) {
 			ColorScreen.SetDraw_Screen();
@@ -593,21 +789,13 @@ namespace DXLib_ref {
 			}
 			P->SetEffect(&NearScreen_,&ColorScreen);
 		}
-		//色味補正
-		{
-			int input_low = 20;
-			int input_high = 255;
-			float gamma = 1.1f;
-			int output_low = 0;
-			int output_high = 255;
-			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, input_low, input_high, int(gamma * 100), output_low, output_high);
-		}
 		//結果描画
 		MAIN_Screen.SetDraw_Screen();
 		{
 			SetDrawBright(r_brt, g_brt, b_brt);
 			NearScreen_.DrawGraph(0, 0, false);
 			SetDrawBright(255, 255, 255);
+			
 			//NormalScreen.DrawExtendGraph(0, 0, 960, 540, false);
 			//DepthScreen.DrawExtendGraph(0, 0, 960, 540, false);
 		}

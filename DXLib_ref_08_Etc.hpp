@@ -74,6 +74,10 @@ namespace DXLib_ref {
 	static bool GetHitCapsuleToTriangle(const VECTOR_ref& startpos, const VECTOR_ref& endpos, float size, const VECTOR_ref& tri_p1, const VECTOR_ref& tri_p2, const VECTOR_ref& tri_p3) {
 		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
+	//直線と直線の一番近い距離
+	static float GetMinLenSegmentToSegment(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgtstartpos, const VECTOR_ref& tgtendpos) {
+		return Segment_Segment_MinLength(startpos.get(), endpos.get(), tgtstartpos.get(), tgtendpos.get());
+	}
 	//直線と点の一番近い点
 	static float GetMinLenSegmentToPoint(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgt) {
 		return Segment_Point_MinLength(startpos.get(), endpos.get(), tgt.get());
@@ -82,6 +86,7 @@ namespace DXLib_ref {
 	static VECTOR_ref GetMinPosSegmentToPoint(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgt) {
 		return Plane_Point_MinLength_Position(startpos.get(), endpos.get(), tgt.get());
 	}
+
 	//ランダム
 	static float GetRandf(float m_arg) noexcept { return -m_arg + (float)(GetRand((int)(m_arg * 2.f * 10000.f))) / 10000.f; }
 	//線分同士の交差判定
@@ -333,8 +338,8 @@ namespace DXLib_ref {
 	//モデルのフレーム情報保持
 	class frames {
 		int			m_FrameID{ -1 };
-		VECTOR_ref	m_WorldPos;
-		VECTOR_ref	m_LocalPos;
+		MATRIX_ref	m_WorldPos;
+		MATRIX_ref	m_LocalPos;
 	public:
 		void			operator=(const frames& tgt) noexcept {
 			this->m_FrameID = tgt.m_FrameID;
@@ -343,12 +348,12 @@ namespace DXLib_ref {
 		}
 		void			Set(int i, const MV1& obj) noexcept {
 			m_FrameID = i;
-			m_WorldPos = obj.frame(i);
+			m_WorldPos = obj.GetFrameLocalWorldMatrix(i);
 			if (obj.frame_parent(i) >= 0) {
-				m_LocalPos = obj.frame(i) - obj.frame((int)obj.frame_parent(i));
+				m_LocalPos = obj.GetFrameLocalMatrix(i);
 			}
 			else {
-				m_LocalPos = obj.frame(i);//
+				m_LocalPos = obj.GetFrameLocalWorldMatrix(i);//
 			}
 		}
 		const auto&		GetFrameID() const noexcept { return m_FrameID; }

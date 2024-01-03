@@ -65,27 +65,29 @@ namespace DXLib_ref {
 	}
 	//
 	bool SceneControl::Execute(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		SetisUpdateFarShadow(this->m_ScenesPtr->GetisUpdateFarShadow());
 #ifdef DEBUG
 		//auto* DebugParts = DebugClass::Instance();
 #endif // DEBUG
+		auto* DrawParts = DXDraw::Instance();
+		//
+		SetisUpdateFarShadow(this->m_ScenesPtr->GetisUpdateFarShadow());
 		//更新
 		auto SelEnd = !this->m_ScenesPtr->Update();
 		m_SelEnd = this->m_ScenesPtr->GetisEnd();
 		//音位置指定
 		Set3DSoundListenerPosAndFrontPosAndUpVec(DrawParts->SetMainCamera().GetCamPos().get(), DrawParts->SetMainCamera().GetCamVec().get(), DrawParts->SetMainCamera().GetCamUp().get());
 		//
-		DXDraw::Instance()->Execute();
+		DrawParts->Execute();
 		OptionWindowClass::Instance()->Execute();
 		//
 		return SelEnd || m_SelEnd;
 	}
 	//描画
 	void SceneControl::Draw(void) noexcept {
-		if (!this->m_ScenesPtr->GetIsUpdateDraw()) { return; }
 		auto* DrawParts = DXDraw::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
+		EffectResource::Instance()->Calc(DrawParts->IsPause());//エフェクシアのアプデを60FPS相当に変更
+		if (!this->m_ScenesPtr->GetIsUpdateDraw()) { return; }
 		//影をセット
 		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw(); },
 			DrawParts->SetMainCamera().GetCamPos() + this->m_ScenesPtr->GetNearShadowMax(),
@@ -134,18 +136,25 @@ namespace DXLib_ref {
 				}
 			},
 			[&]() { this->m_ScenesPtr->DrawUI_Base(); },
-			[&]() { this->m_ScenesPtr->DrawUI_In(); }
+			[&]() {
+				if (DXDraw::Instance()->IsPause()) {
+					//
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.5f), 0, 255));
+					DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+					//
+					if (m_PauseFlashCount > 0.5f) {
+						auto* Fonts = FontPool::Instance();
+						Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
+					}
+					m_PauseFlashCount += 1.f / GetFPS();
+					if (m_PauseFlashCount > 1.f) { m_PauseFlashCount = 0.f; }
+				}
+				this->m_ScenesPtr->DrawUI_In();
+			}
 		);
 		OptionWindowClass::Instance()->Draw();
 		KeyGuideClass::Instance()->Draw();
-		if (DXDraw::Instance()->IsPause()) {
-			if (m_PauseFlashCount > 0.5f) {
-				auto* Fonts = FontPool::Instance();
-				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
-			}
-			m_PauseFlashCount += 1.f / GetFPS();
-			if (m_PauseFlashCount > 1.f) { m_PauseFlashCount = 0.f; }
-		}
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {

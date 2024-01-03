@@ -21,7 +21,7 @@ namespace DXLib_ref {
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
-		SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
+		//SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->Get_Vsync() ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
@@ -92,6 +92,22 @@ namespace DXLib_ref {
 		DxLib_End();
 	}
 	//
+	void			DXDraw::PauseIn() noexcept {
+		if (!IsPause()) {
+			m_PauseActive.Execute(true);
+			auto* Pad = PadControl::Instance();
+			Pad->SetGuideUpdate();
+		}
+	}
+	//
+	void			DXDraw::PauseExit() noexcept {
+		if (IsPause()) {
+			m_PauseActive.Execute(true);
+			auto* Pad = PadControl::Instance();
+			Pad->SetGuideUpdate();
+		}
+	}
+	//
 	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& MaxPos, const VECTOR_ref& MinPos, int shadowSelect) noexcept {
 		if (OPTION::Instance()->Get_Shadow()) {
 			m_Shadow[shadowSelect].Update(doing, MaxPos, MinPos);
@@ -114,6 +130,16 @@ namespace DXLib_ref {
 		}
 		auto* Pad = PadControl::Instance();
 		m_PauseActive.Execute(Pad->GetOptionKey().press());
+		if (m_SendCamShakeTime > 0.f) {
+			if (m_SendCamShake) {
+				m_SendCamShake = false;
+				this->m_CamShake = m_SendCamShakeTime;
+			}
+			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
+			Easing(&this->m_CamShake1, VECTOR_ref::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
+			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
+			this->m_CamShake = std::max(this->m_CamShake - 1.f / GetFPS(), 0.f);
+		}
 	}
 	void			DXDraw::Draw(
 		std::function<void(const Camera3DInfo&)> doing,
