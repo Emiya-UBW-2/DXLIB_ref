@@ -20,8 +20,7 @@ namespace DXLib_ref {
 		);
 	}
 	bool TEMPSCENE::Update() noexcept {
-		auto* Pad = PadControl::Instance();
-		Pad->Execute();
+		PadControl::Instance()->Execute();
 		//環境光と影の初期化
 		auto* DrawParts = DXDraw::Instance();
 		DrawParts->SetAmbientLight(GetLightVec(), GetLightColorF());
@@ -52,7 +51,6 @@ namespace DXLib_ref {
 	//開始
 	void SceneControl::StartScene(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		auto* Pad = PadControl::Instance();
 		SetUseMaskScreenFlag(FALSE);//←一部画面でエフェクトが出なくなるため入れる
 		this->m_ScenesPtr->Set();
 		//遠影をセット
@@ -61,7 +59,7 @@ namespace DXLib_ref {
 			this->m_ScenesPtr->GetFarShadowMax(), this->m_ScenesPtr->GetFarShadowMin(),
 			2);
 		this->m_SelEnd = false;
-		Pad->SetGuideUpdate();
+		PadControl::Instance()->SetGuideUpdate();
 	}
 	//
 	bool SceneControl::Execute(void) noexcept {
@@ -112,7 +110,13 @@ namespace DXLib_ref {
 						this->m_ScenesPtr->MainDraw();
 						//何か描画する必要のあるものができたら修正して有効に
 						//PostPassParts->DrawByDepth([&] { this->m_ScenesPtr->MainDrawbyDepth(); });
-					}, cams);					//描画
+					},
+					[&]() {
+						this->m_ScenesPtr->MainDrawFront();
+						//何か描画する必要のあるものができたら修正して有効に
+						//PostPassParts->DrawByDepth([&] { this->m_ScenesPtr->MainDrawbyDepth(); });
+					},
+					cams);					//描画
 				//完成した画面に対して後処理の2Dシェーダーを反映
 				if (this->m_ScenesPtr->is_lens()) {
 					//レンズ
@@ -154,13 +158,14 @@ namespace DXLib_ref {
 			}
 		);
 		OptionWindowClass::Instance()->Draw();
-		KeyGuideClass::Instance()->Draw();
+		PadControl::Instance()->Draw();
+		DrawParts->DrawEscWindow();
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {
 		this->m_ScenesPtr->Dispose();							//解放
 		this->m_ScenesPtr = this->m_ScenesPtr->Get_Next();		//遷移
-		KeyGuideClass::Instance()->Reset();
+		PadControl::Instance()->Dispose();
 	}
 	//
 };

@@ -416,17 +416,18 @@ namespace DXLib_ref {
 			}
 		};
 	private:
-		std::array<std::pair<int, std::array<EffectS, 256 + 1>>, (int)EffectResource::Effect::effects> m_effect;//エフェクト
+		static const int EffectNum = 16;
+		std::array<std::pair<int, std::array<EffectS, EffectNum + 1>>, (int)EffectResource::Effect::effects> m_effect;//エフェクト
 	public:
 		//複数エフェクトの再生
 		void		SetOnce_Any(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
 			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
 			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetEffectSpeed(speed);
-			++this->m_effect[(int)ID].first %= 256;
+			++this->m_effect[(int)ID].first %= EffectNum;
 		}
 		const auto	CheckEffectCount(void) const noexcept {
 			int cnt = 0;
-			for (int i = 0; i < 256; i++) {
+			for (int i = 0; i < EffectNum; i++) {
 				for (auto& t : this->m_effect[i].second) {
 					if (t.GetIsPlaying()) { cnt++; }
 				}
@@ -435,21 +436,21 @@ namespace DXLib_ref {
 		}
 		//単体で制御したいエフェクトの制御
 		const auto	CheckPlayEffect(EffectResource::Effect ID) const noexcept {
-			return this->m_effect[(int)ID].second[256].GetIsPlaying();
+			return this->m_effect[(int)ID].second[EffectNum].GetIsPlaying();
 		}
 		void		SetLoop(EffectResource::Effect ID, const VECTOR_ref& pos_t) noexcept {
-			this->m_effect[(int)ID].second[256].SetLoop(EffectResource::Instance()->effsorce.at((int)ID), pos_t);
+			this->m_effect[(int)ID].second[EffectNum].SetLoop(EffectResource::Instance()->effsorce.at((int)ID), pos_t);
 		}
 		void		Update_LoopEffect(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect[(int)ID].second[256].SetParam(pos_t, nomal_t, scale);
+			this->m_effect[(int)ID].second[EffectNum].SetParam(pos_t, nomal_t, scale);
 		}
 		void		SetOnce(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect[(int)ID].second[256].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
+			this->m_effect[(int)ID].second[EffectNum].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
 		}
-		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect[(int)ID].second[256].StopEffect(); }
-		void		SetEffectSpeed(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[256].SetEffectSpeed(value); }
-		void		SetEffectScale(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[256].SetEffectScale(value); }
-		void		SetEffectColor(EffectResource::Effect ID, int r, int g, int b, int a) noexcept { this->m_effect[(int)ID].second[256].SetEffectColor(r, g, b, a); }
+		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect[(int)ID].second[EffectNum].StopEffect(); }
+		void		SetEffectSpeed(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectSpeed(value); }
+		void		SetEffectScale(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectScale(value); }
+		void		SetEffectColor(EffectResource::Effect ID, int r, int g, int b, int a) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectColor(r, g, b, a); }
 		//全体の更新
 		void		Init(void) noexcept {
 			for (auto& ef : this->m_effect) {

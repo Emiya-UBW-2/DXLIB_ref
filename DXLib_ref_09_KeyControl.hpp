@@ -2,94 +2,674 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
+	//--------------------------------------------------------------------------------------------------
+	//
+	//--------------------------------------------------------------------------------------------------
+
 	enum class ControlType :int {
 		PS4,
 		PC,
 	};
 
+	enum class PADS :int {
+		MOVE_W,
+		MOVE_A,
+		MOVE_S,
+		MOVE_D,
+		MOVE_STICK,
+		DIR_UP,
+		DIR_DOWN,
+		DIR_LEFT,
+		DIR_RIGHT,
+		DIR_STICK,
+		LEAN_L,
+		LEAN_R,
+		RELOAD,
+		INTERACT,
+		THROW,
+		MELEE,
+		JUMP,
+		INVENTORY,
+		RUN,
+		WALK,
+		SHOT,
+		AIM,
+		ULT,
+		SQUAT,
+		PRONE,
+		CHECK,
+
+		MAX,
+	};
+	static const char* PADSStr[(int)PADS::MAX] = {
+		"MOVE_W",
+		"MOVE_A",
+		"MOVE_S",
+		"MOVE_D",
+		"MOVE_STICK",
+		"DIR_UP",
+		"DIR_DOWN",
+		"DIR_LEFT",
+		"DIR_RIGHT",
+		"DIR_STICK",
+		"LEAN_L",
+		"LEAN_R",
+		"RELOAD",
+		"INTERACT",
+		"THROW",
+		"MELEE",
+		"JUMP",
+		"INVENTORY",
+		"RUN",
+		"WALK",
+		"SHOT",
+		"AIM",
+		"ULT",
+		"SQUAT",
+		"PRONE",
+		"CHECK",
+	};
+
+	static const int KeyNum = 109 + 3;
+	static const int KeyID[KeyNum] = {
+		KEY_INPUT_BACK,
+		KEY_INPUT_TAB,
+		KEY_INPUT_RETURN,
+
+		KEY_INPUT_LSHIFT,
+		KEY_INPUT_RSHIFT,
+		KEY_INPUT_LCONTROL,
+		KEY_INPUT_RCONTROL,
+		KEY_INPUT_ESCAPE,
+		KEY_INPUT_SPACE,
+		KEY_INPUT_PGUP,
+		KEY_INPUT_PGDN,
+		KEY_INPUT_END,
+		KEY_INPUT_HOME,
+		KEY_INPUT_LEFT,
+		KEY_INPUT_UP,
+		KEY_INPUT_RIGHT,
+		KEY_INPUT_DOWN,
+		KEY_INPUT_INSERT,
+		KEY_INPUT_DELETE,
+
+		KEY_INPUT_MINUS,
+		KEY_INPUT_YEN,
+		KEY_INPUT_PREVTRACK,
+		KEY_INPUT_PERIOD,
+		KEY_INPUT_SLASH,
+		KEY_INPUT_LALT,
+		KEY_INPUT_RALT,
+		KEY_INPUT_SCROLL,
+		KEY_INPUT_SEMICOLON,
+		KEY_INPUT_COLON,
+		KEY_INPUT_LBRACKET,
+		KEY_INPUT_RBRACKET,
+		KEY_INPUT_AT,
+		KEY_INPUT_BACKSLASH,
+		KEY_INPUT_COMMA,
+		KEY_INPUT_KANJI,
+		KEY_INPUT_CONVERT,
+		KEY_INPUT_NOCONVERT,
+		KEY_INPUT_KANA,
+		KEY_INPUT_APPS,
+		KEY_INPUT_CAPSLOCK,
+		KEY_INPUT_SYSRQ,
+		KEY_INPUT_PAUSE,
+		KEY_INPUT_LWIN,
+		KEY_INPUT_RWIN,
+
+		KEY_INPUT_NUMLOCK,
+		KEY_INPUT_NUMPAD0,
+		KEY_INPUT_NUMPAD1,
+		KEY_INPUT_NUMPAD2,
+		KEY_INPUT_NUMPAD3,
+		KEY_INPUT_NUMPAD4,
+		KEY_INPUT_NUMPAD5,
+		KEY_INPUT_NUMPAD6,
+		KEY_INPUT_NUMPAD7,
+		KEY_INPUT_NUMPAD8,
+		KEY_INPUT_NUMPAD9,
+		KEY_INPUT_MULTIPLY,
+		KEY_INPUT_ADD,
+		KEY_INPUT_SUBTRACT,
+		KEY_INPUT_DECIMAL,
+		KEY_INPUT_DIVIDE,
+		KEY_INPUT_NUMPADENTER,
+
+		KEY_INPUT_F1,
+		KEY_INPUT_F2,
+		KEY_INPUT_F3,
+		KEY_INPUT_F4,
+		KEY_INPUT_F5,
+		KEY_INPUT_F6,
+		KEY_INPUT_F7,
+		KEY_INPUT_F8,
+		KEY_INPUT_F9,
+		KEY_INPUT_F10,
+		KEY_INPUT_F11,
+		KEY_INPUT_F12,
+
+		KEY_INPUT_A,
+		KEY_INPUT_B,
+		KEY_INPUT_C,
+		KEY_INPUT_D,
+		KEY_INPUT_E,
+		KEY_INPUT_F,
+		KEY_INPUT_G,
+		KEY_INPUT_H,
+		KEY_INPUT_I,
+		KEY_INPUT_J,
+		KEY_INPUT_K,
+		KEY_INPUT_L,
+		KEY_INPUT_M,
+		KEY_INPUT_N,
+		KEY_INPUT_O,
+		KEY_INPUT_P,
+		KEY_INPUT_Q,
+		KEY_INPUT_R,
+		KEY_INPUT_S,
+		KEY_INPUT_T,
+		KEY_INPUT_U,
+		KEY_INPUT_V,
+		KEY_INPUT_W,
+		KEY_INPUT_X,
+		KEY_INPUT_Y,
+		KEY_INPUT_Z,
+
+		KEY_INPUT_0 ,
+		KEY_INPUT_1,
+		KEY_INPUT_2,
+		KEY_INPUT_3,
+		KEY_INPUT_4,
+		KEY_INPUT_5,
+		KEY_INPUT_6,
+		KEY_INPUT_7,
+		KEY_INPUT_8,
+		KEY_INPUT_9,
+
+		MOUSE_INPUT_LEFT | 0xF00,
+		MOUSE_INPUT_RIGHT | 0xF00,
+		MOUSE_INPUT_MIDDLE | 0xF00,
+	};
+	static const char* KeyStr[KeyNum] = {
+		"BACK",
+		"TAB",
+		"RETURN",
+		
+		"LSHIFT",
+		"RSHIFT",
+		"LCONTROL",
+		"RCONTROL",
+		"ESCAPE",
+		"SPACE",
+		"PGUP",
+		"PGDN",
+		"END",
+		"HOME",
+		"LEFT",
+		"UP",
+		"RIGHT",
+		"DOWN",
+		"INSERT",
+		"DELETE",
+		
+		"MINUS",
+		"YEN",
+		"PREVTRACK",
+		"PERIOD",
+		"SLASH",
+		"LALT",
+		"RALT",
+		"SCROLL",
+		"SEMICOLON",
+		"COLON",
+		"LBRACKET",
+		"RBRACKET",
+		"AT",
+		"BACKSLASH",
+		"COMMA",
+		"KANJI",
+		"CONVERT",
+		"NOCONVERT",
+		"KANA",
+		"APPS",
+		"CAPSLOCK",
+		"SYSRQ",
+		"PAUSE",
+		"LWIN",
+		"RWIN",
+		
+		"NUMLOCK",
+		"NUMPAD0",
+		"NUMPAD1",
+		"NUMPAD2",
+		"NUMPAD3",
+		"NUMPAD4",
+		"NUMPAD5",
+		"NUMPAD6",
+		"NUMPAD7",
+		"NUMPAD8",
+		"NUMPAD9",
+		"MULTIPLY",
+		"ADD",
+		"SUBTRACT",
+		"DECIMAL",
+		"DIVIDE",
+		"NUMPADENTER",
+		
+		"F1",
+		"F2",
+		"F3",
+		"F4",
+		"F5",
+		"F6",
+		"F7",
+		"F8",
+		"F9",
+		"F10",
+		"F11",
+		"F12",
+		
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+		"I",
+		"J",
+		"K",
+		"L",
+		"M",
+		"N",
+		"O",
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"U",
+		"V",
+		"W",
+		"X",
+		"Y",
+		"Z",
+		
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+
+		"LMOUSE",
+		"RMOUSE",
+		"WMOUSE",
+	};
+	static const char* KeyGuidePath[KeyNum] = {
+		"BackSpace",
+		"Tab",
+		"Enter",
+
+		"Shift",
+		"Shift",
+		"Ctrl",
+		"Ctrl",
+		"ESC",
+		"none",
+		"PageUp",
+		"PageDown",
+		"End",
+		"Home",
+		"hidari",
+		"ue",
+		"migi",
+		"sita",
+		"Ins",
+		"Del",
+
+		"mainasu",
+		"en",
+		"quotation",
+		"period",
+		"slash",
+		"Alt",
+		"Alt",
+		"ScrollLock",
+		"semikoron",
+		"coron",
+		"kakko3",
+		"kakko4",
+		"atto",
+		"backslash",
+		"comma",
+		"kanji",
+		"Henkan",
+		"Muhenkan",
+		"kana",
+		"F",
+		"CapsLock",
+		"PrintScreen",
+		"Pause",
+		"W",
+		"W",
+
+		"NumLock",
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"asutarisku",
+		"purasu",
+		"mainasu",
+		"period",
+		"slash",
+		"Enter",
+
+		"F1",
+		"F2",
+		"F3",
+		"F4",
+		"F5",
+		"F6",
+		"F7",
+		"F8",
+		"F9",
+		"F10",
+		"F11",
+		"F12",
+
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+		"I",
+		"J",
+		"K",
+		"L",
+		"M",
+		"N",
+		"O",
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"U",
+		"V",
+		"W",
+		"X",
+		"Y",
+		"Z",
+
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+
+		"LM",
+		"RM",
+		"MM",
+	};
+
+	static const int DS4Num = 12 - 1 + 2 + 4;
+	static const int DS4ID[DS4Num] = {
+		0,
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		9,
+		10,
+		11,
+		0xF001,
+		0xF002,
+		0xF010,
+		0xF020,
+		0xF040,
+		0xF080,
+	};
+	static const char* DS4Str[DS4Num] = {
+		"SQUARE",
+		"NG",
+		"OK",
+		"TRIANGLE",
+		"L1",
+		"R1",
+		"L2",
+		"R2",
+		"OPTION",
+		"L3",
+		"R3",
+		"LSTICK",
+		"RSTICK",
+		"LEFT",
+		"UP",
+		"RIGHT",
+		"DOWN",
+	};
+	static const char* DS4GuidePath[DS4Num] = {
+		"square",
+		"ng",
+		"ok",
+		"triangle",
+		"L1",
+		"R1",
+		"L2",
+		"R2",
+		"option",
+		"L_stick",
+		"R_stick",
+		"L_stick",
+		"R_stick",
+		"direction",
+		"direction",
+		"direction",
+		"direction",
+	};
+
+	//--------------------------------------------------------------------------------------------------
+	//
+	//--------------------------------------------------------------------------------------------------
+
 	class PadControl : public SingletonBase<PadControl> {
 	private:
 		friend class SingletonBase<PadControl>;
 	private:
-		switchs m_OptionKey;
-		//左スティック
-		switchs Move_UpKey;
-		switchs Move_DownKey;
-		switchs Move_LeftKey;
-		switchs Move_RightKey;
-		switchs m_Move_Run;
-		//右スティック
-		float Look_XradAdd{ 0.f };
-		float Look_YradAdd{ 0.f };
-		switchs m_Look_On;				//フリールック
-		//L1R1L2R2
-		switchs m_QKey;
-		switchs m_EKey;
-		switchs m_ADSKey;
-		switchs m_ShotKey;
-		//ボタン
-		switchs OKKey;
-		switchs NGKey;
-		switchs m_AccelKey;
-		switchs m_BrakeKey;
-		//ガイド等のコントロール
-		bool		m_IsUpdate{ true };
-		ControlType	m_ControlType{ ControlType::PC };
-	private:
-		PadControl() {
-			m_IsUpdate = true;
-		}
-		~PadControl() {}
-	public:
-		void SetGuideUpdate() noexcept { m_IsUpdate = true; }
-	public:
-		//
-		const auto& GetOptionKey() const noexcept { return m_OptionKey; }
-		//
-		const auto& GetUpKey() const noexcept { return Move_UpKey; }
-		const auto& GetDownKey() const noexcept { return Move_DownKey; }
-		const auto& GetLeftKey() const noexcept { return Move_LeftKey; }
-		const auto& GetRightKey() const noexcept { return Move_RightKey; }
-		const auto& GetRunKey() const noexcept { return m_Move_Run; }
-		//
-		const auto& GetLS_X() const noexcept { return Look_XradAdd; }
-		const auto& GetLS_Y() const noexcept { return Look_YradAdd; }
-		const auto& GetFreeLook() const noexcept { return m_Look_On; }
-		//
-		const auto& GetQKey() const noexcept { return m_QKey; }
-		const auto& GetEKey() const noexcept { return m_EKey; }
-		const auto& GetLookKey() const noexcept { return m_ADSKey; }
-		const auto& GetShotKey() const noexcept { return m_ShotKey; }
-		//
-		const auto& GetOKKey() const noexcept { return OKKey; }
-		const auto& GetNGKey() const noexcept { return NGKey; }
-		const auto& GetAccelKey() const noexcept { return m_AccelKey; }
-		const auto& GetBrakeKey() const noexcept { return m_BrakeKey; }
-		//
-	public:
-		void Execute(void) noexcept;
-		void ChangeGuide(std::function<void()>Guide_Pad_PS4, std::function<void()>Guide_Key) noexcept;
-	};
-
-	class KeyGuideClass : public SingletonBase<KeyGuideClass> {
-	private:
-		friend class SingletonBase<KeyGuideClass>;
-	private:
-		class Keys {
+		class KeyGuideGraphs {
 		public:
 			int xsize{ 0 }, ysize{ 0 };
 			GraphHandle GuideImg;
 			std::string GuideString;
 		public:
-			void AddGuide(std::string_view ImgName, std::string_view GuideStr) noexcept;
-			void Reset() noexcept;
+			void AddGuidePC(int ID, std::string_view GuideStr) noexcept;
+			void AddGuideDS4(int ID, std::string_view GuideStr) noexcept;
+			void Reset() noexcept {
+				GuideImg.Dispose();
+				GuideString = "";
+			}
 			int Draw(int x, int y) const noexcept;
 		};
+
+		class PadsInfo {
+		public:
+			switchs m_Key;
+			int		m_assign = 0;
+			int		m_reserve = 0;
+		};
 	private:
-		std::vector<std::unique_ptr<Keys>>	Key;
+		//ボタン
+		std::array<PadsInfo, (int)PADS::MAX> m_PadsInfo;
+		//右スティック
+		float Look_XradAdd{ 0.f };
+		float Look_YradAdd{ 0.f };
+		//
+		int MouseX{ 0 };
+		int MouseY{ 0 };
+		switchs MouseClick;
+		switchs KeyEsc;
+		//ガイド等のコントロール
+		bool		m_IsUpdate{ true };
+		bool		m_MouseMoveEnable{ true };
+		ControlType	m_ControlType{ ControlType::PC };
+	private:
+		std::vector<std::unique_ptr<KeyGuideGraphs>>	Key;
 	public:
-		void Reset(void) noexcept;
-		void AddGuide(std::string_view ImgName, std::string_view GuideStr) noexcept;
+		const std::string	GetIDtoStr(int ID) const noexcept {
+			switch (m_ControlType) {
+			case DXLib_ref::ControlType::PS4:
+				for (int i = 0; i < DS4Num; i++) {
+					if (DS4ID[i] == ID) {
+						return DS4Str[i];
+					}
+				}
+				break;
+			case DXLib_ref::ControlType::PC:
+				for (int i = 0; i < KeyNum; i++) {
+					if (KeyID[i] == ID) {
+						return KeyStr[i];
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			return "NONE";
+		};
+	private:
+		const int			GetStrtoID(const char* Str) const noexcept {
+			switch (m_ControlType) {
+			case DXLib_ref::ControlType::PS4:
+				for (int i = 0; i < DS4Num; i++) {
+					if (strcmpDx(DS4Str[i], Str) == 0) {
+						return DS4ID[i];
+					}
+				}
+				break;
+			case DXLib_ref::ControlType::PC:
+				for (int i = 0; i < KeyNum; i++) {
+					if (strcmpDx(KeyStr[i], Str) == 0) {
+						return KeyID[i];
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			return -1;
+		}
+		const char*			GetSavePath() const noexcept {
+			switch (m_ControlType) {
+			case DXLib_ref::ControlType::PS4:
+				return "data/KeyConfig_DS4.txt";
+			case DXLib_ref::ControlType::PC:
+				return "data/KeyConfig_PC.txt";
+			default:
+				break;
+			}
+			return "NONE";
+		};
+		void				Reset(void) noexcept {
+			for (auto& k : Key) {
+				k->Reset();
+				k.reset();
+			}
+			Key.clear();
+		}
+	private:
+		PadControl() {
+			m_IsUpdate = true;
+			m_MouseMoveEnable = false;
+			Load();
+		}
+		~PadControl() {}
+	public:
+		const auto& GetLS_X() const noexcept { return Look_XradAdd; }
+		const auto& GetLS_Y() const noexcept { return Look_YradAdd; }
+
+		const auto& GetMS_X() const noexcept { return MouseX; }
+		const auto& GetMS_Y() const noexcept { return MouseY; }
+		const auto& GetMouseClick() const noexcept { return MouseClick; }
+		const auto& GetEsc() const noexcept { return KeyEsc; }
+
+		auto& GetKey(PADS select) noexcept { return m_PadsInfo[(int)select].m_Key; }
+		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo[(int)select].m_Key; }
+		const auto GetKeyassign(PADS select) const noexcept { return m_PadsInfo[(int)select].m_assign; }
+		const auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo[(int)select].m_assign); }
+
+		const auto GetKeyReserve(PADS select) const noexcept { return m_PadsInfo[(int)select].m_reserve; }
+		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo[(int)select].m_reserve = assign; }
+
+		const bool GetButtonPress(int ID);
+		void GetPushAnySwitch(PADS select);
+
+		const bool GetPushAnySwitchLocal(PADS select, int ID);
+	public:
+		void SetMouseMoveEnable(bool value) noexcept { m_MouseMoveEnable = value; }
+		void SetGuideUpdate() noexcept { m_IsUpdate = true; }
+
+		void Save(void) noexcept;
+		void Load(void) noexcept;
+
+		void ResetAssign(void) noexcept;
+		void FlipAssign(void) noexcept;
+
+		void ChangeGuide(std::function<void()>Guide_Pad) noexcept;
+
+		void AddGuide(PADS select, std::string_view GuideStr) noexcept {
+			Key.resize(Key.size() + 1);
+			Key.back() = std::make_unique<KeyGuideGraphs>();
+			switch (m_ControlType) {
+			case DXLib_ref::ControlType::PS4:
+				for (int i = 0; i < DS4Num; i++) {
+					if (DS4ID[i] == m_PadsInfo[(int)select].m_assign) {
+						Key.back()->AddGuideDS4(i, GuideStr);
+						return;
+					}
+				}
+				break;
+			case DXLib_ref::ControlType::PC:
+				for (int i = 0; i < KeyNum; i++) {
+					if (KeyID[i] == m_PadsInfo[(int)select].m_assign) {
+						Key.back()->AddGuidePC(i, GuideStr);
+						return;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			Key.back()->AddGuidePC(-1, GuideStr);
+		}
+	public:
+		void Execute(void) noexcept;
 		void Draw() const noexcept;
+		void Dispose(void) noexcept;
 	};
 };

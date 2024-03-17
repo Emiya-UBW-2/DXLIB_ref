@@ -89,7 +89,7 @@ namespace DXLib_ref {
 		~PostPassEffect(void) noexcept;
 	public:
 		//
-		void Draw(std::function<void()> sky_doing, std::function<void()> doing, const Camera3DInfo& cams);
+		void Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
 		//
 		void Plus_Draw(std::function<void()> doing) noexcept;
 		//

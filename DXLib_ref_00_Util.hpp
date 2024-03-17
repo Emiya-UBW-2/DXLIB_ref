@@ -197,11 +197,14 @@ namespace DXLib_ref {
 	class switchs {
 		bool		m_on{ false };//オンオフ判定
 		bool		m_press{ false };//オンオフ判定
+		bool		m_repeat{ false };//オンオフ判定
 		int8_t		m_presscount{ 0 };//プッシュ判定
+		float		m_repeatcount{ 30.f };//プッシュ判定
 	public:
 		switchs(void) noexcept {
 			Set(false);
 			m_presscount = 0;
+			m_repeatcount = 30.f;
 			m_press = false;
 		};
 		~switchs(void) noexcept { }
@@ -212,9 +215,19 @@ namespace DXLib_ref {
 			m_press = key;
 			if (m_press) {
 				m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
+
+				m_repeat = trigger();
+				m_repeatcount -= 60.f / GetFPS();
+				if (m_repeatcount <= 0.f) {
+					m_repeatcount += 2.f;
+					m_repeat = true;
+				}
 			}
 			else {
 				m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
+
+				m_repeat = false;
+				m_repeatcount = 30.f;
 			}
 			if (trigger()) {
 				m_on ^= 1;
@@ -226,6 +239,8 @@ namespace DXLib_ref {
 		const bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
 		//押している間
 		const bool press(void) const noexcept { return m_press; }
+		//押している間
+		const bool repeat(void) const noexcept { return m_repeat; }
 		//離した瞬間
 		const bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
 		//離している間
@@ -280,5 +295,33 @@ namespace DXLib_ref {
 				MessageBox(NULL, "フォント読込削除", "", MB_OK);
 			}
 		}
+	};
+
+	//--------------------------------------------------------------------------------------------------
+	// 2次元振り子演算
+	//--------------------------------------------------------------------------------------------------
+	class Pendulum2D {
+		float	m_PendulumLength = 10.f;
+		float	m_PendulumMass = 2.f;
+		float	m_drag_coeff = 2.02f;
+
+		float	m_rad = deg2rad(12.f);
+		float	m_vel = 0.f;
+	public:
+		void Init(float Length, float N, float rad) {
+			m_PendulumLength = Length;
+			m_PendulumMass = N;
+			m_rad = rad;
+			m_vel = 0.f;
+		}
+
+		void Execute() {
+			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / 60.f;
+			m_rad += this->m_vel / 60.f;
+		}
+
+		const auto GetRad() const noexcept { return this->m_rad; }
+
+		void AddRad(float value) noexcept { this->m_rad += value; }
 	};
 }

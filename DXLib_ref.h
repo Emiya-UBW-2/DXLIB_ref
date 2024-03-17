@@ -56,7 +56,6 @@
 //追加物
 #include "Box2D/Box2D.h"
 #include "json.hpp"
-
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -146,6 +145,11 @@ namespace DXLib_ref {
 		float						m_CamShake{ 0.f };
 		VECTOR_ref					m_CamShake1;
 		VECTOR_ref					m_CamShake2;
+		//
+		float						m_AberrationPower{1.f};
+		//
+		PopUpDrawClass				m_PopUpDrawClass;
+		bool						m_IsEnd{false};
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
@@ -159,6 +163,9 @@ namespace DXLib_ref {
 		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
 
 		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
+
+		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
+		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 	public:
 		void			SetUseShadow(void) noexcept {
 			for (auto& s : m_Shadow) {
@@ -180,7 +187,7 @@ namespace DXLib_ref {
 			this->m_SendCamShakePower = power;
 		}
 	public:
-
+		void			Init(void) noexcept;
 		void			Execute(void) noexcept;
 		void			Draw(
 			std::function<void(const Camera3DInfo&)> doing,
@@ -189,6 +196,8 @@ namespace DXLib_ref {
 		) noexcept;
 		bool			Screen_Flip(void) noexcept;
 
+		bool			UpdateEscWindow(void) noexcept;
+		void			DrawEscWindow(void) noexcept;
 		//VR
 #ifdef _USE_OPENVR_
 	public:

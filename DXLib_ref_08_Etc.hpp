@@ -63,7 +63,6 @@ namespace DXLib_ref {
 		*RetHandle = graphhandle;
 		return true;
 	}
-
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -110,6 +109,10 @@ namespace DXLib_ref {
 		float len = 0.001f;
 		return (Result->Seg_Point_MinDist_Square <= (len*len));
 	}
+
+	//カメラから画面上の座標を取得
+	static VECTOR_ref GetScreenPos(const VECTOR_ref&campos, const VECTOR_ref&camvec, const VECTOR_ref&camup, float fov, float near_t, float far_t, const VECTOR_ref&worldpos) noexcept;
+
 	//--------------------------------------------------------------------------------------------------
 	// ウィンドウアクティブチェック付きキー操作
 	//--------------------------------------------------------------------------------------------------
@@ -367,6 +370,7 @@ namespace DXLib_ref {
 		VECTOR_ref repos;	//前フレームの座標
 		VECTOR_ref vec;		//加速
 		MATRIX_ref mat;		//回転
+		VECTOR_ref rad;		//回転
 
 		const MATRIX_ref MatIn(void) const noexcept { return mat * MATRIX_ref::Mtrans(pos); }
 
@@ -375,7 +379,34 @@ namespace DXLib_ref {
 			this->repos = tgt.repos;
 			this->vec = tgt.vec;
 			this->mat = tgt.mat;
+			this->rad = tgt.rad;
 		}
+		const auto operator+(const moves& o) const noexcept {
+			//mat,reposに関しては必要に応じて1
+			moves tmp;
+			tmp.pos = this->pos + o.pos;
+			tmp.vec = this->vec + o.vec;
+			tmp.rad = this->rad + o.rad;
+			return tmp;
+		}
+		const auto operator-(const moves& o) const noexcept {
+			//mat,reposに関しては必要に応じて1
+			moves tmp;
+			tmp.pos = this->pos - o.pos;
+			tmp.vec = this->vec - o.vec;
+			tmp.rad = this->rad - o.rad;
+
+			return tmp;
+		}
+		const auto operator*(float per) const noexcept {
+			//mat,reposに関しては必要に応じて1
+			moves tmp;
+			tmp.pos = this->pos*per;
+			tmp.vec = this->vec*per;
+			tmp.rad = this->rad*per;
+			return tmp;
+		}
+
 
 		void			SetPos(const VECTOR_ref& tgt) {
 			this->repos = this->pos;
@@ -585,4 +616,96 @@ namespace DXLib_ref {
 
 		auto GetCubeMapTex() { return dynamicCubeTex; }
 	};
+
+
+	//--------------------------------------------------------------------------------------------------
+	// 汎用セーブデータ
+	//--------------------------------------------------------------------------------------------------
+	typedef std::pair<std::string, int> SaveParam;
+	class SaveDataClass : public SingletonBase<SaveDataClass> {
+	private:
+		friend class SingletonBase<SaveDataClass>;
+	private:
+		std::vector<SaveParam> m_data;
+	private:
+		SaveDataClass() {
+			Load();
+		}
+		~SaveDataClass() {}
+	public:
+		SaveParam* GetData(std::string_view Name) noexcept {
+			for (auto& d : m_data) {
+				if (d.first == Name) {
+					return &d;
+				}
+			}
+			return nullptr;
+		}
+	public:
+		void SetParam(std::string_view Name, int value) noexcept {
+			auto* Data = GetData(Name);
+			if (Data) {
+				Data->second = value;
+			}
+			else {
+				m_data.emplace_back(std::make_pair((std::string)Name, value));
+			}
+		}
+		auto GetParam(std::string_view Name) noexcept {
+			auto* Data = GetData(Name);
+			if (Data) {
+				return Data->second;
+			}
+			return -1;
+		}
+	public:
+		void Save() noexcept {
+			std::ofstream outputfile("data/Save/new.svf");
+			for (auto& d : m_data) {
+				outputfile << d.first + "=" + std::to_string(d.second) + "\n";
+			}
+			outputfile.close();
+		}
+		void Load() noexcept {
+
+			m_data.clear();
+
+			std::ifstream inputputfile("data/Save/new.svf");
+			std::string line;
+			while (std::getline(inputputfile, line)) {
+				auto Start = line.find("=");
+				if (Start != std::string::npos) {
+					m_data.emplace_back(std::make_pair(line.substr(0, Start), std::stoi(line.substr(Start + 1))));
+				}
+			}
+			inputputfile.close();
+
+		}
+	};
+
+	//--------------------------------------------------------------------------------------------------
+	// ポップアップ
+	//--------------------------------------------------------------------------------------------------
+	class PopUpDrawClass {
+	private:
+		bool m_Active{false};
+		bool m_ActiveSwitch{false};
+		float m_ActivePer{0.f};
+		char m_WindwoName[64]{};
+
+		int WinSizeX{720};
+		int WinSizeY{720};
+
+		std::function<void(int xsize,int ysize, bool EndSwitch)> m_Doing;
+	public:
+		PopUpDrawClass() {}
+		~PopUpDrawClass() {}
+	public:
+		void			Set(const char* WindowName, int sizex, int sizey, std::function<void(int xsize, int ysize, bool EndSwitch)> doing) noexcept;
+		void			Update(bool KeyTrigger) noexcept;
+		void			Draw(void) noexcept;
+	public:
+		const auto& IsActive() const noexcept { return m_Active; }
+	};
+
 };

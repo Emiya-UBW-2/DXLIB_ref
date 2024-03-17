@@ -218,6 +218,8 @@ namespace DXLib_ref {
 			Nomal_Edge,		//MSゴシック、エッジ付き細
 			Nomal_EdgeL,	//MSゴシック、エッジ付き太
 			Nomal_AA,		//MSゴシック、AA
+			Nomal_ItalicAA,	//MSゴシック、イタリックAA
+			Gothic_Edge,	//MSゴシック、エッジ付き細
 		};
 		class Fonthave {
 			int				m_scaleType{ DX_DRAWMODE_BILINEAR };
@@ -276,16 +278,36 @@ namespace DXLib_ref {
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(this->m_fontsize, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_fontsize, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE_8X8, -1, 3);
+						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE_8X8, -1, 3);
 					}
 					break;
 				case FontType::Nomal_AA:
 					this->m_size = 92;
 					this->m_scaleType = DX_DRAWMODE_NEAREST;
+					if (this->m_fontsize != -1) {
+						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_fontsize, DX_FONTTYPE_ANTIALIASING, -1, -1);
+					}
+					else {
+						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_8X8, -1, -1);
+					}
+					break;
+				case FontType::Nomal_ItalicAA:
+					this->m_size = 92;
+					this->m_scaleType = DX_DRAWMODE_NEAREST;
 					this->m_Handle = FontHandle::Create("BIZ UD ゴシック", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1, true);
+					break;
+				case FontType::Gothic_Edge:
+					this->m_size = 32;
+					this->m_scaleType = DX_DRAWMODE_BILINEAR;
+					if (this->m_fontsize != -1) {
+						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_fontsize, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
+					}
+					else {
+						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE_8X8, -1, 1);
+					}
 					break;
 				default:
 					break;

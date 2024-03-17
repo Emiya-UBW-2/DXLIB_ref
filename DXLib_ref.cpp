@@ -1,5 +1,7 @@
 ﻿#include "DXLib_ref.h"
 
+#define LineHeight	y_r(18)
+
 namespace DXLib_ref {
 	const DXDraw* SingletonBase<DXDraw>::m_Singleton = nullptr;
 	//
@@ -35,7 +37,7 @@ namespace DXLib_ref {
 			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		else {
-			SetWindowStyleMode(4);
+			SetWindowStyleMode(2);
 			SetWindowPos(GetMainWindowHandle(), HWND_TOP, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		Effekseer_Init(8000);										//Effekseer
@@ -55,6 +57,9 @@ namespace DXLib_ref {
 		}
 		if (!OptionParts->Get_useVR()) {
 			SetWindowSize(deskx * DPI / 96, desky * DPI / 96);
+			if (OptionParts->Get_AllWaysFront()) {
+				DxLib::GetWindowSize(&this->m_DispXSize, &this->m_DispYSize);
+			}
 		}
 		//m_StartTime = GetNowHiPerformanceCount();
 #ifdef DEBUG
@@ -65,13 +70,14 @@ namespace DXLib_ref {
 		FontPool::Create();
 		PadControl::Create();							//キー
 		OptionWindowClass::Create();
-		OptionWindowClass::Instance()->Init();
-		KeyGuideClass::Create();
+		PadControl::Create();
+		SaveDataClass::Create();
 
 		auto* SE = SoundPool::Instance();
 		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/hit.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/cancel.wav", false);
+		SE->SetVol(OptionParts->Get_SE());
 		//影生成
 		for (auto& s : m_Shadow) {
 			s.Init();
@@ -95,16 +101,14 @@ namespace DXLib_ref {
 	void			DXDraw::PauseIn() noexcept {
 		if (!IsPause()) {
 			m_PauseActive.Execute(true);
-			auto* Pad = PadControl::Instance();
-			Pad->SetGuideUpdate();
+			PadControl::Instance()->SetGuideUpdate();
 		}
 	}
 	//
 	void			DXDraw::PauseExit() noexcept {
 		if (IsPause()) {
 			m_PauseActive.Execute(true);
-			auto* Pad = PadControl::Instance();
-			Pad->SetGuideUpdate();
+			PadControl::Instance()->SetGuideUpdate();
 		}
 	}
 	//
@@ -121,6 +125,47 @@ namespace DXLib_ref {
 		SetLightDirection(AmbientLightVec.get());
 	}
 	//
+	void			DXDraw::Init(void) noexcept {
+		OptionWindowClass::Instance()->Init();
+		//
+		m_PopUpDrawClass.Set("Exit", y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
+			auto* Pad = PadControl::Instance();
+			auto* Fonts = FontPool::Instance();
+
+			auto White = GetColor(255, 255, 255);
+			auto Gray25 = GetColor(216, 216, 216);
+			auto Black = GetColor(0, 0, 0);
+			int xp1, yp1;
+			//タイトル
+			{
+				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+				int Height = LineHeight;
+
+				int xpos = xp1 + y_r(6);
+				int ypos = yp1 + (yp1 + Height - yp1) / 2;
+				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(Height, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE,
+																	   xpos, ypos, White, Black, "ゲームを終了しますか？");
+			}
+			//
+			{
+				xp1 = y_r(960) - y_r(54);
+				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+
+				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2);
+				int xpos = xp1 + (xp1 + y_r(108) - xp1) / 2;
+				int ypos = yp1 + (yp1 + LineHeight * 2 - yp1) / 2;
+
+				DrawBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, MouseOver ? White : Gray25, true);
+				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(std::min(LineHeight, yp1 + LineHeight * 2 - yp1), FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE,
+																	   xpos, ypos, White, Black, "終了");
+
+				if (Pad->GetKey(PADS::INTERACT).trigger() || (MouseOver && Pad->GetMouseClick().trigger())) {
+					m_IsEnd = true;
+				}
+			}
+							 });
+	}
 	void			DXDraw::Execute(void) noexcept {
 #ifdef _USE_OPENVR_
 		VR_Execute();		//VR空間に適用
@@ -128,8 +173,7 @@ namespace DXLib_ref {
 		if (EffectResource::Instance()->Update_effect_f) {
 			UpdateEffekseer3D();
 		}
-		auto* Pad = PadControl::Instance();
-		m_PauseActive.Execute(Pad->GetOptionKey().press());
+		m_PauseActive.Execute(PadControl::Instance()->GetKey(PADS::INVENTORY).press());
 		if (m_SendCamShakeTime > 0.f) {
 			if (m_SendCamShake) {
 				m_SendCamShake = false;
@@ -191,6 +235,7 @@ namespace DXLib_ref {
 				doingUI2();										//UI2
 			}
 		}
+
 	}
 	bool			DXDraw::Screen_Flip(void) noexcept {
 		ScreenFlip();
@@ -210,6 +255,23 @@ namespace DXLib_ref {
 		VR_WaitSync();
 #endif // _USE_OPENVR_
 		return true;
+	}
+
+	bool			DXDraw::UpdateEscWindow(void) noexcept {
+		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger());
+		if (m_PopUpDrawClass.IsActive()) {
+			auto* Pad = PadControl::Instance();
+			Pad->ChangeGuide(
+				[&]() {
+					auto* KeyGuide = PadControl::Instance();
+					KeyGuide->AddGuide(PADS::RELOAD, "戻る");
+				}
+			);
+		}
+		return m_IsEnd;
+	}
+	void			DXDraw::DrawEscWindow(void) noexcept {
+		m_PopUpDrawClass.Draw();
 	}
 	//VR
 #ifdef _USE_OPENVR_

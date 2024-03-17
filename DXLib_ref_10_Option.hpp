@@ -27,6 +27,8 @@ namespace DXLib_ref {
 		int		DirectXVer{ DX_DIRECT3D_11 };
 		bool	SSR{ true };
 		bool	MotionBlur{ true };
+		float	Xsensing{ 0.5f };
+		float	Ysensing{ 0.5f };
 	public:
 		//VRでは使えない機能は　 && !useVR
 		const auto		Get_grass_level()const noexcept { return grass_level; }
@@ -45,6 +47,8 @@ namespace DXLib_ref {
 		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_SSR()const noexcept { return SSR && !useVR; }
 		const auto		Get_MotionBlur()const noexcept { return MotionBlur; }
+		const auto		Get_Xsensing()const noexcept { return Xsensing; }
+		const auto		Get_Ysensing()const noexcept { return Ysensing; }
 	public:
 		void			Set_grass_level(int value) noexcept { grass_level = value; }
 		void			Set_DoF(bool use) { DoF = use; }
@@ -57,10 +61,13 @@ namespace DXLib_ref {
 		void			Set_SE(float per) noexcept { SE = per; }
 		void			Set_VOICE(float per)noexcept { VOICE = per; }
 		void			Set_BGM(float per) noexcept { BGM = per; }
+		void			Set_AllWaysFront(bool value) noexcept { AllWaysFront = value; }
 		void			Set_aberration(bool value) noexcept { aberration = value; }
 		void			Set_DirectXVer(int value) noexcept { DirectXVer = value; }
 		void			Set_SSR(bool use) { SSR = use; }
 		void			Set_MotionBlur(bool use) { MotionBlur = use; }
+		void			Set_Xsensing(float per) noexcept { Xsensing = per; }
+		void			Set_Ysensing(float per) noexcept { Ysensing = per; }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -77,7 +84,8 @@ namespace DXLib_ref {
 			std::function<void()> m_LeftPush;
 			std::function<void()> m_RightPush;
 			std::function<void()> m_OKPush;
-			std::function<void(int xpos, int ypos)> m_Draw;
+			std::function<void()> m_AnyDoing;
+			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
 		public:
 			float selanim{ 0.f };
 		public:
@@ -87,8 +95,11 @@ namespace DXLib_ref {
 			void GetLeftPush() const noexcept { m_LeftPush(); }
 			void GetRightPush() const noexcept { m_RightPush(); }
 			void GetOKPush() const noexcept { m_OKPush(); }
+			void GetAnyDoing() const noexcept { m_AnyDoing(); }
 		public:
-			void Init(const char* name, const char* info, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush, std::function<void(int xpos, int ypos)> draw) {
+			void Init(const char* name, const char* info, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
+				std::function<void()> AnyDoing,
+				std::function<void(int xpos, int ypos, bool isMine)> draw) {
 				selanim = 0;
 
 				m_Name = name;
@@ -96,6 +107,7 @@ namespace DXLib_ref {
 				m_LeftPush = LeftPush;
 				m_RightPush = RightPush;
 				m_OKPush = OKPush;
+				m_AnyDoing = AnyDoing;
 				m_Draw = draw;
 			}
 			void Draw(int xpos, int ypos, bool isMine) const noexcept;
@@ -116,8 +128,8 @@ namespace DXLib_ref {
 				m_name = name;
 				Init_Sub();
 			}
-			void Execute(int *select) noexcept;
-			void Draw(int xpos, int ypos, bool isActive, int select) noexcept;
+			void Execute(int *select, bool CanPress) noexcept;
+			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept;
 
 			void DrawInfo(int xpos, int ypos, int select) noexcept;
 		};
@@ -130,19 +142,28 @@ namespace DXLib_ref {
 		protected:
 			void Init_Sub() noexcept override;
 		};
+		class ControlTabsInfo :public OptionTabsInfo {
+		protected:
+			void Init_Sub() noexcept override;
+		private:
+			void KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept;
+		};
+		class ElseTabsInfo :public OptionTabsInfo {
+		protected:
+			void Init_Sub() noexcept override;
+		};
 	private:
 		int m_tabsel{ 0 };
 		int m_select{ 0 };
-		std::array<std::unique_ptr<OptionTabsInfo>, 2> m_Tabs;
-		bool m_isActive{ false };
-		float m_ActivePer{ 0.f };
-	private:
+		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
+		PopUpDrawClass				m_PopUpDrawClass;
+		bool						m_ActiveSwitch{false};
 	public:
-		void SetActive() noexcept;
-		const auto& IsActive() const noexcept { return m_isActive; }
+		void SetActive() noexcept { m_ActiveSwitch = true; }
+		const auto& IsActive() const noexcept { return m_PopUpDrawClass.IsActive(); }
 	public:
 		void Init() noexcept;
 		void Execute(void)noexcept;
-		void Draw() const noexcept;
+		void Draw() noexcept;
 	};
 }

@@ -36,6 +36,7 @@ namespace DXLib_ref {
 		}
 	}
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
+		int DrawCall = GetDrawCallCount();
 		auto PMax = PointMax + 1;
 		SetPoint("End");
 		auto* Fonts = FontPool::Instance();
@@ -82,7 +83,7 @@ namespace DXLib_ref {
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
 			"AsyncCount :%d", GetASyncLoadNum()); yp_f += FontSize;
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
-			"Drawcall   :%d", GetDrawCallCount()); yp_f += FontSize;
+			"Drawcall   :%d", DrawCall); yp_f += FontSize;
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
 			"FPS        :%5.2f fps", GetFPS()); yp_f += FontSize;
 		for (int index = 0; index < PMax; ++index) {

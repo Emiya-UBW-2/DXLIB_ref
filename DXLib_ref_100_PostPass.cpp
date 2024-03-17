@@ -248,9 +248,9 @@ namespace DXLib_ref {
 				{
 					DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 					SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-					BufScreen[0].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.01f, 0.f, true);
-					BufScreen[1].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.005f, 0.f, true);
-					BufScreen[2].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f, 0.f, true);
+					BufScreen[0].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
+					BufScreen[1].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f, 0.f, true);
+					BufScreen[2].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f - 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
 					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 				}
 			}
@@ -681,7 +681,7 @@ namespace DXLib_ref {
 		m_PostPass.clear();
 	}
 	//
-	void PostPassEffect::Draw(std::function<void()> sky_doing, std::function<void()> doing, const Camera3DInfo& cams) {
+	void PostPassEffect::Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams) {
 		//nearに描画
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
@@ -713,7 +713,7 @@ namespace DXLib_ref {
 		//空
 		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() {
 			sky_doing();
-		});
+			   });
 		//遠距離
 		G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
 			if (OptionParts->Get_Shadow()) {
@@ -724,7 +724,8 @@ namespace DXLib_ref {
 			else {
 				doing();
 			}
-		});
+			doingFront();
+			   });
 		//遠距離の強烈なぼかし
 		if (OptionParts->Get_DoF()) {
 			GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
@@ -742,7 +743,8 @@ namespace DXLib_ref {
 				doing();
 			}
 			DrawEffekseer3D();
-		});
+			doingFront();
+			   });
 		//至近
 		G_Draw(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
 			Effekseer_Sync3DSetting();
@@ -755,7 +757,8 @@ namespace DXLib_ref {
 				doing();
 			}
 			DrawEffekseer3D();
-		});
+			doingFront();
+			   });
 		//fovを記憶しておく
 		fov = cams.GetCamFov();
 		//ポストパスエフェクトの適用

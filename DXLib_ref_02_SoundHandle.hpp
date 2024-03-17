@@ -199,6 +199,7 @@ namespace DXLib_ref {
 			for (int i = 0; i < (int)this->havehandle.size(); i++) {
 				auto& h = this->havehandle[i];
 				if (h.Get_ID() == ID_t) {
+					h.StopAll(0);
 					h.Delete();
 					std::swap(h, this->havehandle.back());
 					this->havehandle.pop_back();
