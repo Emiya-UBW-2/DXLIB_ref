@@ -67,6 +67,7 @@ namespace DXLib_ref {
 #endif // DEBUG
 		EffectResource::Create();						//エフェクト
 		SoundPool::Create();							//サウンド
+		BGMPool::Create();
 		FontPool::Create();
 		PadControl::Create();							//キー
 		OptionWindowClass::Create();

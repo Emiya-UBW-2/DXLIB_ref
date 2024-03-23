@@ -38,6 +38,17 @@ namespace DXLib_ref {
 		}
 		GuideString = GuideStr;
 	}
+	int PadControl::KeyGuideGraphs::GetDrawSize() const noexcept {
+		auto* Fonts = FontPool::Instance();
+
+		int ofs = 0;
+		if (xsize > 0) {
+			ofs += xsize + y_r(6);
+		}
+		ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(21), GuideString) + y_r(6);
+		return ofs;
+	}
+
 	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
 		auto* Fonts = FontPool::Instance();
 
@@ -47,8 +58,7 @@ namespace DXLib_ref {
 			ofs += xsize + y_r(6);
 		}
 		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(21), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, x + ofs, y, GetColor(255, 255, 255), GetColor(0, 0, 0), GuideString);
-		ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(21), GuideString) + y_r(6);
-		return ofs;
+		return GetDrawSize();
 	}
 
 	const bool PadControl::GetButtonPress(int ID) {
@@ -369,10 +379,14 @@ namespace DXLib_ref {
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 	}
 	void PadControl::Draw() const noexcept {
-		int x = y_r(32);
+		int xp = 0;
 		int y = y_r(1080 - 21 - 16);
 		for (const auto& k : Key) {
-			x += k->Draw(x, y);
+			xp += k->Draw(y_r(32) + xp, y);
+			if (xp > y_r(960)) {
+				xp = 0;
+				y -= y_r(24);
+			}
 		}
 	}
 	void PadControl::Dispose(void) noexcept {

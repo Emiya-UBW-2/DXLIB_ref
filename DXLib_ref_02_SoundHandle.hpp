@@ -45,7 +45,14 @@ namespace DXLib_ref {
 		SoundHandle Duplicate(void) const noexcept { return DxLib::DuplicateSoundMem(this->handle_); }
 		bool check()  const noexcept { return (DxLib::CheckSoundMem(handle_) == TRUE); }
 		bool play(int type, int flag = 1) const noexcept { return (PlaySoundMem(handle_, type, flag) == 0); }
-		bool stop(void) const noexcept { return (StopSoundMem(handle_) == 0); }
+		bool stop(void) const noexcept {
+			if (invalid_handle != this->handle_) {
+				return (StopSoundMem(handle_) == 0);
+			}
+			else {
+				return false;
+			}
+		}
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
 		const auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
 		bool SetPosition(const VECTOR_ref& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
@@ -68,10 +75,8 @@ namespace DXLib_ref {
 		class Soundhave {
 			class handles {
 			public:
-				size_t ID_2{ 0 };
 				std::string path;
 				std::vector<SoundHandle> handle;
-
 			};
 
 			int ID{ 0 };
@@ -205,6 +210,90 @@ namespace DXLib_ref {
 					this->havehandle.pop_back();
 					i--;
 				}
+			}
+		}
+	};
+
+
+	//サウンドプール
+	class BGMPool : public SingletonBase<BGMPool> {
+	private:
+		friend class SingletonBase<BGMPool>;
+	private:
+		class BGMhave {
+			int ID{0};
+			std::string path;
+			SoundHandle handle;
+			int Set_vol = 255;
+			float vol_rate = 1.f;
+		public:
+			//const auto&		GetHandles(void)const noexcept { return shandle; }
+			const auto&		Get_ID(void)const noexcept { return ID; }
+			void			Set(int ID_t, std::string path_t) {
+				if (path_t == "") { return; }
+				if (path_t == path) { return; }
+				this->ID = ID_t;
+				this->path = path_t;
+				SetCreate3DSoundFlag(FALSE);
+				this->handle = SoundHandle::Load(this->path);
+			}
+			bool			Check() {
+				return this->handle.check();
+			}
+			void			Delete() {
+				this->handle.Dispose();
+			}
+			void			Stop() {
+				this->handle.stop();
+			}
+			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) {
+				this->handle.play(type_t, Flag_t);
+			}
+			void			SetVol_Local(int vol) {
+				Set_vol = std::clamp(vol, 0, 255);
+				this->handle.vol((int)(vol_rate * Set_vol));
+			}
+			void			SetVol(float vol) {
+				vol_rate = std::clamp(vol, 0.f, 1.f);
+				this->handle.vol((int)(vol_rate * Set_vol));
+			}
+		};
+	private:
+		std::vector<BGMhave> havehandle;
+	public:
+		void			SetVol(float vol) {
+			for (auto& h : this->havehandle) {
+				h.SetVol(vol);
+			}
+		}
+	public:
+		size_t			Add(int ID_t, std::string path_t = "") {
+			for (auto& h : this->havehandle) {
+				if (h.Get_ID() == ID_t) {
+					h.Set(ID_t, path_t);
+					return &h - &this->havehandle.front();
+				}
+			}
+			this->havehandle.resize(this->havehandle.size() + 1);
+			this->havehandle.back().Set(ID_t, path_t);
+			return this->havehandle.size() - 1;
+		}
+		BGMhave&		Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
+		void			Delete(int ID_t) {
+			for (int i = 0; i < (int)this->havehandle.size(); i++) {
+				auto& h = this->havehandle[i];
+				if (h.Get_ID() == ID_t) {
+					h.Stop();
+					h.Delete();
+					std::swap(h, this->havehandle.back());
+					this->havehandle.pop_back();
+					i--;
+				}
+			}
+		}
+		void			StopAll() {
+			for (auto& h : this->havehandle) {
+				h.Stop();
 			}
 		}
 	};

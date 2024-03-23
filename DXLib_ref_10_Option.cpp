@@ -325,23 +325,32 @@ namespace DXLib_ref {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("BGM", "BGMƒ{ƒŠƒ…[ƒ€‚ð•ÏX‚µ‚Ü‚·",
 									 [&]() {
+										 auto* BGM = BGMPool::Instance();
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_BGM(std::clamp(OptionParts->Get_BGM() - 0.1f, 0.f, 1.f));
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 BGM->SetVol(OptionParts->Get_BGM());
 									 },
 									 [&]() {
+										 auto* BGM = BGMPool::Instance();
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_BGM(std::clamp(OptionParts->Get_BGM() + 0.1f, 0.f, 1.f));
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 BGM->SetVol(OptionParts->Get_BGM());
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* BGM = BGMPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->Get_BGM()*100.f + 0.5f), 0, 100);
 										 OptionParts->Set_BGM((float)value / 100.f);
+
+										 BGM->SetVol(OptionParts->Get_BGM());
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -363,9 +372,11 @@ namespace DXLib_ref {
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->Get_SE()*100.f + 0.5f), 0, 100);
 										 OptionParts->Set_SE((float)value / 100.f);
+										 SE->SetVol(OptionParts->Get_SE());
 									 }
 									 );
 	}

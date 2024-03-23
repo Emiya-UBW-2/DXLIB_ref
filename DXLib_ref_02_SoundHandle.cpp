@@ -6,4 +6,5 @@ namespace DXLib_ref {
 	//
 	//--------------------------------------------------------------------------------------------------
 	const SoundPool* SingletonBase<SoundPool>::m_Singleton = nullptr;
+	const BGMPool* SingletonBase<BGMPool>::m_Singleton = nullptr;
 };

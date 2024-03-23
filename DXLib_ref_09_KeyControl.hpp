@@ -514,6 +514,7 @@ namespace DXLib_ref {
 				GuideImg.Dispose();
 				GuideString = "";
 			}
+			int GetDrawSize() const noexcept;
 			int Draw(int x, int y) const noexcept;
 		};
 
