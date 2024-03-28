@@ -588,11 +588,22 @@ namespace DXLib_ref {
 		const char*			GetSavePath() const noexcept {
 			switch (m_ControlType) {
 			case DXLib_ref::ControlType::PS4:
-				return "data/KeyConfig_DS4.txt";
+				return "Save/KeyConfig_DS4.txt";
 			case DXLib_ref::ControlType::PC:
-				return "data/KeyConfig_PC.txt";
+				return "Save/KeyConfig_PC.txt";
 			default:
 				break;
+			}
+			return "NONE";
+		};
+		const char*			GetBasePath() const noexcept {
+			switch (m_ControlType) {
+				case DXLib_ref::ControlType::PS4:
+					return "data/KeyConfigBase_DS4.txt";
+				case DXLib_ref::ControlType::PC:
+					return "data/KeyConfigBase_PC.txt";
+				default:
+					break;
 			}
 			return "NONE";
 		};

@@ -42,9 +42,11 @@ namespace DXLib_ref {
 		auto* Fonts = FontPool::Instance();
 		auto white = GetColor(255, 255, 255);
 		auto black = GetColor(1, 1, 1);
+		
+		int FontSize = y_r(12);
 
-		auto wide = 180;
-		auto height = 100;
+		auto wide = y_r(180);
+		auto height = y_r(100);
 		auto half = height / 2;
 
 		for (int index = 0; index < PMax; ++index) {
@@ -75,7 +77,7 @@ namespace DXLib_ref {
 
 		auto xp_f = xpos;
 		auto yp_f = ypos + height;
-		auto xs_f = 150;
+		auto xs_f = y_r(250);
 		auto ys_f = (int)(m_PointSel + 3 + 1) * FontSize + 3;
 		DrawBox(xp_f - 1, yp_f - 1, xp_f + xs_f + 1, yp_f + ys_f + 1, black, TRUE);
 		DrawBox(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, white, FALSE);

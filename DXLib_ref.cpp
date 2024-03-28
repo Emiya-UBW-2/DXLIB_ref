@@ -61,7 +61,6 @@ namespace DXLib_ref {
 				DxLib::GetWindowSize(&this->m_DispXSize, &this->m_DispYSize);
 			}
 		}
-		//m_StartTime = GetNowHiPerformanceCount();
 #ifdef DEBUG
 		DebugClass::Create();
 #endif // DEBUG
@@ -76,8 +75,9 @@ namespace DXLib_ref {
 
 		auto* SE = SoundPool::Instance();
 		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
-		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/hit.wav", false);
-		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/cancel.wav", false);
+		SE->Add((int)SoundEnumCommon::UI_CANCEL, 1, "data/Sound/UI/cancel.wav", false);
+		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/ok.wav", false);
+		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->Get_SE());
 		//影生成
 		for (auto& s : m_Shadow) {
@@ -240,16 +240,15 @@ namespace DXLib_ref {
 	}
 	bool			DXDraw::Screen_Flip(void) noexcept {
 		ScreenFlip();
-		/*
+		//*
 		auto* OptionParts = OPTION::Instance();
 		if (!OptionParts->Get_Vsync()) {
 			//4msだけスリープ
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / 60 - 1000 * 4) {
+			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->Get_FrameLimit() - 1000 * 4) {
 				if (ProcessMessage() != 0) { return false; }
 				Sleep(1);	// 1msecスリープする
 			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / 60) {}
-			m_StartTime = GetNowHiPerformanceCount();
+			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->Get_FrameLimit()) {}
 		}
 		//*/
 #ifdef _USE_OPENVR_

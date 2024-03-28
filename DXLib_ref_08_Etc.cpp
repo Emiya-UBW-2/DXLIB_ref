@@ -72,7 +72,7 @@ namespace DXLib_ref {
 			yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
 			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2);
 			if (KeyTrigger || Pad->GetKey(PADS::RELOAD).trigger() || (MouseOver && Pad->GetMouseClick().trigger())) {
-				SE->Get((int)SoundEnumCommon::UI_NG).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
 				m_Active = false;
 				m_ActiveSwitch = true;
 				Pad->SetGuideUpdate();

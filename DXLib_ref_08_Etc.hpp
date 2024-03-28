@@ -367,7 +367,9 @@ namespace DXLib_ref {
 	class moves {
 	public:
 		VECTOR_ref pos;		//座標
+		VECTOR_ref posbuf;	//座標
 		VECTOR_ref repos;	//前フレームの座標
+		float		Speed{0.f};
 		VECTOR_ref vec;		//加速
 		MATRIX_ref mat;		//回転
 		VECTOR_ref rad;		//回転
@@ -408,10 +410,18 @@ namespace DXLib_ref {
 		}
 
 
-		void			SetPos(const VECTOR_ref& tgt) {
+		void			UpdatePos(const VECTOR_ref& tgt) {
 			this->repos = this->pos;
 			this->pos = tgt;
 		}
+		void			UpdatePosBuf(const VECTOR_ref& tgt, float per) {
+			this->posbuf = tgt;
+			auto Repos = this->pos;
+			Easing(&this->pos, this->posbuf, per, EasingType::OutExpo);
+			this->Speed = (this->pos - Repos).Length();
+			this->repos = this->posbuf;
+		}
+
 		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f) {
 			this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
 			this->vec.yadd(M_GR / powf((GetFPS() / rate), 2.f));
@@ -660,7 +670,7 @@ namespace DXLib_ref {
 		}
 	public:
 		void Save() noexcept {
-			std::ofstream outputfile("data/Save/new.svf");
+			std::ofstream outputfile("Save/new.svf");
 			for (auto& d : m_data) {
 				outputfile << d.first + "=" + std::to_string(d.second) + "\n";
 			}
@@ -670,7 +680,7 @@ namespace DXLib_ref {
 
 			m_data.clear();
 
-			std::ifstream inputputfile("data/Save/new.svf");
+			std::ifstream inputputfile("Save/new.svf");
 			std::string line;
 			while (std::getline(inputputfile, line)) {
 				auto Start = line.find("=");
@@ -679,7 +689,9 @@ namespace DXLib_ref {
 				}
 			}
 			inputputfile.close();
-
+		}
+		void Reset() noexcept {
+			m_data.clear();
 		}
 	};
 

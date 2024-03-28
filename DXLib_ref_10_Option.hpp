@@ -19,6 +19,7 @@ namespace DXLib_ref {
 		bool	SSAO{ true };
 		float	Fov = 45.f;
 		bool	Vsync{ false };
+		int		FrameLimit = 60;
 		float	SE{ 1.f };
 		float	VOICE{ 1.f };
 		float	BGM{ 1.f };
@@ -29,6 +30,7 @@ namespace DXLib_ref {
 		bool	MotionBlur{ true };
 		float	Xsensing{ 0.5f };
 		float	Ysensing{ 0.5f };
+		bool	HeadBobbing{true};
 	public:
 		//VRでは使えない機能は　 && !useVR
 		const auto		Get_grass_level()const noexcept { return grass_level; }
@@ -39,6 +41,7 @@ namespace DXLib_ref {
 		const auto		Get_SSAO()const noexcept { return SSAO && !useVR; }
 		const auto		Get_Fov()const noexcept { return Fov; }
 		const auto		Get_Vsync()const noexcept { return Vsync; }
+		const auto		Get_FrameLimit()const noexcept { return FrameLimit; }
 		const auto		Get_SE()const noexcept { return SE; }
 		const auto		Get_VOICE()const noexcept { return VOICE; }
 		const auto		Get_BGM()const noexcept { return BGM; }
@@ -49,6 +52,8 @@ namespace DXLib_ref {
 		const auto		Get_MotionBlur()const noexcept { return MotionBlur; }
 		const auto		Get_Xsensing()const noexcept { return Xsensing; }
 		const auto		Get_Ysensing()const noexcept { return Ysensing; }
+		const auto		Get_HeadBobbing()const noexcept { return HeadBobbing; }
+		
 	public:
 		void			Set_grass_level(int value) noexcept { grass_level = value; }
 		void			Set_DoF(bool use) { DoF = use; }
@@ -58,6 +63,7 @@ namespace DXLib_ref {
 		void			Set_SSAO(bool use) { SSAO = use; }
 		void			Set_Fov(float per) noexcept { Fov = per; }
 		void			Set_Vsync(bool value) noexcept { Vsync = value; }
+		void			Set_FrameLimit(int value) noexcept { FrameLimit = value; }
 		void			Set_SE(float per) noexcept { SE = per; }
 		void			Set_VOICE(float per)noexcept { VOICE = per; }
 		void			Set_BGM(float per) noexcept { BGM = per; }
@@ -68,6 +74,7 @@ namespace DXLib_ref {
 		void			Set_MotionBlur(bool use) { MotionBlur = use; }
 		void			Set_Xsensing(float per) noexcept { Xsensing = per; }
 		void			Set_Ysensing(float per) noexcept { Ysensing = per; }
+		void			Set_HeadBobbing(bool use) noexcept { HeadBobbing = use; }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -139,6 +146,18 @@ namespace DXLib_ref {
 			void Init_Sub() noexcept override;
 		};
 		class GraphicTabsInfo :public OptionTabsInfo {
+			static const int	FrameLimitsNum = 7;
+			const int	FrameLimits[FrameLimitsNum] = {
+				30,
+				60,
+				75,
+				90,
+				120,
+				144,
+				240,
+			};
+		private:
+			int RefreshRate{FrameLimits[1]};
 		protected:
 			void Init_Sub() noexcept override;
 		};

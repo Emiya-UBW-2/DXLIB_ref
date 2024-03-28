@@ -7,7 +7,6 @@ namespace DXLib_ref {
 	private:
 		friend class SingletonBase<DebugClass>;
 	private:
-		const int			FontSize{ 12 };
 		static const int	PointMax{ 12 };
 	private:
 		float																	m_FrameRate{ 60.f };

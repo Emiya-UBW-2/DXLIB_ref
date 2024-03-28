@@ -3,7 +3,7 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*ÉrÉãÉhê›íË																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-//#define DEBUG
+#define DEBUG
 //#define _USE_OPENVR_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -132,7 +132,7 @@ namespace DXLib_ref {
 		int				m_DispYSize{ desky };
 	private:
 		switchs			m_PauseActive;
-		//LONGLONG		m_StartTime{ 0 };
+		LONGLONG		m_StartTime{ 0 };
 		std::array<ShadowControl, 3>		m_Shadow;
 		VECTOR_ref		m_LightVec;
 		COLOR_F			m_LightColorF{ GetColorF(0, 0, 0, 0) };
@@ -188,6 +188,9 @@ namespace DXLib_ref {
 		}
 	public:
 		void			Init(void) noexcept;
+		void			SetStartTime(void) noexcept {
+			m_StartTime = GetNowHiPerformanceCount();
+		}
 		void			Execute(void) noexcept;
 		void			Draw(
 			std::function<void(const Camera3DInfo&)> doing,

@@ -20,6 +20,7 @@ namespace DXLib_ref {
 		SSAO = getparams::_bool(mdata);
 		Fov = getparams::_float(mdata);
 		Vsync = getparams::_bool(mdata);
+		FrameLimit = getparams::_int(mdata);
 		SE = getparams::_float(mdata);
 		VOICE = getparams::_float(mdata);
 		BGM = getparams::_float(mdata);
@@ -38,11 +39,12 @@ namespace DXLib_ref {
 		MotionBlur = getparams::_bool(mdata);
 		Xsensing = getparams::_float(mdata);
 		Ysensing = getparams::_float(mdata);
+		HeadBobbing = getparams::_bool(mdata);
 		FileRead_close(mdata);
 		SetOutApplicationLogValidFlag(TRUE);
 	}
 	void			OPTION::Save(void) noexcept {
-		std::ofstream outputfile("data/setting.txt");
+		std::ofstream outputfile("data/Setting.txt");
 		outputfile << "grass_level=" + std::to_string(grass_level) + "\n";
 		outputfile << "DoF=" + std::string((DoF) ? "true" : "false") + "\n";
 		outputfile << "bloom=" + std::string((Bloom) ? "true" : "false") + "\n";
@@ -51,6 +53,7 @@ namespace DXLib_ref {
 		outputfile << "SSAO=" + std::string((SSAO) ? "true" : "false") + "\n";
 		outputfile << "fov=" + std::to_string(Fov) + "\n";
 		outputfile << "vsync=" + std::string((Vsync) ? "true" : "false") + "\n";
+		outputfile << "FpsLimit=" + std::to_string(FrameLimit) + "\n";
 		outputfile << "SE=" + std::to_string(SE) + "\n";
 		outputfile << "VOICE=" + std::to_string(VOICE) + "\n";
 		outputfile << "BGM=" + std::to_string(BGM) + "\n";
@@ -70,6 +73,7 @@ namespace DXLib_ref {
 		outputfile << "MotionBlur=" + std::string((MotionBlur) ? "true" : "false") + "\n";
 		outputfile << "Xsensing=" + std::to_string(Xsensing) + "\n";
 		outputfile << "Ysensing=" + std::to_string(Ysensing) + "\n";
+		outputfile << "HeadBobbing=" + std::string((HeadBobbing) ? "true" : "false") + "\n";
 		outputfile.close();
 	}
 
@@ -381,6 +385,11 @@ namespace DXLib_ref {
 									 );
 	}
 	void OptionWindowClass::GraphicTabsInfo::Init_Sub() noexcept {
+		HDC hdc;
+		hdc = GetDC(GetMainWindowHandle());	// デバイスコンテキストの取得
+		RefreshRate = GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
+		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
+
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Window Mode", "ウィンドウ、ボーダーレスモードを選択します(反映は再起動後にされます)",
 									 [&]() {
@@ -433,12 +442,18 @@ namespace DXLib_ref {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_Vsync(OptionParts->Get_Vsync() ^ 1);
+										 if (OptionParts->Get_Vsync()) {
+											 OptionParts->Set_FrameLimit(RefreshRate);
+										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_Vsync(OptionParts->Get_Vsync() ^ 1);
+										 if (OptionParts->Get_Vsync()) {
+											 OptionParts->Set_FrameLimit(RefreshRate);
+										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
@@ -446,6 +461,73 @@ namespace DXLib_ref {
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_Vsync(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_Vsync()));
+										 if (OptionParts->Get_Vsync()) {
+											 OptionParts->Set_FrameLimit(RefreshRate);
+										 }
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("FPS Limit", "垂直同期を切った際のFPS制限を指定します",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+
+										 int value = OptionParts->Get_FrameLimit();
+										 bool isHit = false;
+										 for (int i = 0;i < FrameLimitsNum;i++) {
+											 if (FrameLimits[i] == value) {
+												 i--;
+												 if (i < 0) { i = FrameLimitsNum - 1; }
+												 value = FrameLimits[i];
+												 isHit = true;
+												 break;
+											 }
+										 }
+										 if (!isHit) {
+											 value = FrameLimits[1];
+										 }
+
+										 OptionParts->Set_FrameLimit(value);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 int value = OptionParts->Get_FrameLimit();
+										 bool isHit = false;
+										 for (int i = 0;i < FrameLimitsNum;i++) {
+											 if (FrameLimits[i] == value) {
+												 i++;
+												 if (i > FrameLimitsNum - 1) { i = 0; }
+												 value = FrameLimits[i];
+												 isHit = true;
+												 break;
+											 }
+										 }
+										 if (!isHit) {
+											 value = FrameLimits[1];
+										 }
+										 OptionParts->Set_FrameLimit(value);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->Get_FrameLimit(), FrameLimits[0], FrameLimits[FrameLimitsNum - 1]);
+										 //結果から一番近いやつに指定
+										 int diff = 10000;
+										 int valuetmp = value;
+										 for (int i = 0;i < FrameLimitsNum;i++) {
+											 int tmp = std::abs(FrameLimits[i] - value);
+											 if (diff > tmp) {
+												 diff = tmp;
+												 valuetmp = FrameLimits[i];
+											 }
+										 }
+										 value = valuetmp;
+
+										 OptionParts->Set_FrameLimit(value);
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -711,6 +793,27 @@ namespace DXLib_ref {
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->Get_Ysensing()*100.f + 0.5f), 10, 100);
 										 OptionParts->Set_Ysensing((float)value / 100.f);
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("HeadBobbing", "視点の揺れの有効無効を指定します",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_HeadBobbing(OptionParts->Get_HeadBobbing() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_HeadBobbing(OptionParts->Get_HeadBobbing() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_HeadBobbing(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_HeadBobbing()));
 									 }
 									 );
 	}

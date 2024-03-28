@@ -181,7 +181,14 @@ namespace DXLib_ref {
 
 
 	void PadControl::Load(void) noexcept {
-		int mdata = FileRead_open(GetSavePath(), FALSE);
+		FILEINFO FileInfo;
+		int mdata = -1;
+		if (FileRead_findFirst(GetSavePath(), &FileInfo) != (DWORD_PTR)-1) {
+			mdata = FileRead_open(GetSavePath(), FALSE);
+		}
+		else {
+			mdata = FileRead_open(GetBasePath(), FALSE);
+		}
 		while (true) {
 			if (FileRead_eof(mdata) != 0) { break; }
 			auto ALL = getparams::Getstr(mdata);
@@ -225,6 +232,16 @@ namespace DXLib_ref {
 		if (m_IsUpdate) {
 			m_IsUpdate = false;
 			Reset();
+			//
+			Key.resize(Key.size() + 1);
+			Key.back() = std::make_unique<KeyGuideGraphs>();
+			for (int i = 0; i < KeyNum; i++) {
+				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
+					Key.back()->AddGuidePC(i, "èIóπ");
+					break;
+				}
+			}
+			//
 			Guide_Pad();
 		}
 	}

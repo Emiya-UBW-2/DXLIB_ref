@@ -11,6 +11,7 @@ namespace DXLib_ref {
 	enum class SoundEnumCommon {
 		UI_Select,
 		UI_OK,
+		UI_CANCEL,
 		UI_NG,
 		Num,
 	};
