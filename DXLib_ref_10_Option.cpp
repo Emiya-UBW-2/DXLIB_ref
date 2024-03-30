@@ -95,7 +95,7 @@ namespace DXLib_ref {
 	namespace WindowSystem {
 		//” 
 		static void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
-			DrawBox(xp1, yp1, xp2, yp2, colorSet, true);
+			DrawBox_2D(xp1, yp1, xp2, yp2, colorSet, true);
 		};
 		//•¶Žš
 		template <typename... Args>

@@ -6,29 +6,59 @@
 #define y_r(p1) (int(p1) * DXDraw::Instance()->m_DispYSize / 1080)
 
 namespace DXLib_ref {
+	//
+	static float GetFrameRate() noexcept { return std::max(GetFPS(), 30.f); }
+
+	//--------------------------------------------------------------------------------------------------
+	// 補完
+	//--------------------------------------------------------------------------------------------------
+	//イージング
+	enum class EasingType {
+		OutExpo,
+	};
+	//線形補完
+	template <class T>
+	static T Lerp(const T& A, const T& B, float Per) noexcept {
+		if (Per == 0.f) {
+			return A;
+		}
+		else if (Per == 1.f) {
+			return B;
+		}
+		else {
+			return A + (T)((B - A)*Per);
+		}
+	}
+	template <class T>
+	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) {
+		switch (EasingType) {
+			case DXLib_ref::EasingType::OutExpo:
+				*A = Lerp(*A, B, (1.f - std::powf(ratio, 60.f / GetFrameRate())));
+				break;
+			default:
+				break;
+		}
+	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	//Matrix版のイージング
-	static void Easing_Matrix(MATRIX_ref* A, const MATRIX_ref& B, float ratio, EasingType EasingType) noexcept {
-		VECTOR_ref basex = A->xvec();
-		VECTOR_ref basey = A->yvec();
-		VECTOR_ref basez = A->zvec();
-		Easing(&basex, B.xvec(), ratio, EasingType);
-		Easing(&basey, B.yvec(), ratio, EasingType);
-		Easing(&basez, B.zvec(), ratio, EasingType);
-
-		*A = MATRIX_ref::Axis1(
-			basex.Norm(),
-			basey.Norm(),
-			basez.Norm()).GetRot();
-	}
 	//Matrix版の線形補完
 	static MATRIX_ref Lerp_Matrix(const MATRIX_ref& A, const MATRIX_ref& B, float Per) noexcept {
 		return MATRIX_ref::Axis1(
 			Lerp(A.xvec(), B.xvec(), Per).Norm(),
 			Lerp(A.yvec(), B.yvec(), Per).Norm(),
-			Lerp(A.zvec(), B.zvec(), Per).Norm());
+			Lerp(A.zvec(), B.zvec(), Per).Norm())*
+			MATRIX_ref::Mtrans(Lerp(A.pos(), B.pos(), Per));
+	}
+	//Matrix版のイージング
+	static void Easing_Matrix(MATRIX_ref* A, const MATRIX_ref& B, float ratio, EasingType EasingType) noexcept {
+		switch (EasingType) {
+			case DXLib_ref::EasingType::OutExpo:
+				*A = Lerp_Matrix(*A, B, (1.f - std::powf(ratio, 60.f / GetFrameRate())));
+				break;
+			default:
+				break;
+		}
 	}
 	//クリップボードに画像をコピー
 	static const auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
@@ -112,7 +142,6 @@ namespace DXLib_ref {
 
 	//カメラから画面上の座標を取得
 	static VECTOR_ref GetScreenPos(const VECTOR_ref&campos, const VECTOR_ref&camvec, const VECTOR_ref&camup, float fov, float near_t, float far_t, const VECTOR_ref&worldpos) noexcept;
-
 	//--------------------------------------------------------------------------------------------------
 	// ウィンドウアクティブチェック付きキー操作
 	//--------------------------------------------------------------------------------------------------
@@ -149,20 +178,15 @@ namespace DXLib_ref {
 		return DxLib::DrawLine(p1x, p1y, p2x, p2y, color, thickness) == TRUE;
 	}
 	//縁付き四角
-	static void DrawEdgeBox_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, const unsigned int& EdgeColor) noexcept {
-		int p = -1;
-		DrawBox(p1x + p, p1y + p, p2x - p, p2y - p, EdgeColor, FALSE);
-		p = 0;
-		DrawBox(p1x + p, p1y + p, p2x - p, p2y - p, color, FALSE);
-		p = 1;
-		DrawBox(p1x + p, p1y + p, p2x - p, p2y - p, EdgeColor, FALSE);
+	static bool DrawBox_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, bool IsFill) noexcept {
+		return DxLib::DrawBox(p1x, p1y, p2x, p2y, color, IsFill ? TRUE : FALSE) == TRUE;
 	}
 	//縁ぬき四角
 	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
-		DxLib::DrawLine(p1x, p1y, p1x, p2y, color, thickness);
-		DxLib::DrawLine(p1x, p1y, p2x, p1y, color, thickness);
-		DxLib::DrawLine(p1x, p2y, p2x, p2y, color, thickness);
-		DxLib::DrawLine(p2x, p1y, p2x, p2y, color, thickness);
+		DrawLine_2D(p1x, p1y, p1x, p2y, color, thickness);
+		DrawLine_2D(p1x, p1y, p2x, p1y, color, thickness);
+		DrawLine_2D(p1x, p2y, p2x, p2y, color, thickness);
+		DrawLine_2D(p2x, p1y, p2x, p2y, color, thickness);
 	}
 	//グラデーションのある矩形を描画
 	static void DrawGradationBox_2D(int x1, int y1, int x2, int y2, COLOR_U8 color1, COLOR_U8 color2, const unsigned char UorL = 255) noexcept {
@@ -424,16 +448,93 @@ namespace DXLib_ref {
 
 		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f) {
 			this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
-			this->vec.yadd(M_GR / powf((GetFPS() / rate), 2.f));
+			this->vec.yadd(M_GR / powf((GetFrameRate() / rate), 2.f));
 
 			//this->gun_m.pos += this->gun_m.vec;
-			//this->gun_m.vec.yadd(M_GR / std::powf(GetFPS(), 2.f));
+			//this->gun_m.vec.yadd(M_GR / std::powf(GetFrameRate(), 2.f));
 		}
 
 		void			HitGround(const MV1_COLL_RESULT_POLY& colres, float hight) {//0.005f
 			this->pos = VECTOR_ref(colres.HitPosition) + VECTOR_ref(colres.Normal)*hight;
 			this->mat *= MATRIX_ref::RotVec2(this->mat.xvec(), VECTOR_ref(colres.Normal)*-1.f);
 		}
+	};
+	//キー押し判定
+	class switchs {
+		bool		m_on{false};//オンオフ判定
+		bool		m_press{false};//オンオフ判定
+		bool		m_repeat{false};//オンオフ判定
+		int8_t		m_presscount{0};//プッシュ判定
+		float		m_repeatcount{30.f};//プッシュ判定
+	public:
+		switchs(void) noexcept {
+			Set(false);
+			m_presscount = 0;
+			m_repeatcount = 30.f;
+			m_press = false;
+		};
+		~switchs(void) noexcept {}
+		//使用前の用意
+		void			Set(bool on) noexcept { m_on = on; }
+		//更新
+		void			Execute(bool key) noexcept {
+			m_press = key;
+			if (m_press) {
+				m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
+
+				m_repeat = trigger();
+				m_repeatcount -= 60.f / GetFrameRate();
+				if (m_repeatcount <= 0.f) {
+					m_repeatcount += 2.f;
+					m_repeat = true;
+				}
+			}
+			else {
+				m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
+
+				m_repeat = false;
+				m_repeatcount = 30.f;
+			}
+			if (trigger()) {
+				m_on ^= 1;
+			}
+		}
+		//オンオフの取得
+		const bool on(void) const noexcept { return m_on; }
+		//押した瞬間
+		const bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
+		//押している間
+		const bool press(void) const noexcept { return m_press; }
+		//押している間
+		const bool repeat(void) const noexcept { return m_repeat; }
+		//離した瞬間
+		const bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
+		//離している間
+		const bool release(void) const noexcept { return !m_press; }
+	};
+	// 2次元振り子演算
+	class Pendulum2D {
+		float	m_PendulumLength = 10.f;
+		float	m_PendulumMass = 2.f;
+		float	m_drag_coeff = 2.02f;
+
+		float	m_rad = deg2rad(12.f);
+		float	m_vel = 0.f;
+	public:
+		void Init(float Length, float N, float rad) {
+			m_PendulumLength = Length;
+			m_PendulumMass = N;
+			m_rad = rad;
+			m_vel = 0.f;
+		}
+		void Update() {
+			float FPS = GetFrameRate();
+			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / FPS;
+			m_rad += this->m_vel / FPS;
+		}
+	public:
+		const auto GetRad() const noexcept { return this->m_rad; }
+		void AddRad(float value) noexcept { this->m_rad += value; }
 	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/

@@ -10,8 +10,8 @@ namespace DXLib_ref {
 	//共通のサウンドEnum
 	enum class SoundEnumCommon {
 		UI_Select,
-		UI_OK,
 		UI_CANCEL,
+		UI_OK,
 		UI_NG,
 		Num,
 	};
@@ -214,7 +214,6 @@ namespace DXLib_ref {
 			}
 		}
 	};
-
 
 	//サウンドプール
 	class BGMPool : public SingletonBase<BGMPool> {

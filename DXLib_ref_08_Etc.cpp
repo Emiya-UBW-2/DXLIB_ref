@@ -93,7 +93,7 @@ namespace DXLib_ref {
 		if (m_ActivePer > 1.f / 255.f) {
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
-			DrawBox(y_r(960) - WinSizeX / 2, y_r(540) - WinSizeY / 2, y_r(960) + WinSizeX / 2, y_r(540) + WinSizeY / 2, Gray50, true);
+			DrawBox_2D(y_r(960) - WinSizeX / 2, y_r(540) - WinSizeY / 2, y_r(960) + WinSizeX / 2, y_r(540) + WinSizeY / 2, Gray50, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//ƒ^ƒCƒgƒ‹
@@ -116,7 +116,7 @@ namespace DXLib_ref {
 				int xpos = xp1 + (xp1 + y_r(108) - xp1) / 2;
 				int ypos = yp1 + (yp1 + LineHeight * 2 - yp1) / 2;
 
-				DrawBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, MouseOver ? White : Red, true);
+				DrawBox_2D(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, MouseOver ? White : Red, true);
 				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(std::min(LineHeight, yp1 + LineHeight * 2 - yp1), FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE,
 																	   xpos, ypos, White, Black, "•Â‚¶‚é");
 			}
@@ -126,7 +126,7 @@ namespace DXLib_ref {
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
 
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
-				DrawBox(xp1 + y_r(24), yp1, xp1 + WinSizeX - y_r(24), y_r(540) + WinSizeY / 2 - LineHeight, Gray50, true);
+				DrawBox_2D(xp1 + y_r(24), yp1, xp1 + WinSizeX - y_r(24), y_r(540) + WinSizeY / 2 - LineHeight, Gray50, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//

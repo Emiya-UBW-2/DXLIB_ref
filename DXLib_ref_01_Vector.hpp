@@ -60,10 +60,6 @@ namespace DXLib_ref {
 		float y(void) const noexcept { return this->value.y; }
 		float z(void) const noexcept { return this->value.z; }
 
-		void	SetEasingX(float x, float per) noexcept { Easing(&this->value.x, x, per, EasingType::OutExpo); }
-		void	SetEasingY(float y, float per) noexcept { Easing(&this->value.y, y, per, EasingType::OutExpo); }
-		void	SetEasingZ(float z, float per) noexcept { Easing(&this->value.z, z, per, EasingType::OutExpo); }
-
 		//“ü—Í
 		static const VECTOR_ref vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }
 		void Set(float x, float y, float z) noexcept { this->value = DxLib::VGet(x, y, z); }

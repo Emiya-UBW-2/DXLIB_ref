@@ -48,21 +48,20 @@ namespace DXLib_ref {
 	// ファイル操作
 	//--------------------------------------------------------------------------------------------------
 	//ディレクトリ内のファイル走査
-	static const auto GetFileNamesInDirectory(std::string path_t) noexcept {
-		std::vector<WIN32_FIND_DATA> data_t;
+	static void GetFileNamesInDirectory(const char* pPath, std::vector<WIN32_FIND_DATA>* pData) noexcept {
+		pData->clear();
 		WIN32_FIND_DATA win32fdt;
-		HANDLE hFind = FindFirstFile((path_t + "*").c_str(), &win32fdt);
+		HANDLE hFind = FindFirstFile(pPath, &win32fdt);
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (win32fdt.cFileName[0] != '.') {
-					data_t.resize(data_t.size() + 1);
-					data_t.back() = win32fdt;
+					pData->resize(pData->size() + 1);
+					pData->back() = win32fdt;
 				}
 
 			} while (FindNextFile(hFind, &win32fdt));
 		} //else{ return false; }
 		FindClose(hFind);
-		return data_t;
 	}
 	//ファイル選択ダイアログ
 	class DialogManager {
@@ -189,94 +188,6 @@ namespace DXLib_ref {
 		// 変換結果を返す
 		return oRet;
 	}
-
-	//--------------------------------------------------------------------------------------------------
-	// キースイッチ
-	//--------------------------------------------------------------------------------------------------
-	//キー押し判定
-	class switchs {
-		bool		m_on{ false };//オンオフ判定
-		bool		m_press{ false };//オンオフ判定
-		bool		m_repeat{ false };//オンオフ判定
-		int8_t		m_presscount{ 0 };//プッシュ判定
-		float		m_repeatcount{ 30.f };//プッシュ判定
-	public:
-		switchs(void) noexcept {
-			Set(false);
-			m_presscount = 0;
-			m_repeatcount = 30.f;
-			m_press = false;
-		};
-		~switchs(void) noexcept { }
-		//使用前の用意
-		void			Set(bool on) noexcept { m_on = on; }
-		//更新
-		void			Execute(bool key) noexcept {
-			m_press = key;
-			if (m_press) {
-				m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
-
-				m_repeat = trigger();
-				m_repeatcount -= 60.f / GetFPS();
-				if (m_repeatcount <= 0.f) {
-					m_repeatcount += 2.f;
-					m_repeat = true;
-				}
-			}
-			else {
-				m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
-
-				m_repeat = false;
-				m_repeatcount = 30.f;
-			}
-			if (trigger()) {
-				m_on ^= 1;
-			}
-		}
-		//オンオフの取得
-		const bool on(void) const noexcept { return m_on; }
-		//押した瞬間
-		const bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
-		//押している間
-		const bool press(void) const noexcept { return m_press; }
-		//押している間
-		const bool repeat(void) const noexcept { return m_repeat; }
-		//離した瞬間
-		const bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
-		//離している間
-		const bool release(void) const noexcept { return !m_press; }
-	};
-
-	//--------------------------------------------------------------------------------------------------
-	// 補完
-	//--------------------------------------------------------------------------------------------------
-	//イージング
-	enum class EasingType {
-		OutExpo,
-	};
-	//線形補完
-	template <class T>
-	static T Lerp(const T& A, const T& B, float Per) noexcept {
-		if (Per == 0.f) {
-			return A;
-		}
-		else if (Per == 1.f) {
-			return B;
-		}
-		else {
-			return A + (T)((B - A)*Per);
-		}
-	}
-	template <class T>
-	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) {
-		switch (EasingType) {
-		case DXLib_ref::EasingType::OutExpo:
-			*A = Lerp(*A, B, (1.f - std::powf(ratio, 60.f / GetFPS())));
-			break;
-		default:
-			break;
-		}
-	};
 	//--------------------------------------------------------------------------------------------------
 	// フォントファイル管理
 	//--------------------------------------------------------------------------------------------------
@@ -295,33 +206,5 @@ namespace DXLib_ref {
 				MessageBox(NULL, "フォント読込削除", "", MB_OK);
 			}
 		}
-	};
-
-	//--------------------------------------------------------------------------------------------------
-	// 2次元振り子演算
-	//--------------------------------------------------------------------------------------------------
-	class Pendulum2D {
-		float	m_PendulumLength = 10.f;
-		float	m_PendulumMass = 2.f;
-		float	m_drag_coeff = 2.02f;
-
-		float	m_rad = deg2rad(12.f);
-		float	m_vel = 0.f;
-	public:
-		void Init(float Length, float N, float rad) {
-			m_PendulumLength = Length;
-			m_PendulumMass = N;
-			m_rad = rad;
-			m_vel = 0.f;
-		}
-
-		void Execute() {
-			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / 60.f;
-			m_rad += this->m_vel / 60.f;
-		}
-
-		const auto GetRad() const noexcept { return this->m_rad; }
-
-		void AddRad(float value) noexcept { this->m_rad += value; }
 	};
 }

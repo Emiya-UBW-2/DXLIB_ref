@@ -54,7 +54,7 @@ namespace DXLib_ref {
 					int xr = DrawParts->m_DispXSize / EXTEND * 30 / 100;
 					int yr = DrawParts->m_DispYSize / EXTEND * 60 / 100;
 
-					DrawBox(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, GetColor(0, 0, 0), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, GetColor(0, 0, 0), TRUE);
 					DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr, yr, GetColor(255, 255, 255), TRUE);
 
 					int r = 0, c = 0, p = 2;
@@ -120,7 +120,7 @@ namespace DXLib_ref {
 				{
 					TargetGraph->DrawGraph(0, 0, true);
 					SSRScreen.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
-					//DrawBox(0, 0, 1920, 1080, GetColor(255, 0, 0), TRUE);
+					//DrawBox_2D(0, 0, 1920, 1080, GetColor(255, 0, 0), TRUE);
 				}
 				GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
@@ -232,11 +232,11 @@ namespace DXLib_ref {
 			if (OptionParts->Get_aberration()) {
 				auto* DrawParts = DXDraw::Instance();
 				BufScreen[0].SetDraw_Screen(true);
-				DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 				BufScreen[1].SetDraw_Screen(true);
-				DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 				BufScreen[2].SetDraw_Screen(true);
-				DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 				GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 				GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
@@ -246,7 +246,7 @@ namespace DXLib_ref {
 				//output_high = 255;
 				TargetGraph->SetDraw_Screen(true);
 				{
-					DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 					SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 					BufScreen[0].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
 					BufScreen[1].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f, 0.f, true);
@@ -348,7 +348,7 @@ namespace DXLib_ref {
 					int xr = DrawParts->m_DispXSize * 60 / 100;
 					int yr = DrawParts->m_DispYSize * 70 / 100;
 
-					DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 					DrawOval(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, xr, yr, GetColor(255, 255, 255), TRUE);
 
 					int r = 0, c = 0, p = 2;
@@ -404,7 +404,7 @@ namespace DXLib_ref {
 				bkScreen.SetDraw_Screen(true);
 				{
 					int y = 0, c = 0, p = 2;
-					DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(255, 255, 255), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(255, 255, 255), TRUE);
 
 					p = 1;
 					for (y = 0; y < 255; y += p) {
@@ -436,7 +436,7 @@ namespace DXLib_ref {
 
 			TargetGraph->SetDraw_Screen();
 			{
-				DrawBox(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}

@@ -37,7 +37,13 @@ namespace DXLib_ref {
 		const auto		Get_DoF()const noexcept { return DoF && !useVR; }
 		const auto		Get_Bloom()const noexcept { return Bloom && !useVR; }
 		const auto		Get_Shadow()const noexcept { return Shadow; }
-		const auto		Get_useVR()const noexcept { return useVR; }
+		const auto		Get_useVR()const noexcept {
+#ifndef _USE_OPENVR_
+			return false;
+#else
+			return useVR;
+#endif
+		}
 		const auto		Get_SSAO()const noexcept { return SSAO && !useVR; }
 		const auto		Get_Fov()const noexcept { return Fov; }
 		const auto		Get_Vsync()const noexcept { return Vsync; }

@@ -293,7 +293,8 @@ namespace DXLib_ref {
 		std::vector<EffekseerEffectHandle> effsorce;	/*エフェクトリソース*/
 	private:
 		EffectResource() {
-			auto data_t = GetFileNamesInDirectory("data/effect/");
+			std::vector<WIN32_FIND_DATA> data_t;
+			GetFileNamesInDirectory("data/effect/*", &data_t);
 			for (const auto& d : data_t) {
 				std::string p = d.cFileName;
 				if (p.find(".efk") != std::string::npos && p.find(".efkproj") == std::string::npos) {

@@ -61,8 +61,8 @@ namespace DXLib_ref {
 			}
 		}
 
-		DrawBox(xpos - 1, ypos - 1, xpos + wide + 1, ypos + height + 1, black, TRUE);
-		DrawBox(xpos, ypos, xpos + wide, ypos + height, white, FALSE);
+		DrawBox_2D(xpos - 1, ypos - 1, xpos + wide + 1, ypos + height + 1, black, TRUE);
+		DrawBox_2D(xpos, ypos, xpos + wide, ypos + height, white, FALSE);
 		DrawLine_2D(xpos, ypos + height - half, xpos + wide, ypos + height - half, white);//Šî€ü
 		auto xs = (float)wide / m_FrameRate;
 		auto ys = (float)half / (1000.0f / m_FrameRate);
@@ -79,8 +79,8 @@ namespace DXLib_ref {
 		auto yp_f = ypos + height;
 		auto xs_f = y_r(250);
 		auto ys_f = (int)(m_PointSel + 3 + 1) * FontSize + 3;
-		DrawBox(xp_f - 1, yp_f - 1, xp_f + xs_f + 1, yp_f + ys_f + 1, black, TRUE);
-		DrawBox(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, white, FALSE);
+		DrawBox_2D(xp_f - 1, yp_f - 1, xp_f + xs_f + 1, yp_f + ys_f + 1, black, TRUE);
+		DrawBox_2D(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, white, FALSE);
 
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
 			"AsyncCount :%d", GetASyncLoadNum()); yp_f += FontSize;

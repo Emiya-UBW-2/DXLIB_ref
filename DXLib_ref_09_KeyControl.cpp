@@ -226,9 +226,6 @@ namespace DXLib_ref {
 
 
 	void PadControl::ChangeGuide(std::function<void()>Guide_Pad) noexcept {
-		if (DXDraw::Instance()->IsPauseSwitch()) {
-			m_IsUpdate = true;
-		}
 		if (m_IsUpdate) {
 			m_IsUpdate = false;
 			Reset();
@@ -349,9 +346,6 @@ namespace DXLib_ref {
 				}
 				else {
 					if (!DrawParts->IsPause()) {
-						if (DrawParts->IsPauseSwitch()) {
-							SetMousePoint(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2);
-						}
 						SetMousePoint(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2);
 						SetMouseDispFlag(FALSE);
 						auto* OptionParts = OPTION::Instance();
