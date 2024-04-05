@@ -571,14 +571,22 @@ namespace DXLib_ref {
 				Screen_vertex[5] = Screen_vertex[1];
 			}
 		};
+
+		// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列
+		struct LIGHTCAMERA_MATRIX {
+			MATRIX ViewMatrix;
+			MATRIX ProjectionMatrix;
+		};
 	private:
 		//シェーダーハンドル
-		int m_VertexShaderhandle{ -1 };
-		int m_PixelShaderhandle{ -1 };
+		int m_VertexShaderhandle{-1};
+		int m_PixelShaderhandle{-1};
 		//シェーダーに渡す追加パラメーターを配するハンドル
-		std::array<int, 4> m_VertexShadercbhandle{ -1 };
-		int m_PixelShaderSendDispSizeHandle{ -1 };
-		std::array<int, 4> m_PixelShadercbhandle{ -1 };
+		int LightCameraMatrixConstantBufferHandle;	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
+		std::array<int, 4> m_VertexShadercbhandle{-1};
+		int m_PixelShaderSendDispSizeHandle{-1};
+		std::array<int, 4> m_PixelShadercbhandle{-1};
+
 	public:
 		ShaderUseClass() {
 			//シェーダーハンドル
@@ -600,6 +608,7 @@ namespace DXLib_ref {
 			for (auto& h : m_VertexShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
+			LightCameraMatrixConstantBufferHandle = CreateShaderConstantBuffer(sizeof(LIGHTCAMERA_MATRIX));		// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファの作成
 			this->m_VertexShaderhandle = LoadVertexShader(VertexShader);		// 頂点シェーダーバイナリコードの読み込み
 			//ピクセルシェーダ―周り
 			this->m_PixelShaderSendDispSizeHandle = CreateShaderConstantBuffer(sizeof(float) * 4);
@@ -612,6 +621,7 @@ namespace DXLib_ref {
 		void			Dispose() noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			//頂点シェーダー周り
+			DeleteShaderConstantBuffer(this->LightCameraMatrixConstantBufferHandle);
 			for (auto& h : m_VertexShadercbhandle) {
 				DeleteShaderConstantBuffer(h);
 			}
@@ -624,6 +634,16 @@ namespace DXLib_ref {
 			DeleteShader(this->m_PixelShaderhandle);
 		}
 	public:
+		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		void			SetVertexCameraMatrix(int Slot) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			// 設定したカメラのビュー行列と射影行列を取得しておく
+			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle);
+			LightCameraMatrixConst->ViewMatrix = GetCameraViewMatrix();
+			LightCameraMatrixConst->ProjectionMatrix = GetCameraProjectionMatrix();
+			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle);
+			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle, DX_SHADERTYPE_VERTEX, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
+		}
 		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }

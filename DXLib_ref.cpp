@@ -281,6 +281,74 @@ namespace DXLib_ref {
 	};
 #endif
 
+	void DXDraw::ShadowDraw::Init(int ShadowMapSize, int dispsizex, int dispsizey) {
+		//
+		BaseShadowHandle = GraphHandle::Make(dispsizex, dispsizey, TRUE);
+		{
+			int size = 2 << ShadowMapSize;
+			DepthBaseScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
+			SetDrawValidFloatTypeGraphCreateFlag(TRUE);
+			SetCreateDrawValidGraphChannelNum(2);
+			SetCreateGraphChannelBitDepth(32);
+			DepthScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
+
+			// 設定を元に戻す
+			SetDrawValidFloatTypeGraphCreateFlag(FALSE);
+			SetCreateDrawValidGraphChannelNum(4);
+			SetCreateGraphColorBitDepth(32);
+		}
+		m_isUpdate = true;
+
+		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
+		m_Shader_Skin4_DepthShadow_Step2.Init("shader/SkinMesh4_DirLight_DepthShadow_Step2VS.vso", "shader/DirLight_DepthShadow_Step2PS.pso");
+	}
+	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, VECTOR_ref Center) {
+		if (!m_isUpdate) { return; }
+		// 影用の深度記録画像の準備を行う
+		DepthScreenHandle.SetDraw_Screen();
+		DepthBaseScreenHandle.SetDraw_Screen();
+		{
+			SetupCamera_Ortho(5.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+			SetCameraNearFar(0.05f*12.5f, 30.f*12.5f);		// 描画する奥行き範囲をセット
+			// カメラの位置と注視点はステージ全体が見渡せる位置
+			auto Vec = m_ShadowVec;
+			if (Vec.x() == 0.f && m_ShadowVec.z() == 0.f) {
+				Vec.z(0.1f);
+			}
+			SetCameraPositionAndTarget_UpVecY((Center - Vec.Norm() * (5.f*12.5f)).get(), Center.get());
+
+			// 設定したカメラのビュー行列と射影行列を取得しておく
+			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
+
+			SetRenderTargetToShader(2, DepthScreenHandle.get());
+			Shadowdoing();
+			SetRenderTargetToShader(2, -1);
+		}
+	}
+	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing) {
+		if (!m_isUpdate) { return; }
+		auto* DrawParts = DXDraw::Instance();
+		// 影の結果を出力
+		Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f*12.5f, 5.f*12.5f);
+		BaseShadowHandle.SetDraw_Screen(tmp_cam);
+		{
+			SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
+			m_Shader_Skin4_DepthShadow_Step2.Draw_lamda(doing);
+			SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
+		}
+		//後処理
+		//*
+		GraphFilter(BaseShadowHandle.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
+		GraphBlend(BaseShadowHandle.get(), BaseShadowHandle.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+				   DX_RGBA_SELECT_SRC_G,    // 出力結果の赤成分は AlphaHandle の緑成分
+				   DX_RGBA_SELECT_SRC_G,    // 出力結果の緑成分は AlphaHandle の赤成分
+				   DX_RGBA_SELECT_SRC_G,    // 出力結果の青成分は AlphaHandle の青成分
+				   DX_RGBA_SELECT_BLEND_R    // 出力結果のアルファ成分は BlendHandle の赤成分
+		);
+		//*/
+	}
+
 	//
 	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
@@ -371,8 +439,10 @@ namespace DXLib_ref {
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->Get_SE());
 		//影生成
-		for (auto& s : m_Shadow) {
-			s.Init();
+		if (!OptionParts->Get_LightMode()) {
+			m_ShadowDraw.Init(12, this->m_DispXSize, this->m_DispYSize);
+			m_Shadow.at(1).Init();
+			m_Shadow.at(2).Init();
 		}
 		//Init
 		m_PauseActive.Set(false);
@@ -389,9 +459,8 @@ namespace DXLib_ref {
 		this->GetVRControl()->Dispose();
 		delete m_VRControl;
 		//影削除
-		for (auto& s : m_Shadow) {
-			s.Dispose();
-		}
+		m_Shadow.at(1).Dispose();
+		m_Shadow.at(2).Dispose();
 		//
 		Effkseer_End();
 		DxLib_End();
@@ -413,7 +482,18 @@ namespace DXLib_ref {
 	//
 	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, int shadowSelect) noexcept {
 		if (OPTION::Instance()->Get_Shadow()) {
-			m_Shadow[shadowSelect].Update(doing, CenterPos);
+			// 影用の深度記録画像の準備を行う
+			if (shadowSelect==0) {
+				m_ShadowDraw.Update(doing, CenterPos);
+			}
+			else {
+				m_Shadow[shadowSelect].Update(doing, CenterPos);
+			}
+		}
+	}
+	void			DXDraw::Update_NearShadow(std::function<void()> doing) noexcept {
+		if (OPTION::Instance()->Get_Shadow()) {
+			m_ShadowDraw.SetDraw(doing);
 		}
 	}
 	//
@@ -618,6 +698,7 @@ namespace DXLib_ref {
 			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			{
 				PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);	//デフォ描画
+
 				doingUI();										//UI1
 				if (IsPause()) {
 					//

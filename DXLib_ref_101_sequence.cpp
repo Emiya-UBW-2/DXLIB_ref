@@ -46,8 +46,11 @@ namespace DXLib_ref {
 		EffectResource::Instance()->Calc(DrawParts->IsPause());//エフェクシアのアプデを60FPS相当に変更
 		//影をセット
 		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), 0);
+		DrawParts->Update_NearShadow([&] {this->m_ScenesPtr->MainDraw(); });
+
 		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw_NearFar(); }, DrawParts->SetMainCamera().GetCamPos(), 1);
 		DrawParts->Update_Shadow([&] {this->m_ScenesPtr->ShadowDraw_Far(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
+
 		//画面に反映
 		DrawParts->Draw(
 			[&](const Camera3DInfo& cams) {

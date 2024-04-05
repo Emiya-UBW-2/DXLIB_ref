@@ -116,10 +116,10 @@ namespace DXLib_ref {
 		public:
 			void			Init() noexcept {
 				if (m_ShadowHandle == -1) {
-					auto size = int(pow(2, 13));
+					auto size = int(pow(2, 12));
 					m_ShadowHandle = MakeShadowMap(size, size);
+					SetShadowMapAdjustDepth(m_ShadowHandle, 0.0005f);
 				}
-				SetShadowMapAdjustDepth(m_ShadowHandle, 0.0005f);
 			}
 			void			Update(std::function<void()> doing, const VECTOR_ref& CenterPos) noexcept {
 				if (m_ShadowHandle != -1 && m_isUpdate) {
@@ -137,6 +137,30 @@ namespace DXLib_ref {
 				}
 			}
 		};
+		class ShadowDraw {
+			GraphHandle	BaseShadowHandle;			// モデルハンドル
+			GraphHandle DepthBaseScreenHandle;
+			GraphHandle DepthScreenHandle;
+			// 深度記録画像を使ったディレクショナルライト一つ付きの描画用の剛体メッシュ用とスキニングメッシュ用のシェーダー
+			ShaderUseClass					m_Shader_Skin4_DepthShadow_Step2;
+			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
+			VECTOR_ref		m_ShadowVec{VECTOR_ref::up()};
+			bool			m_isUpdate{false};
+		public:
+			void			SetVec(const VECTOR_ref& Vec) noexcept { m_ShadowVec = Vec; }
+			void SetisUpdate(bool value) noexcept { m_isUpdate = value; }
+
+			void Init(int ShadowMapSize, int dispsizex, int dispsizey);
+			void Update(std::function<void()> Shadowdoing, VECTOR_ref Center);
+			void SetDraw(std::function<void()> doing);
+
+			void Draw() {
+				if (!m_isUpdate) { return; }
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+				BaseShadowHandle.DrawGraph(0, 0, true);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			}
+		};
 	public:
 		int							m_DispXSize{deskx};
 		int							m_DispYSize{desky};
@@ -146,6 +170,7 @@ namespace DXLib_ref {
 		bool						m_IsEnd{false};
 
 		std::array<ShadowControl, 3> m_Shadow;
+		ShadowDraw					m_ShadowDraw;
 		VECTOR_ref					m_LightVec;
 		COLOR_F						m_LightColorF{GetColorF(0, 0, 0, 0)};
 		GraphHandle					m_OutScreen;							//スクリーンバッファ
@@ -179,6 +204,8 @@ namespace DXLib_ref {
 
 		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
+
+		void			GetShadowAfterDraw() { m_ShadowDraw.Draw(); }
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
@@ -194,20 +221,34 @@ namespace DXLib_ref {
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 	public:
 		void			SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-		void			SetShadow(const VECTOR_ref& Vec, const VECTOR_ref& MinSize, const VECTOR_ref& MaxSize, int shadowSelect) noexcept { m_Shadow[shadowSelect].Set(Vec, MinSize, MaxSize); }
-		void			SetIsUpdateShadow(int shadowSelect, bool value) noexcept { m_Shadow[shadowSelect].SetisUpdate(value); }
+		void			SetShadow(const VECTOR_ref& Vec, const VECTOR_ref& MinSize, const VECTOR_ref& MaxSize, int shadowSelect) noexcept {
+			if (shadowSelect == 0) {
+				m_ShadowDraw.SetVec(Vec);
+			}
+			else {
+				m_Shadow[shadowSelect].Set(Vec, MinSize, MaxSize);
+			}
+		}
+		void			SetIsUpdateShadow(int shadowSelect, bool value) noexcept {
+			if (shadowSelect == 0) {
+				m_ShadowDraw.SetisUpdate(value);
+			}
+			else {
+				m_Shadow[shadowSelect].SetisUpdate(value);
+			}
+		}
 
 		void			SetUseShadow(void) noexcept {
-			for (auto& s : m_Shadow) {
-				SetUseShadowMap((int)(&s - &m_Shadow.front()), s.GetHandle());
-			}
+			SetUseShadowMap(0, m_Shadow.at(1).GetHandle());
+			SetUseShadowMap(1, m_Shadow.at(2).GetHandle());
 		}
 		void			ResetUseShadow(void) noexcept {
-			for (auto& s : m_Shadow) {
-				SetUseShadowMap((int)(&s - &m_Shadow.front()), -1);
-			}
+			SetUseShadowMap(0, -1);
+			SetUseShadowMap(1, -1);
 		}
 		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, int shadowSelect) noexcept;
+
+		void			Update_NearShadow(std::function<void()> doing) noexcept;
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;

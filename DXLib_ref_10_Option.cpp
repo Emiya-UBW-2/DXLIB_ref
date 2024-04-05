@@ -40,26 +40,27 @@ namespace DXLib_ref {
 		Xsensing = getparams::_float(mdata);
 		Ysensing = getparams::_float(mdata);
 		HeadBobbing = getparams::_bool(mdata);
+		LightMode = getparams::_bool(mdata);
 		FileRead_close(mdata);
 		SetOutApplicationLogValidFlag(TRUE);
 	}
 	void			OPTION::Save(void) noexcept {
 		std::ofstream outputfile("data/Setting.txt");
-		outputfile << "grass_level=" + std::to_string(grass_level) + "\n";
-		outputfile << "DoF=" + std::string((DoF) ? "true" : "false") + "\n";
-		outputfile << "bloom=" + std::string((Bloom) ? "true" : "false") + "\n";
-		outputfile << "shadow=" + std::string((Shadow) ? "true" : "false") + "\n";
-		outputfile << "usevr=" + std::string((useVR) ? "true" : "false") + "\n";
-		outputfile << "SSAO=" + std::string((SSAO) ? "true" : "false") + "\n";
-		outputfile << "fov=" + std::to_string(Fov) + "\n";
-		outputfile << "vsync=" + std::string((Vsync) ? "true" : "false") + "\n";
-		outputfile << "FpsLimit=" + std::to_string(FrameLimit) + "\n";
-		outputfile << "SE=" + std::to_string(SE) + "\n";
-		outputfile << "VOICE=" + std::to_string(VOICE) + "\n";
-		outputfile << "BGM=" + std::to_string(BGM) + "\n";
-		outputfile << "AllWaysFront=" + std::string((AllWaysFront) ? "true" : "false") + "\n";
-		outputfile << "aberration=" + std::string((aberration) ? "true" : "false") + "\n";
-		switch (DirectXVer) {
+		outputfile << "grass_level=" + std::to_string(Get_grass_level()) + "\n";
+		outputfile << "DoF=" + std::string((Get_DoF()) ? "true" : "false") + "\n";
+		outputfile << "bloom=" + std::string((Get_Bloom()) ? "true" : "false") + "\n";
+		outputfile << "shadow=" + std::string((Get_Shadow()) ? "true" : "false") + "\n";
+		outputfile << "usevr=" + std::string((Get_useVR()) ? "true" : "false") + "\n";
+		outputfile << "SSAO=" + std::string((Get_SSAO()) ? "true" : "false") + "\n";
+		outputfile << "fov=" + std::to_string(Get_Fov()) + "\n";
+		outputfile << "vsync=" + std::string((Get_Vsync()) ? "true" : "false") + "\n";
+		outputfile << "FpsLimit=" + std::to_string(Get_FrameLimit()) + "\n";
+		outputfile << "SE=" + std::to_string(Get_SE()) + "\n";
+		outputfile << "VOICE=" + std::to_string(Get_VOICE()) + "\n";
+		outputfile << "BGM=" + std::to_string(Get_BGM()) + "\n";
+		outputfile << "AllWaysFront=" + std::string((Get_AllWaysFront()) ? "true" : "false") + "\n";
+		outputfile << "aberration=" + std::string((Get_aberration()) ? "true" : "false") + "\n";
+		switch (Get_DirectXVer()) {
 			case  DX_DIRECT3D_9EX:
 				outputfile << "DirectXVer=" + std::string("9c") + "\n";
 				break;
@@ -69,11 +70,12 @@ namespace DXLib_ref {
 			default:
 				break;
 		}
-		outputfile << "SSR=" + std::string((SSR) ? "true" : "false") + "\n";
-		outputfile << "MotionBlur=" + std::string((MotionBlur) ? "true" : "false") + "\n";
-		outputfile << "Xsensing=" + std::to_string(Xsensing) + "\n";
-		outputfile << "Ysensing=" + std::to_string(Ysensing) + "\n";
-		outputfile << "HeadBobbing=" + std::string((HeadBobbing) ? "true" : "false") + "\n";
+		outputfile << "SSR=" + std::string((Get_SSR()) ? "true" : "false") + "\n";
+		outputfile << "MotionBlur=" + std::string((Get_MotionBlur()) ? "true" : "false") + "\n";
+		outputfile << "Xsensing=" + std::to_string(Get_Xsensing()) + "\n";
+		outputfile << "Ysensing=" + std::to_string(Get_Ysensing()) + "\n";
+		outputfile << "HeadBobbing=" + std::string((Get_HeadBobbing()) ? "true" : "false") + "\n";
+		outputfile << "LightMode=" + std::string((Get_LightMode()) ? "true" : "false") + "\n";
 		outputfile.close();
 	}
 
@@ -391,6 +393,27 @@ namespace DXLib_ref {
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Light Mode", "軽量モードを指定します(反映は再起動後にされます)",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_LightMode(OptionParts->Get_LightMode() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_LightMode(OptionParts->Get_LightMode() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_LightMode(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_LightMode()));
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Window Mode", "ウィンドウ、ボーダーレスモードを選択します(反映は再起動後にされます)",
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
@@ -579,6 +602,27 @@ namespace DXLib_ref {
 															  LineHeight, FontHandle::FontXCenter::RIGHT, (OptionParts->Get_DirectXVer() == DX_DIRECT3D_11) ? White : Gray50, Black, "11.0");
 									 }
 									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("AntiAlias", "FXAAの有効無効を指定します",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_FXAA(OptionParts->Get_FXAA() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_FXAA(OptionParts->Get_FXAA() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_FXAA(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_FXAA()));
+									 }
+									 );
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("SSAO", "画面ベースの環境遮蔽の有効無効を指定します",
@@ -645,7 +689,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Grass", "木の表示をするかを指定します",
+		this->m_Elements.back().Init("Object", "オブジェクトの表示をするかを指定します",
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();

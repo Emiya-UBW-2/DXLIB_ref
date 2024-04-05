@@ -31,20 +31,25 @@ namespace DXLib_ref {
 		float	Xsensing{ 0.5f };
 		float	Ysensing{ 0.5f };
 		bool	HeadBobbing{true};
+		bool	FXAA{true};
+		bool	LightMode{false};
 	public:
-		//VRでは使えない機能は　 && !useVR
-		const auto		Get_grass_level()const noexcept { return grass_level; }
-		const auto		Get_DoF()const noexcept { return DoF && !useVR; }
-		const auto		Get_Bloom()const noexcept { return Bloom && !useVR; }
-		const auto		Get_Shadow()const noexcept { return Shadow; }
+		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_useVR()const noexcept {
 #ifndef _USE_OPENVR_
 			return false;
 #else
-			return useVR;
+			return useVR && (Get_DirectXVer() == DX_DIRECT3D_11);
 #endif
 		}
-		const auto		Get_SSAO()const noexcept { return SSAO && !useVR; }
+
+		const auto		Get_LightMode()const noexcept { return LightMode; }
+		//VRでは使えない機能は　 && !Get_useVR()
+		const auto		Get_grass_level()const noexcept { return grass_level; }
+		const auto		Get_DoF()const noexcept { return DoF && !Get_useVR() && !Get_LightMode(); }
+		const auto		Get_Bloom()const noexcept { return Bloom && !Get_useVR() && !Get_LightMode(); }
+		const auto		Get_Shadow()const noexcept { return Shadow && !Get_LightMode(); }
+		const auto		Get_SSAO()const noexcept { return SSAO && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
 		const auto		Get_Fov()const noexcept { return Fov; }
 		const auto		Get_Vsync()const noexcept { return Vsync; }
 		const auto		Get_FrameLimit()const noexcept { return FrameLimit; }
@@ -52,20 +57,21 @@ namespace DXLib_ref {
 		const auto		Get_VOICE()const noexcept { return VOICE; }
 		const auto		Get_BGM()const noexcept { return BGM; }
 		const auto		Get_AllWaysFront()const noexcept { return AllWaysFront; }
-		const auto		Get_aberration()const noexcept { return aberration; }
-		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
-		const auto		Get_SSR()const noexcept { return SSR && !useVR; }
-		const auto		Get_MotionBlur()const noexcept { return MotionBlur; }
+		const auto		Get_aberration()const noexcept { return aberration && !Get_LightMode(); }
+		const auto		Get_SSR()const noexcept { return SSR && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
+		const auto		Get_MotionBlur()const noexcept { return MotionBlur && !Get_LightMode(); }
 		const auto		Get_Xsensing()const noexcept { return Xsensing; }
 		const auto		Get_Ysensing()const noexcept { return Ysensing; }
 		const auto		Get_HeadBobbing()const noexcept { return HeadBobbing; }
-		
+		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
+
 	public:
+		void			Set_useVR(bool use) { useVR = use; }
+		void			Set_LightMode(bool use) { LightMode = use; }
 		void			Set_grass_level(int value) noexcept { grass_level = value; }
 		void			Set_DoF(bool use) { DoF = use; }
 		void			Set_Bloom(bool value) noexcept { Bloom = value; }
 		void			Set_Shadow(bool value) noexcept { Shadow = value; }
-		void			Set_useVR(bool use) { useVR = use; }
 		void			Set_SSAO(bool use) { SSAO = use; }
 		void			Set_Fov(float per) noexcept { Fov = per; }
 		void			Set_Vsync(bool value) noexcept { Vsync = value; }
@@ -81,6 +87,7 @@ namespace DXLib_ref {
 		void			Set_Xsensing(float per) noexcept { Xsensing = per; }
 		void			Set_Ysensing(float per) noexcept { Ysensing = per; }
 		void			Set_HeadBobbing(bool use) noexcept { HeadBobbing = use; }
+		void			Set_FXAA(bool use) noexcept { FXAA = use; }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -152,7 +159,7 @@ namespace DXLib_ref {
 			void Init_Sub() noexcept override;
 		};
 		class GraphicTabsInfo :public OptionTabsInfo {
-			static const int	FrameLimitsNum = 7;
+			static const int	FrameLimitsNum = 10;
 			const int	FrameLimits[FrameLimitsNum] = {
 				30,
 				60,
@@ -161,6 +168,9 @@ namespace DXLib_ref {
 				120,
 				144,
 				240,
+				300,
+				360,
+				1000,
 			};
 		private:
 			int RefreshRate{FrameLimits[1]};

@@ -631,6 +631,36 @@ namespace DXLib_ref {
 			}
 		}
 	};
+
+	class PostPassFXAA : public PostPassBase {
+	private:
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderUseClass		m_FXAA;			// シェーダー
+	public:
+		PostPassFXAA(void) {
+			auto* DrawParts = DXDraw::Instance();
+			m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);							// 頂点データの準備
+			m_FXAA.Init("shader/FXAA_VS.vso", "shader/FXAA_PS.pso");					// FXAA
+		}
+		~PostPassFXAA(void) {}
+	public:
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
+			auto* DrawParts = DXDraw::Instance();
+			auto* OptionParts = OPTION::Instance();
+
+			if (OptionParts->Get_FXAA()) {
+				TargetGraph->SetDraw_Screen();
+				{
+					SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
+					m_FXAA.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+					{
+						m_FXAA.Draw(m_ScreenVertex);
+					}
+					SetUseTextureToShader(0, -1);
+				}
+			}
+		}
+	};
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -642,36 +672,40 @@ namespace DXLib_ref {
 		NearScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);		//描画スクリーン
 		MAIN_Screen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);		//最終描画用
 		//Gバッファ
-		ColorScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
-		NormalScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);	// 法線Gバッファ
-		{
-			// 深度を描画するテクスチャGバッファの作成( 2チャンネル浮動小数点32ビットテクスチャ )
-			auto prevMip = GetCreateDrawValidGraphChannelNum();
-			auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
-			auto prevBit = GetCreateGraphChannelBitDepth();
-			SetCreateDrawValidGraphChannelNum(2);
-			SetDrawValidFloatTypeGraphCreateFlag(TRUE);
-			SetCreateGraphChannelBitDepth(32);
-			DepthScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
-			SetCreateDrawValidGraphChannelNum(prevMip);
-			SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
-			SetCreateGraphChannelBitDepth(prevBit);
-		}
-		//深度描画用
-		//DepthDraw.Init("shader/NormalMesh_PointLightVS.vso", "shader/NormalMesh_PointLightPS.pso");
-		//ポストエフェクト
-		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
-		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
-		m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
-		m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
-		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
-		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
-		m_PostPass.emplace_back(std::make_unique<PostPassMotionBlur>());
-		m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
-		m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
-		
-		for (auto& P : m_PostPass) {
-			P->SetPtr(&NormalScreen, &DepthScreen);
+		auto* OptionParts = OPTION::Instance();
+		if (!OptionParts->Get_LightMode()) {
+			ColorScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
+			NormalScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);	// 法線Gバッファ
+			{
+				// 深度を描画するテクスチャGバッファの作成( 2チャンネル浮動小数点32ビットテクスチャ )
+				auto prevMip = GetCreateDrawValidGraphChannelNum();
+				auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
+				auto prevBit = GetCreateGraphChannelBitDepth();
+				SetCreateDrawValidGraphChannelNum(2);
+				SetDrawValidFloatTypeGraphCreateFlag(TRUE);
+				SetCreateGraphChannelBitDepth(32);
+				DepthScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
+				SetCreateDrawValidGraphChannelNum(prevMip);
+				SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
+				SetCreateGraphChannelBitDepth(prevBit);
+			}
+			//深度描画用
+			//DepthDraw.Init("shader/NormalMesh_PointLightVS.vso", "shader/NormalMesh_PointLightPS.pso");
+			//ポストエフェクト
+			m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
+			m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
+			m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
+			m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
+			m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
+			m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
+			m_PostPass.emplace_back(std::make_unique<PostPassMotionBlur>());
+			m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
+			m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
+			m_PostPass.emplace_back(std::make_unique<PostPassFXAA>());
+
+			for (auto& P : m_PostPass) {
+				P->SetPtr(&NormalScreen, &DepthScreen);
+			}
 		}
 	}
 	PostPassEffect::~PostPassEffect(void) noexcept {
@@ -687,8 +721,10 @@ namespace DXLib_ref {
 		auto* OptionParts = OPTION::Instance();
 		//全ての画面を初期化
 		{
-			NormalScreen.SetDraw_Screen();//リセット替わり
-			DepthScreen.SetDraw_Screen();//リセット替わり
+			if (!OptionParts->Get_LightMode()) {
+				NormalScreen.SetDraw_Screen();//リセット替わり
+				DepthScreen.SetDraw_Screen();//リセット替わり
+			}
 			FarScreen_.SetDraw_Screen();//リセット替わり
 			NearScreen_.SetDraw_Screen();//リセット替わり
 		}
@@ -696,9 +732,10 @@ namespace DXLib_ref {
 		auto G_Draw = [&](GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done) {
 			// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
 			SetRenderTargetToShader(0, TargetDraw->get());
-			SetRenderTargetToShader(1, NormalScreen.get());
-			SetRenderTargetToShader(2, DepthScreen.get());
-			//SetRenderTargetToShader(3, SpecScreenHandle);
+			if (!OptionParts->Get_LightMode()) {
+				SetRenderTargetToShader(1, NormalScreen.get());
+				SetRenderTargetToShader(2, DepthScreen.get());
+			}
 			SetCameraNearFar(near_len, far_len);
 			SetupCamera_Perspective(cams.GetCamFov());
 			SetCameraPositionAndTargetAndUpVec(cams.GetCamPos().get(), cams.GetCamVec().get(), cams.GetCamUp().get());
@@ -708,7 +745,6 @@ namespace DXLib_ref {
 			SetRenderTargetToShader(0, -1);
 			SetRenderTargetToShader(1, -1);
 			SetRenderTargetToShader(2, -1);
-			//SetRenderTargetToShader(3, -1);
 		};
 		//空
 		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() {
@@ -761,6 +797,13 @@ namespace DXLib_ref {
 			   });
 		//fovを記憶しておく
 		fov = cams.GetCamFov();
+
+		if (OPTION::Instance()->Get_Shadow()) {
+			Plus_Draw([&]() {
+				DrawParts->GetShadowAfterDraw();
+									 });
+
+		}
 		//ポストパスエフェクトの適用
 		SetPostpassEffect();
 	}
@@ -785,13 +828,18 @@ namespace DXLib_ref {
 			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
 		}
 		//bufに描画
+		/**/
+		auto* OptionParts = OPTION::Instance();
 		for (auto& P : m_PostPass) {
-			ColorScreen.SetDraw_Screen();
-			{
-				NearScreen_.DrawGraph(0, 0, false);
+			if (!OptionParts->Get_LightMode()) {
+				ColorScreen.SetDraw_Screen();
+				{
+					NearScreen_.DrawGraph(0, 0, false);
+				}
 			}
-			P->SetEffect(&NearScreen_,&ColorScreen);
+			P->SetEffect(&NearScreen_, &ColorScreen);
 		}
+		//*/
 		//結果描画
 		MAIN_Screen.SetDraw_Screen();
 		{
