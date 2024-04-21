@@ -7,8 +7,14 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 
 	enum class ControlType :int {
+		XBox,
 		PS4,
 		PC,
+	};
+	static const char* ControlTypeStr[]= {
+		"XBox",
+		"PS4",
+		"PC",
 	};
 
 	enum class PADS :int {
@@ -196,7 +202,7 @@ namespace DXLib_ref {
 		"BACK",
 		"TAB",
 		"RETURN",
-		
+
 		"LSHIFT",
 		"RSHIFT",
 		"LCONTROL",
@@ -213,7 +219,7 @@ namespace DXLib_ref {
 		"DOWN",
 		"INSERT",
 		"DELETE",
-		
+
 		"MINUS",
 		"YEN",
 		"PREVTRACK",
@@ -239,7 +245,7 @@ namespace DXLib_ref {
 		"PAUSE",
 		"LWIN",
 		"RWIN",
-		
+
 		"NUMLOCK",
 		"NUMPAD0",
 		"NUMPAD1",
@@ -257,7 +263,7 @@ namespace DXLib_ref {
 		"DECIMAL",
 		"DIVIDE",
 		"NUMPADENTER",
-		
+
 		"F1",
 		"F2",
 		"F3",
@@ -270,7 +276,7 @@ namespace DXLib_ref {
 		"F10",
 		"F11",
 		"F12",
-		
+
 		"A",
 		"B",
 		"C",
@@ -297,7 +303,7 @@ namespace DXLib_ref {
 		"X",
 		"Y",
 		"Z",
-		
+
 		"0",
 		"1",
 		"2",
@@ -488,12 +494,80 @@ namespace DXLib_ref {
 		"R_stick",
 		"L_stick",
 		"R_stick",
-		"direction",
-		"direction",
-		"direction",
-		"direction",
+		"left",
+		"up",
+		"right",
+		"down",
 	};
 
+	static const int XBoxNum = 12 - 1 + 2 + 4;
+	static const int XBoxID[XBoxNum] = {
+		14,
+		12,
+		13,
+		15,
+
+		8,
+		9,
+
+		0xF100,
+		0xF200,
+
+		4,
+
+		6,
+		7,
+
+		0xF001,
+		0xF002,
+		2,
+		0,
+		3,
+		1,
+	};
+	static const char* XBoxStr[XBoxNum] = {
+		"SQUARE",
+		"NG",
+		"OK",
+		"TRIANGLE",
+
+		"L1",
+		"R1",
+
+		"L2",
+		"R2",
+
+		"OPTION",
+
+		"L3",
+		"R3",
+
+		"LSTICK",
+		"RSTICK",
+		"LEFT",
+		"UP",
+		"RIGHT",
+		"DOWN",
+	};
+	static const char* XBoxGuidePath[XBoxNum] = {
+		"square",
+		"ng",
+		"ok",
+		"triangle",
+		"L1",
+		"R1",
+		"L2",
+		"R2",
+		"option",
+		"L_stick",
+		"R_stick",
+		"L_stick",
+		"R_stick",
+		"left",
+		"up",
+		"right",
+		"down",
+	};
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -504,12 +578,13 @@ namespace DXLib_ref {
 	private:
 		class KeyGuideGraphs {
 		public:
-			int xsize{ 0 }, ysize{ 0 };
+			int xsize{0}, ysize{0};
 			GraphHandle GuideImg;
 			std::string GuideString;
 		public:
-			void AddGuidePC(int ID, std::string_view GuideStr) noexcept;
+			void AddGuideXBox(int ID, std::string_view GuideStr) noexcept;
 			void AddGuideDS4(int ID, std::string_view GuideStr) noexcept;
+			void AddGuidePC(int ID, std::string_view GuideStr) noexcept;
 			void Reset() noexcept {
 				GuideImg.Dispose();
 				GuideString = "";
@@ -528,76 +603,94 @@ namespace DXLib_ref {
 		//ボタン
 		std::array<PadsInfo, (int)PADS::MAX> m_PadsInfo;
 		//右スティック
-		float Look_XradAdd{ 0.f };
-		float Look_YradAdd{ 0.f };
+		float Look_XradAdd{0.f};
+		float Look_YradAdd{0.f};
 		//
-		int MouseX{ 0 };
-		int MouseY{ 0 };
+		int MouseX{0};
+		int MouseY{0};
 		switchs MouseClick;
 		switchs KeyEsc;
 		//ガイド等のコントロール
-		bool		m_IsUpdate{ true };
-		bool		m_MouseMoveEnable{ true };
-		ControlType	m_ControlType{ ControlType::PC };
+		bool		m_IsUpdate{true};
+		bool		m_MouseMoveEnable{true};
+		ControlType	m_ControlType{ControlType::PC};
 	private:
 		std::vector<std::unique_ptr<KeyGuideGraphs>>	Key;
 	public:
 		const std::string	GetIDtoStr(int ID) const noexcept {
 			switch (m_ControlType) {
-			case DXLib_ref::ControlType::PS4:
-				for (int i = 0; i < DS4Num; i++) {
-					if (DS4ID[i] == ID) {
-						return DS4Str[i];
+				case DXLib_ref::ControlType::XBox:
+					for (int i = 0; i < XBoxNum; i++) {
+						if (XBoxID[i] == ID) {
+							return XBoxStr[i];
+						}
 					}
-				}
-				break;
-			case DXLib_ref::ControlType::PC:
-				for (int i = 0; i < KeyNum; i++) {
-					if (KeyID[i] == ID) {
-						return KeyStr[i];
+					break;
+				case DXLib_ref::ControlType::PS4:
+					for (int i = 0; i < DS4Num; i++) {
+						if (DS4ID[i] == ID) {
+							return DS4Str[i];
+						}
 					}
-				}
-				break;
-			default:
-				break;
+					break;
+				case DXLib_ref::ControlType::PC:
+					for (int i = 0; i < KeyNum; i++) {
+						if (KeyID[i] == ID) {
+							return KeyStr[i];
+						}
+					}
+					break;
+				default:
+					break;
 			}
 			return "NONE";
 		};
 	private:
 		const int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
-			case DXLib_ref::ControlType::PS4:
-				for (int i = 0; i < DS4Num; i++) {
-					if (strcmpDx(DS4Str[i], Str) == 0) {
-						return DS4ID[i];
+				case DXLib_ref::ControlType::XBox:
+					for (int i = 0; i < XBoxNum; i++) {
+						if (strcmpDx(XBoxStr[i], Str) == 0) {
+							return XBoxID[i];
+						}
 					}
-				}
-				break;
-			case DXLib_ref::ControlType::PC:
-				for (int i = 0; i < KeyNum; i++) {
-					if (strcmpDx(KeyStr[i], Str) == 0) {
-						return KeyID[i];
+					break;
+				case DXLib_ref::ControlType::PS4:
+					for (int i = 0; i < DS4Num; i++) {
+						if (strcmpDx(DS4Str[i], Str) == 0) {
+							return DS4ID[i];
+						}
 					}
-				}
-				break;
-			default:
-				break;
+					break;
+				case DXLib_ref::ControlType::PC:
+					for (int i = 0; i < KeyNum; i++) {
+						if (strcmpDx(KeyStr[i], Str) == 0) {
+							return KeyID[i];
+						}
+					}
+					break;
+				default:
+					break;
 			}
 			return -1;
 		}
 		const char*			GetSavePath() const noexcept {
 			switch (m_ControlType) {
-			case DXLib_ref::ControlType::PS4:
-				return "Save/KeyConfig_DS4.txt";
-			case DXLib_ref::ControlType::PC:
-				return "Save/KeyConfig_PC.txt";
-			default:
-				break;
+				case DXLib_ref::ControlType::XBox:
+					return "Save/KeyConfig_XBox.txt";
+				case DXLib_ref::ControlType::PS4:
+					return "Save/KeyConfig_DS4.txt";
+				case DXLib_ref::ControlType::PC:
+					return "Save/KeyConfig_PC.txt";
+				default:
+					break;
 			}
 			return "NONE";
 		};
 		const char*			GetBasePath() const noexcept {
 			switch (m_ControlType) {
+				case DXLib_ref::ControlType::XBox:
+					return "data/KeyConfigBase_XBox.txt";
 				case DXLib_ref::ControlType::PS4:
 					return "data/KeyConfigBase_DS4.txt";
 				case DXLib_ref::ControlType::PC:
@@ -658,24 +751,32 @@ namespace DXLib_ref {
 			Key.resize(Key.size() + 1);
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			switch (m_ControlType) {
-			case DXLib_ref::ControlType::PS4:
-				for (int i = 0; i < DS4Num; i++) {
-					if (DS4ID[i] == m_PadsInfo[(int)select].m_assign) {
-						Key.back()->AddGuideDS4(i, GuideStr);
-						return;
+				case DXLib_ref::ControlType::XBox:
+					for (int i = 0; i < XBoxNum; i++) {
+						if (XBoxID[i] == m_PadsInfo[(int)select].m_assign) {
+							Key.back()->AddGuideXBox(i, GuideStr);
+							return;
+						}
 					}
-				}
-				break;
-			case DXLib_ref::ControlType::PC:
-				for (int i = 0; i < KeyNum; i++) {
-					if (KeyID[i] == m_PadsInfo[(int)select].m_assign) {
-						Key.back()->AddGuidePC(i, GuideStr);
-						return;
+					break;
+				case DXLib_ref::ControlType::PS4:
+					for (int i = 0; i < DS4Num; i++) {
+						if (DS4ID[i] == m_PadsInfo[(int)select].m_assign) {
+							Key.back()->AddGuideDS4(i, GuideStr);
+							return;
+						}
 					}
-				}
-				break;
-			default:
-				break;
+					break;
+				case DXLib_ref::ControlType::PC:
+					for (int i = 0; i < KeyNum; i++) {
+						if (KeyID[i] == m_PadsInfo[(int)select].m_assign) {
+							Key.back()->AddGuidePC(i, GuideStr);
+							return;
+						}
+					}
+					break;
+				default:
+					break;
 			}
 			Key.back()->AddGuidePC(-1, GuideStr);
 		}

@@ -5,6 +5,9 @@
 #define x_r(p1) (int(p1) * DXDraw::Instance()->m_DispXSize / 1920)
 #define y_r(p1) (int(p1) * DXDraw::Instance()->m_DispYSize / 1080)
 
+#define EdgeSize	y_r(2)
+#define LineHeight	y_r(18)
+
 namespace DXLib_ref {
 	//
 	static float GetFrameRate() noexcept { return std::max(GetFPS(), 30.f); }
@@ -304,6 +307,130 @@ namespace DXLib_ref {
 	static bool DrawSphere_3D(const VECTOR_ref& p1, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawSphere3D(p1.get(), range, 8, color, speccolor, TRUE) == TRUE;
 	}
+
+	//カラー指定
+	static const unsigned int Red{GetColor(255, 0, 0)};
+
+	static const unsigned int Green{GetColor(0, 255, 0)};//GetColor(43, 255, 91)
+	static const unsigned int DarkGreen{GetColor(0, 64, 0)};//GetColor(21, 128, 45)
+
+	static const unsigned int Blue{GetColor(0, 0, 255)};
+
+	static const unsigned int Yellow{GetColor(255, 255, 0)};
+
+	static const unsigned int WhiteSel{GetColor(216, 255, 216)};
+
+	static const unsigned int White{GetColor(255, 255, 255)};
+	static const unsigned int Gray15{GetColor(216, 216, 216)};
+	static const unsigned int Gray25{GetColor(192, 192, 192)};
+	static const unsigned int Gray50{GetColor(128, 128, 128)};
+	static const unsigned int Gray65{GetColor(96, 96, 96)};
+	static const unsigned int Gray75{GetColor(64, 64, 64)};
+	static const unsigned int Black{GetColor(0, 0, 0)};
+
+	namespace WindowSystem {
+		//箱
+		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
+		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
+		//文字
+		template <typename... Args>
+		extern const int GetMsgLen(int size, std::string_view String, Args&&... args) {
+			auto* Fonts = FontPool::Instance();
+			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, size).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(6) + 2;//エッジ分:
+		}
+
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX);
+
+		template <typename... Args>
+		extern const int SetMsg(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+			if (String == "") { return 0; }
+			auto* Fonts = FontPool::Instance();
+			int xSize = GetMsgLen(size, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
+				return 0;
+			}
+			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(size, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			return xSize;//エッジ分
+		};
+		//
+		template <typename... Args>
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
+			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+			return ret;
+		};
+		template <typename... Args>
+		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
+			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+		};
+
+		extern bool CheckBox(int xp1, int yp1, bool switchturn);
+
+		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax);
+		//
+		/*
+		class ScrollBoxClass {
+			bool		m_IsChangeScrollY{ false };
+			int			m_BaseScrollY{ 0 };
+			float		m_NowScrollYPer{ 0.f };
+		public:
+			const auto&		GetNowScrollYPer(void) const noexcept { return this->m_NowScrollYPer; }
+			void			ScrollBox(int xp1, int yp1, int xp2, int yp2, float TotalPer, bool IsActive) {
+				auto* Pad = PadControl::Instance();
+				unsigned int color = Gray25;
+
+				int length = (int)((float)(yp2 - yp1) / TotalPer);
+				float Total = (float)(yp2 - yp1 - length);
+				int Yp_t = (int)(Total * this->m_NowScrollYPer);
+				int Yp_s = std::max(yp1, yp1 + Yp_t);
+				int Yp_e = std::min(yp2, Yp_s + length);
+
+				if (IsActive) {
+					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp1, yp1, xp2, yp2)) {
+						if (Pad->GetWheelAdd() != 0.f) {
+							m_NowScrollYPer = std::clamp(m_NowScrollYPer + (float)(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
+						}
+					}
+					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp2 - y_r(24), yp1, xp2, yp2)) {
+						if (Pad->GetINTERACTKey().trigger()) {
+							m_IsChangeScrollY = true;
+						}
+
+						if (!m_IsChangeScrollY) {
+							HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
+							SetCursor(hCursor);
+						}
+					}
+					if (m_IsChangeScrollY) {
+						if (Pad->GetINTERACTKey().press()) {
+							color = White;
+							m_NowScrollYPer = std::clamp((float)(Pad->GetMouseY() - this->m_BaseScrollY) / Total, 0.f, 1.f);
+
+							HCURSOR hCursor = LoadCursor(NULL, IDC_SIZENS);
+							SetCursor(hCursor);
+						}
+						else {
+							m_IsChangeScrollY = false;
+						}
+					}
+					else {
+						m_BaseScrollY = Pad->GetMouseY() - Yp_t;
+						if (Pad->GetMouseY() < Yp_s) {
+							m_BaseScrollY += Yp_s - Pad->GetMouseY();
+						}
+
+						if (Pad->GetMouseY() > Yp_e) {
+							m_BaseScrollY += Yp_e - Pad->GetMouseY();
+						}
+					}
+				}
+				SetBox(xp2 - y_r(24), yp1, xp2, yp2, Gray50);
+				SetBox(xp2 - y_r(24) + y_r(1), Yp_s, xp2 - y_r(1), Yp_e, color);
+			};
+		};
+		//*/
+	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*クラス																																	*/
@@ -752,7 +879,7 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	// 汎用セーブデータ
 	//--------------------------------------------------------------------------------------------------
-	typedef std::pair<std::string, int> SaveParam;
+	typedef std::pair<std::string, int64_t> SaveParam;
 	class SaveDataClass : public SingletonBase<SaveDataClass> {
 	private:
 		friend class SingletonBase<SaveDataClass>;
@@ -773,7 +900,7 @@ namespace DXLib_ref {
 			return nullptr;
 		}
 	public:
-		void SetParam(std::string_view Name, int value) noexcept {
+		void SetParam(std::string_view Name, int64_t value) noexcept {
 			auto* Data = GetData(Name);
 			if (Data) {
 				Data->second = value;
@@ -787,7 +914,7 @@ namespace DXLib_ref {
 			if (Data) {
 				return Data->second;
 			}
-			return -1;
+			return (int64_t)-1;
 		}
 	public:
 		void Save() noexcept {
@@ -839,6 +966,6 @@ namespace DXLib_ref {
 		void			Draw(void) noexcept;
 	public:
 		const auto& IsActive() const noexcept { return m_Active; }
+		const auto& GetActiveSwitch() const noexcept { return m_ActiveSwitch; }
 	};
-
 };

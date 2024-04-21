@@ -2,6 +2,68 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
+	enum class EnumParamType {
+		Boolean,
+		Int,
+		Float,
+		Else,
+	};
+	static EnumParamType ParamTypes[] = {
+		EnumParamType::Int,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Float,
+		EnumParamType::Boolean,
+		EnumParamType::Int,
+		EnumParamType::Float,
+		EnumParamType::Float,
+		EnumParamType::Float,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Else,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Float,
+		EnumParamType::Float,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
+		EnumParamType::Else,
+	};
+	static const char* OptionStr[] = {
+		"grass_level",
+		"DoF",
+		"bloom",
+		"shadow",
+		"usevr",
+		"SSAO",
+		"fov",
+		"vsync",
+		"FpsLimit",
+		"SE",
+		"VOICE",
+		"BGM",
+		"AllWaysFront",
+		"aberration",
+		"DirectXVer",
+		"SSR",
+		"MotionBlur",
+		"Xsensing",
+		"Ysensing",
+		"HeadBobbing",
+		"EnableCheck",
+		"LightMode",
+		"ControlType",
+	};
+	//
+	static const char* DirectXVerStr[] = {
+	"9c",
+	"11",
+	};
+
 	class OPTION : public SingletonBase<OPTION> {
 	private:
 		friend class SingletonBase<OPTION>;
@@ -25,21 +87,23 @@ namespace DXLib_ref {
 		float	BGM{ 1.f };
 		bool	AllWaysFront{ false };
 		bool	aberration{ true };
-		int		DirectXVer{ DX_DIRECT3D_11 };
+		int		DirectXVer{ 1 };
 		bool	SSR{ true };
 		bool	MotionBlur{ true };
 		float	Xsensing{ 0.5f };
 		float	Ysensing{ 0.5f };
 		bool	HeadBobbing{true};
+		bool	EnableCheck{true};
 		bool	FXAA{true};
 		bool	LightMode{false};
+		int		PadType{1};
 	public:
 		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_useVR()const noexcept {
 #ifndef _USE_OPENVR_
 			return false;
 #else
-			return useVR && (Get_DirectXVer() == DX_DIRECT3D_11);
+			return useVR && (Get_DirectXVer() == 1);
 #endif
 		}
 
@@ -49,7 +113,7 @@ namespace DXLib_ref {
 		const auto		Get_DoF()const noexcept { return DoF && !Get_useVR() && !Get_LightMode(); }
 		const auto		Get_Bloom()const noexcept { return Bloom && !Get_useVR() && !Get_LightMode(); }
 		const auto		Get_Shadow()const noexcept { return Shadow && !Get_LightMode(); }
-		const auto		Get_SSAO()const noexcept { return SSAO && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
+		const auto		Get_SSAO()const noexcept { return SSAO && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
 		const auto		Get_Fov()const noexcept { return Fov; }
 		const auto		Get_Vsync()const noexcept { return Vsync; }
 		const auto		Get_FrameLimit()const noexcept { return FrameLimit; }
@@ -58,12 +122,15 @@ namespace DXLib_ref {
 		const auto		Get_BGM()const noexcept { return BGM; }
 		const auto		Get_AllWaysFront()const noexcept { return AllWaysFront; }
 		const auto		Get_aberration()const noexcept { return aberration && !Get_LightMode(); }
-		const auto		Get_SSR()const noexcept { return SSR && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
+		const auto		Get_SSR()const noexcept { return SSR && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
 		const auto		Get_MotionBlur()const noexcept { return MotionBlur && !Get_LightMode(); }
 		const auto		Get_Xsensing()const noexcept { return Xsensing; }
 		const auto		Get_Ysensing()const noexcept { return Ysensing; }
 		const auto		Get_HeadBobbing()const noexcept { return HeadBobbing; }
-		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == DX_DIRECT3D_11); }
+		const auto		Get_EnableCheck()const noexcept { return EnableCheck; }
+		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
+		const auto		Get_PadType()const noexcept { return PadType; }
+		
 
 	public:
 		void			Set_useVR(bool use) { useVR = use; }
@@ -87,7 +154,10 @@ namespace DXLib_ref {
 		void			Set_Xsensing(float per) noexcept { Xsensing = per; }
 		void			Set_Ysensing(float per) noexcept { Ysensing = per; }
 		void			Set_HeadBobbing(bool use) noexcept { HeadBobbing = use; }
+		void			Set_EnableCheck(bool use) noexcept { EnableCheck = use; }
 		void			Set_FXAA(bool use) noexcept { FXAA = use; }
+		void			Set_PadType(int use) noexcept { PadType = use; }
+		
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -195,6 +265,11 @@ namespace DXLib_ref {
 		bool						m_ActiveSwitch{false};
 	public:
 		void SetActive() noexcept { m_ActiveSwitch = true; }
+		void OffSwitch() noexcept {
+			if (m_PopUpDrawClass.IsActive()) {
+				m_ActiveSwitch = true;
+			}
+		}
 		const auto& IsActive() const noexcept { return m_PopUpDrawClass.IsActive(); }
 	public:
 		void Init() noexcept;

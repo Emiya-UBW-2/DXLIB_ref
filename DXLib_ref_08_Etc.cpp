@@ -1,14 +1,10 @@
 #include "DXLib_ref.h"
-//#include "DXLib_ref_08_Etc.hpp"
-
-#define LineHeight	y_r(18)
 
 namespace DXLib_ref {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
-
 	static VECTOR_ref GetScreenPos(const VECTOR_ref&campos, const VECTOR_ref&camvec, const VECTOR_ref&camup, float fov, float near_t, float far_t, const VECTOR_ref&worldpos) noexcept {
 		int ScrX = y_r(1920);
 		int ScrY = y_r(1080);
@@ -44,7 +40,92 @@ namespace DXLib_ref {
 		}
 		return screenPos;
 	}
+	//
+	namespace WindowSystem {
+		//î†
+		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
+			DrawBox_2D(xp1, yp1, xp2, yp2, colorSet, true);
+		};
+		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
+			auto* Pad = PadControl::Instance();
+			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp2, yp2);
+			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
+			return (MouseOver && Pad->GetMouseClick().trigger());
+		};
+		//ï∂éö
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
+			auto* DrawParts = DXDraw::Instance();
+			*yp1 = *yp1 + (yp2 - *yp1) / 2;
+			if ((*yp1 - size / 2) > DrawParts->m_DispYSize || (*yp1 + size / 2) < 0) { return false; }				//âÊñ äOÇÕï\é¶ÇµÇ»Ç¢
+			switch (FontX) {
+				case FontHandle::FontXCenter::LEFT:
+					*xp1 = *xp1 + y_r(6);
+					if ((*xp1) > DrawParts->m_DispXSize || (*xp1 + xSize) < 0) { return false; }						//âÊñ äOÇÕï\é¶ÇµÇ»Ç¢
+					break;
+				case FontHandle::FontXCenter::MIDDLE:
+					*xp1 = *xp1 + (xp2 - *xp1) / 2;
+					if ((*xp1 - xSize / 2) > DrawParts->m_DispXSize || (*xp1 + xSize / 2) < 0) { return false; }		//âÊñ äOÇÕï\é¶ÇµÇ»Ç¢
+					break;
+				case FontHandle::FontXCenter::RIGHT:
+					*xp1 = xp2 - y_r(6);
+					if ((*xp1 - xSize) > DrawParts->m_DispXSize || (*xp1) < 0) { return false; }						//âÊñ äOÇÕï\é¶ÇµÇ»Ç¢
+					break;
+				default:
+					break;
+			}
+			return true;
+		};
+		//
+		bool CheckBox(int xp1, int yp1, bool switchturn) {
+			int xp3 = xp1 + EdgeSize;
+			int yp3 = yp1 + EdgeSize;
+			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
+			int yp4 = yp1 + LineHeight - EdgeSize;
 
+			auto* Pad = PadControl::Instance();
+			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp3, yp3, xp4, yp4);
+			if (MouseOver && Pad->GetMouseClick().trigger()) {
+				switchturn ^= 1;
+				auto* SE = SoundPool::Instance();
+				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+			}
+			unsigned int color = Gray25;
+			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 - y_r(5), yp4 - y_r(5), Black);
+			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
+			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 + y_r(5), yp4 - y_r(5), Gray50);
+			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
+			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
+			SetBox(xp3, yp3, xp4, yp4, color);
+			return switchturn;
+		}
+		//
+		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) {
+			int xp = 0;
+			{
+				int xpmin = xmin + 1;
+				int xpmax = xmax - 1;
+
+				auto* Pad = PadControl::Instance();
+				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight);
+				if (MouseOver && Pad->GetMouseClick().trigger()) {
+					auto* SE = SoundPool::Instance();
+					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				}
+				if (MouseOver && Pad->GetMouseClick().press()) {
+					value = ((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin;
+				}
+
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
+					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
+			}
+			xp = (xmin + (xmax - xmin) / 2);
+			SetMsg(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+
+			return value;
+		}
+	};
+	//
 	void			PopUpDrawClass::Set(const char* WindowName, int sizex, int sizey, std::function<void(int xsize, int ysize, bool EndSwitch)> doing) noexcept {
 		sprintf_s(m_WindwoName, 64, WindowName);
 		WinSizeX = sizex;
@@ -67,11 +148,7 @@ namespace DXLib_ref {
 		}
 		else {
 			Pad->SetMouseMoveEnable(false);
-			int xp1, yp1;
-			xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
-			yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
-			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2);
-			if (KeyTrigger || Pad->GetKey(PADS::RELOAD).trigger() || (MouseOver && Pad->GetMouseClick().trigger())) {
+			if (KeyTrigger) {
 				SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
 				m_Active = false;
 				m_ActiveSwitch = true;
@@ -82,11 +159,8 @@ namespace DXLib_ref {
 	void			PopUpDrawClass::Draw(void) noexcept {
 		auto* Pad = PadControl::Instance();
 		auto* Fonts = FontPool::Instance();
+		auto* SE = SoundPool::Instance();
 
-		auto White = GetColor(255, 255, 255);
-		auto Red = GetColor(255, 0, 0);
-		auto Gray50 = GetColor(128, 128, 128);
-		auto Black = GetColor(0, 0, 0);
 		int xp1, yp1;
 
 		//îwåi
@@ -108,17 +182,15 @@ namespace DXLib_ref {
 																	   xpos, ypos, White, Black, m_WindwoName);
 			}
 			//
-			{
+			if (m_Active) {
 				xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
-
-				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2);
-				int xpos = xp1 + (xp1 + y_r(108) - xp1) / 2;
-				int ypos = yp1 + (yp1 + LineHeight * 2 - yp1) / 2;
-
-				DrawBox_2D(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, MouseOver ? White : Red, true);
-				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(std::min(LineHeight, yp1 + LineHeight * 2 - yp1), FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE,
-																	   xpos, ypos, White, Black, "ï¬Ç∂ÇÈ");
+				if (Pad->GetKey(PADS::RELOAD).trigger() || WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, "ï¬Ç∂ÇÈ")) {
+					SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
+					m_Active = false;
+					m_ActiveSwitch = true;
+					Pad->SetGuideUpdate();
+				}
 			}
 			//îwåi
 			{

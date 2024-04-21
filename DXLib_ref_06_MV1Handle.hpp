@@ -22,8 +22,9 @@ namespace DXLib_ref {
 
 			void GoStart(void) noexcept { this->time = 0.f; }
 			void GoEnd(void) noexcept { this->time = this->alltime; }
-			const auto GetTimePer(void) const noexcept { return this->time / this->alltime; }
+			const auto GetTimePer(void) const noexcept { return (this->alltime > 0) ? this->time / this->alltime : 1.f; }
 
+			const auto TimeStart(void) const noexcept { return time <= 0; }
 			const auto TimeEnd(void) const noexcept { return time >= alltime; }
 
 			void Reset(void) noexcept {

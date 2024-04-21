@@ -27,7 +27,7 @@ namespace DXLib_ref {
 					// 遮蔽物の影響の強さ
 					// オクルージョンカラー
 					// オクルージョンカラーの強さ
-				GraphFilterBlt(m_NormalScreenPtr->get(), TargetGraph->get(), DX_GRAPH_FILTER_SSAO, ColorGraph->get(), 120.f, 0.004f, 0.01f, 0.9f, GetColor(0, 0, 0), 20.f);
+				GraphFilterBlt(m_NormalScreenPtr->get(), TargetGraph->get(), DX_GRAPH_FILTER_SSAO, ColorGraph->get(), 120.f, 0.004f, 0.01f, 0.9f, Black, 20.f);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -54,8 +54,8 @@ namespace DXLib_ref {
 					int xr = DrawParts->m_DispXSize / EXTEND * 30 / 100;
 					int yr = DrawParts->m_DispYSize / EXTEND * 60 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, GetColor(0, 0, 0), TRUE);
-					DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr, yr, GetColor(255, 255, 255), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, Black, TRUE);
+					DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -120,7 +120,7 @@ namespace DXLib_ref {
 				{
 					TargetGraph->DrawGraph(0, 0, true);
 					SSRScreen.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
-					//DrawBox_2D(0, 0, 1920, 1080, GetColor(255, 0, 0), TRUE);
+					//DrawBox_2D(0, 0, 1920, 1080, Red, TRUE);
 				}
 				GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
@@ -197,7 +197,7 @@ namespace DXLib_ref {
 			auto* OptionParts = OPTION::Instance();
 
 			if (OptionParts->Get_Bloom()) {
-				GraphFilterBlt(TargetGraph->get(), BufScreen.get(), DX_GRAPH_FILTER_TWO_COLOR, 250, GetColor(0, 0, 0), 255, GetColor(128, 128, 128), 255);
+				GraphFilterBlt(TargetGraph->get(), BufScreen.get(), DX_GRAPH_FILTER_TWO_COLOR, 250, Black, 255, Gray50, 255);
 				GraphFilterBlt(BufScreen.get(), GaussScreen_.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				GraphFilter(GaussScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 				TargetGraph->SetDraw_Screen(false);
@@ -232,11 +232,11 @@ namespace DXLib_ref {
 			if (OptionParts->Get_aberration()) {
 				auto* DrawParts = DXDraw::Instance();
 				BufScreen[0].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
 				BufScreen[1].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
 				BufScreen[2].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
 				GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 				GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
@@ -246,7 +246,7 @@ namespace DXLib_ref {
 				//output_high = 255;
 				TargetGraph->SetDraw_Screen(true);
 				{
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
 					SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 					BufScreen[0].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
 					BufScreen[1].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f, 0.f, true);
@@ -348,8 +348,8 @@ namespace DXLib_ref {
 					int xr = DrawParts->m_DispXSize * 60 / 100;
 					int yr = DrawParts->m_DispYSize * 70 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
-					DrawOval(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, xr, yr, GetColor(255, 255, 255), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+					DrawOval(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -404,7 +404,7 @@ namespace DXLib_ref {
 				bkScreen.SetDraw_Screen(true);
 				{
 					int y = 0, c = 0, p = 2;
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(255, 255, 255), TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, White, TRUE);
 
 					p = 1;
 					for (y = 0; y < 255; y += p) {
@@ -436,7 +436,7 @@ namespace DXLib_ref {
 
 			TargetGraph->SetDraw_Screen();
 			{
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, GetColor(0, 0, 0), TRUE);
+				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
@@ -847,8 +847,8 @@ namespace DXLib_ref {
 			NearScreen_.DrawGraph(0, 0, false);
 			SetDrawBright(255, 255, 255);
 			
-			//NormalScreen.DrawExtendGraph(0, 0, 960, 540, false);
-			//DepthScreen.DrawExtendGraph(0, 0, 960, 540, false);
+			//NormalScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
+			//DepthScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
 		}
 	}
 	//書き込んだ深度に応じて対応

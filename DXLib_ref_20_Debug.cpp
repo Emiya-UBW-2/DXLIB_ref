@@ -40,7 +40,6 @@ namespace DXLib_ref {
 		auto PMax = PointMax + 1;
 		SetPoint("End");
 		auto* Fonts = FontPool::Instance();
-		auto white = GetColor(255, 255, 255);
 		auto black = GetColor(1, 1, 1);
 		
 		int FontSize = y_r(12);
@@ -62,8 +61,8 @@ namespace DXLib_ref {
 		}
 
 		DrawBox_2D(xpos - 1, ypos - 1, xpos + wide + 1, ypos + height + 1, black, TRUE);
-		DrawBox_2D(xpos, ypos, xpos + wide, ypos + height, white, FALSE);
-		DrawLine_2D(xpos, ypos + height - half, xpos + wide, ypos + height - half, white);//Šî€ü
+		DrawBox_2D(xpos, ypos, xpos + wide, ypos + height, White, FALSE);
+		DrawLine_2D(xpos, ypos + height - half, xpos + wide, ypos + height - half, White);//Šî€ü
 		auto xs = (float)wide / m_FrameRate;
 		auto ys = (float)half / (1000.0f / m_FrameRate);
 		for (int j = (int)(m_Point.size() - 1 - 1); j >= 0; --j) {
@@ -80,22 +79,22 @@ namespace DXLib_ref {
 		auto xs_f = y_r(250);
 		auto ys_f = (int)(m_PointSel + 3 + 1) * FontSize + 3;
 		DrawBox_2D(xp_f - 1, yp_f - 1, xp_f + xs_f + 1, yp_f + ys_f + 1, black, TRUE);
-		DrawBox_2D(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, white, FALSE);
+		DrawBox_2D(xp_f, yp_f, xp_f + xs_f, yp_f + ys_f, White, FALSE);
 
-		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
+		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 			"AsyncCount :%d", GetASyncLoadNum()); yp_f += FontSize;
-		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
+		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 			"Drawcall   :%d", DrawCall); yp_f += FontSize;
-		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
+		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 			"FPS        :%5.2f fps", GetFPS()); yp_f += FontSize;
 		for (int index = 0; index < PMax; ++index) {
 			if (m_PointSel - 1 >= index || index == PointMax) {
 				if (index == 0) {
-					Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
+					Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 						"%02d(%5.2fms)[%s]", index, m_Point[0][index].first, "Start");
 				}
 				else {
-					Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, white, black,
+					Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 						"%02d(%5.2fms)[%s]", index, m_Point[0][index].first - m_Point[0][index - 1].first, m_Point[0][index - 1].second.c_str());
 				}
 				yp_f += FontSize;

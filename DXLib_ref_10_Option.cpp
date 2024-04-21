@@ -1,7 +1,6 @@
+#include "DXLib_ref_09_KeyControl.hpp"
 #include "DXLib_ref_10_Option.hpp"
-
-#define EdgeSize	y_r(2)
-#define LineHeight	y_r(18)
+#include "DXLib_ref_08_Etc.hpp"
 
 namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
@@ -12,70 +11,137 @@ namespace DXLib_ref {
 	void			OPTION::Load(void) noexcept {
 		SetOutApplicationLogValidFlag(FALSE);
 		int mdata = FileRead_open("data/Setting.txt", FALSE);
-		grass_level = std::clamp<int>(getparams::_int(mdata), 0, 4);
-		DoF = getparams::_bool(mdata);
-		Bloom = getparams::_bool(mdata);
-		Shadow = getparams::_bool(mdata);
-		useVR = getparams::_bool(mdata);
-		SSAO = getparams::_bool(mdata);
-		Fov = getparams::_float(mdata);
-		Vsync = getparams::_bool(mdata);
-		FrameLimit = getparams::_int(mdata);
-		SE = getparams::_float(mdata);
-		VOICE = getparams::_float(mdata);
-		BGM = getparams::_float(mdata);
-		AllWaysFront = getparams::_bool(mdata);
-		aberration = getparams::_bool(mdata);
-		{
-			std::string DctXVer = getparams::_str(mdata);
-			if (DctXVer == "9c") {
-				DirectXVer = DX_DIRECT3D_9EX;
+		while (true) {
+			if (FileRead_eof(mdata) != 0) { break; }
+			auto ALL = getparams::Getstr(mdata);
+			if (ALL == "") { continue; }
+			auto LEFT = getparams::getleft(ALL);
+			auto RIGHT = getparams::getright(ALL);
+			if (LEFT == OptionStr[0]) {
+				grass_level = std::clamp<int>(std::stoi(RIGHT), 0, 4);
 			}
-			else if (DctXVer == "11") {
-				DirectXVer = DX_DIRECT3D_11;
+			else if (LEFT == OptionStr[1]) {
+				DoF = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[2]) {
+				Bloom = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[3]) {
+				Shadow = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[4]) {
+				useVR = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[5]) {
+				SSAO = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[6]) {
+				Fov = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[7]) {
+				Vsync = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[8]) {
+				FrameLimit = std::stoi(RIGHT);
+			}
+			else if (LEFT == OptionStr[9]) {
+				SE = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[10]) {
+				VOICE = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[11]) {
+				BGM = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[12]) {
+				AllWaysFront = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[13]) {
+				aberration = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[14]) {
+				std::string DctXVer = RIGHT;
+				for (int i = 1;i < 2;i++) {
+					if (DctXVer == DirectXVerStr[i]) {
+						DirectXVer = i;
+					}
+				}
+			}
+			else if (LEFT == OptionStr[15]) {
+				SSR = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[16]) {
+				MotionBlur = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[17]) {
+				Xsensing = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[18]) {
+				Ysensing = std::stof(RIGHT);
+			}
+			else if (LEFT == OptionStr[19]) {
+				HeadBobbing = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[20]) {
+				EnableCheck = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[21]) {
+				LightMode = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[22]) {
+				std::string DctXVer = RIGHT;
+				for (int i = 1;i < 3;i++) {
+					if (DctXVer == ControlTypeStr[i]) {
+						PadType = i;
+					}
+				}
 			}
 		}
-		SSR = getparams::_bool(mdata);
-		MotionBlur = getparams::_bool(mdata);
-		Xsensing = getparams::_float(mdata);
-		Ysensing = getparams::_float(mdata);
-		HeadBobbing = getparams::_bool(mdata);
-		LightMode = getparams::_bool(mdata);
 		FileRead_close(mdata);
 		SetOutApplicationLogValidFlag(TRUE);
 	}
-	void			OPTION::Save(void) noexcept {
-		std::ofstream outputfile("data/Setting.txt");
-		outputfile << "grass_level=" + std::to_string(Get_grass_level()) + "\n";
-		outputfile << "DoF=" + std::string((Get_DoF()) ? "true" : "false") + "\n";
-		outputfile << "bloom=" + std::string((Get_Bloom()) ? "true" : "false") + "\n";
-		outputfile << "shadow=" + std::string((Get_Shadow()) ? "true" : "false") + "\n";
-		outputfile << "usevr=" + std::string((Get_useVR()) ? "true" : "false") + "\n";
-		outputfile << "SSAO=" + std::string((Get_SSAO()) ? "true" : "false") + "\n";
-		outputfile << "fov=" + std::to_string(Get_Fov()) + "\n";
-		outputfile << "vsync=" + std::string((Get_Vsync()) ? "true" : "false") + "\n";
-		outputfile << "FpsLimit=" + std::to_string(Get_FrameLimit()) + "\n";
-		outputfile << "SE=" + std::to_string(Get_SE()) + "\n";
-		outputfile << "VOICE=" + std::to_string(Get_VOICE()) + "\n";
-		outputfile << "BGM=" + std::to_string(Get_BGM()) + "\n";
-		outputfile << "AllWaysFront=" + std::string((Get_AllWaysFront()) ? "true" : "false") + "\n";
-		outputfile << "aberration=" + std::string((Get_aberration()) ? "true" : "false") + "\n";
-		switch (Get_DirectXVer()) {
-			case  DX_DIRECT3D_9EX:
-				outputfile << "DirectXVer=" + std::string("9c") + "\n";
-				break;
-			case  DX_DIRECT3D_11:
-				outputfile << "DirectXVer=" + std::string("11") + "\n";
+	template<class T>
+	std::string GetString(int id, T Param) {
+		switch (ParamTypes[id]) {
+			case EnumParamType::Boolean:
+				return std::string((Param) ? "true" : "false");
+			case EnumParamType::Int:
+				return std::to_string(Param);
+			case EnumParamType::Float:
+				return std::to_string(Param);
+			case EnumParamType::Else:
 				break;
 			default:
 				break;
 		}
-		outputfile << "SSR=" + std::string((Get_SSR()) ? "true" : "false") + "\n";
-		outputfile << "MotionBlur=" + std::string((Get_MotionBlur()) ? "true" : "false") + "\n";
-		outputfile << "Xsensing=" + std::to_string(Get_Xsensing()) + "\n";
-		outputfile << "Ysensing=" + std::to_string(Get_Ysensing()) + "\n";
-		outputfile << "HeadBobbing=" + std::string((Get_HeadBobbing()) ? "true" : "false") + "\n";
-		outputfile << "LightMode=" + std::string((Get_LightMode()) ? "true" : "false") + "\n";
+		return "";
+	}
+
+	void			OPTION::Save(void) noexcept {
+		std::ofstream outputfile("data/Setting.txt");
+		outputfile << std::string(OptionStr[0]) + "=" + GetString(0, Get_grass_level()) + "\n";
+		outputfile << std::string(OptionStr[1]) + "=" + GetString(1, Get_DoF()) + "\n";
+		outputfile << std::string(OptionStr[2]) + "=" + GetString(2, Get_Bloom()) + "\n";
+		outputfile << std::string(OptionStr[3]) + "=" + GetString(3, Get_Shadow()) + "\n";
+		outputfile << std::string(OptionStr[4]) + "=" + GetString(4, Get_useVR()) + "\n";
+		outputfile << std::string(OptionStr[5]) + "=" + GetString(5, Get_SSAO()) + "\n";
+		outputfile << std::string(OptionStr[6]) + "=" + GetString(6, Get_Fov()) + "\n";
+		outputfile << std::string(OptionStr[7]) + "=" + GetString(7, Get_Vsync()) + "\n";
+		outputfile << std::string(OptionStr[8]) + "=" + GetString(8, Get_FrameLimit()) + "\n";
+		outputfile << std::string(OptionStr[9]) + "=" + GetString(9, Get_SE()) + "\n";
+		outputfile << std::string(OptionStr[10]) + "=" + GetString(10, Get_VOICE()) + "\n";
+		outputfile << std::string(OptionStr[11]) + "=" + GetString(11, Get_BGM()) + "\n";
+		outputfile << std::string(OptionStr[12]) + "=" + GetString(12, Get_AllWaysFront()) + "\n";
+		outputfile << std::string(OptionStr[13]) + "=" + GetString(13, Get_aberration()) + "\n";
+		outputfile << std::string(OptionStr[14]) + "=" + std::string(DirectXVerStr[DirectXVer]) + "\n";
+		outputfile << std::string(OptionStr[15]) + "=" + GetString(15, Get_SSR()) + "\n";
+		outputfile << std::string(OptionStr[16]) + "=" + GetString(16, Get_MotionBlur()) + "\n";
+		outputfile << std::string(OptionStr[17]) + "=" + GetString(17, Get_Xsensing()) + "\n";
+		outputfile << std::string(OptionStr[18]) + "=" + GetString(18, Get_Ysensing()) + "\n";
+		outputfile << std::string(OptionStr[19]) + "=" + GetString(19, Get_HeadBobbing()) + "\n";
+		outputfile << std::string(OptionStr[20]) + "=" + GetString(20, Get_EnableCheck()) + "\n";
+		outputfile << std::string(OptionStr[21]) + "=" + GetString(21, Get_LightMode()) + "\n";
+		outputfile << std::string(OptionStr[22]) + "=" + std::string(ControlTypeStr[Get_PadType()]) + "\n";
 		outputfile.close();
 	}
 
@@ -83,175 +149,6 @@ namespace DXLib_ref {
 	//
 	//--------------------------------------------------------------------------------------------------
 	const OptionWindowClass* SingletonBase<OptionWindowClass>::m_Singleton = nullptr;
-
-	//カラー指定
-	static const unsigned int Red{GetColor(255, 0, 0)};
-	static const unsigned int DarkGreen{GetColor(21, 128, 45)};
-	static const unsigned int Green{GetColor(43, 255, 91)};
-	static const unsigned int White{GetColor(255, 255, 255)};
-	static const unsigned int Gray25{GetColor(192, 192, 192)};
-	static const unsigned int Gray50{GetColor(128, 128, 128)};
-	static const unsigned int Gray75{GetColor(64, 64, 64)};
-	static const unsigned int Black{GetColor(0, 0, 0)};
-
-	namespace WindowSystem {
-		//箱
-		static void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
-			DrawBox_2D(xp1, yp1, xp2, yp2, colorSet, true);
-		};
-		//文字
-		template <typename... Args>
-		static const auto GetMsgLen(int size, std::string_view String, Args&&... args) {
-			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, size).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(6) + 2;//エッジ分:
-		}
-		template <typename... Args>
-		static const auto SetMsg(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
-			if (String == "") { return 0; }
-			auto* DrawParts = DXDraw::Instance();
-			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLen(size, String, args...);
-			int xpos = 0;
-			int ypos = yp1 + (yp2 - yp1) / 2;
-			if ((ypos - size / 2) > DrawParts->m_DispYSize || (ypos + size / 2) < 0) { return 0; }				//画面外は表示しない
-			switch (FontX) {
-				case FontHandle::FontXCenter::LEFT:
-					xpos = xp1 + y_r(6);
-					if ((xpos) > DrawParts->m_DispXSize || (xpos + xSize) < 0) { return 0; }						//画面外は表示しない
-					break;
-				case FontHandle::FontXCenter::MIDDLE:
-					xpos = xp1 + (xp2 - xp1) / 2;
-					if ((xpos - xSize / 2) > DrawParts->m_DispXSize || (xpos + xSize / 2) < 0) { return 0; }		//画面外は表示しない
-					break;
-				case FontHandle::FontXCenter::RIGHT:
-					xpos = xp2 - y_r(6);
-					if ((xpos - xSize) > DrawParts->m_DispXSize || (xpos) < 0) { return 0; }						//画面外は表示しない
-					break;
-				default:
-					break;
-			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(size, FontX, FontHandle::FontYCenter::MIDDLE, xpos, ypos, Color, EdleColor, ((std::string)String).c_str(), args...);
-			return xSize;//エッジ分
-		};
-		//
-		template <typename... Args>
-		static void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
-		};
-
-		static bool CheckBox(int xp1, int yp1, bool switchturn) {
-			int xp3 = xp1 + EdgeSize;
-			int yp3 = yp1 + EdgeSize;
-			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
-			int yp4 = yp1 + LineHeight - EdgeSize;
-
-			auto* Pad = PadControl::Instance();
-			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp3, yp3, xp4, yp4);
-			if (MouseOver && Pad->GetMouseClick().trigger()) {
-				switchturn ^= 1;
-				auto* SE = SoundPool::Instance();
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-			}
-			unsigned int color = Gray25;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 - y_r(5), yp4 - y_r(5), Black);
-			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 + y_r(5), yp4 - y_r(5), Gray50);
-			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
-			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
-			SetBox(xp3, yp3, xp4, yp4, color);
-			return switchturn;
-		}
-
-		static int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) {
-			int xp = 0;
-			{
-				int xpmin = xmin + 1;
-				int xpmax = xmax - 1;
-
-				auto* Pad = PadControl::Instance();
-				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight);
-				if (MouseOver && Pad->GetMouseClick().trigger()) {
-					auto* SE = SoundPool::Instance();
-					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				}
-				if (MouseOver && Pad->GetMouseClick().press()) {
-					value = ((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin;
-				}
-
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
-					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
-			}
-			xp = (xmin + (xmax - xmin) / 2);
-			SetMsg(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
-
-			return value;
-		}
-		//
-		/*
-		class ScrollBoxClass {
-			bool		m_IsChangeScrollY{ false };
-			int			m_BaseScrollY{ 0 };
-			float		m_NowScrollYPer{ 0.f };
-		public:
-			const auto&		GetNowScrollYPer(void) const noexcept { return this->m_NowScrollYPer; }
-			void			ScrollBox(int xp1, int yp1, int xp2, int yp2, float TotalPer, bool IsActive) {
-				auto* Pad = PadControl::Instance();
-				unsigned int color = Gray25;
-
-				int length = (int)((float)(yp2 - yp1) / TotalPer);
-				float Total = (float)(yp2 - yp1 - length);
-				int Yp_t = (int)(Total * this->m_NowScrollYPer);
-				int Yp_s = std::max(yp1, yp1 + Yp_t);
-				int Yp_e = std::min(yp2, Yp_s + length);
-
-				if (IsActive) {
-					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp1, yp1, xp2, yp2)) {
-						if (Pad->GetWheelAdd() != 0.f) {
-							m_NowScrollYPer = std::clamp(m_NowScrollYPer + (float)(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
-						}
-					}
-					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp2 - y_r(24), yp1, xp2, yp2)) {
-						if (Pad->GetINTERACTKey().trigger()) {
-							m_IsChangeScrollY = true;
-						}
-
-						if (!m_IsChangeScrollY) {
-							HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
-							SetCursor(hCursor);
-						}
-					}
-					if (m_IsChangeScrollY) {
-						if (Pad->GetINTERACTKey().press()) {
-							color = White;
-							m_NowScrollYPer = std::clamp((float)(Pad->GetMouseY() - this->m_BaseScrollY) / Total, 0.f, 1.f);
-
-							HCURSOR hCursor = LoadCursor(NULL, IDC_SIZENS);
-							SetCursor(hCursor);
-						}
-						else {
-							m_IsChangeScrollY = false;
-						}
-					}
-					else {
-						m_BaseScrollY = Pad->GetMouseY() - Yp_t;
-						if (Pad->GetMouseY() < Yp_s) {
-							m_BaseScrollY += Yp_s - Pad->GetMouseY();
-						}
-
-						if (Pad->GetMouseY() > Yp_e) {
-							m_BaseScrollY += Yp_e - Pad->GetMouseY();
-						}
-					}
-				}
-				SetBox(xp2 - y_r(24), yp1, xp2, yp2, Gray50);
-				SetBox(xp2 - y_r(24) + y_r(1), Yp_s, xp2 - y_r(1), Yp_e, color);
-			};
-		};
-		//*/
-	};
-
 	//
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		ypos += y_r((int)selanim);
@@ -284,7 +181,7 @@ namespace DXLib_ref {
 			if (Pad->GetKey(PADS::MOVE_D).repeat()) {
 				m_Elements.at((*select)).GetRightPush();
 			}
-			if (Pad->GetKey(PADS::INTERACT).trigger()) {
+			if (Pad->GetKey(PADS::INTERACT).trigger() || Pad->GetMouseClick().trigger()) {
 				m_Elements.at((*select)).GetOKPush();
 			}
 		}
@@ -298,16 +195,11 @@ namespace DXLib_ref {
 		{
 			xp1 = xpos + (y_r(140) + y_r(12)) * m_id;
 			yp1 = ypos;
-			auto* Pad = PadControl::Instance();
-			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1 - y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 + y_r(5));
-			if (MouseOver && Pad->GetMouseClick().trigger()) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 - y_r(5), (isActive ? Gray25 : Gray75), m_name)) {
 				*TabSel = GetID();
 				auto* SE = SoundPool::Instance();
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
-			WindowSystem::SetMsgBox(xp1, yp1 + y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 - y_r(5),
-									MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : (isActive ? Gray25 : Gray75),
-									m_name);
 		}
 		//内容
 		if (isActive) {
@@ -558,30 +450,22 @@ namespace DXLib_ref {
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 switch (OptionParts->Get_DirectXVer()) {
-											 case  DX_DIRECT3D_9EX:
-												 OptionParts->Set_DirectXVer(DX_DIRECT3D_11);
+										 for (int i = 1;i < 2;i++) {
+											 if (OptionParts->Get_DirectXVer() == i) {
+												 OptionParts->Set_DirectXVer((i + 1) % 2);
 												 break;
-											 case  DX_DIRECT3D_11:
-												 OptionParts->Set_DirectXVer(DX_DIRECT3D_9EX);
-												 break;
-											 default:
-												 break;
+											 }
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 switch (OptionParts->Get_DirectXVer()) {
-											 case  DX_DIRECT3D_9EX:
-												 OptionParts->Set_DirectXVer(DX_DIRECT3D_11);
+										 for (int i = 1;i < 2;i++) {
+											 if (OptionParts->Get_DirectXVer() == i) {
+												 OptionParts->Set_DirectXVer((i + 1) % 2);
 												 break;
-											 case  DX_DIRECT3D_11:
-												 OptionParts->Set_DirectXVer(DX_DIRECT3D_9EX);
-												 break;
-											 default:
-												 break;
+											 }
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
@@ -589,17 +473,17 @@ namespace DXLib_ref {
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_DirectXVer() == DX_DIRECT3D_11))) {
-											 OptionParts->Set_DirectXVer(DX_DIRECT3D_11);
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_DirectXVer() == 1))) {
+											 OptionParts->Set_DirectXVer(1);
 										 }
 										 else {
-											 OptionParts->Set_DirectXVer(DX_DIRECT3D_9EX);
+											 OptionParts->Set_DirectXVer(0);
 										 }
 
 										 WindowSystem::SetMsg(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
-															  LineHeight, FontHandle::FontXCenter::MIDDLE, (OptionParts->Get_DirectXVer() == DX_DIRECT3D_9EX) ? White : Gray50, Black, "9.0C");
+															  LineHeight, FontHandle::FontXCenter::MIDDLE, (OptionParts->Get_DirectXVer() == 0) ? White : Gray50, Black, "9.0C");
 										 WindowSystem::SetMsg(xpos + y_r(200), ypos, xpos + y_r(200), ypos + LineHeight,
-															  LineHeight, FontHandle::FontXCenter::RIGHT, (OptionParts->Get_DirectXVer() == DX_DIRECT3D_11) ? White : Gray50, Black, "11.0");
+															  LineHeight, FontHandle::FontXCenter::RIGHT, (OptionParts->Get_DirectXVer() == 1) ? White : Gray50, Black, "11.0");
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -860,6 +744,102 @@ namespace DXLib_ref {
 										 OptionParts->Set_HeadBobbing(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_HeadBobbing()));
 									 }
 									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("CheckMagazine", "追加で眺め/マガジン確認をするかを指定します",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EnableCheck(OptionParts->Get_EnableCheck() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EnableCheck(OptionParts->Get_EnableCheck() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EnableCheck(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_EnableCheck()));
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("PadType", "パッドの入力方式を変更します",
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((ControlType)OptionParts->Get_PadType()) {
+											 case  ControlType::PS4:
+												 OptionParts->Set_PadType((int)ControlType::XBox);
+												 break;
+											 case  ControlType::XBox:
+												 OptionParts->Set_PadType((int)ControlType::PS4);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((ControlType)OptionParts->Get_PadType()) {
+											 case  ControlType::PS4:
+												 OptionParts->Set_PadType((int)ControlType::XBox);
+												 break;
+											 case  ControlType::XBox:
+												 OptionParts->Set_PadType((int)ControlType::PS4);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_PadType() == (int)ControlType::PS4))) {
+											 OptionParts->Set_PadType((int)ControlType::PS4);
+										 }
+										 else {
+											 OptionParts->Set_PadType((int)ControlType::XBox);
+										 }
+										 ypos -= LineHeight * 1 / 6;
+										 if (OptionParts->Get_PadType() == (int)ControlType::XBox) {
+											 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+																  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
+										 }
+										 else {
+											 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+																  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
+										 }
+
+										 if (GetJoypadNum() > 0) {
+											 switch (GetJoypadType(DX_INPUT_PAD1)) {
+												 case DX_PADTYPE_OTHER:
+												 case DX_PADTYPE_DUAL_SHOCK_4:
+												 case DX_PADTYPE_DUAL_SENSE:
+												 case DX_PADTYPE_SWITCH_JOY_CON_L:
+												 case DX_PADTYPE_SWITCH_JOY_CON_R:
+												 case DX_PADTYPE_SWITCH_PRO_CTRL:
+												 case DX_PADTYPE_SWITCH_HORI_PAD:
+													 WindowSystem::SetMsg(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+																		  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:DirectInput");
+													 break;
+												 case DX_PADTYPE_XBOX_360:
+												 case DX_PADTYPE_XBOX_ONE:
+													 WindowSystem::SetMsg(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+																		  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:XInput");
+													 break;
+												 default:
+													 break;
+											 }
+										 }
+									 }
+									 );
 	}
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
@@ -1083,20 +1063,20 @@ namespace DXLib_ref {
 			m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
 
 			//
-			if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_select != 3)) {
+			if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
 				--m_tabsel;
 				if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
 				m_select = 0;
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
-			if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_select != 3)) {
+			if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
 				++m_tabsel;
 				if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
 				m_select = 0;
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 
-			m_Tabs.at(m_tabsel)->Execute(&m_select, (m_select != 3));
+			m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
 			//
 			if (EndSwitch) {
 				Pad->SetGuideUpdate();

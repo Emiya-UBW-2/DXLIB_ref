@@ -8,6 +8,8 @@ namespace DXLib_ref {
 
 		bool			m_IsFirstLoop{true};			//初回チェック
 	public://ゲッター
+		bool			isLoading{false};
+	public://ゲッター
 		void			Set_Next(const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr = Next_scenes_ptr_t; }
 		auto&			Get_Next(void) noexcept { return Next_ptr; }
 
@@ -16,7 +18,13 @@ namespace DXLib_ref {
 		TEMPSCENE(void) noexcept {}
 		~TEMPSCENE(void) noexcept {}
 	public://メイン更新
-		void Load(void) noexcept { Load_Sub(); }		//事前読み込み　ローダーなど別のシーンで呼ぶ
+		//事前読み込み　ローダーなど別のシーンで呼ぶ
+		void Load(void) noexcept {
+			if (!isLoading) {
+				isLoading = true;
+				Load_Sub();
+			}
+		}
 
 		void Set(void) noexcept {
 			m_IsFirstLoop = true;
@@ -28,6 +36,13 @@ namespace DXLib_ref {
 			return ans;
 		}
 		void Dispose(void) noexcept { Dispose_Sub(); }
+
+		void Dispose_Load(void) noexcept {
+			if (isLoading) {
+				isLoading = false;
+				Dispose_Load_Sub();
+			}
+		}
 
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
 		void Depth_Draw(void) noexcept { Depth_Draw_Sub(); }
@@ -47,9 +62,11 @@ namespace DXLib_ref {
 		virtual bool Update_Sub(void) noexcept { return true; }
 		virtual void Dispose_Sub(void) noexcept {}
 
+		virtual void Dispose_Load_Sub(void) noexcept {}
+
 		virtual void BG_Draw_Sub(void) noexcept {
 			auto* DrawParts = DXDraw::Instance();
-			DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispXSize, GetColor(192, 192, 192), TRUE);
+			DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispXSize, Gray25, TRUE);
 		}
 
 		virtual void Depth_Draw_Sub(void) noexcept {}

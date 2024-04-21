@@ -1,7 +1,5 @@
 ﻿#include "DXLib_ref.h"
 
-#define LineHeight	y_r(18)
-
 namespace DXLib_ref {
 	const DXDraw* SingletonBase<DXDraw>::m_Singleton = nullptr;
 
@@ -308,14 +306,14 @@ namespace DXLib_ref {
 		DepthScreenHandle.SetDraw_Screen();
 		DepthBaseScreenHandle.SetDraw_Screen();
 		{
-			SetupCamera_Ortho(5.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+			SetupCamera_Ortho(15.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
 			SetCameraNearFar(0.05f*12.5f, 30.f*12.5f);		// 描画する奥行き範囲をセット
 			// カメラの位置と注視点はステージ全体が見渡せる位置
 			auto Vec = m_ShadowVec;
 			if (Vec.x() == 0.f && m_ShadowVec.z() == 0.f) {
 				Vec.z(0.1f);
 			}
-			SetCameraPositionAndTarget_UpVecY((Center - Vec.Norm() * (5.f*12.5f)).get(), Center.get());
+			SetCameraPositionAndTarget_UpVecY((Center - Vec.Norm() * (15.f*12.5f)).get(), Center.get());
 
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
@@ -330,7 +328,7 @@ namespace DXLib_ref {
 		auto* DrawParts = DXDraw::Instance();
 		// 影の結果を出力
 		Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f*12.5f, 5.f*12.5f);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f*12.5f, 15.f*12.5f);
 		BaseShadowHandle.SetDraw_Screen(tmp_cam);
 		{
 			SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
@@ -373,23 +371,26 @@ namespace DXLib_ref {
 			this->m_DispXSize = deskx;
 			this->m_DispYSize = desky;
 		}
+		int DXVer = (OptionParts->Get_DirectXVer() == 1) ? DX_DIRECT3D_11 : DX_DIRECT3D_9EX;
 		SetOutApplicationLogValidFlag(TRUE);						//log
 		SetMainWindowText("Loading...");							//タイトル
 		ChangeWindowMode(TRUE);										//窓表示
-		SetUseDirect3DVersion(OptionParts->Get_DirectXVer());		//directX ver
+		SetUseDirect3DVersion(DXVer);								//directX ver
 		SetUseDirectInputFlag(TRUE);								//
 		SetDirectInputMouseMode(TRUE);								//
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
-		//SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
+		if (!OptionParts->Get_LightMode()) {
+			SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
+		}
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->Get_Vsync() ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
 		DxLib_Init();												//
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		//SetCreateDrawValidGraphMultiSample(4, 3);					//アンチエイリアス
-		if (GetUseDirect3DVersion() != OptionParts->Get_DirectXVer()) {
+		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, "DirectXのバージョンが適用していません。古いバージョンで動作しています", "", MB_OK);
 		}
 		if (OptionParts->Get_AllWaysFront()) {
@@ -509,38 +510,22 @@ namespace DXLib_ref {
 		OptionWindowClass::Instance()->Init();
 		//
 		m_PopUpDrawClass.Set("Exit", y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
-			auto* Pad = PadControl::Instance();
-			auto* Fonts = FontPool::Instance();
-
-			auto White = GetColor(255, 255, 255);
-			auto Gray25 = GetColor(216, 216, 216);
-			auto Black = GetColor(0, 0, 0);
 			int xp1, yp1;
 			//タイトル
 			{
 				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
-				int Height = LineHeight;
 
-				int xpos = xp1 + y_r(6);
-				int ypos = yp1 + (yp1 + Height - yp1) / 2;
-				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(Height, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE,
-																	   xpos, ypos, White, Black, "ゲームを終了しますか？");
+				WindowSystem::SetMsg(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "ゲームを終了しますか？");
 			}
 			//
 			{
 				xp1 = y_r(960) - y_r(54);
 				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
 
-				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2);
-				int xpos = xp1 + (xp1 + y_r(108) - xp1) / 2;
-				int ypos = yp1 + (yp1 + LineHeight * 2 - yp1) / 2;
-
-				DrawBox_2D(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, MouseOver ? White : Gray25, true);
-				Fonts->Get(FontPool::FontType::Gothic_Edge).DrawString(std::min(LineHeight, yp1 + LineHeight * 2 - yp1), FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE,
-																	   xpos, ypos, White, Black, "終了");
-
-				if (Pad->GetKey(PADS::INTERACT).trigger() || (MouseOver && Pad->GetMouseClick().trigger())) {
+				auto* Pad = PadControl::Instance();
+				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, "終了");
+				if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 					m_IsEnd = true;
 				}
 			}
@@ -549,14 +534,28 @@ namespace DXLib_ref {
 	bool			DXDraw::FirstExecute(void) noexcept {
 		m_StartTime = GetNowHiPerformanceCount();
 		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger());
-		if (m_PopUpDrawClass.IsActive()) {
-			auto* Pad = PadControl::Instance();
-			Pad->ChangeGuide(
-				[&]() {
-					auto* KeyGuide = PadControl::Instance();
-					KeyGuide->AddGuide(PADS::RELOAD, "戻る");
+		{
+			if (m_PopUpDrawClass.GetActiveSwitch()) {
+				if (m_PopUpDrawClass.IsActive()) {
+					m_PrevPausePopupOpen = IsPause();
+					PauseIn();
+					OptionWindowClass::Instance()->OffSwitch();
 				}
-			);
+				else {
+					if (!m_PrevPausePopupOpen) {
+						PauseExit();
+					}
+				}
+			}
+			if (m_PopUpDrawClass.IsActive()) {
+				auto* Pad = PadControl::Instance();
+				Pad->ChangeGuide(
+					[&]() {
+						auto* KeyGuide = PadControl::Instance();
+						KeyGuide->AddGuide(PADS::RELOAD, "戻る");
+					}
+				);
+			}
 		}
 		return (ProcessMessage() == 0) && !m_IsEnd;
 	}
@@ -645,12 +644,12 @@ namespace DXLib_ref {
 					if (IsPause()) {
 						//
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.5f), 0, 255));
-						DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, GetColor(0, 0, 0), TRUE);
+						DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, Black, TRUE);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 						//
 						if (m_PauseFlashCount > 0.5f) {
 							auto* Fonts = FontPool::Instance();
-							Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
+							Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
 						}
 					}
 					doingUI2();										//UI2
@@ -664,7 +663,7 @@ namespace DXLib_ref {
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
 			{
-				DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, GetColor(255, 255, 255), TRUE);
+				DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, White, TRUE);
 				m_OutScreen.DrawRotaGraph(this->m_DispXSize / 2, this->m_DispYSize / 2, 0.5f, 0, false);
 				OptionWindowClass::Instance()->Draw();
 				PadControl::Instance()->Draw();
@@ -703,12 +702,12 @@ namespace DXLib_ref {
 				if (IsPause()) {
 					//
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.5f), 0, 255));
-					DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, GetColor(0, 0, 0), TRUE);
+					DrawBox_2D(0, 0, this->m_DispXSize, this->m_DispYSize, Black, TRUE);
 					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 					//
 					if (m_PauseFlashCount > 0.5f) {
 						auto* Fonts = FontPool::Instance();
-						Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), GetColor(0, 255, 0), GetColor(0, 0, 0), "Pause");
+						Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
 					}
 				}
 				doingUI2();										//UI2

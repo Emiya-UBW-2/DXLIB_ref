@@ -229,13 +229,14 @@ namespace DXLib_ref {
 		public:
 			//const auto&		GetHandles(void)const noexcept { return shandle; }
 			const auto&		Get_ID(void)const noexcept { return ID; }
-			void			Set(int ID_t, std::string path_t) {
+			void			Set(int ID_t, std::string path_t, bool is3Dsound = false) {
 				if (path_t == "") { return; }
 				if (path_t == path) { return; }
 				this->ID = ID_t;
 				this->path = path_t;
-				SetCreate3DSoundFlag(FALSE);
+				SetCreate3DSoundFlag(is3Dsound ? TRUE : FALSE);
 				this->handle = SoundHandle::Load(this->path);
+				SetCreate3DSoundFlag(FALSE);
 			}
 			bool			Check() {
 				return this->handle.check();
@@ -248,6 +249,17 @@ namespace DXLib_ref {
 			}
 			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) {
 				this->handle.play(type_t, Flag_t);
+			}
+			void 			Play_3D(const VECTOR_ref& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
+				bool isplay = true;
+				{
+					//距離内にいない場合鳴らさない
+					//float dist = (pos_t - GetCameraPosition()).size();
+					//isplay = (dist < radius);
+				}
+				if (isplay) {
+					this->handle.play_3D(pos_t, radius, type_t);
+				}
 			}
 			void			SetVol_Local(int vol) {
 				Set_vol = std::clamp(vol, 0, 255);
@@ -267,15 +279,15 @@ namespace DXLib_ref {
 			}
 		}
 	public:
-		size_t			Add(int ID_t, std::string path_t = "") {
+		size_t			Add(int ID_t, std::string path_t = "", bool is3Dsound = false) {
 			for (auto& h : this->havehandle) {
 				if (h.Get_ID() == ID_t) {
-					h.Set(ID_t, path_t);
+					h.Set(ID_t, path_t, is3Dsound);
 					return &h - &this->havehandle.front();
 				}
 			}
 			this->havehandle.resize(this->havehandle.size() + 1);
-			this->havehandle.back().Set(ID_t, path_t);
+			this->havehandle.back().Set(ID_t, path_t, is3Dsound);
 			return this->havehandle.size() - 1;
 		}
 		BGMhave&		Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
