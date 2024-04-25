@@ -209,6 +209,43 @@ namespace DXLib_ref {
 		}
 	};
 
+	//ローカライズプール
+	class LocalizePool : public SingletonBase<LocalizePool> {
+	private:
+		friend class SingletonBase<LocalizePool>;
+	public:
+		typedef int LocalizeID;
+	private:
+		struct LocalizeStr {
+			LocalizeID m_ID{0};
+			char m_Str[256]{};
+		};
+
+		std::vector<LocalizeStr> havehandle;
+	private:
+		LocalizePool() {
+			Load("Eng");
+		}
+		~LocalizePool() {
+			Dispose();
+		}
+	public:
+		void Load(const char* Lang);
+		void Dispose() {
+			this->havehandle.clear();
+			this->havehandle.shrink_to_fit();
+		}
+	public:
+		const char* Get(LocalizeID type) noexcept {
+			for (auto& s : this->havehandle) {
+				if (s.m_ID == type) {
+					return s.m_Str;
+				}
+			}
+			return "";
+		}
+	};
+
 	//フォントプール
 	class FontPool : public SingletonBase<FontPool> {
 	private:
@@ -269,55 +306,55 @@ namespace DXLib_ref {
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
 					}
 					break;
 				case FontType::Nomal_EdgeL:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
 					}
 					else {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 					}
 					break;
 				case FontType::Nomal_AA:
 					this->m_size = 92;
 					this->m_scaleType = DX_DRAWMODE_NEAREST;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create("BIZ UD ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
 					}
 					break;
 				case FontType::Nomal_ItalicAA:
 					this->m_size = 92;
 					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create("BIZ UD ゴシック", (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, -1, -1, true);
+					this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, -1, -1, true);
 					break;
 				case FontType::Gothic_Edge:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
 					}
 					break;
 				case FontType::Gothic_AA:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create("ＭＳ ゴシック", this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
 					}
 					break;
 				default:

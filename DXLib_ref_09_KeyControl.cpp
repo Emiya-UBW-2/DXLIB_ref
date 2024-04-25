@@ -286,7 +286,7 @@ namespace DXLib_ref {
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			for (int i = 0; i < KeyNum; i++) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
-					Key.back()->AddGuidePC(i, "I—¹");
+					Key.back()->AddGuidePC(i, LocalizePool::Instance()->Get(9990));
 					break;
 				}
 			}

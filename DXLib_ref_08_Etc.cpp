@@ -185,7 +185,7 @@ namespace DXLib_ref {
 			if (m_Active) {
 				xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
-				if (Pad->GetKey(PADS::RELOAD).trigger() || WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, "•Â‚¶‚é")) {
+				if (Pad->GetKey(PADS::RELOAD).trigger() || WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizePool::Instance()->Get(20))) {
 					SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
 					m_Active = false;
 					m_ActiveSwitch = true;

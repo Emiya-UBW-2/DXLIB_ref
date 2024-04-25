@@ -221,7 +221,7 @@ namespace DXLib_ref {
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub() noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("BGM", "BGMボリュームを変更します",
+		this->m_Elements.back().Init("BGM", LocalizePool::Instance()->Get(1110),
 									 [&]() {
 										 auto* BGM = BGMPool::Instance();
 										 auto* SE = SoundPool::Instance();
@@ -252,7 +252,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SE", "SEボリュームを変更します",
+		this->m_Elements.back().Init("SE", LocalizePool::Instance()->Get(1111),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -285,7 +285,7 @@ namespace DXLib_ref {
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Light Mode", "軽量モードを指定します(反映は再起動後にされます)",
+		this->m_Elements.back().Init("Light Mode", LocalizePool::Instance()->Get(1120),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -306,7 +306,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Window Mode", "ウィンドウ、ボーダーレスモードを選択します(反映は再起動後にされます)",
+		this->m_Elements.back().Init("Window Mode", LocalizePool::Instance()->Get(1121),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -330,7 +330,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Fov", "垂直視野角を変更します",
+		this->m_Elements.back().Init("Fov", LocalizePool::Instance()->Get(1122),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -352,7 +352,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("V Sync", "垂直同期の有効無効を指定します(反映は再起動後にされます)",
+		this->m_Elements.back().Init("V Sync", LocalizePool::Instance()->Get(1123),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -382,7 +382,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("FPS Limit", "垂直同期を切った際のFPS制限を指定します",
+		this->m_Elements.back().Init("FPS Limit", LocalizePool::Instance()->Get(1124),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -446,7 +446,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("DirectX Version", "DirectXのバージョンを変更します(反映は再起動後にされます)",
+		this->m_Elements.back().Init("DirectX Version", LocalizePool::Instance()->Get(1125),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -487,7 +487,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("AntiAlias", "FXAAの有効無効を指定します",
+		this->m_Elements.back().Init("AntiAlias", LocalizePool::Instance()->Get(1126),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -509,7 +509,7 @@ namespace DXLib_ref {
 									 );
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SSAO", "画面ベースの環境遮蔽の有効無効を指定します",
+		this->m_Elements.back().Init("SSAO", LocalizePool::Instance()->Get(1127),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -530,7 +530,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SSR", "画面ベースの鏡面反射の有効無効を指定します DirectX11のみ有効",
+		this->m_Elements.back().Init("SSR", LocalizePool::Instance()->Get(1128),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -552,7 +552,7 @@ namespace DXLib_ref {
 									 );
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Shadow", "影の有効無効を指定します",
+		this->m_Elements.back().Init("Shadow", LocalizePool::Instance()->Get(1129),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -573,7 +573,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Object", "オブジェクトの表示をするかを指定します",
+		this->m_Elements.back().Init("Object", LocalizePool::Instance()->Get(1130),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -594,7 +594,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Bloom Effect", "ブルームエフェクトの有効無効を指定します",
+		this->m_Elements.back().Init("Bloom Effect", LocalizePool::Instance()->Get(1131),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -615,7 +615,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Color Aberration", "画面エフェクトの有効無効を指定します",
+		this->m_Elements.back().Init("Color Aberration", LocalizePool::Instance()->Get(1132),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -636,7 +636,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("DoF", "遠近のピンボケの有効無効を指定します",
+		this->m_Elements.back().Init("DoF", LocalizePool::Instance()->Get(1133),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -657,7 +657,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("MotionBlur", "モーションブラーの有効無効を指定します",
+		this->m_Elements.back().Init("MotionBlur", LocalizePool::Instance()->Get(1134),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -680,7 +680,7 @@ namespace DXLib_ref {
 	}
 	void OptionWindowClass::ElseTabsInfo::Init_Sub() noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("X sensing", "横方向の感度を変更します",
+		this->m_Elements.back().Init("X sensing", LocalizePool::Instance()->Get(1140),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -702,7 +702,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Y sensing", "縦方向の感度を変更します",
+		this->m_Elements.back().Init("Y sensing", LocalizePool::Instance()->Get(1141),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -724,7 +724,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("HeadBobbing", "視点の揺れの有効無効を指定します",
+		this->m_Elements.back().Init("HeadBobbing", LocalizePool::Instance()->Get(1142),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -745,7 +745,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("CheckMagazine", "追加で眺め/マガジン確認をするかを指定します",
+		this->m_Elements.back().Init("CheckMagazine", LocalizePool::Instance()->Get(1143),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -766,7 +766,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("PadType", "パッドの入力方式を変更します",
+		this->m_Elements.back().Init("PadType", LocalizePool::Instance()->Get(1144),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -1096,17 +1096,16 @@ namespace DXLib_ref {
 				[&]() {
 					auto* KeyGuide = PadControl::Instance();
 
-					KeyGuide->AddGuide(PADS::INTERACT, "決定");
-					KeyGuide->AddGuide(PADS::RELOAD, "戻る");
+					KeyGuide->AddGuide(PADS::INTERACT, LocalizePool::Instance()->Get(9992));
+					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
 
 					KeyGuide->AddGuide(PADS::LEAN_L, "");
-					KeyGuide->AddGuide(PADS::LEAN_R, "タブ切替");
+					KeyGuide->AddGuide(PADS::LEAN_R, LocalizePool::Instance()->Get(9994));
 					KeyGuide->AddGuide(PADS::MOVE_W, "");
 					KeyGuide->AddGuide(PADS::MOVE_A, "");
-					KeyGuide->AddGuide(PADS::MOVE_STICK, "上選択");
 					KeyGuide->AddGuide(PADS::MOVE_S, "");
 					KeyGuide->AddGuide(PADS::MOVE_D, "");
-					KeyGuide->AddGuide(PADS::MOVE_STICK, "下選択");
+					KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizePool::Instance()->Get(9993));
 				}
 			);
 		}

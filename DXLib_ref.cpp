@@ -350,6 +350,8 @@ namespace DXLib_ref {
 	//
 	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
+		LocalizePool::Create();
+
 		auto* OptionParts = OPTION::Instance();
 		//VR初期化
 		m_VRControl = new VRControl;
@@ -391,7 +393,7 @@ namespace DXLib_ref {
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		//SetCreateDrawValidGraphMultiSample(4, 3);					//アンチエイリアス
 		if (GetUseDirect3DVersion() != DXVer) {
-			MessageBox(NULL, "DirectXのバージョンが適用していません。古いバージョンで動作しています", "", MB_OK);
+			MessageBox(NULL, LocalizePool::Instance()->Get(10), "", MB_OK);
 		}
 		if (OptionParts->Get_AllWaysFront()) {
 			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
@@ -509,14 +511,14 @@ namespace DXLib_ref {
 		PostPassEffect::Create();						//シェーダー
 		OptionWindowClass::Instance()->Init();
 		//
-		m_PopUpDrawClass.Set("Exit", y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
+		m_PopUpDrawClass.Set(LocalizePool::Instance()->Get(100), y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
 			int xp1, yp1;
 			//タイトル
 			{
 				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
 
-				WindowSystem::SetMsg(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "ゲームを終了しますか？");
+				WindowSystem::SetMsg(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
 			}
 			//
 			{
@@ -524,7 +526,7 @@ namespace DXLib_ref {
 				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
 
 				auto* Pad = PadControl::Instance();
-				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, "終了");
+				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(102));
 				if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 					m_IsEnd = true;
 				}
@@ -552,7 +554,7 @@ namespace DXLib_ref {
 				Pad->ChangeGuide(
 					[&]() {
 						auto* KeyGuide = PadControl::Instance();
-						KeyGuide->AddGuide(PADS::RELOAD, "戻る");
+						KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
 					}
 				);
 			}
