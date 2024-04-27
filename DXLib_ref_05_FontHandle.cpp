@@ -8,6 +8,11 @@ namespace DXLib_ref {
 	const FontPool* SingletonBase<FontPool>::m_Singleton = nullptr;
 	const LocalizePool* SingletonBase<LocalizePool>::m_Singleton = nullptr;
 
+	LocalizePool::LocalizePool() {
+		auto* OptionParts = OPTION::Instance();
+		Load(LanguageStr[OptionParts->Get_Language()]);
+	}
+
 	void LocalizePool::Load(const char* Lang) {
 		std::string Path = "data/Localize/";
 		Path += Lang;

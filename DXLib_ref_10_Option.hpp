@@ -32,6 +32,7 @@ namespace DXLib_ref {
 		EnumParamType::Boolean,
 		EnumParamType::Boolean,
 		EnumParamType::Else,
+		EnumParamType::Else,
 	};
 	static const char* OptionStr[] = {
 		"grass_level",
@@ -57,11 +58,21 @@ namespace DXLib_ref {
 		"EnableCheck",
 		"LightMode",
 		"ControlType",
+		"Language",
 	};
 	//
 	static const char* DirectXVerStr[] = {
 	"9c",
 	"11",
+	};
+
+	enum class LanguageType :int {
+		Jpn,
+		Eng,
+	};
+	static const char* LanguageStr[] = {
+	"Jpn",
+	"Eng",
 	};
 
 	class OPTION : public SingletonBase<OPTION> {
@@ -97,6 +108,7 @@ namespace DXLib_ref {
 		bool	FXAA{true};
 		bool	LightMode{false};
 		int		PadType{1};
+		int		Language{0};
 	public:
 		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_useVR()const noexcept {
@@ -130,7 +142,7 @@ namespace DXLib_ref {
 		const auto		Get_EnableCheck()const noexcept { return EnableCheck; }
 		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
 		const auto		Get_PadType()const noexcept { return PadType; }
-		
+		const auto		Get_Language()const noexcept { return Language; }
 
 	public:
 		void			Set_useVR(bool use) { useVR = use; }
@@ -157,6 +169,7 @@ namespace DXLib_ref {
 		void			Set_EnableCheck(bool use) noexcept { EnableCheck = use; }
 		void			Set_FXAA(bool use) noexcept { FXAA = use; }
 		void			Set_PadType(int use) noexcept { PadType = use; }
+		void			Set_Language(int use) noexcept { Language = use; }
 		
 	public:
 		void			Load(void) noexcept;
@@ -263,12 +276,21 @@ namespace DXLib_ref {
 		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
 		PopUpDrawClass				m_PopUpDrawClass;
 		bool						m_ActiveSwitch{false};
+		bool						m_RestartSwitch{false};
 	public:
+		void SetRestart() noexcept { m_RestartSwitch = true; }
 		void SetActive() noexcept { m_ActiveSwitch = true; }
 		void OffSwitch() noexcept {
 			if (m_PopUpDrawClass.IsActive()) {
 				m_ActiveSwitch = true;
 			}
+		}
+		const auto IsRestartSwitch() noexcept {
+			auto Res = !m_PopUpDrawClass.IsActive() && m_RestartSwitch;
+			if (Res) {
+				m_RestartSwitch = false;
+			}
+			return Res;
 		}
 		const auto& IsActive() const noexcept { return m_PopUpDrawClass.IsActive(); }
 	public:

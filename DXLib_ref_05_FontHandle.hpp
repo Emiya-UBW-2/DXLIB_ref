@@ -223,9 +223,7 @@ namespace DXLib_ref {
 
 		std::vector<LocalizeStr> havehandle;
 	private:
-		LocalizePool() {
-			Load("Eng");
-		}
+		LocalizePool();
 		~LocalizePool() {
 			Dispose();
 		}

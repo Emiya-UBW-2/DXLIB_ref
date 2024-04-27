@@ -96,6 +96,14 @@ namespace DXLib_ref {
 					}
 				}
 			}
+			else if (LEFT == OptionStr[23]) {
+				std::string LangStr = RIGHT;
+				for (int i = 0;i < 2;i++) {
+					if (LangStr == LanguageStr[i]) {
+						PadType = i;
+					}
+				}
+			}
 		}
 		FileRead_close(mdata);
 		SetOutApplicationLogValidFlag(TRUE);
@@ -142,6 +150,7 @@ namespace DXLib_ref {
 		outputfile << std::string(OptionStr[20]) + "=" + GetString(20, Get_EnableCheck()) + "\n";
 		outputfile << std::string(OptionStr[21]) + "=" + GetString(21, Get_LightMode()) + "\n";
 		outputfile << std::string(OptionStr[22]) + "=" + std::string(ControlTypeStr[Get_PadType()]) + "\n";
+		outputfile << std::string(OptionStr[23]) + "=" + std::string(LanguageStr[Get_PadType()]) + "\n";
 		outputfile.close();
 	}
 
@@ -291,18 +300,24 @@ namespace DXLib_ref {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_LightMode(OptionParts->Get_LightMode() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_LightMode(OptionParts->Get_LightMode() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_LightMode();
 										 OptionParts->Set_LightMode(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_LightMode()));
+										 if (prev != OptionParts->Get_LightMode()) {
+											 OptionWindowClass::Instance()->SetRestart();
+										 }
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -312,21 +327,28 @@ namespace DXLib_ref {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_AllWaysFront(OptionParts->Get_AllWaysFront() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->Set_AllWaysFront(OptionParts->Get_AllWaysFront() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_AllWaysFront();
+
 										 OptionParts->Set_AllWaysFront(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_AllWaysFront()));
+										 if (prev != OptionParts->Get_AllWaysFront()) {
+											 OptionWindowClass::Instance()->SetRestart();
+										 }
 
 										 WindowSystem::SetMsg(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
-															  LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->Get_AllWaysFront() ? "ウィンドウ" : "ボーダーレス");
+															  LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->Get_AllWaysFront() ? LocalizePool::Instance()->Get(1135) : LocalizePool::Instance()->Get(1136));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -840,6 +862,67 @@ namespace DXLib_ref {
 										 }
 									 }
 									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Language", LocalizePool::Instance()->Get(1145),
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((LanguageType)OptionParts->Get_Language()) {
+											 case  LanguageType::Eng:
+												 OptionParts->Set_Language((int)LanguageType::Jpn);
+												 break;
+											 case  LanguageType::Jpn:
+												 OptionParts->Set_Language((int)LanguageType::Eng);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 auto* LocalizeParts = LocalizePool::Instance();
+										 LocalizeParts->Dispose();
+										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((LanguageType)OptionParts->Get_Language()) {
+											 case  LanguageType::Eng:
+												 OptionParts->Set_Language((int)LanguageType::Jpn);
+												 break;
+											 case  LanguageType::Jpn:
+												 OptionParts->Set_Language((int)LanguageType::Eng);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 auto* LocalizeParts = LocalizePool::Instance();
+										 LocalizeParts->Dispose();
+										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_Language();
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_Language() == (int)LanguageType::Eng))) {
+											 OptionParts->Set_Language((int)LanguageType::Eng);
+										 }
+										 else {
+											 OptionParts->Set_Language((int)LanguageType::Jpn);
+										 }
+										 if (prev != OptionParts->Get_Language()) {
+											 auto* LocalizeParts = LocalizePool::Instance();
+											 LocalizeParts->Dispose();
+											 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+										 }
+
+										 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight,
+															  LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->Get_Language()]);
+									 }
+									 );
 	}
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
@@ -851,10 +934,10 @@ namespace DXLib_ref {
 
 
 	void OptionWindowClass::ControlTabsInfo::Init_Sub() noexcept {
-		const char* KeyInfo = "[マウス必須]カーソルをかざし設定するボタンを押してください";
+		const char* KeyInfo = LocalizePool::Instance()->Get(1151);
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("変更を破棄", "[マウス必須]リセットします",
+		this->m_Elements.back().Init("Reset", LocalizePool::Instance()->Get(1150),
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -867,7 +950,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("前進/上を選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1153), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -875,7 +958,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("後退/下を選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1154), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -883,7 +966,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("左移動/左を選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1155), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -891,7 +974,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("右移動/右を選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1156), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -899,7 +982,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("左リーン/左タブを選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1157), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -907,7 +990,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("右リーン/右タブを選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1158), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -915,7 +998,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("リロード/戻る", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1159), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -923,7 +1006,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("インタラクト/選択", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1160), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -931,7 +1014,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("投げる", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1161), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -939,7 +1022,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("近接攻撃", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1162), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -947,7 +1030,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("スタンス切替", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1163), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -955,7 +1038,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("走る", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1164), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -963,7 +1046,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("歩く", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1165), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -971,7 +1054,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("射撃", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1166), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -979,7 +1062,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("エイム", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1167), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -987,7 +1070,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("銃器切替", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1168), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -995,7 +1078,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("しゃがみ", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1169), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1003,7 +1086,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("伏せ", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1170), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1011,7 +1094,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("装備確認", KeyInfo,
+		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1171), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1019,7 +1102,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 25); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("セーブ", "[マウス必須]キーコンフィグをセーブします",
+		this->m_Elements.back().Init("Save", LocalizePool::Instance()->Get(1152),
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},

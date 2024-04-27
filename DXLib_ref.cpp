@@ -532,10 +532,32 @@ namespace DXLib_ref {
 				}
 			}
 							 });
+		m_RestartPopUpDrawClass.Set(LocalizePool::Instance()->Get(100), y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
+			int xp1, yp1;
+			//タイトル
+			{
+				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+
+				WindowSystem::SetMsg(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
+			}
+			//
+			{
+				xp1 = y_r(960) - y_r(54);
+				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+
+				auto* Pad = PadControl::Instance();
+				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(2102));
+				if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+					m_IsEnd = true;
+					StartMe();
+				}
+			}
+									});
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
 		m_StartTime = GetNowHiPerformanceCount();
-		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger());
+		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger() || (m_RestartPopUpDrawClass.IsActive() && m_PopUpDrawClass.IsActive()));
 		{
 			if (m_PopUpDrawClass.GetActiveSwitch()) {
 				if (m_PopUpDrawClass.IsActive()) {
@@ -559,6 +581,31 @@ namespace DXLib_ref {
 				);
 			}
 		}
+		m_RestartPopUpDrawClass.Update(OptionWindowClass::Instance()->IsRestartSwitch());
+		{
+			if (m_RestartPopUpDrawClass.GetActiveSwitch()) {
+				if (m_RestartPopUpDrawClass.IsActive()) {
+					m_PrevPausePopupOpen = IsPause();
+					PauseIn();
+					OptionWindowClass::Instance()->OffSwitch();
+				}
+				else {
+					if (!m_PrevPausePopupOpen) {
+						PauseExit();
+					}
+				}
+			}
+			if (m_RestartPopUpDrawClass.IsActive()) {
+				auto* Pad = PadControl::Instance();
+				Pad->ChangeGuide(
+					[&]() {
+						auto* KeyGuide = PadControl::Instance();
+						KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
+					}
+				);
+			}
+		}
+
 		return (ProcessMessage() == 0) && !m_IsEnd;
 	}
 	void			DXDraw::Execute(void) noexcept {
@@ -670,6 +717,7 @@ namespace DXLib_ref {
 				OptionWindowClass::Instance()->Draw();
 				PadControl::Instance()->Draw();
 				m_PopUpDrawClass.Draw();
+				m_RestartPopUpDrawClass.Draw();
 			}
 		}
 		else {
@@ -716,6 +764,7 @@ namespace DXLib_ref {
 				OptionWindowClass::Instance()->Draw();
 				PadControl::Instance()->Draw();
 				m_PopUpDrawClass.Draw();
+				m_RestartPopUpDrawClass.Draw();
 			}
 		}
 	}
