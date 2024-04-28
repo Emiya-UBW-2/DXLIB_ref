@@ -33,6 +33,8 @@ namespace DXLib_ref {
 		EnumParamType::Boolean,
 		EnumParamType::Else,
 		EnumParamType::Else,
+		EnumParamType::Boolean,
+		EnumParamType::Boolean,
 	};
 	static const char* OptionStr[] = {
 		"grass_level",
@@ -59,6 +61,8 @@ namespace DXLib_ref {
 		"LightMode",
 		"ControlType",
 		"Language",
+		"EX_UI",
+		"EX_UI2",
 	};
 	//
 	static const char* DirectXVerStr[] = {
@@ -85,13 +89,13 @@ namespace DXLib_ref {
 		~OPTION() {}
 	private:
 		int		grass_level = 4;
-		bool	DoF{ false };
-		bool	Bloom{ false };
-		bool	Shadow{ false };
+		bool	DoF{ true };
+		bool	Bloom{true};
+		bool	Shadow{true};
 		bool	useVR{ true };
 		bool	SSAO{ true };
-		float	Fov = 45.f;
-		bool	Vsync{ false };
+		float	Fov = 90.f;
+		bool	Vsync{true};
 		int		FrameLimit = 60;
 		float	SE{ 1.f };
 		float	VOICE{ 1.f };
@@ -109,6 +113,8 @@ namespace DXLib_ref {
 		bool	LightMode{false};
 		int		PadType{1};
 		int		Language{0};
+		bool	EX_UI{true};
+		bool	EX_UI2{true};
 	public:
 		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
 		const auto		Get_useVR()const noexcept {
@@ -143,7 +149,8 @@ namespace DXLib_ref {
 		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
 		const auto		Get_PadType()const noexcept { return PadType; }
 		const auto		Get_Language()const noexcept { return Language; }
-
+		const auto		Get_EX_UI()const noexcept { return EX_UI; }
+		const auto		Get_EX_UI2()const noexcept { return EX_UI2; }
 	public:
 		void			Set_useVR(bool use) { useVR = use; }
 		void			Set_LightMode(bool use) { LightMode = use; }
@@ -170,7 +177,9 @@ namespace DXLib_ref {
 		void			Set_FXAA(bool use) noexcept { FXAA = use; }
 		void			Set_PadType(int use) noexcept { PadType = use; }
 		void			Set_Language(int use) noexcept { Language = use; }
-		
+		void			Set_EX_UI(bool use) noexcept { EX_UI = use; }
+		void			Set_EX_UI2(bool use) noexcept { EX_UI2 = use; }
+
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;

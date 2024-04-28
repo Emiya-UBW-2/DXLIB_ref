@@ -120,7 +120,7 @@ namespace DXLib_ref {
 					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
-			SetMsg(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+			SetMsgWW(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
 			return value;
 		}

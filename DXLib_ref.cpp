@@ -518,7 +518,7 @@ namespace DXLib_ref {
 				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
 
-				WindowSystem::SetMsg(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
+				WindowSystem::SetMsgWW(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
 			}
 			//
 			{
@@ -539,7 +539,7 @@ namespace DXLib_ref {
 				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
 
-				WindowSystem::SetMsg(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
+				WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
 			}
 			//
 			{

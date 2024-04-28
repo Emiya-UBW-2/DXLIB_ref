@@ -2,6 +2,7 @@
 #include "DXLib_ref_10_Option.hpp"
 #include "DXLib_ref_08_Etc.hpp"
 
+
 namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
@@ -9,8 +10,30 @@ namespace DXLib_ref {
 	const OPTION* SingletonBase<OPTION>::m_Singleton = nullptr;
 
 	void			OPTION::Load(void) noexcept {
-		SetOutApplicationLogValidFlag(FALSE);
-		int mdata = FileRead_open("data/Setting.txt", FALSE);
+		//SetOutApplicationLogValidFlag(FALSE);
+		int mdata = -1;
+		bool NewData = true;
+		if (std::filesystem::is_regular_file("Save/Setting.txt")) {
+			mdata = FileRead_open("Save/Setting.txt", FALSE);
+			NewData = false;
+		}
+		
+		if (NewData) {
+			WCHAR localeName[LOCALE_NAME_MAX_LENGTH];
+			int retVal = GetUserDefaultLocaleName(localeName, ARRAYSIZE(localeName));
+			if (retVal > 0) {
+				if (StrCmpW(localeName, L"ja-JP") != 0) {
+					Language = 1;//Eng
+				}
+			}
+			//ã§í ê›íËçÄñ⁄
+			if (std::filesystem::is_regular_file("data/Setting.txt")) {
+				mdata = FileRead_open("data/Setting.txt", FALSE);
+			}
+			else {
+				return;
+			}
+		}
 		while (true) {
 			if (FileRead_eof(mdata) != 0) { break; }
 			auto ALL = getparams::Getstr(mdata);
@@ -97,16 +120,24 @@ namespace DXLib_ref {
 				}
 			}
 			else if (LEFT == OptionStr[23]) {
-				std::string LangStr = RIGHT;
-				for (int i = 0;i < 2;i++) {
-					if (LangStr == LanguageStr[i]) {
-						PadType = i;
+				if (!NewData) {
+					std::string LangStr = RIGHT;
+					for (int i = 0;i < 2;i++) {
+						if (LangStr == LanguageStr[i]) {
+							Language = i;
+						}
 					}
 				}
 			}
+			else if (LEFT == OptionStr[24]) {
+				EX_UI = (RIGHT.find("true") != std::string::npos);
+			}
+			else if (LEFT == OptionStr[25]) {
+				EX_UI2 = (RIGHT.find("true") != std::string::npos);
+			}
 		}
 		FileRead_close(mdata);
-		SetOutApplicationLogValidFlag(TRUE);
+		//SetOutApplicationLogValidFlag(TRUE);
 	}
 	template<class T>
 	std::string GetString(int id, T Param) {
@@ -126,7 +157,7 @@ namespace DXLib_ref {
 	}
 
 	void			OPTION::Save(void) noexcept {
-		std::ofstream outputfile("data/Setting.txt");
+		std::ofstream outputfile("Save/Setting.txt");
 		outputfile << std::string(OptionStr[0]) + "=" + GetString(0, Get_grass_level()) + "\n";
 		outputfile << std::string(OptionStr[1]) + "=" + GetString(1, Get_DoF()) + "\n";
 		outputfile << std::string(OptionStr[2]) + "=" + GetString(2, Get_Bloom()) + "\n";
@@ -150,7 +181,9 @@ namespace DXLib_ref {
 		outputfile << std::string(OptionStr[20]) + "=" + GetString(20, Get_EnableCheck()) + "\n";
 		outputfile << std::string(OptionStr[21]) + "=" + GetString(21, Get_LightMode()) + "\n";
 		outputfile << std::string(OptionStr[22]) + "=" + std::string(ControlTypeStr[Get_PadType()]) + "\n";
-		outputfile << std::string(OptionStr[23]) + "=" + std::string(LanguageStr[Get_PadType()]) + "\n";
+		outputfile << std::string(OptionStr[23]) + "=" + std::string(LanguageStr[Get_Language()]) + "\n";
+		outputfile << std::string(OptionStr[24]) + "=" + GetString(24, Get_EX_UI()) + "\n";
+		outputfile << std::string(OptionStr[25]) + "=" + GetString(25, Get_EX_UI2()) + "\n";
 		outputfile.close();
 	}
 
@@ -161,7 +194,7 @@ namespace DXLib_ref {
 	//
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		ypos += y_r((int)selanim);
-		WindowSystem::SetMsg(xpos, ypos, xpos, ypos + LineHeight,
+		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight,
 							 LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
 		m_Draw(xpos + y_r(720 - 324), ypos, isMine);
 	}
@@ -225,7 +258,7 @@ namespace DXLib_ref {
 		}
 	}
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
-		WindowSystem::SetMsg(xpos, ypos, xpos, ypos + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, m_Elements.at(select).GetInfo());
+		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, m_Elements.at(select).GetInfo());
 	}
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub() noexcept {
@@ -347,7 +380,7 @@ namespace DXLib_ref {
 											 OptionWindowClass::Instance()->SetRestart();
 										 }
 
-										 WindowSystem::SetMsg(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
 															  LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->Get_AllWaysFront() ? LocalizePool::Instance()->Get(1135) : LocalizePool::Instance()->Get(1136));
 									 }
 									 );
@@ -383,6 +416,7 @@ namespace DXLib_ref {
 											 OptionParts->Set_FrameLimit(RefreshRate);
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
@@ -392,14 +426,19 @@ namespace DXLib_ref {
 											 OptionParts->Set_FrameLimit(RefreshRate);
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_Vsync();
 										 OptionParts->Set_Vsync(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_Vsync()));
 										 if (OptionParts->Get_Vsync()) {
 											 OptionParts->Set_FrameLimit(RefreshRate);
+										 }
+										 if (prev != OptionParts->Get_Vsync()) {
+											 OptionWindowClass::Instance()->SetRestart();
 										 }
 									 }
 									 );
@@ -479,6 +518,7 @@ namespace DXLib_ref {
 											 }
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
@@ -490,21 +530,26 @@ namespace DXLib_ref {
 											 }
 										 }
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_DirectXVer();
 										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_DirectXVer() == 1))) {
 											 OptionParts->Set_DirectXVer(1);
 										 }
 										 else {
 											 OptionParts->Set_DirectXVer(0);
 										 }
+										 if (prev != OptionParts->Get_DirectXVer()) {
+											 OptionWindowClass::Instance()->SetRestart();
+										 }
 
-										 WindowSystem::SetMsg(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
 															  LineHeight, FontHandle::FontXCenter::MIDDLE, (OptionParts->Get_DirectXVer() == 0) ? White : Gray50, Black, "9.0C");
-										 WindowSystem::SetMsg(xpos + y_r(200), ypos, xpos + y_r(200), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(200), ypos, xpos + y_r(200), ypos + LineHeight,
 															  LineHeight, FontHandle::FontXCenter::RIGHT, (OptionParts->Get_DirectXVer() == 1) ? White : Gray50, Black, "11.0");
 									 }
 									 );
@@ -702,6 +747,70 @@ namespace DXLib_ref {
 	}
 	void OptionWindowClass::ElseTabsInfo::Init_Sub() noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Language", LocalizePool::Instance()->Get(1145),
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((LanguageType)OptionParts->Get_Language()) {
+											 case  LanguageType::Eng:
+												 OptionParts->Set_Language((int)LanguageType::Jpn);
+												 break;
+											 case  LanguageType::Jpn:
+												 OptionParts->Set_Language((int)LanguageType::Eng);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 auto* LocalizeParts = LocalizePool::Instance();
+										 LocalizeParts->Dispose();
+										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+										 OptionWindowClass::Instance()->SetRestart();
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 switch ((LanguageType)OptionParts->Get_Language()) {
+											 case  LanguageType::Eng:
+												 OptionParts->Set_Language((int)LanguageType::Jpn);
+												 break;
+											 case  LanguageType::Jpn:
+												 OptionParts->Set_Language((int)LanguageType::Eng);
+												 break;
+											 default:
+												 break;
+										 }
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+										 auto* LocalizeParts = LocalizePool::Instance();
+										 LocalizeParts->Dispose();
+										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+										 OptionWindowClass::Instance()->SetRestart();
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 auto prev = OptionParts->Get_Language();
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_Language() == (int)LanguageType::Eng))) {
+											 OptionParts->Set_Language((int)LanguageType::Eng);
+										 }
+										 else {
+											 OptionParts->Set_Language((int)LanguageType::Jpn);
+										 }
+										 if (prev != OptionParts->Get_Language()) {
+											 auto* LocalizeParts = LocalizePool::Instance();
+											 LocalizeParts->Dispose();
+											 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
+											 OptionWindowClass::Instance()->SetRestart();
+										 }
+
+										 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight,
+																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->Get_Language()]);
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("X sensing", LocalizePool::Instance()->Get(1140),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
@@ -831,11 +940,11 @@ namespace DXLib_ref {
 										 }
 										 ypos -= LineHeight * 1 / 6;
 										 if (OptionParts->Get_PadType() == (int)ControlType::XBox) {
-											 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
 																  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
 										 }
 										 else {
-											 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
 																  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
 										 }
 
@@ -848,12 +957,12 @@ namespace DXLib_ref {
 												 case DX_PADTYPE_SWITCH_JOY_CON_R:
 												 case DX_PADTYPE_SWITCH_PRO_CTRL:
 												 case DX_PADTYPE_SWITCH_HORI_PAD:
-													 WindowSystem::SetMsg(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
 																		  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "êÑèß:DirectInput");
 													 break;
 												 case DX_PADTYPE_XBOX_360:
 												 case DX_PADTYPE_XBOX_ONE:
-													 WindowSystem::SetMsg(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
 																		  LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "êÑèß:XInput");
 													 break;
 												 default:
@@ -863,70 +972,51 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Language", LocalizePool::Instance()->Get(1145),
+		this->m_Elements.back().Init("EX UI", LocalizePool::Instance()->Get(1146),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 switch ((LanguageType)OptionParts->Get_Language()) {
-											 case  LanguageType::Eng:
-												 OptionParts->Set_Language((int)LanguageType::Jpn);
-												 break;
-											 case  LanguageType::Jpn:
-												 OptionParts->Set_Language((int)LanguageType::Eng);
-												 break;
-											 default:
-												 break;
-										 }
+										 OptionParts->Set_EX_UI(OptionParts->Get_EX_UI() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-
-										 auto* LocalizeParts = LocalizePool::Instance();
-										 LocalizeParts->Dispose();
-										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 switch ((LanguageType)OptionParts->Get_Language()) {
-											 case  LanguageType::Eng:
-												 OptionParts->Set_Language((int)LanguageType::Jpn);
-												 break;
-											 case  LanguageType::Jpn:
-												 OptionParts->Set_Language((int)LanguageType::Eng);
-												 break;
-											 default:
-												 break;
-										 }
+										 OptionParts->Set_EX_UI(OptionParts->Get_EX_UI() ^ 1);
 										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-
-										 auto* LocalizeParts = LocalizePool::Instance();
-										 LocalizeParts->Dispose();
-										 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
-										 auto prev = OptionParts->Get_Language();
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->Get_Language() == (int)LanguageType::Eng))) {
-											 OptionParts->Set_Language((int)LanguageType::Eng);
-										 }
-										 else {
-											 OptionParts->Set_Language((int)LanguageType::Jpn);
-										 }
-										 if (prev != OptionParts->Get_Language()) {
-											 auto* LocalizeParts = LocalizePool::Instance();
-											 LocalizeParts->Dispose();
-											 LocalizeParts->Load(LanguageStr[OptionParts->Get_Language()]);
-										 }
-
-										 WindowSystem::SetMsg(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight,
-															  LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->Get_Language()]);
+										 OptionParts->Set_EX_UI(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_EX_UI()));
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("EX UI2", LocalizePool::Instance()->Get(1147),
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EX_UI2(OptionParts->Get_EX_UI2() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* SE = SoundPool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EX_UI2(OptionParts->Get_EX_UI2() ^ 1);
+										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->Set_EX_UI2(WindowSystem::CheckBox(xpos, ypos, OptionParts->Get_EX_UI2()));
 									 }
 									 );
 	}
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
-		WindowSystem::SetMsg(xpos, ypos, xpos + y_r(200), ypos + LineHeight,
+		WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight,
 							 LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
 							 "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
@@ -946,7 +1036,7 @@ namespace DXLib_ref {
 										 if (isMine && PadControl::Instance()->GetMouseClick().trigger()) {
 											 PadControl::Instance()->ResetAssign();
 										 }
-										 WindowSystem::SetMsg(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1113,7 +1203,7 @@ namespace DXLib_ref {
 											 Pad->FlipAssign();
 											 Pad->Save();
 										 }
-										 WindowSystem::SetMsg(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 									 );
 	}

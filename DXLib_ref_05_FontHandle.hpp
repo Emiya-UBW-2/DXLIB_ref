@@ -256,6 +256,7 @@ namespace DXLib_ref {
 			Nomal_ItalicAA,	//MSゴシック、イタリックAA
 			Gothic_Edge,	//MSゴシック、エッジ付き細
 			Gothic_AA,	//MSゴシック、AA
+			WW_Gothic,		//MS UI Gothic
 		};
 		class Fonthave {
 			int				m_scaleType{ DX_DRAWMODE_BILINEAR };
@@ -353,6 +354,16 @@ namespace DXLib_ref {
 					}
 					else {
 						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
+					}
+					break;
+				case FontType::WW_Gothic:
+					this->m_size = 32;
+					this->m_scaleType = DX_DRAWMODE_BILINEAR;
+					if (this->m_fontsize != -1) {
+						this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
+					}
+					else {
+						this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 					}
 					break;
 				default:

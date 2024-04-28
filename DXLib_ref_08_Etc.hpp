@@ -354,9 +354,27 @@ namespace DXLib_ref {
 		};
 		//
 		template <typename... Args>
+		extern const int GetMsgLenWW(int size, std::string_view String, Args&&... args) {
+			auto* Fonts = FontPool::Instance();
+			return Fonts->Get(FontPool::FontType::WW_Gothic, size).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(6) + 2;//エッジ分:
+		}
+
+		template <typename... Args>
+		extern const int SetMsgWW(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+			if (String == "") { return 0; }
+			auto* Fonts = FontPool::Instance();
+			int xSize = GetMsgLenWW(size, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
+				return 0;
+			}
+			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString(size, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			return xSize;//エッジ分
+		};
+		//
+		template <typename... Args>
 		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
 			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+			SetMsgWW(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
 		template <typename... Args>

@@ -233,9 +233,8 @@ namespace DXLib_ref {
 
 
 	void PadControl::Load(void) noexcept {
-		FILEINFO FileInfo;
 		int mdata = -1;
-		if (FileRead_findFirst(GetSavePath(), &FileInfo) != (DWORD_PTR)-1) {
+		if (std::filesystem::is_regular_file(GetSavePath())) {
 			mdata = FileRead_open(GetSavePath(), FALSE);
 		}
 		else {
