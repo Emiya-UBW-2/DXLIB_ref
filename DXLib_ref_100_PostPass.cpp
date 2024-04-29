@@ -689,8 +689,6 @@ namespace DXLib_ref {
 				SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
 				SetCreateGraphChannelBitDepth(prevBit);
 			}
-			//深度描画用
-			//DepthDraw.Init("shader/NormalMesh_PointLightVS.vso", "shader/NormalMesh_PointLightPS.pso");
 			//ポストエフェクト
 			m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
 			m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
@@ -850,15 +848,5 @@ namespace DXLib_ref {
 			//NormalScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
 			//DepthScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
 		}
-	}
-	//書き込んだ深度に応じて対応
-	void PostPassEffect::DrawByDepth(std::function<void()> doing) noexcept {
-		/*
-		DepthDraw.SetPixelParam(3, 3.f*12.5f, 0, 0, 0);
-		DepthDraw.Draw_lamda([&] {
-			SetUseTextureToShader(1, DepthScreen.get());
-			doing();
-		});
-		//*/
 	}
 };

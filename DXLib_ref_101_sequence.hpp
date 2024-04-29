@@ -5,27 +5,22 @@ namespace DXLib_ref {
 	class TEMPSCENE {
 	private:
 		std::shared_ptr<TEMPSCENE> Next_ptr{nullptr};
-
 		bool			m_IsFirstLoop{true};			//初回チェック
-	public://ゲッター
-		bool			isLoading{false};
+		bool			m_IsLoading{false};
 	public://ゲッター
 		void			Set_Next(const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr = Next_scenes_ptr_t; }
 		auto&			Get_Next(void) noexcept { return Next_ptr; }
-
 		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		~TEMPSCENE(void) noexcept {}
 	public://メイン更新
-		//事前読み込み　ローダーなど別のシーンで呼ぶ
 		void Load(void) noexcept {
-			if (!isLoading) {
-				isLoading = true;
+			if (!m_IsLoading) {
+				m_IsLoading = true;
 				Load_Sub();
 			}
 		}
-
 		void Set(void) noexcept {
 			m_IsFirstLoop = true;
 			Set_Sub();
@@ -35,52 +30,38 @@ namespace DXLib_ref {
 			m_IsFirstLoop = false;
 			return ans;
 		}
+		void Draw(void) noexcept;
 		void Dispose(void) noexcept { Dispose_Sub(); }
-
 		void Dispose_Load(void) noexcept {
-			if (isLoading) {
-				isLoading = false;
+			if (m_IsLoading) {
+				m_IsLoading = false;
 				Dispose_Load_Sub();
 			}
 		}
-
-		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
-		void Depth_Draw(void) noexcept { Depth_Draw_Sub(); }
-		void MainDraw(void) noexcept { MainDraw_Sub(); }
-		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
-		void MainDrawbyDepth(void) noexcept { MainDrawbyDepth_Sub(); }
-		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
-		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
-
+		//
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
-		void ShadowDraw_NearFar(void) noexcept { ShadowDraw_NearFar_Sub(); }
-		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 	protected://継承物
 		virtual void Load_Sub(void) noexcept {}
-
 		virtual void Set_Sub(void) noexcept {}
 		virtual bool Update_Sub(void) noexcept { return true; }
 		virtual void Dispose_Sub(void) noexcept {}
-
 		virtual void Dispose_Load_Sub(void) noexcept {}
 
 		virtual void BG_Draw_Sub(void) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispXSize, Gray25, TRUE);
 		}
-
 		virtual void Depth_Draw_Sub(void) noexcept {}
-
-		virtual void ShadowDraw_Far_Sub(void) noexcept {}
-		virtual void ShadowDraw_NearFar_Sub(void) noexcept {}
-		virtual void ShadowDraw_Sub(void) noexcept {}
-
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
 		virtual void MainDrawbyDepth_Sub(void) noexcept {}
 
-		virtual void DrawUI_Base_Sub(void) noexcept {}//VR上で表示する
-		virtual void DrawUI_In_Sub(void) noexcept {}//カメラ
+		virtual void DrawUI_Base_Sub(void) noexcept {}
+		virtual void DrawUI_In_Sub(void) noexcept {}
+
+		virtual void ShadowDraw_Far_Sub(void) noexcept {}
+		virtual void ShadowDraw_NearFar_Sub(void) noexcept {}
+		virtual void ShadowDraw_Sub(void) noexcept {}
 	};
 	//
 	class SceneControl {

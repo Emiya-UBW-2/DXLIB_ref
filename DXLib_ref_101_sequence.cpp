@@ -4,6 +4,28 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
+	void TEMPSCENE::Draw(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		//影をセット
+		DrawParts->Update_Shadow([&] {ShadowDraw_Far(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
+		DrawParts->Update_Shadow([&] { ShadowDraw_NearFar_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 1);
+		DrawParts->Update_Shadow([&] { ShadowDraw_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 0);
+		DrawParts->Update_NearShadow([&] {MainDraw_Sub(); });
+		//画面に反映
+		DrawParts->Draw(
+			[&](const Camera3DInfo& cams) {
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->Draw(
+					[&]() { BG_Draw_Sub(); },
+					[&]() { MainDraw_Sub(); },
+					[&]() { MainDrawFront_Sub(); },
+					cams);
+			},
+			[&]() { DrawUI_Base_Sub(); },
+			[&]() { DrawUI_In_Sub(); }
+		);
+	}
+
 	//開始
 	void SceneControl::StartScene(void) noexcept {
 		SetUseMaskScreenFlag(FALSE);//←一部画面でエフェクトが出なくなるため入れる
@@ -43,32 +65,10 @@ namespace DXLib_ref {
 	//描画
 	void SceneControl::Draw(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		//
 		EffectResource::Instance()->Calc(DrawParts->IsPause());//エフェクシアのアプデを60FPS相当に変更
-		//影をセット
-		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), 0);
-		DrawParts->Update_NearShadow([&] {this->m_ScenesPtr->MainDraw(); });
-
-		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw_NearFar(); }, DrawParts->SetMainCamera().GetCamPos(), 1);
-		DrawParts->Update_Shadow([&] {this->m_ScenesPtr->ShadowDraw_Far(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
-
-		//画面に反映
-		DrawParts->Draw(
-			[&](const Camera3DInfo& cams) {
-				auto* PostPassParts = PostPassEffect::Instance();
-				PostPassParts->Draw(
-					[&]() { this->m_ScenesPtr->BG_Draw(); },
-					[&]() {
-						this->m_ScenesPtr->MainDraw();
-						//PostPassParts->DrawByDepth([&] { this->m_ScenesPtr->MainDrawbyDepth(); });//何か描画する必要のあるものができたら修正して有効に
-					},
-					[&]() {
-						this->m_ScenesPtr->MainDrawFront();
-						//PostPassParts->DrawByDepth([&] { this->m_ScenesPtr->MainDrawbyDepth(); });//何か描画する必要のあるものができたら修正して有効に
-					},
-						cams);					//描画
-			},
-			[&]() { this->m_ScenesPtr->DrawUI_Base(); },
-				[&]() { this->m_ScenesPtr->DrawUI_In(); });
+		//
+		this->m_ScenesPtr->Draw();
 		//デバッグ
 		{
 			FPSAvgs.at(m_FPSAvg) = GetFPS();

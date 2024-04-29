@@ -42,8 +42,6 @@ namespace DXLib_ref {
 		GraphHandle NormalScreen;	//法線のGバッファ
 		GraphHandle	DepthScreen;	//深度のGバッファ
 		//
-		//ShaderUseClass		DepthDraw;									// シェーダー
-		//
 		float fov = 0.f;
 		float near_DoF = 0.f;
 		float far_DoF = 0.f;
