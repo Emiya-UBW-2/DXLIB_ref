@@ -104,7 +104,7 @@ namespace DXLib_ref {
 		bool	aberration{ true };
 		int		DirectXVer{ 1 };
 		bool	SSR{ true };
-		bool	MotionBlur{ true };
+		bool	MotionBlur{ false };
 		float	Xsensing{ 0.5f };
 		float	Ysensing{ 0.5f };
 		bool	HeadBobbing{true};

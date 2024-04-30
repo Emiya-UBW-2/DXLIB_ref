@@ -239,6 +239,7 @@ namespace DXLib_ref {
 			yp1 = ypos;
 			if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 - y_r(5), (isActive ? Gray25 : Gray75), m_name)) {
 				*TabSel = GetID();
+				*select = 0;
 				auto* SE = SoundPool::Instance();
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
