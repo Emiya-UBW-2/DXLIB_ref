@@ -2,46 +2,44 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
-	enum class EnumParamType {
-		Boolean,
-		Int,
-		Float,
-		Else,
+	enum class EnumSaveParam {
+		LightMode,
+		DirectXVer,
+		usevr,
+		grass_level,
+		DoF,
+		bloom,
+		shadow,
+		SSAO,
+		fov,
+		vsync,
+		FpsLimit,
+		SE,
+		VOICE,
+		BGM,
+		AllWaysFront,
+		aberration,
+		SSR,
+		MotionBlur,
+		Xsensing,
+		Ysensing,
+		HeadBobbing,
+		EnableCheck,
+		ControlType,
+		Language,
+		EX_UI,
+		EX_UI2,
+		AA,
+		Max,
 	};
-	static EnumParamType ParamTypes[] = {
-		EnumParamType::Int,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Float,
-		EnumParamType::Boolean,
-		EnumParamType::Int,
-		EnumParamType::Float,
-		EnumParamType::Float,
-		EnumParamType::Float,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Else,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Float,
-		EnumParamType::Float,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-		EnumParamType::Else,
-		EnumParamType::Else,
-		EnumParamType::Boolean,
-		EnumParamType::Boolean,
-	};
-	static const char* OptionStr[] = {
+	static const char* OptionStr[(int)EnumSaveParam::Max] = {
+		"LightMode",
+		"DirectXVer",
+		"usevr",
 		"grass_level",
 		"DoF",
 		"bloom",
 		"shadow",
-		"usevr",
 		"SSAO",
 		"fov",
 		"vsync",
@@ -51,20 +49,30 @@ namespace DXLib_ref {
 		"BGM",
 		"AllWaysFront",
 		"aberration",
-		"DirectXVer",
 		"SSR",
 		"MotionBlur",
 		"Xsensing",
 		"Ysensing",
 		"HeadBobbing",
 		"EnableCheck",
-		"LightMode",
 		"ControlType",
 		"Language",
 		"EX_UI",
 		"EX_UI2",
+		"AA",
+	};
+
+	enum class EnumParamType {
+		Boolean,
+		Int,
+		Float,
+		Else,
 	};
 	//
+	static const int DirectXVerID[] = {
+		DX_DIRECT3D_9EX,
+		DX_DIRECT3D_11,
+	};
 	static const char* DirectXVerStr[] = {
 	"9c",
 	"11",
@@ -79,6 +87,26 @@ namespace DXLib_ref {
 	"Eng",
 	};
 
+	struct SaveParams {
+	private:
+		EnumParamType m_EnumParamType{};
+		int valueint{0};
+	public:
+		void SetEnumParamType(EnumParamType value) { m_EnumParamType = value; }
+		const auto GetEnumParamType() const { return m_EnumParamType; }
+
+		void SetBoolean(bool use) { valueint = use ? 1 : 0; }
+		const auto GetBoolean() const { return (valueint != 0); }
+		void ChangeBoolean() { SetBoolean(GetBoolean() ^ 1); }
+
+		void SetInt(int use) { valueint = use; }
+		const auto GetInt() const { return valueint; }
+
+		void SetFloat(float use) { valueint = (int)(use*1000.f); }
+		const auto GetFloat() const { return (float)(valueint) / 1000.f; }
+
+	};
+
 	class OPTION : public SingletonBase<OPTION> {
 	private:
 		friend class SingletonBase<OPTION>;
@@ -88,98 +116,66 @@ namespace DXLib_ref {
 		}
 		~OPTION() {}
 	private:
-		int		grass_level = 4;
-		bool	DoF{ true };
-		bool	Bloom{true};
-		bool	Shadow{true};
-		bool	useVR{ true };
-		bool	SSAO{ true };
-		float	Fov = 90.f;
-		bool	Vsync{true};
-		int		FrameLimit = 60;
-		float	SE{ 1.f };
-		float	VOICE{ 1.f };
-		float	BGM{ 1.f };
-		bool	AllWaysFront{ false };
-		bool	aberration{ true };
-		int		DirectXVer{ 1 };
-		bool	SSR{ true };
-		bool	MotionBlur{ false };
-		float	Xsensing{ 0.5f };
-		float	Ysensing{ 0.5f };
-		bool	HeadBobbing{true};
-		bool	EnableCheck{true};
-		bool	FXAA{true};
-		bool	LightMode{false};
-		int		PadType{1};
-		int		Language{0};
-		bool	EX_UI{true};
-		bool	EX_UI2{true};
+		std::array<SaveParams, (int)EnumSaveParam::Max> m_SaveParams;
 	public:
-		const auto		Get_DirectXVer()const noexcept { return DirectXVer; }
-		const auto		Get_useVR()const noexcept {
+		const auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetBoolean(); }
+		const auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetInt(); }
+		const auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetFloat(); }
+	public:
+		void			SetParamBoolean(EnumSaveParam id, bool use) {
+			switch (id) {
+				case EnumSaveParam::SSAO:
+				case EnumSaveParam::SSR:
+				case EnumSaveParam::AA:
+					
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
+					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
+					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
+					break;
+				case EnumSaveParam::DoF:
+				case EnumSaveParam::bloom:
+					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
+					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
+					break;
+				case EnumSaveParam::shadow:
+				case EnumSaveParam::aberration:
+				case EnumSaveParam::MotionBlur:
+					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
+					break;
+				case EnumSaveParam::usevr:
 #ifndef _USE_OPENVR_
-			return false;
-#else
-			return useVR && (Get_DirectXVer() == 1);
+					use = false;
 #endif
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
+					break;
+				case EnumSaveParam::grass_level:
+				case EnumSaveParam::fov:
+				case EnumSaveParam::vsync:
+				case EnumSaveParam::FpsLimit:
+				case EnumSaveParam::SE:
+				case EnumSaveParam::VOICE:
+				case EnumSaveParam::BGM:
+				case EnumSaveParam::AllWaysFront:
+				case EnumSaveParam::DirectXVer:
+				case EnumSaveParam::Xsensing:
+				case EnumSaveParam::Ysensing:
+				case EnumSaveParam::HeadBobbing:
+				case EnumSaveParam::EnableCheck:
+				case EnumSaveParam::LightMode:
+				case EnumSaveParam::ControlType:
+				case EnumSaveParam::Language:
+				case EnumSaveParam::EX_UI:
+				case EnumSaveParam::EX_UI2:
+					break;
+				default:
+					break;
+			}
+			m_SaveParams.at((int)id).SetBoolean(use);
 		}
+		void			ChangeParamBoolean(EnumSaveParam id) { m_SaveParams.at((int)id).ChangeBoolean(); }
 
-		const auto		Get_LightMode()const noexcept { return LightMode; }
-		//VRでは使えない機能は　 && !Get_useVR()
-		const auto		Get_grass_level()const noexcept { return grass_level; }
-		const auto		Get_DoF()const noexcept { return DoF && !Get_useVR() && !Get_LightMode(); }
-		const auto		Get_Bloom()const noexcept { return Bloom && !Get_useVR() && !Get_LightMode(); }
-		const auto		Get_Shadow()const noexcept { return Shadow && !Get_LightMode(); }
-		const auto		Get_SSAO()const noexcept { return SSAO && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
-		const auto		Get_Fov()const noexcept { return Fov; }
-		const auto		Get_Vsync()const noexcept { return Vsync; }
-		const auto		Get_FrameLimit()const noexcept { return FrameLimit; }
-		const auto		Get_SE()const noexcept { return SE; }
-		const auto		Get_VOICE()const noexcept { return VOICE; }
-		const auto		Get_BGM()const noexcept { return BGM; }
-		const auto		Get_AllWaysFront()const noexcept { return AllWaysFront; }
-		const auto		Get_aberration()const noexcept { return aberration && !Get_LightMode(); }
-		const auto		Get_SSR()const noexcept { return SSR && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
-		const auto		Get_MotionBlur()const noexcept { return MotionBlur && !Get_LightMode(); }
-		const auto		Get_Xsensing()const noexcept { return Xsensing; }
-		const auto		Get_Ysensing()const noexcept { return Ysensing; }
-		const auto		Get_HeadBobbing()const noexcept { return HeadBobbing; }
-		const auto		Get_EnableCheck()const noexcept { return EnableCheck; }
-		const auto		Get_FXAA()const noexcept { return FXAA && !Get_useVR() && !Get_LightMode() && (Get_DirectXVer() == 1); }
-		const auto		Get_PadType()const noexcept { return PadType; }
-		const auto		Get_Language()const noexcept { return Language; }
-		const auto		Get_EX_UI()const noexcept { return EX_UI; }
-		const auto		Get_EX_UI2()const noexcept { return EX_UI2; }
-	public:
-		void			Set_useVR(bool use) { useVR = use; }
-		void			Set_LightMode(bool use) { LightMode = use; }
-		void			Set_grass_level(int value) noexcept { grass_level = value; }
-		void			Set_DoF(bool use) { DoF = use; }
-		void			Set_Bloom(bool value) noexcept { Bloom = value; }
-		void			Set_Shadow(bool value) noexcept { Shadow = value; }
-		void			Set_SSAO(bool use) { SSAO = use; }
-		void			Set_Fov(float per) noexcept { Fov = per; }
-		void			Set_Vsync(bool value) noexcept { Vsync = value; }
-		void			Set_FrameLimit(int value) noexcept { FrameLimit = value; }
-		void			Set_SE(float per) noexcept { SE = per; }
-		void			Set_VOICE(float per)noexcept { VOICE = per; }
-		void			Set_BGM(float per) noexcept { BGM = per; }
-		void			Set_AllWaysFront(bool value) noexcept { AllWaysFront = value; }
-		void			Set_aberration(bool value) noexcept { aberration = value; }
-		void			Set_DirectXVer(int value) noexcept { DirectXVer = value; }
-		void			Set_SSR(bool use) { SSR = use; }
-		void			Set_MotionBlur(bool use) { MotionBlur = use; }
-		void			Set_Xsensing(float per) noexcept { Xsensing = per; }
-		void			Set_Ysensing(float per) noexcept { Ysensing = per; }
-		void			Set_HeadBobbing(bool use) noexcept { HeadBobbing = use; }
-		void			Set_EnableCheck(bool use) noexcept { EnableCheck = use; }
-		void			Set_FXAA(bool use) noexcept { FXAA = use; }
-		void			Set_PadType(int use) noexcept { PadType = use; }
-		void			Set_Language(int use) noexcept { Language = use; }
-		void			Set_EX_UI(bool use) noexcept { EX_UI = use; }
-		void			Set_EX_UI2(bool use) noexcept { EX_UI2 = use; }
-
+		void			SetParamInt(EnumSaveParam id, int use) { m_SaveParams.at((int)id).SetInt(use); }
+		void			SetParamFloat(EnumSaveParam id, float use) { m_SaveParams.at((int)id).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -199,7 +195,7 @@ namespace DXLib_ref {
 			std::function<void()> m_AnyDoing;
 			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
 		public:
-			float selanim{ 0.f };
+			float selanim{0.f};
 		public:
 			const auto& GetName() const noexcept { return m_Name; }
 			const auto& GetInfo() const noexcept { return m_Info; }
@@ -210,8 +206,8 @@ namespace DXLib_ref {
 			void GetAnyDoing() const noexcept { m_AnyDoing(); }
 		public:
 			void Init(const char* name, const char* info, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
-				std::function<void()> AnyDoing,
-				std::function<void(int xpos, int ypos, bool isMine)> draw) {
+					  std::function<void()> AnyDoing,
+					  std::function<void(int xpos, int ypos, bool isMine)> draw) {
 				selanim = 0;
 
 				m_Name = name;
@@ -227,7 +223,7 @@ namespace DXLib_ref {
 		class OptionTabsInfo {
 		private:
 		protected:
-			int m_id{ 0 };
+			int m_id{0};
 			std::string m_name;
 			std::vector<OptionElementsInfo> m_Elements;
 		protected:
@@ -280,8 +276,8 @@ namespace DXLib_ref {
 			void Init_Sub() noexcept override;
 		};
 	private:
-		int m_tabsel{ 0 };
-		int m_select{ 0 };
+		int m_tabsel{0};
+		int m_select{0};
 		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
 		PopUpDrawClass				m_PopUpDrawClass;
 		bool						m_ActiveSwitch{false};

@@ -15,7 +15,7 @@ namespace DXLib_ref {
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
 			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->Get_SSAO()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::SSAO)) {
 				// SSAOフィルター処理
 					// 変換元として法線バッファを指定
 					// 出力先バッファの指定
@@ -95,7 +95,7 @@ namespace DXLib_ref {
 			auto* OptionParts = OPTION::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 
-			if (OptionParts->Get_SSR()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::SSR)) {
 				GraphFilterBlt(ColorGraph->get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				GraphFilterBlt(m_NormalScreenPtr->get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				GraphFilterBlt(m_DepthScreenPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
@@ -129,7 +129,7 @@ namespace DXLib_ref {
 					SSRScreen2.DrawGraph(0, 0, true);
 				}
 			}
-			if (OptionParts->Get_Bloom()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::bloom)) {
 				TargetGraph->SetDraw_Screen(false);
 				{
 				}
@@ -156,7 +156,7 @@ namespace DXLib_ref {
 			auto* OptionParts = OPTION::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 
-			if (OptionParts->Get_DoF()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::DoF)) {
 				if (GetUseDirect3DVersion() == DX_DIRECT3D_11) {
 					GraphFilterBlt(TargetGraph->get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 2000);
 					TargetGraph->SetDraw_Screen();
@@ -196,7 +196,7 @@ namespace DXLib_ref {
 			auto* DrawParts = DXDraw::Instance();
 			auto* OptionParts = OPTION::Instance();
 
-			if (OptionParts->Get_Bloom()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::bloom)) {
 				GraphFilterBlt(TargetGraph->get(), BufScreen.get(), DX_GRAPH_FILTER_TWO_COLOR, 250, Black, 255, Gray50, 255);
 				GraphFilterBlt(BufScreen.get(), GaussScreen_.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				GraphFilter(GaussScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
@@ -229,7 +229,7 @@ namespace DXLib_ref {
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept {
 			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->Get_aberration()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::aberration)) {
 				auto* DrawParts = DXDraw::Instance();
 				BufScreen[0].SetDraw_Screen(true);
 				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
@@ -321,7 +321,7 @@ namespace DXLib_ref {
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept {
 			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->Get_MotionBlur()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur)) {
 				GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen([&]() {
 					TargetGraph->DrawGraph(0, 0, false);
 				});
@@ -373,7 +373,7 @@ namespace DXLib_ref {
 			auto* DrawParts = DXDraw::Instance();
 			auto* OptionParts = OPTION::Instance();
 			//結果描画
-			if (OptionParts->Get_aberration()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::aberration)) {
 				GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 				GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 
@@ -648,7 +648,7 @@ namespace DXLib_ref {
 			auto* DrawParts = DXDraw::Instance();
 			auto* OptionParts = OPTION::Instance();
 
-			if (OptionParts->Get_FXAA()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::AA)) {
 				TargetGraph->SetDraw_Screen();
 				{
 					SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
@@ -673,7 +673,7 @@ namespace DXLib_ref {
 		MAIN_Screen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);		//最終描画用
 		//Gバッファ
 		auto* OptionParts = OPTION::Instance();
-		if (!OptionParts->Get_LightMode()) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 			ColorScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
 			NormalScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);	// 法線Gバッファ
 			{
@@ -719,7 +719,7 @@ namespace DXLib_ref {
 		auto* OptionParts = OPTION::Instance();
 		//全ての画面を初期化
 		{
-			if (!OptionParts->Get_LightMode()) {
+			if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 				NormalScreen.SetDraw_Screen();//リセット替わり
 				DepthScreen.SetDraw_Screen();//リセット替わり
 			}
@@ -730,7 +730,7 @@ namespace DXLib_ref {
 		auto G_Draw = [&](GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done) {
 			// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
 			SetRenderTargetToShader(0, TargetDraw->get());
-			if (!OptionParts->Get_LightMode()) {
+			if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 				SetRenderTargetToShader(1, NormalScreen.get());
 				SetRenderTargetToShader(2, DepthScreen.get());
 			}
@@ -750,7 +750,7 @@ namespace DXLib_ref {
 			   });
 		//遠距離
 		G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
-			if (OptionParts->Get_Shadow()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
 				DrawParts->SetUseShadow();
 				doing();
 				DrawParts->ResetUseShadow();
@@ -761,14 +761,14 @@ namespace DXLib_ref {
 			doingFront();
 			   });
 		//遠距離の強烈なぼかし
-		if (OptionParts->Get_DoF()) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::DoF)) {
 			GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
 		}
 		//中間
 		G_Draw(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
 			FarScreen_.DrawGraph(0, 0, false);
 			Effekseer_Sync3DSetting();
-			if (OptionParts->Get_Shadow()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
 				DrawParts->SetUseShadow();
 				doing();
 				DrawParts->ResetUseShadow();
@@ -782,7 +782,7 @@ namespace DXLib_ref {
 		//至近
 		G_Draw(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
 			Effekseer_Sync3DSetting();
-			if (OptionParts->Get_Shadow()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
 				DrawParts->SetUseShadow();
 				doing();
 				DrawParts->ResetUseShadow();
@@ -796,7 +796,7 @@ namespace DXLib_ref {
 		//fovを記憶しておく
 		fov = cams.GetCamFov();
 
-		if (OPTION::Instance()->Get_Shadow()) {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
 			Plus_Draw([&]() {
 				DrawParts->GetShadowAfterDraw();
 									 });
@@ -829,7 +829,7 @@ namespace DXLib_ref {
 		/**/
 		auto* OptionParts = OPTION::Instance();
 		for (auto& P : m_PostPass) {
-			if (!OptionParts->Get_LightMode()) {
+			if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 				ColorScreen.SetDraw_Screen();
 				{
 					NearScreen_.DrawGraph(0, 0, false);

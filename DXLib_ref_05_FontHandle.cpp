@@ -10,7 +10,7 @@ namespace DXLib_ref {
 
 	LocalizePool::LocalizePool() {
 		auto* OptionParts = OPTION::Instance();
-		Load(LanguageStr[OptionParts->Get_Language()]);
+		Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 	}
 
 	void LocalizePool::Load(const char* Lang) {

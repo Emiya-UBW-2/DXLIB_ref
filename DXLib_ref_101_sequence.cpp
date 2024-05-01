@@ -32,7 +32,7 @@ namespace DXLib_ref {
 		//ƒJƒƒ‰‚Ì‰ŠúÝ’è
 		auto* OptionParts = OPTION::Instance();
 		auto* DrawParts = DXDraw::Instance();
-		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->Get_useVR() ? 120 : OptionParts->Get_Fov()), 0.05f, 200.f);
+		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::SSAO)), 0.05f, 200.f);
 		//ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
 		VECTOR_ref DefaultVec = VECTOR_ref::vget(0.25f, -1.f, 0.25f);
 		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));

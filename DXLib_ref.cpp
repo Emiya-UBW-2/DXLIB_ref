@@ -159,12 +159,12 @@ namespace DXLib_ref {
 			}
 		}
 		void			Haptic(char id_, unsigned short times) noexcept {
-			if (OPTION::Instance()->Get_useVR() && (id_ != -1) && m_VR_SystemPtr) {
+			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr) && (id_ != -1) && m_VR_SystemPtr) {
 				m_VR_SystemPtr->TriggerHapticPulse(m_VR_DeviceInfo[id_].GetID(), 2, times);
 			}
 		}
 		const auto		GetEyePosition(char eye_type) noexcept {
-			if (OPTION::Instance()->Get_useVR()) {
+			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
 				const vr::HmdMatrix34_t tmpmat = vr::VRSystem()->GetEyeToHeadTransform((vr::EVREye)eye_type);
 				return MATRIX_ref::Vtrans(VECTOR_ref::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMove().mat);
@@ -175,7 +175,7 @@ namespace DXLib_ref {
 		void Init() noexcept {
 			auto* OptionParts = OPTION::Instance();
 			//VRが使えるかチェック
-			if (OptionParts->Get_useVR()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				m_VR_ErrorHandle = vr::VRInitError_None;
 				m_VR_SystemPtr = vr::VR_Init(&m_VR_ErrorHandle, vr::VRApplication_Scene);
 				if (m_VR_ErrorHandle != vr::VRInitError_None) {
@@ -184,7 +184,7 @@ namespace DXLib_ref {
 				}
 			}
 			//デバイスセット
-			if (OptionParts->Get_useVR()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				m_VR_TrackerID.clear();
 				char DeviceCount = 0;
 				bool IsFirstHand = true;
@@ -222,7 +222,7 @@ namespace DXLib_ref {
 			}
 		}
 		void Execute(void) noexcept {
-			if (OPTION::Instance()->Get_useVR()) {
+			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr)) {
 				for (auto& c : m_VR_DeviceInfo) {
 					c.Update(m_VR_SystemPtr);
 				}
@@ -238,13 +238,13 @@ namespace DXLib_ref {
 			vr::VRCompositor()->Submit((vr::EVREye)eye_type, &tex, NULL, vr::Submit_Default);
 		}
 		void WaitSync(void) noexcept {
-			if (OPTION::Instance()->Get_useVR()) {
+			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr)) {
 				vr::TrackedDevicePose_t tmp;
 				vr::VRCompositor()->WaitGetPoses(&tmp, 1, NULL, 1);
 			}
 		}
 		void Dispose(void) noexcept {
-			if (OPTION::Instance()->Get_useVR()) {
+			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr)) {
 				//vr::VR_Shutdown();
 				m_VR_SystemPtr = nullptr;
 			}
@@ -357,7 +357,7 @@ namespace DXLib_ref {
 		m_VRControl = new VRControl;
 		this->GetVRControl()->Init();
 		//
-		if (OptionParts->Get_useVR()) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//解像度指定
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
@@ -373,7 +373,7 @@ namespace DXLib_ref {
 			this->m_DispXSize = deskx;
 			this->m_DispYSize = desky;
 		}
-		int DXVer = (OptionParts->Get_DirectXVer() == 1) ? DX_DIRECT3D_11 : DX_DIRECT3D_9EX;
+		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
 		SetOutApplicationLogValidFlag(TRUE);						//log
 		SetMainWindowText("Loading...");							//タイトル
 		ChangeWindowMode(TRUE);										//窓表示
@@ -383,11 +383,11 @@ namespace DXLib_ref {
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
-		if (!OptionParts->Get_LightMode()) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 			SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
 		}
 		Set3DSoundOneMetre(1.0f);									//
-		SetWaitVSyncFlag(OptionParts->Get_Vsync() ? TRUE : FALSE);	//垂直同期
+		SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync) ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
 		DxLib_Init();												//
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
@@ -395,7 +395,7 @@ namespace DXLib_ref {
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizePool::Instance()->Get(10), "", MB_OK);
 		}
-		if (OptionParts->Get_AllWaysFront()) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
 			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->m_DispXSize) / 2, (desky - this->m_DispYSize) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		else {
@@ -410,7 +410,7 @@ namespace DXLib_ref {
 		SetUseZBuffer3D(TRUE);										//zbufuse
 		SetWriteZBuffer3D(TRUE);									//zbufwrite
 		//MV1SetLoadModelPhysicsWorldGravity(M_GR);					//重力
-		if (!OptionParts->Get_useVR()) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			int DPI = 96;
 			if (IsWindows10OrGreater()) {
 				//DPI = GetDpiForWindow(GetMainWindowHandle());
@@ -419,7 +419,7 @@ namespace DXLib_ref {
 				}
 			}
 			SetWindowSize(deskx * DPI / 96, desky * DPI / 96);
-			if (OptionParts->Get_AllWaysFront()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
 				DxLib::GetWindowSize(&this->m_DispXSize, &this->m_DispYSize);
 			}
 		}
@@ -440,9 +440,9 @@ namespace DXLib_ref {
 		SE->Add((int)SoundEnumCommon::UI_CANCEL, 1, "data/Sound/UI/cancel.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/ok.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
-		SE->SetVol(OptionParts->Get_SE());
+		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 		//影生成
-		if (!OptionParts->Get_LightMode()) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 			m_ShadowDraw.Init(12, this->m_DispXSize, this->m_DispYSize);
 			m_Shadow.at(1).Init();
 			m_Shadow.at(2).Init();
@@ -484,7 +484,7 @@ namespace DXLib_ref {
 	}
 	//
 	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, int shadowSelect) noexcept {
-		if (OPTION::Instance()->Get_Shadow()) {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
 			// 影用の深度記録画像の準備を行う
 			if (shadowSelect==0) {
 				m_ShadowDraw.Update(doing, CenterPos);
@@ -495,7 +495,7 @@ namespace DXLib_ref {
 		}
 	}
 	void			DXDraw::Update_NearShadow(std::function<void()> doing) noexcept {
-		if (OPTION::Instance()->Get_Shadow()) {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
 			m_ShadowDraw.SetDraw(doing);
 		}
 	}
@@ -640,7 +640,7 @@ namespace DXLib_ref {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		//画面に映す
-		if (OptionParts->Get_useVR()) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//VRに移す
 			Camera3DInfo tmp_cam = GetMainCamera();
 			for (char i = 0; i < 2; i++) {
@@ -772,13 +772,13 @@ namespace DXLib_ref {
 		ScreenFlip();
 		//*
 		auto* OptionParts = OPTION::Instance();
-		if (!OptionParts->Get_Vsync()) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			//4msだけスリープ
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->Get_FrameLimit() - 1000 * 4) {
+			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 1000 * 4) {
 				if (ProcessMessage() != 0) { return false; }
 				Sleep(1);	// 1msecスリープする
 			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->Get_FrameLimit()) {}
+			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit)) {}
 		}
 		//*/
 		this->GetVRControl()->WaitSync();
