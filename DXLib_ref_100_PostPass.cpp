@@ -42,20 +42,26 @@ namespace DXLib_ref {
 		GraphHandle bkScreen2;		//SSRぼかし
 		ShaderUseClass::ScreenVertex	m_SSRScreenVertex;				// 頂点データ
 		ShaderUseClass		m_SSR;										// シェーダー
+
+		int RayInterval = 500;//レイの分割間隔
+		float SSRScale = 12.5f;
+		float DepthThreshold = 1.8f;
+
+		static const int SSREX = 2;
 	public:
 		PostPassSSR(void) {
 			auto* DrawParts = DXDraw::Instance();
-			SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, true);							//描画スクリーン
+			SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, true);							//描画スクリーン
 			SSRScreen2 = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 			{
-				bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);							//ふち黒
+				bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);							//ふち黒
 				bkScreen2.SetDraw_Screen(true);
 				{
-					int xr = DrawParts->m_DispXSize / EXTEND * 30 / 100;
-					int yr = DrawParts->m_DispYSize / EXTEND * 60 / 100;
+					int xr = DrawParts->m_DispXSize / SSREX * 30 / 100;
+					int yr = DrawParts->m_DispYSize / SSREX * 60 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, Black, TRUE);
-					DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr, yr, White, TRUE);
+					DrawBox_2D(0, 0, DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, Black, TRUE);
+					DrawOval(DrawParts->m_DispXSize / SSREX / 2, DrawParts->m_DispYSize / SSREX / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -63,13 +69,13 @@ namespace DXLib_ref {
 					for (r = 0; r < 255; r += p) {
 						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
 
-						DrawOval(DrawParts->m_DispXSize / EXTEND / 2, DrawParts->m_DispYSize / EXTEND / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(DrawParts->m_DispXSize / SSREX / 2, DrawParts->m_DispYSize / SSREX / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
 				}
 			}
 			{
-				SSRColorScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);
-				SSRNormalScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);			// 法線
+				SSRColorScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);
+				SSRNormalScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);			// 法線
 				{
 					// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
 					auto prevMip = GetCreateDrawValidGraphChannelNum();
@@ -78,13 +84,13 @@ namespace DXLib_ref {
 					SetCreateDrawValidGraphChannelNum(2);
 					SetDrawValidFloatTypeGraphCreateFlag(TRUE);
 					SetCreateGraphChannelBitDepth(32);
-					SSRDepthScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, false);
+					SSRDepthScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);
 					SetCreateDrawValidGraphChannelNum(prevMip);
 					SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
 					SetCreateGraphChannelBitDepth(prevBit);
 				}
 			}
-			m_SSRScreenVertex.SetScreenVertex(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND);	// 頂点データの準備
+			m_SSRScreenVertex.SetScreenVertex(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX);	// 頂点データの準備
 			m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		}
 		~PostPassSSR(void) {
@@ -96,18 +102,31 @@ namespace DXLib_ref {
 			auto* PostPassParts = PostPassEffect::Instance();
 
 			if (OptionParts->GetParamBoolean(EnumSaveParam::SSR)) {
-				GraphFilterBlt(ColorGraph->get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-				GraphFilterBlt(m_NormalScreenPtr->get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-				GraphFilterBlt(m_DepthScreenPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+				GraphFilterBlt(ColorGraph->get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
+				GraphFilterBlt(m_NormalScreenPtr->get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
+				GraphFilterBlt(m_DepthScreenPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
 				SSRScreen.SetDraw_Screen();
 				{
-					int RayInterval = 50;//レイの分割間隔
-					float SSRScale = 12.5f;
-					float DepthThreshold = 8.f;
+#ifdef DEBUG
+					if (CheckHitKeyWithCheck(KEY_INPUT_1) != 0) {
+						RayInterval = std::max(RayInterval - 1, 0);
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_2) != 0) {
+						RayInterval += 1;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_5) != 0) {
+						DepthThreshold = std::max(DepthThreshold - 0.05f, 0.f);
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_6) != 0) {
+						DepthThreshold += 0.05f;
+					}
+					DebugClass::Create();
+					printfDx("RayInterval   :%d\n", RayInterval);
+					printfDx("DepthThreshold:%f\n", DepthThreshold);
+#endif // DEBUG
 					SetUseTextureToShader(0, SSRColorScreen.get());	//使用するテクスチャをセット
 					SetUseTextureToShader(1, SSRNormalScreen.get());
 					SetUseTextureToShader(2, SSRDepthScreen.get());
-					m_SSR.SetPixelDispSize(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND);
 					m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(PostPassParts->Get_fov() / 2.f), DepthThreshold);
 					{
 						m_SSR.Draw(m_SSRScreenVertex);
