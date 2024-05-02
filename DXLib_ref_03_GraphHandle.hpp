@@ -8,9 +8,9 @@
 
 namespace DXLib_ref {
 	class Camera3DInfo {
-		VECTOR_ref	m_pos;
-		VECTOR_ref	m_vec;
-		VECTOR_ref	m_up{ VECTOR_ref::up() };	//カメラ
+		Vector3DX	m_pos;
+		Vector3DX	m_vec;
+		Vector3DX	m_up{ Vector3DX::up() };	//カメラ
 		float		m_fov{ DX_PI_F / 2 };		//カメラ
 		float		m_near{ 0.1f };
 		float		m_far{ 10.f };	//ニアファー
@@ -22,7 +22,7 @@ namespace DXLib_ref {
 		const auto&		GetCamNear(void)const noexcept { return m_near; }
 		const auto&		GetCamFar(void)const noexcept { return m_far; }
 	public:
-		void			SetCamPos(const VECTOR_ref& cam_pos, const VECTOR_ref& cam_vec, const VECTOR_ref& cam_up) {
+		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) {
 			m_pos = cam_pos;
 			m_vec = cam_vec;
 			m_up = cam_up;
@@ -126,7 +126,7 @@ namespace DXLib_ref {
 			SetupCamera_Perspective(camInfo.GetCamFov());
 			SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
 		}
-		void SetDraw_Screen(const VECTOR_ref& campos, const VECTOR_ref& camvec, const VECTOR_ref& camup, float fov, float near_, float far_, const bool& Clear = true) {
+		void SetDraw_Screen(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_, const bool& Clear = true) {
 			SetDraw_Screen(Clear);
 			SetCameraNearFar(near_, far_);
 			SetupCamera_Perspective(fov);
@@ -147,7 +147,7 @@ namespace DXLib_ref {
 			SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
 		}
 
-		static void SetDraw_Screen(int handle, const VECTOR_ref& campos, const VECTOR_ref& camvec, const VECTOR_ref& camup, float fov, float near_, float far_, const bool& Clear = true) {
+		static void SetDraw_Screen(int handle, const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_, const bool& Clear = true) {
 			SetDraw_Screen(handle, Clear);
 			SetCameraNearFar(near_, far_);
 			SetupCamera_Perspective(fov);

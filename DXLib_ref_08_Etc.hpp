@@ -46,15 +46,14 @@ namespace DXLib_ref {
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	//Matrix版の線形補完
-	static MATRIX_ref Lerp_Matrix(const MATRIX_ref& A, const MATRIX_ref& B, float Per) noexcept {
-		return MATRIX_ref::Axis1(
-			Lerp(A.xvec(), B.xvec(), Per).Norm(),
-			Lerp(A.yvec(), B.yvec(), Per).Norm(),
-			Lerp(A.zvec(), B.zvec(), Per).Norm())*
-			MATRIX_ref::Mtrans(Lerp(A.pos(), B.pos(), Per));
+	static Matrix4x4DX Lerp_Matrix(const Matrix4x4DX& A, const Matrix4x4DX& B, float Per) noexcept {
+		return Matrix4x4DX::Axis1(
+			Lerp(A.yvec(), B.yvec(), Per).normalized(),
+			Lerp(A.zvec(), B.zvec(), Per).normalized(),
+			Lerp(A.pos(), B.pos(), Per));
 	}
 	//Matrix版のイージング
-	static void Easing_Matrix(MATRIX_ref* A, const MATRIX_ref& B, float ratio, EasingType EasingType) noexcept {
+	static void Easing_Matrix(Matrix4x4DX* A, const Matrix4x4DX& B, float ratio, EasingType EasingType) noexcept {
 		switch (EasingType) {
 			case DXLib_ref::EasingType::OutExpo:
 				*A = Lerp_Matrix(*A, B, (1.f - std::powf(ratio, 60.f / GetFrameRate())));
@@ -103,26 +102,26 @@ namespace DXLib_ref {
 	// 演算補助
 	//--------------------------------------------------------------------------------------------------
 	//三角とカプセルとの判定
-	static bool GetHitCapsuleToTriangle(const VECTOR_ref& startpos, const VECTOR_ref& endpos, float size, const VECTOR_ref& tri_p1, const VECTOR_ref& tri_p2, const VECTOR_ref& tri_p3) {
+	static bool GetHitCapsuleToTriangle(const Vector3DX& startpos, const Vector3DX& endpos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) {
 		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
 	//直線と直線の一番近い距離
-	static float GetMinLenSegmentToSegment(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgtstartpos, const VECTOR_ref& tgtendpos) {
+	static float GetMinLenSegmentToSegment(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgtstartpos, const Vector3DX& tgtendpos) {
 		return Segment_Segment_MinLength(startpos.get(), endpos.get(), tgtstartpos.get(), tgtendpos.get());
 	}
 	//直線と点の一番近い点
-	static float GetMinLenSegmentToPoint(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgt) {
+	static float GetMinLenSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) {
 		return Segment_Point_MinLength(startpos.get(), endpos.get(), tgt.get());
 	}
 	//平面と点の一番近い点
-	static VECTOR_ref GetMinPosSegmentToPoint(const VECTOR_ref& startpos, const VECTOR_ref& endpos, const VECTOR_ref& tgt) {
+	static Vector3DX GetMinPosSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) {
 		return Plane_Point_MinLength_Position(startpos.get(), endpos.get(), tgt.get());
 	}
 
 	//ランダム
 	static float GetRandf(float m_arg) noexcept { return -m_arg + (float)(GetRand((int)(m_arg * 2.f * 10000.f))) / 10000.f; }
 	//線分同士の交差判定
-	static bool GetSegmenttoSegment(const VECTOR_ref &SegmentAPos1, const VECTOR_ref &SegmentAPos2, const VECTOR_ref &SegmentBPos1, const VECTOR_ref &SegmentBPos2, SEGMENT_SEGMENT_RESULT *Result) noexcept {
+	static bool GetSegmenttoSegment(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &SegmentBPos1, const Vector3DX &SegmentBPos2, SEGMENT_SEGMENT_RESULT *Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
 		VECTOR PosAt = SegmentBPos1.get();
@@ -133,7 +132,7 @@ namespace DXLib_ref {
 		return (Result->SegA_SegB_MinDist_Square <= (len*len));
 	}
 	//線分と点の最接近点情報を解析する
-	static bool GetSegmenttoPoint(const VECTOR_ref &SegmentAPos1, const VECTOR_ref &SegmentAPos2, const VECTOR_ref &PointPos, SEGMENT_POINT_RESULT *Result) noexcept {
+	static bool GetSegmenttoPoint(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &PointPos, SEGMENT_POINT_RESULT *Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
 		VECTOR PosAt = PointPos.get();
@@ -144,7 +143,7 @@ namespace DXLib_ref {
 	}
 
 	//カメラから画面上の座標を取得
-	static VECTOR_ref GetScreenPos(const VECTOR_ref&campos, const VECTOR_ref&camvec, const VECTOR_ref&camup, float fov, float near_t, float far_t, const VECTOR_ref&worldpos) noexcept;
+	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept;
 	//--------------------------------------------------------------------------------------------------
 	// ウィンドウアクティブチェック付きキー操作
 	//--------------------------------------------------------------------------------------------------
@@ -300,11 +299,11 @@ namespace DXLib_ref {
 		DrawPolygon2D(Vertex, 2, DX_NONE_GRAPH, FALSE);
 	}
 	//カプセル描画
-	static bool DrawCapsule_3D(const VECTOR_ref& p1, const VECTOR_ref& p2, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
+	static bool DrawCapsule_3D(const Vector3DX& p1, const Vector3DX& p2, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawCapsule3D(p1.get(), p2.get(), range, 8, color, speccolor, TRUE) == TRUE;
 	}
 	//球描画
-	static bool DrawSphere_3D(const VECTOR_ref& p1, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
+	static bool DrawSphere_3D(const Vector3DX& p1, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawSphere3D(p1.get(), range, 8, color, speccolor, TRUE) == TRUE;
 	}
 
@@ -510,8 +509,8 @@ namespace DXLib_ref {
 	//モデルのフレーム情報保持
 	class frames {
 		int			m_FrameID{ -1 };
-		MATRIX_ref	m_WorldPos;
-		MATRIX_ref	m_LocalPos;
+		Matrix4x4DX	m_WorldPos;
+		Matrix4x4DX	m_LocalPos;
 	public:
 		void			operator=(const frames& tgt) noexcept {
 			this->m_FrameID = tgt.m_FrameID;
@@ -535,15 +534,15 @@ namespace DXLib_ref {
 	//位置情報
 	class moves {
 	public:
-		VECTOR_ref pos;		//座標
-		VECTOR_ref posbuf;	//座標
-		VECTOR_ref repos;	//前フレームの座標
+		Vector3DX pos;		//座標
+		Vector3DX posbuf;	//座標
+		Vector3DX repos;	//前フレームの座標
 		float		Speed{0.f};
-		VECTOR_ref vec;		//加速
-		MATRIX_ref mat;		//回転
-		VECTOR_ref rad;		//回転
+		Vector3DX vec;		//加速
+		Matrix4x4DX mat;		//回転
+		Vector3DX rad;		//回転
 
-		const MATRIX_ref MatIn(void) const noexcept { return mat * MATRIX_ref::Mtrans(pos); }
+		const Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
 
 		void			operator=(const moves&tgt) {
 			this->pos = tgt.pos;
@@ -579,29 +578,29 @@ namespace DXLib_ref {
 		}
 
 
-		void			UpdatePos(const VECTOR_ref& tgt) {
+		void			UpdatePos(const Vector3DX& tgt) {
 			this->repos = this->pos;
 			this->pos = tgt;
 		}
-		void			UpdatePosBuf(const VECTOR_ref& tgt, float per) {
+		void			UpdatePosBuf(const Vector3DX& tgt, float per) {
 			this->posbuf = tgt;
 			auto Repos = this->pos;
 			Easing(&this->pos, this->posbuf, per, EasingType::OutExpo);
-			this->Speed = (this->pos - Repos).Length();
+			this->Speed = (this->pos - Repos).magnitude();
 			this->repos = this->posbuf;
 		}
 
 		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f) {
 			this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
-			this->vec.yadd(M_GR / powf((GetFrameRate() / rate), 2.f));
+			this->vec.y+= M_GR / powf((GetFrameRate() / rate), 2.f);
 
 			//this->gun_m.pos += this->gun_m.vec;
 			//this->gun_m.vec.yadd(M_GR / std::powf(GetFrameRate(), 2.f));
 		}
 
 		void			HitGround(const MV1_COLL_RESULT_POLY& colres, float hight) {//0.005f
-			this->pos = VECTOR_ref(colres.HitPosition) + VECTOR_ref(colres.Normal)*hight;
-			this->mat *= MATRIX_ref::RotVec2(this->mat.xvec(), VECTOR_ref(colres.Normal)*-1.f);
+			this->pos = Vector3DX(colres.HitPosition) + Vector3DX(colres.Normal)*hight;
+			this->mat *= Matrix4x4DX::RotVec2(this->mat.xvec(), Vector3DX(colres.Normal)*-1.f);
 		}
 	};
 	//キー押し判定
@@ -875,7 +874,7 @@ namespace DXLib_ref {
 			up[5] = VGet(0.0f, 1.0f, 0.0f);
 		}
 
-		void ReadyDraw(const VECTOR_ref& Pos, const std::function<void()>& Doing) {
+		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) {
 			for (int i = 0; i < 6; i++) {		// 映りこむ環境を描画する面の数だけ繰り返し
 				for (int j = 0; j < MIPLEVEL; j++) {			// ミップマップの数だけ繰り返し
 					SetRenderTargetToShader(0, dynamicCubeTex, i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定

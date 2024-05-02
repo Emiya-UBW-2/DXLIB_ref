@@ -1,130 +1,124 @@
 #pragma once
 #include "DXLib_ref.h"
 
-//VECTOR_ref‚ÉŠÖ‚µ‚Ä
-/*=============================================================================
-  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
-  Distributed under the Boost Software License, Version 1.0.
-  (See https://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
 namespace DXLib_ref {
-	class VECTOR_ref {
-		VECTOR value;
+	class Vector3DX {
 	public:
-		VECTOR_ref() noexcept : value(DxLib::VGet(0, 0, 0)) {}
-		VECTOR_ref(VECTOR value) { this->value = value; }
+		float x{0};
+		float y{0};
+		float z{0};
+	public:
+		Vector3DX() noexcept : x(0), y(0), z(0) {}
+		Vector3DX(VECTOR value) noexcept { this->Set(value.x, value.y, value.z); }
+		VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					//•ÏŠ·
+		static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	//“ü—Í
 		//
-		bool operator==(const VECTOR_ref& obj) const noexcept {
-			return (*this - obj).Length() <= 0.001f;
+		static const Vector3DX back(void) noexcept { return DxLib::VGet(0.f, 0.f, -1.f); }
+		static const Vector3DX down(void) noexcept { return DxLib::VGet(0.f, -1.f, 0.f); }
+		static const Vector3DX forward(void) noexcept { return DxLib::VGet(0.f, 0.f, 1.f); }
+		static const Vector3DX left(void) noexcept { return DxLib::VGet(-1.f, 0.f, 0.f); }
+
+		static const Vector3DX one(void) noexcept { return DxLib::VGet(1.f, 1.f, 1.f); }
+
+		static const Vector3DX right(void) noexcept { return DxLib::VGet(1.f, 0.f, 0.f); }
+		static const Vector3DX up(void) noexcept { return DxLib::VGet(0.f, 1.f, 0.f); }
+		static const Vector3DX zero(void) noexcept { return DxLib::VGet(0.f, 0.f, 0.f); }
+		//
+		float magnitude(void) const noexcept { return DxLib::VSize(this->get()); }				//ƒTƒCƒY
+		Vector3DX normalized(void) const noexcept { return DxLib::VNorm(this->get()); }		//³‹K‰»
+		float sqrMagnitude(void) const noexcept { return DxLib::VSquareSize(this->get()); }		//ƒTƒCƒY
+		//
+		bool Equals(const Vector3DX& obj) const noexcept { return *this == obj; }
+		void Set(float x1, float y1, float z1) noexcept {
+			this->x = x1;
+			this->y = y1;
+			this->z = z1;
 		}
-		bool operator!=(const VECTOR_ref& obj) const noexcept {
-			return !(*this == obj);
+		//
+		static const float			Angle(const Vector3DX& A, const Vector3DX& B) noexcept { return std::acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
+		static const Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept {
+			auto Len = A.magnitude();
+			return A.normalized() * std::clamp(Len,0.f,Limit);
 		}
-		VECTOR_ref operator+(const VECTOR_ref& obj) const noexcept { return VECTOR_ref(DxLib::VAdd(this->value, obj.value)); }
-		VECTOR_ref operator+=(const VECTOR_ref& obj) {
-			this->value = DxLib::VAdd(this->value, obj.value);
-			return this->value;
-		}
+		static const Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VCross(A.get(), B.get()); }
+		static const float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
+		static const float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
+		//static const Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return DXLib_ref::Lerp<Vector3DX>(A, B, Per); }
+		//LerpUnclamped
+		static const Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
+		static const Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
+		//MoveTowards
+		static const Vector3DX		Normalize(const Vector3DX& A) noexcept { return A.normalized(); }
+		//OrthoNormalize
+		//Project
+		//ProjectOnPlane
+		static const Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Vector3DX::Dot(inNormal, inDirection*-1.f))*2.f; }
+		//RotateTowards
+		static const Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
+		//SignedAngle
+		//Slerp
+		//SlerpUnclamped
+		//SmoothDamp
+
+		//”äŠr
+		bool operator==(const Vector3DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
+		bool operator!=(const Vector3DX& obj) const noexcept { return !(*this == obj); }
+		//‰ÁŽZ
+		Vector3DX operator+(const Vector3DX& obj) const noexcept { return DxLib::VAdd(this->get(), obj.get()); }
+		void operator+=(const Vector3DX& obj) noexcept { *this = *this + obj; }
 		//Œ¸ŽZ
-		VECTOR_ref operator-(const VECTOR_ref& obj) const noexcept { return VECTOR_ref(DxLib::VSub(this->value, obj.value)); }
-		VECTOR_ref operator-=(const VECTOR_ref& obj) {
-			this->value = DxLib::VSub(this->value, obj.value);
-			return this->value;
-		}
+		Vector3DX operator-(const Vector3DX& obj) const noexcept { return DxLib::VSub(this->get(), obj.get()); }
+		void operator-=(const Vector3DX& obj) noexcept { *this = *this - obj; }
 		//æŽZ
-		VECTOR_ref operator*(float p1) const noexcept { return VECTOR_ref(DxLib::VScale(this->value, p1)); }
-		VECTOR_ref operator*=(float p1) {
-			this->value = DxLib::VScale(this->value, p1);
-			return this->value;
-		}
+		Vector3DX operator*(float p1) const noexcept { return DxLib::VScale(this->get(), p1); }
+		void operator*=(float p1) noexcept { *this = *this * p1; }
 		//œŽZ
-		VECTOR_ref operator/(float p1) const noexcept { return VECTOR_ref(DxLib::VScale(this->value, 1.f / p1)); }
-		VECTOR_ref operator/=(float p1) {
-			this->value = DxLib::VScale(this->value, 1.f / p1);
-			return this->value;
-		}
-		//ŠOÏ
-		VECTOR_ref cross(const VECTOR_ref& obj) const noexcept { return VECTOR_ref(DxLib::VCross(this->value, obj.value)); }
-		//“àÏ
-		float dot(const VECTOR_ref& obj) const noexcept { return DxLib::VDot(this->value, obj.value); }
-		//³‹K‰»
-		VECTOR_ref Norm(void) const noexcept { return VECTOR_ref(DxLib::VNorm(this->value)); }
-		//ƒŠƒZƒbƒg‰»
-		void clear(void) noexcept { this->value = DxLib::VGet(0, 0, 0); }
-		//ƒTƒCƒY
-		float size(void) const noexcept { return DxLib::VSize(this->value); }
-		float Length(void) const noexcept { return DxLib::VSize(this->value); }
-		//o—Í
-		VECTOR get(void) const noexcept { return this->value; }
-		float x(void) const noexcept { return this->value.x; }
-		float y(void) const noexcept { return this->value.y; }
-		float z(void) const noexcept { return this->value.z; }
-
-		//“ü—Í
-		static const VECTOR_ref vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }
-		void Set(float x, float y, float z) noexcept { this->value = DxLib::VGet(x, y, z); }
-		float x(float p) noexcept { this->value.x = p; return this->value.x; }
-		float y(float p) noexcept { this->value.y = p; return this->value.y; }
-		float z(float p) noexcept { this->value.z = p; return this->value.z; }
-
-		float xadd(float p) noexcept { this->value.x += p; return this->value.x; }
-		float yadd(float p) noexcept { this->value.y += p; return this->value.y; }
-		float zadd(float p) noexcept { this->value.z += p; return this->value.z; }
-		//ƒx[ƒVƒbƒN
-		static const VECTOR_ref zero(void) noexcept { return DxLib::VGet(0.f, 0.f, 0.f); }
-
-		static const VECTOR_ref right(void) noexcept { return DxLib::VGet(1.f, 0.f, 0.f); }
-		static const VECTOR_ref up(void) noexcept { return DxLib::VGet(0.f, 1.f, 0.f); }
-		static const VECTOR_ref front(void) noexcept { return DxLib::VGet(0.f, 0.f, 1.f); }
+		Vector3DX operator/(float p1) const noexcept { return DxLib::VScale(this->get(), 1.f / p1); }
+		void operator/=(float p1) noexcept { *this = *this / p1; }
 	};
-	class MATRIX_ref {
+	class Matrix4x4DX {
 		MATRIX value;
 	public:
-		MATRIX_ref() noexcept : value(DxLib::MGetIdent()) {}
-		MATRIX_ref(MATRIX value) { this->value = value; }
-		//‰ÁŽZ
-		MATRIX_ref operator+(MATRIX_ref obj)  const noexcept { return MATRIX_ref(DxLib::MAdd(this->value, obj.value)); }
-		MATRIX_ref operator+=(MATRIX_ref obj) noexcept {
-			this->value = DxLib::MAdd(this->value, obj.value);
-			return this->value;
-		}
-		//æŽZ
-		MATRIX_ref operator*(MATRIX_ref obj)  const noexcept { return MATRIX_ref(DxLib::MMult(this->value, obj.value)); }
-		MATRIX_ref operator*=(MATRIX_ref obj) noexcept {
-			this->value = DxLib::MMult(this->value, obj.value);
-			return this->value;
-		}
-		//ƒTƒCƒY•ÏX
-		MATRIX_ref Scale(float p1) const noexcept { return MATRIX_ref(DxLib::MScale(this->value, p1)); }
-		//‹t
-		MATRIX_ref Inverse(void) const noexcept { return MATRIX_ref(DxLib::MInverse(this->value)); }
-		//ƒŠƒZƒbƒg‰»
-		void clear(void) noexcept { this->value = DxLib::MGetIdent(); }
-		//o—Í
-		MATRIX get(void) const noexcept { return this->value; }
+		Matrix4x4DX() noexcept : value(DxLib::MGetIdent()) {}
+		Matrix4x4DX(MATRIX value) noexcept { this->value = value; }
+		MATRIX get(void) const noexcept { return this->value; }		//•ÏŠ·
 		//
-		static MATRIX_ref Axis1_YZ(const VECTOR_ref& yvec, const VECTOR_ref& zvec) noexcept { return { DxLib::MGetAxis1((yvec.cross(zvec)).get(),yvec.get(),zvec.get(),VGet(0,0,0)) }; }
-		static MATRIX_ref Axis1_YZ(const VECTOR_ref& yvec, const VECTOR_ref& zvec, const VECTOR_ref& pos) noexcept { return { DxLib::MGetAxis1((yvec.cross(zvec)).get(),yvec.get(),zvec.get(),pos.get()) }; }
+		static const Matrix4x4DX identity() noexcept { return DxLib::MGetIdent(); }
 
-		static MATRIX_ref Axis1(const VECTOR_ref& xvec, const VECTOR_ref& yvec, const VECTOR_ref& zvec) noexcept { return { DxLib::MGetAxis1(xvec.get(),yvec.get(),zvec.get(),VGet(0,0,0)) }; }
-		static MATRIX_ref Axis1(const VECTOR_ref& xvec, const VECTOR_ref& yvec, const VECTOR_ref& zvec, const VECTOR_ref& pos) noexcept { return { DxLib::MGetAxis1(xvec.get(),yvec.get(),zvec.get(),pos.get()) }; }
-		static MATRIX_ref Axis2(const VECTOR_ref& xvec, const VECTOR_ref& yvec, const VECTOR_ref& zvec) noexcept { return { DxLib::MGetAxis2(xvec.get(),yvec.get(),zvec.get(),VGet(0,0,0)) }; }
-		static MATRIX_ref Axis2(const VECTOR_ref& xvec, const VECTOR_ref& yvec, const VECTOR_ref& zvec, const VECTOR_ref& pos) noexcept { return { DxLib::MGetAxis2(xvec.get(),yvec.get(),zvec.get(),pos.get()) }; }
-		static MATRIX_ref RotX(float rad) noexcept { return { DxLib::MGetRotX(rad) }; }
-		static MATRIX_ref RotY(float rad) noexcept { return { DxLib::MGetRotY(rad) }; }
-		static MATRIX_ref RotZ(float rad) noexcept { return { DxLib::MGetRotZ(rad) }; }
-		static MATRIX_ref RotAxis(const VECTOR_ref& p1, float p2) { return DxLib::MGetRotAxis(p1.get(), p2); }
-		static MATRIX_ref RotVec2(const VECTOR_ref& p1, const VECTOR_ref& p2) noexcept { return { DxLib::MGetRotVec2(p1.get(), p2.get()) }; }
-		static MATRIX_ref GetScale(float scale) noexcept { return { DxLib::MGetScale(DxLib::VGet(scale,scale,scale)) }; }
-		static MATRIX_ref GetScale(const VECTOR_ref& scale) noexcept { return { DxLib::MGetScale(scale.get()) }; }
-		static MATRIX_ref Mtrans(const VECTOR_ref& p1) { return DxLib::MGetTranslate(p1.get()); }
-		static VECTOR_ref Vtrans(const VECTOR_ref& p1, const MATRIX_ref& p2) { return DxLib::VTransform(p1.get(), p2.get()); }
-		static MATRIX_ref zero() noexcept { return DxLib::MGetIdent(); }
+		static Matrix4x4DX Axis1(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis1(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }
+		static Matrix4x4DX Axis2(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis2(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }
+		static Matrix4x4DX RotAxis(const Vector3DX& p1, float p2) noexcept { return DxLib::MGetRotAxis(p1.get(), p2); }
+		static Matrix4x4DX RotVec2(const Vector3DX& p1, const Vector3DX& p2) noexcept { return {DxLib::MGetRotVec2(p1.get(), p2.get())}; }
+		static Matrix4x4DX GetScale(float scale) noexcept { return {DxLib::MGetScale(DxLib::VGet(scale,scale,scale))}; }
+		static Matrix4x4DX GetScale(const Vector3DX& scale) noexcept { return {DxLib::MGetScale(scale.get())}; }
+		static Matrix4x4DX Mtrans(const Vector3DX& p1) noexcept { return DxLib::MGetTranslate(p1.get()); }
+		static Vector3DX Vtrans(const Vector3DX& p1, const Matrix4x4DX& p2) noexcept { return DxLib::VTransform(p1.get(), p2.get()); }
+		//
+		const Matrix4x4DX inverse(void) const noexcept { return DxLib::MInverse(this->get()); }		//‹t
+		const bool isIdentity(void) const noexcept { return *this == identity(); }		//‹t
+		//lossyScale
+		const Vector3DX lossyScale(void) const noexcept { return DxLib::MGetSize(this->get()); }
+		const Matrix4x4DX rotation(void) const noexcept { return DxLib::MGetRotElem(this->get()); }		//‹t
+		const Matrix4x4DX transpose(void) const noexcept { return DxLib::MTranspose(this->get()); }		//‹t
 
-		VECTOR_ref pos(void) const noexcept { return Vtrans(VECTOR_ref::vget(0.f, 0.f, 0.f), this->value); }
-		MATRIX_ref GetRot(void) const noexcept { return MATRIX_ref(this->value) * Mtrans(this->pos()).Inverse(); }
-		VECTOR_ref xvec(void) const noexcept { return Vtrans(VECTOR_ref::vget(1.f, 0.f, 0.f), GetRot()); }
-		VECTOR_ref yvec(void) const noexcept { return Vtrans(VECTOR_ref::up(), GetRot()); }
-		VECTOR_ref zvec(void) const noexcept { return Vtrans(VECTOR_ref::front(), GetRot()); }
+		const Vector3DX pos(void) const noexcept { return Vtrans(Vector3DX::zero(), this->get()); }
+		const Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), rotation()); }
+		const Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), rotation()); }
+		const Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), rotation()); }
+		//”äŠr
+		bool operator==(const Matrix4x4DX& obj) const noexcept {
+			for (int x = 0;x < 4;x++) {
+				for (int y = 0;y < 4;y++) {
+					if (this->get().m[x][y] != obj.get().m[x][y]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		bool operator!=(const Matrix4x4DX& obj) const noexcept { return !(*this == obj); }
+		//æŽZ
+		Matrix4x4DX operator*(const Matrix4x4DX& obj)  const noexcept { return DxLib::MMult(this->get(), obj.get()); }
+		void operator*=(const Matrix4x4DX& obj) noexcept { *this = *this * obj; }
 	};
 }

@@ -37,19 +37,19 @@ namespace DXLib_ref {
 		int get(void) const noexcept { return handle_; }
 
 		LightHandle Duplicate(void) const noexcept { return this->handle_; }
-		void SetPos(const VECTOR_ref& Position) {
+		void SetPos(const Vector3DX& Position) {
 			SetLightPositionHandle(this->handle_, Position.get());
 		}
-		void SetPos(const VECTOR_ref& Position, const VECTOR_ref& Direction) {
+		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) {
 			SetLightPositionHandle(this->handle_, Position.get());
 			SetLightDirectionHandle(this->handle_, Direction.get());
 		}
 
-		static LightHandle Create(const VECTOR_ref& Position, const VECTOR_ref& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) {
+		static LightHandle Create(const Vector3DX& Position, const Vector3DX& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) {
 			return { DxLib::CreateSpotLightHandle(Position.get(), Direction.get(), OutAngle, InAngle, Range, Atten0, Atten1, Atten2) };
 		}
 
-		static LightHandle Create(const VECTOR_ref& Position, float Range, float Atten0, float Atten1, float Atten2) {
+		static LightHandle Create(const Vector3DX& Position, float Range, float Atten0, float Atten1, float Atten2) {
 			return { DxLib::CreatePointLightHandle(Position.get(), Range, Atten0, Atten1, Atten2) };
 		}
 	};
@@ -65,10 +65,10 @@ namespace DXLib_ref {
 		};
 		std::array<Lights, 2> handles;
 		int now = 0;
-		VECTOR_ref campos;
+		Vector3DX campos;
 	public:
-		void			Put(const VECTOR_ref& pos) noexcept {
-			if ((pos - campos).size() >= 10.f) { return; }
+		void			Put(const Vector3DX& pos) noexcept {
+			if ((pos - campos).magnitude() >= 10.f) { return; }
 			if (handles[now].handle.get() != -1) {
 				handles[now].handle.Dispose();
 			}
@@ -77,7 +77,7 @@ namespace DXLib_ref {
 			SetLightDifColorHandle(handles[now].handle.get(), GetColorF(1.f, 1.f, 0.f, 1.f));
 			++now %= handles.size();
 		}
-		void			Update(const VECTOR_ref& campos_t) noexcept {
+		void			Update(const Vector3DX& campos_t) noexcept {
 			campos = campos_t;
 			/*
 			for (auto& h : handles) {

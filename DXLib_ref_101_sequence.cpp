@@ -34,16 +34,16 @@ namespace DXLib_ref {
 		auto* DrawParts = DXDraw::Instance();
 		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::SSAO)), 0.05f, 200.f);
 		//環境光と影の初期化
-		VECTOR_ref DefaultVec = VECTOR_ref::vget(0.25f, -1.f, 0.25f);
+		Vector3DX DefaultVec = Vector3DX::vget(0.25f, -1.f, 0.25f);
 		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));
-		DrawParts->SetShadow(DefaultVec, VECTOR_ref::vget(-100.f, -10.f, -100.f), VECTOR_ref::vget(100.f, 10.f, 100.f), 0);
-		DrawParts->SetShadow(DefaultVec, VECTOR_ref::vget(-100.f, -10.f, -100.f), VECTOR_ref::vget(100.f, 10.f, 100.f), 1);
-		DrawParts->SetShadow(DefaultVec, VECTOR_ref::vget(-100.f, -10.f, -100.f), VECTOR_ref::vget(100.f, 10.f, 100.f), 2);
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 0);
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 1);
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 2);
 		DrawParts->SetIsUpdateShadow(0, true);
 		DrawParts->SetIsUpdateShadow(1, true);
 		this->m_ScenesPtr->Set();
 		DrawParts->SetIsUpdateShadow(2, true);
-		DrawParts->Update_Shadow([&]() {this->m_ScenesPtr->ShadowDraw_Far(); }, VECTOR_ref::zero(), 2);		//遠影をセット
+		DrawParts->Update_Shadow([&]() {this->m_ScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), 2);		//遠影をセット
 		DrawParts->SetIsUpdateShadow(2, false);
 		PadControl::Instance()->SetGuideUpdate();
 		//FPS表示

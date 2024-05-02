@@ -16,7 +16,7 @@ namespace DXLib_ref {
 			//位置やボタン判定
 			uint64_t					m_ButtonPressFlag{0};
 			uint64_t					m_ButtonTouchFlag{0};
-			VECTOR_ref					m_TouchPadPoint{VECTOR_ref::zero()};
+			Vector3DX					m_TouchPadPoint{Vector3DX::zero()};
 			moves						m_move;
 		public:
 			const auto&		GetID(void) const noexcept { return m_ID; }
@@ -71,13 +71,12 @@ namespace DXLib_ref {
 						SystemPtr->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0.0f, &tmp, 1);
 						this->m_ButtonPressFlag = 0;
 						this->m_ButtonTouchFlag = 0;
-						this->m_TouchPadPoint = VECTOR_ref::zero();
+						this->m_TouchPadPoint = Vector3DX::zero();
 						this->m_isActive = tmp.bPoseIsValid;
-						this->m_move.pos = VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
-						this->m_move.mat = MATRIX_ref::Axis1(
-							VECTOR_ref::vget(-tmp.mDeviceToAbsoluteTracking.m[0][0], -tmp.mDeviceToAbsoluteTracking.m[1][0], tmp.mDeviceToAbsoluteTracking.m[2][0])*-1.f,
-							VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
-							VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
+						this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
+						this->m_move.mat = Matrix4x4DX::Axis1(
+							Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
+							Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
 						);
 						break;
 					case vr::TrackedDeviceClass_Controller:
@@ -88,13 +87,12 @@ namespace DXLib_ref {
 							SystemPtr->GetControllerStateWithPose(vr::TrackingUniverseStanding, this->m_DeviceNumber, &night, sizeof(night), &tmp);
 							this->m_ButtonPressFlag = night.ulButtonPressed;
 							this->m_ButtonTouchFlag = night.ulButtonTouched;
-							this->m_TouchPadPoint = VECTOR_ref::vget(night.rAxis[0].x, night.rAxis[0].y, 0);
+							this->m_TouchPadPoint = Vector3DX::vget(night.rAxis[0].x, night.rAxis[0].y, 0);
 							this->m_isActive = tmp.bPoseIsValid;
-							this->m_move.pos = VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
-							this->m_move.mat = MATRIX_ref::Axis1(
-								VECTOR_ref::vget(-tmp.mDeviceToAbsoluteTracking.m[0][0], -tmp.mDeviceToAbsoluteTracking.m[1][0], tmp.mDeviceToAbsoluteTracking.m[2][0])*-1.f,
-								VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
-								VECTOR_ref::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
+							this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
+							this->m_move.mat = Matrix4x4DX::Axis1(
+								Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
+								Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
 							);
 						}
 						break;
@@ -105,7 +103,7 @@ namespace DXLib_ref {
 			void Reset() {
 				this->m_ButtonPressFlag = 0;
 				this->m_ButtonTouchFlag = 0;
-				this->m_TouchPadPoint = VECTOR_ref::zero();
+				this->m_TouchPadPoint = Vector3DX::zero();
 				this->m_move.pos.clear();
 				this->m_move.mat.clear();
 			}
@@ -120,7 +118,7 @@ namespace DXLib_ref {
 		std::vector<char>			m_VR_TrackerID;
 		bool						m_VR_PrevHMDIsActive{false};
 		bool						m_VR_HMD_StartFlag{true};
-		MATRIX_ref					m_VR_HMD_StartPoint;
+		Matrix4x4DX					m_VR_HMD_StartPoint;
 	public:
 		VRControl(void) noexcept {}
 		~VRControl(void) noexcept {}
@@ -132,29 +130,29 @@ namespace DXLib_ref {
 			m_VR_PrevHMDIsActive = false;
 			m_VR_HMD_StartFlag = true;
 		}
-		void			GetHMDPosition(VECTOR_ref* pos_, MATRIX_ref*mat) noexcept {
+		void			GetHMDPosition(Vector3DX* pos_, Matrix4x4DX*mat) noexcept {
 			auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
 			if (HMDPtr) {
 				*mat = HMDPtr->GetMove().mat;
-				*mat = MATRIX_ref::Axis1((*mat).xvec()*-1.f, (*mat).yvec(), (*mat).zvec()*-1.f);
+				*mat = Matrix4x4DX::Axis1((*mat).yvec(), (*mat).zvec()*-1.f);
 				if (!HMDPtr->IsActive()) {
 					m_VR_HMD_StartFlag = true;
 				}
 				if (m_VR_HMD_StartFlag && HMDPtr->IsActive() != m_VR_PrevHMDIsActive) {
 					m_VR_HMD_StartFlag = false;
 					//
-					VECTOR_ref pos = HMDPtr->GetMove().pos; pos.y(0.f);
-					VECTOR_ref tmp = mat->zvec(); tmp.y(0.f); tmp = tmp.Norm();
-					float rad = DX_PI_F + std::atan2f(tmp.x(), -tmp.z());
-					m_VR_HMD_StartPoint = MATRIX_ref::RotY(rad) * MATRIX_ref::Mtrans(pos);
+					Vector3DX pos = HMDPtr->GetMove().pos; pos.y(0.f);
+					Vector3DX tmp = mat->zvec(); tmp.y(0.f); tmp = tmp.normalized();
+					float rad = DX_PI_F + std::atan2f(tmp.x, -tmp.z);
+					m_VR_HMD_StartPoint = Matrix4x4DX::RotAxis(Vector3DX::up(), rad) * Matrix4x4DX::Mtrans(pos);
 				}
 				m_VR_PrevHMDIsActive = HMDPtr->IsActive();
 				*pos_ = HMDPtr->GetMove().pos - m_VR_HMD_StartPoint.pos();
-				*mat = *mat * m_VR_HMD_StartPoint.GetRot();
+				*mat = *mat * m_VR_HMD_StartPoint.rotation();
 			}
 			else {
-				*pos_ = VECTOR_ref::zero();
-				*mat = MATRIX_ref::zero();
+				*pos_ = Vector3DX::zero();
+				*mat = Matrix4x4DX::zero();
 				ResetHMD();
 			}
 		}
@@ -167,9 +165,9 @@ namespace DXLib_ref {
 			if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
 				const vr::HmdMatrix34_t tmpmat = vr::VRSystem()->GetEyeToHeadTransform((vr::EVREye)eye_type);
-				return MATRIX_ref::Vtrans(VECTOR_ref::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMove().mat);
+				return Matrix4x4DX::Vtrans(Vector3DX::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMove().mat);
 			}
-			return VECTOR_ref::zero();
+			return Vector3DX::zero();
 		}
 	public:
 		void Init() noexcept {
@@ -257,7 +255,7 @@ namespace DXLib_ref {
 		public:
 			const bool		PadPress(VR_PAD) const noexcept { return false; }
 			const bool		PadTouch(VR_PAD) const noexcept { return false; }
-			const auto&		GetTouchPadPoint(void) const noexcept { return VECTOR_ref::zero(); }
+			const auto&		GetTouchPadPoint(void) const noexcept { return Vector3DX::zero(); }
 		};
 	public:
 		VRControl(void) noexcept {}
@@ -267,9 +265,9 @@ namespace DXLib_ref {
 		const VRDeviceClass*	Get_VR_Hand2Device(void) const noexcept { return nullptr; }
 		const VRDeviceClass*	GetTrackerDevice(int) const noexcept { return nullptr; }
 		void			ResetHMD(void) noexcept {}
-		void			GetHMDPosition(VECTOR_ref*, MATRIX_ref*) noexcept {}
+		void			GetHMDPosition(Vector3DX*, Matrix4x4DX*) noexcept {}
 		void			Haptic(char, unsigned short) noexcept {}
-		const auto		GetEyePosition(char) noexcept { return VECTOR_ref::zero(); }
+		const auto		GetEyePosition(char) noexcept { return Vector3DX::zero(); }
 	public:
 		void Init() noexcept {}
 		void Execute(void) noexcept {}
@@ -300,7 +298,7 @@ namespace DXLib_ref {
 		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
 		m_Shader_Skin4_DepthShadow_Step2.Init("shader/SkinMesh4_DirLight_DepthShadow_Step2VS.vso", "shader/DirLight_DepthShadow_Step2PS.pso");
 	}
-	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, VECTOR_ref Center) {
+	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) {
 		if (!m_isUpdate) { return; }
 		// 影用の深度記録画像の準備を行う
 		DepthScreenHandle.SetDraw_Screen();
@@ -310,10 +308,10 @@ namespace DXLib_ref {
 			SetCameraNearFar(0.05f*12.5f, 30.f*12.5f);		// 描画する奥行き範囲をセット
 			// カメラの位置と注視点はステージ全体が見渡せる位置
 			auto Vec = m_ShadowVec;
-			if (Vec.x() == 0.f && m_ShadowVec.z() == 0.f) {
-				Vec.z(0.1f);
+			if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
+				Vec.z = (0.1f);
 			}
-			SetCameraPositionAndTarget_UpVecY((Center - Vec.Norm() * (15.f*12.5f)).get(), Center.get());
+			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (15.f*12.5f)).get(), Center.get());
 
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
@@ -483,7 +481,7 @@ namespace DXLib_ref {
 		}
 	}
 	//
-	void			DXDraw::Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, int shadowSelect) noexcept {
+	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept {
 		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
 			// 影用の深度記録画像の準備を行う
 			if (shadowSelect==0) {
@@ -500,7 +498,7 @@ namespace DXLib_ref {
 		}
 	}
 	//
-	void			DXDraw::SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept {
+	void			DXDraw::SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept {
 		m_LightVec = AmbientLightVec;
 		m_LightColorF = LightColor;
 		SetGlobalAmbientLight(LightColor);
@@ -627,7 +625,7 @@ namespace DXLib_ref {
 				this->m_CamShake = m_SendCamShakeTime;
 			}
 			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
-			Easing(&this->m_CamShake1, VECTOR_ref::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
+			Easing(&this->m_CamShake1, Vector3DX::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
 			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
 			this->m_CamShake = std::max(this->m_CamShake - 1.f / GetFrameRate(), 0.f);
 		}
@@ -685,7 +683,7 @@ namespace DXLib_ref {
 						SetUseZBuffer3D(FALSE);												//zbufuse
 						SetWriteZBuffer3D(FALSE);											//zbufwrite
 						{
-							DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).Norm()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
+							DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).normalized()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
 						}
 						SetUseZBuffer3D(TRUE);												//zbufuse
 						SetWriteZBuffer3D(TRUE);											//zbufwrite
@@ -785,14 +783,14 @@ namespace DXLib_ref {
 		return true;
 	}
 	//VR
-	void					DXDraw::Get_VR_HMDPositionVR(VECTOR_ref* pos_, MATRIX_ref*mat) noexcept { this->GetVRControl()->GetHMDPosition(pos_, mat); }
+	void					DXDraw::Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX*mat) noexcept { this->GetVRControl()->GetHMDPosition(pos_, mat); }
 	void					DXDraw::Reset_VR_HMD(void) noexcept { this->GetVRControl()->ResetHMD(); }
 	bool					DXDraw::Get_VR_Hand1PadPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->PadPress(ID) : false; }
 	bool					DXDraw::Get_VR_Hand1TouchPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->PadTouch(ID) : false; }
-	VECTOR_ref				DXDraw::Get_VR_Hand1TouchPadPoint() const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->GetTouchPadPoint() : VECTOR_ref::zero(); }
+	Vector3DX				DXDraw::Get_VR_Hand1TouchPadPoint() const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->GetTouchPadPoint() : Vector3DX::zero(); }
 	bool					DXDraw::Get_VR_Hand2PadPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->PadPress(ID) : false; }
 	bool					DXDraw::Get_VR_Hand2TouchPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->PadTouch(ID) : false; }
-	VECTOR_ref				DXDraw::Get_VR_Hand2TouchPadPoint() const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->GetTouchPadPoint() : VECTOR_ref::zero(); }
+	Vector3DX				DXDraw::Get_VR_Hand2TouchPadPoint() const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->GetTouchPadPoint() : Vector3DX::zero(); }
 
 	void					DXDraw::VR_Haptic(char id_, unsigned short times) noexcept { this->GetVRControl()->Haptic(id_, times); }
 };

@@ -5,7 +5,7 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
-	static VECTOR_ref GetScreenPos(const VECTOR_ref&campos, const VECTOR_ref&camvec, const VECTOR_ref&camup, float fov, float near_t, float far_t, const VECTOR_ref&worldpos) noexcept {
+	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
 		int ScrX = y_r(1920);
 		int ScrY = y_r(1080);
 		// ビュー行列と射影行列の取得
@@ -35,7 +35,7 @@ namespace DXLib_ref {
 		// スクリーン変換
 		screenPos = VTransform(tmp, viewport);
 		screenPos.z = -1.f;
-		if ((camvec - campos).dot(worldpos - campos) > 0.f) {
+		if (Vector3DX::Dot(camvec - campos, worldpos - campos) > 0.f) {
 			screenPos.z = 0.5f;
 		}
 		return screenPos;

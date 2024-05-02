@@ -93,18 +93,18 @@ namespace DXLib_ref {
 		bool IsActive(void) const noexcept { return this->handle_ != invalid_handle; }
 		int get(void) const noexcept { return this->handle_; }
 		/*モデル*/
-		bool SetPosition(const VECTOR_ref& p1) const noexcept { return MV1SetPosition(this->handle_, p1.get()) == TRUE; }
-		VECTOR_ref GetPosition(void) const noexcept { return MV1GetPosition(this->handle_); }
-		bool SetRotationZYAxis(const VECTOR_ref& zaxis, const VECTOR_ref& yaxis, float zrad) const noexcept { return MV1SetRotationZYAxis(this->handle_, zaxis.get(), yaxis.get(), zrad) == TRUE; }
-		bool SetMatrix(const MATRIX_ref& mat) const noexcept { return MV1SetMatrix(this->handle_, mat.get()) == TRUE; }
+		bool SetPosition(const Vector3DX& p1) const noexcept { return MV1SetPosition(this->handle_, p1.get()) == TRUE; }
+		Vector3DX GetPosition(void) const noexcept { return MV1GetPosition(this->handle_); }
+		bool SetRotationZYAxis(const Vector3DX& zaxis, const Vector3DX& yaxis, float zrad) const noexcept { return MV1SetRotationZYAxis(this->handle_, zaxis.get(), yaxis.get(), zrad) == TRUE; }
+		bool SetMatrix(const Matrix4x4DX& mat) const noexcept { return MV1SetMatrix(this->handle_, mat.get()) == TRUE; }
 		bool DrawModel(void) const noexcept { return MV1DrawModel(this->handle_) == TRUE; }
 		bool SetOpacityRate(float p1) const noexcept { return MV1SetOpacityRate(this->handle_, p1) == TRUE; }
 		float GetOpacityRate(void) const noexcept { return MV1GetOpacityRate(this->handle_); }
-		bool SetScale(const VECTOR_ref& p1) const noexcept { return MV1SetScale(this->handle_, p1.get()) == TRUE; }
+		bool SetScale(const Vector3DX& p1) const noexcept { return MV1SetScale(this->handle_, p1.get()) == TRUE; }
 		/*テクスチャ*/
 		bool SetTextureGraphHandle(int p1, const GraphHandle& p2, bool trans) const noexcept { return MV1SetTextureGraphHandle(this->handle_, p1, p2.get(), trans ? TRUE : FALSE) == TRUE; }
 		/*フレーム*/
-		VECTOR_ref frame(int p1) const noexcept { return MV1GetFramePosition(this->handle_, p1); }
+		Vector3DX frame(int p1) const noexcept { return MV1GetFramePosition(this->handle_, p1); }
 		size_t frame_num(void) const noexcept {
 			if (IsActive()) {
 				return MV1GetFrameNum(this->handle_);
@@ -116,11 +116,11 @@ namespace DXLib_ref {
 		int frame_parent(int p1) const noexcept { return MV1GetFrameParent(this->handle_, p1); }
 		size_t frame_child(int p1, int p2) const noexcept { return MV1GetFrameChild(this->handle_, p1, p2); }
 		size_t frame_child_num(int p1) const noexcept { return MV1GetFrameChildNum(this->handle_, p1); }
-		bool SetFrameLocalMatrix(int id, MATRIX_ref mat) const noexcept { return MV1SetFrameUserLocalMatrix(this->handle_, id, mat.get()) == TRUE; }
+		bool SetFrameLocalMatrix(int id, Matrix4x4DX mat) const noexcept { return MV1SetFrameUserLocalMatrix(this->handle_, id, mat.get()) == TRUE; }
 
-		MATRIX_ref GetFrameLocalMatrix(int id) const noexcept { return MV1GetFrameLocalMatrix(this->handle_, id); }
-		MATRIX_ref GetFrameLocalWorldMatrix(int id) const noexcept { return MV1GetFrameLocalWorldMatrix(this->handle_, id); }
-		MATRIX_ref GetMatrix(void) const noexcept { return MV1GetMatrix(this->handle_); }
+		Matrix4x4DX GetFrameLocalMatrix(int id) const noexcept { return MV1GetFrameLocalMatrix(this->handle_, id); }
+		Matrix4x4DX GetFrameLocalWorldMatrix(int id) const noexcept { return MV1GetFrameLocalWorldMatrix(this->handle_, id); }
+		Matrix4x4DX GetMatrix(void) const noexcept { return MV1GetMatrix(this->handle_); }
 
 		const bool DrawFrame(int p1) const noexcept { return MV1DrawFrame(this->handle_, p1) == TRUE; }
 		const std::string frame_name(const size_t& p1) const noexcept { return MV1GetFrameName(this->handle_, int(p1)); }
@@ -141,8 +141,8 @@ namespace DXLib_ref {
 				return 0;
 			}
 		}
-		VECTOR_ref mesh_maxpos(int p1) const noexcept { return MV1GetMeshMaxPosition(this->handle_, p1); }
-		VECTOR_ref mesh_minpos(int p1) const noexcept { return MV1GetMeshMinPosition(this->handle_, p1); }
+		Vector3DX mesh_maxpos(int p1) const noexcept { return MV1GetMeshMaxPosition(this->handle_, p1); }
+		Vector3DX mesh_minpos(int p1) const noexcept { return MV1GetMeshMinPosition(this->handle_, p1); }
 		bool DrawMesh(int p1) const noexcept { return MV1DrawMesh(this->handle_, p1) == TRUE; }
 		/*シェイプ*/
 		int SearchShape(const char* str) const noexcept { return MV1SearchShape(this->handle_, str); }
@@ -187,14 +187,14 @@ namespace DXLib_ref {
 		bool RefreshCollInfo(int frame = -1, int mesh = -1) const noexcept {
 			return MV1RefreshCollInfo(this->handle_, frame, mesh) == 0;
 		}
-		const auto CollCheck_Line(const VECTOR_ref& start, const VECTOR_ref& end, int frame = -1, int mesh = -1) const noexcept {
+		const auto CollCheck_Line(const Vector3DX& start, const Vector3DX& end, int frame = -1, int mesh = -1) const noexcept {
 			return MV1CollCheck_Line(this->handle_, frame, start.get(), end.get(), mesh);
 		}
-		const auto CollCheck_Sphere(const VECTOR_ref& startpos, float range, int frame = -1, int mesh = -1) const noexcept {
+		const auto CollCheck_Sphere(const Vector3DX& startpos, float range, int frame = -1, int mesh = -1) const noexcept {
 			return MV1CollCheck_Sphere(this->handle_, frame, startpos.get(), range, mesh);
 		}
 
-		const auto CollCheck_Capsule(const VECTOR_ref& startpos, const VECTOR_ref& endpos, float range, int frame = -1, int mesh = -1) const noexcept {
+		const auto CollCheck_Capsule(const Vector3DX& startpos, const Vector3DX& endpos, float range, int frame = -1, int mesh = -1) const noexcept {
 			return MV1CollCheck_Capsule(this->handle_, frame, startpos.get(), endpos.get(), range, mesh);
 		}
 

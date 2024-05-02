@@ -46,8 +46,8 @@ namespace DXLib_ref {
 		//    @brief	再生中の2D表示のエフェクトの位置を設定する。
 		//    @param	x	X座標
 		//    @param	y	Y座標
-		void SetPos(VECTOR_ref pos) const noexcept {
-			SetPosPlayingEffekseer2DEffect(this->handle_, pos.x(), pos.y(), pos.z());
+		void SetPos(Vector3DX pos) const noexcept {
+			SetPosPlayingEffekseer2DEffect(this->handle_, pos.x, pos.y, pos.z);
 		}
 		//    @brief	再生中の2D表示のエフェクトの角度を設定する。
 		//    @param	x	X軸角度(ラジアン)
@@ -141,8 +141,8 @@ namespace DXLib_ref {
 			@param	x	X座標
 			@param	y	Y座標
 		*/
-		void SetPos(const VECTOR_ref& pos) const noexcept {
-			SetPosPlayingEffekseer3DEffect(this->handle_, pos.x(), pos.y(), pos.z());
+		void SetPos(const Vector3DX& pos) const noexcept {
+			SetPosPlayingEffekseer3DEffect(this->handle_, pos.x, pos.y, pos.z);
 		}
 		/**
 			@brief	再生中の3D表示のエフェクトの角度を設定する。
@@ -332,15 +332,15 @@ namespace DXLib_ref {
 			bool						m_IsFirst{ false };				//
 			bool						m_IsLoop{ false };				//
 			size_t						m_ID{ 0 };						//
-			VECTOR_ref					m_pos;							//
-			VECTOR_ref					m_Normal;						//
+			Vector3DX					m_pos;							//
+			Vector3DX					m_Normal;						//
 			float						m_scale{ 1.f };					//
 			Effekseer3DPlayingHandle	m_handle;						//
 		public:
 			const auto		GetIsPlaying(void) const noexcept { return this->m_handle.IsPlaying(); }
 			const auto&		GetIsFirst(void) const noexcept { return this->m_IsFirst; }
 		private:
-			void			Ef_Set(const EffekseerEffectHandle& handle_, const VECTOR_ref& pPos, const VECTOR_ref& pNormal, float pScale = 1.f) noexcept {
+			void			Ef_Set(const EffekseerEffectHandle& handle_, const Vector3DX& pPos, const Vector3DX& pNormal, float pScale = 1.f) noexcept {
 				this->m_IsFirst = true;
 				if (GetIsPlaying()) {
 					this->m_handle.Stop();
@@ -351,23 +351,23 @@ namespace DXLib_ref {
 			void			Ef_Update(void) noexcept {
 				if (GetIsPlaying()) {
 					this->m_handle.SetPos(this->m_pos);
-					this->m_handle.SetRotation(atan2(this->m_Normal.y(), std::hypot(this->m_Normal.x(), this->m_Normal.z())), atan2(-this->m_Normal.x(), -this->m_Normal.z()), 0);
+					this->m_handle.SetRotation(atan2(this->m_Normal.y, std::hypot(this->m_Normal.x, this->m_Normal.z)), atan2(-this->m_Normal.x, -this->m_Normal.z), 0);
 					this->m_handle.SetScale(this->m_scale);
 				}
 			}
 		public:
-			void			SetParam(const VECTOR_ref& pPos, const VECTOR_ref& pNormal, float pScale = 1.f) noexcept {
+			void			SetParam(const Vector3DX& pPos, const Vector3DX& pNormal, float pScale = 1.f) noexcept {
 				this->m_pos = pPos;
 				this->m_Normal = pNormal;
 				this->m_scale = pScale;
 			}
 
-			void			SetLoop(const EffekseerEffectHandle& handle_, const VECTOR_ref& pPos = VECTOR_ref::zero(), const VECTOR_ref& pNormal = VECTOR_ref::front(), float pScale = 1.f) noexcept {
+			void			SetLoop(const EffekseerEffectHandle& handle_, const Vector3DX& pPos = Vector3DX::zero(), const Vector3DX& pNormal = Vector3DX::forward(), float pScale = 1.f) noexcept {
 				Ef_Set(handle_, pPos, pNormal, pScale);
 				Ef_Update();
 				this->m_IsLoop = true;
 			}
-			void			SetOnce(const EffekseerEffectHandle& handle_, const VECTOR_ref& pPos, const VECTOR_ref& pNormal, float pScale = 1.f) noexcept {
+			void			SetOnce(const EffekseerEffectHandle& handle_, const Vector3DX& pPos, const Vector3DX& pNormal, float pScale = 1.f) noexcept {
 				Ef_Set(handle_, pPos, pNormal, pScale);
 				Ef_Update();
 				this->m_IsLoop = false;
@@ -382,7 +382,7 @@ namespace DXLib_ref {
 					this->m_handle.SetSpeed(pSpeed);
 				}
 			}
-			void			SetEffectPos(const VECTOR_ref& pPos) noexcept {
+			void			SetEffectPos(const Vector3DX& pPos) noexcept {
 				if (GetIsPlaying()) {
 					this->m_pos = pPos;
 					this->m_handle.SetPos(pPos);
@@ -421,7 +421,7 @@ namespace DXLib_ref {
 		std::array<std::pair<int, std::array<EffectS, EffectNum + 1>>, (int)EffectResource::Effect::effects> m_effect;//エフェクト
 	public:
 		//複数エフェクトの再生
-		void		SetOnce_Any(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
+		void		SetOnce_Any(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
 			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
 			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetEffectSpeed(speed);
 			++this->m_effect[(int)ID].first %= EffectNum;
@@ -439,13 +439,13 @@ namespace DXLib_ref {
 		const auto	CheckPlayEffect(EffectResource::Effect ID) const noexcept {
 			return this->m_effect[(int)ID].second[EffectNum].GetIsPlaying();
 		}
-		void		SetLoop(EffectResource::Effect ID, const VECTOR_ref& pos_t) noexcept {
+		void		SetLoop(EffectResource::Effect ID, const Vector3DX& pos_t) noexcept {
 			this->m_effect[(int)ID].second[EffectNum].SetLoop(EffectResource::Instance()->effsorce.at((int)ID), pos_t);
 		}
-		void		Update_LoopEffect(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f) noexcept {
+		void		Update_LoopEffect(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			this->m_effect[(int)ID].second[EffectNum].SetParam(pos_t, nomal_t, scale);
 		}
-		void		SetOnce(EffectResource::Effect ID, const VECTOR_ref& pos_t, const VECTOR_ref& nomal_t, float scale = 1.f) noexcept {
+		void		SetOnce(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			this->m_effect[(int)ID].second[EffectNum].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
 		}
 		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect[(int)ID].second[EffectNum].StopEffect(); }

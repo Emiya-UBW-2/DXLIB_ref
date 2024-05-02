@@ -56,9 +56,9 @@ namespace DXLib_ref {
 		}
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
 		const auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
-		bool SetPosition(const VECTOR_ref& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
+		bool SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
 		bool Radius(float radius) const noexcept { return (Set3DRadiusSoundMem(radius, handle_) == 0); }
-		void play_3D(const VECTOR_ref& pos, float radius, int type_t = DX_PLAYTYPE_BACK)const {
+		void play_3D(const Vector3DX& pos, float radius, int type_t = DX_PLAYTYPE_BACK)const {
 			SetPosition(pos);
 			Radius(radius);
 			play(type_t, TRUE);
@@ -138,7 +138,7 @@ namespace DXLib_ref {
 				++now %= shandle[Sel_t].handle.size();
 				return (int)ans;
 			}
-			int 			Play_3D(int Sel_t, const VECTOR_ref& pos_t, float radius, int vol_t = -1, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = -1, int type_t = DX_PLAYTYPE_BACK) noexcept {
 				bool isplay = true;
 				{
 					//距離内にいない場合鳴らさない
@@ -160,7 +160,7 @@ namespace DXLib_ref {
 			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) {
 				shandle[Sel_t].handle[Sel2_t].vol((int)(vol_rate * std::clamp(vol, 0, 255)));
 			}
-			void			SetPos(int Sel_t, int Sel2_t, const VECTOR_ref& pos_t) {
+			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) {
 				shandle[Sel_t].handle[Sel2_t].SetPosition(pos_t);
 			}
 			void			SetVol_Local(int vol) {
@@ -250,7 +250,7 @@ namespace DXLib_ref {
 			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) {
 				this->handle.play(type_t, Flag_t);
 			}
-			void 			Play_3D(const VECTOR_ref& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			void 			Play_3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
 				bool isplay = true;
 				{
 					//距離内にいない場合鳴らさない

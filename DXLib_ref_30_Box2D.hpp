@@ -26,7 +26,7 @@ namespace DXLib_ref {
 		std::unique_ptr<b2Body>		body;					//
 		b2Fixture*					playerfix{ nullptr };	//
 	public:
-		VECTOR_ref					pos;//‰¼
+		Vector3DX					pos;//‰¼
 	public:
 		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) {
 			fixtureDef.shape = dynamicBox;								//
@@ -40,8 +40,8 @@ namespace DXLib_ref {
 			this->body->SetLinearVelocity(position);
 		}
 
-		void		Execute(const VECTOR_ref& add, float yradadd) {
-			this->body->SetLinearVelocity(b2Vec2(add.x(), add.z()));
+		void		Execute(const Vector3DX& add, float yradadd) {
+			this->body->SetLinearVelocity(b2Vec2(add.x, add.z));
 			this->body->SetAngularVelocity(yradadd);
 		}
 

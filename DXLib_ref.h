@@ -104,13 +104,13 @@ namespace DXLib_ref {
 	private:
 		class ShadowControl {
 			int				m_ShadowHandle{-1};
-			VECTOR_ref		m_ShadowVec;
-			VECTOR_ref		m_ShadowMax;
-			VECTOR_ref		m_ShadowMin;
+			Vector3DX		m_ShadowVec;
+			Vector3DX		m_ShadowMax;
+			Vector3DX		m_ShadowMin;
 			bool			m_isUpdate{false};
 		public:
 			const auto&		GetHandle(void) const noexcept { return m_ShadowHandle; }
-			void			Set(const VECTOR_ref& Vec, const VECTOR_ref& MinSize, const VECTOR_ref& MaxSize) noexcept {
+			void			Set(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize) noexcept {
 				m_ShadowVec = Vec;
 				m_ShadowMin = MinSize;
 				m_ShadowMax = MaxSize;
@@ -124,7 +124,7 @@ namespace DXLib_ref {
 					SetShadowMapAdjustDepth(m_ShadowHandle, 0.0005f);
 				}
 			}
-			void			Update(std::function<void()> doing, const VECTOR_ref& CenterPos) noexcept {
+			void			Update(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
 				if (m_ShadowHandle != -1 && m_isUpdate) {
 					SetShadowMapLightDirection(m_ShadowHandle, m_ShadowVec.get());
 					SetShadowMapDrawArea(m_ShadowHandle, (CenterPos + m_ShadowMin).get(), (CenterPos + m_ShadowMax).get());
@@ -147,14 +147,14 @@ namespace DXLib_ref {
 			// 深度記録画像を使ったディレクショナルライト一つ付きの描画用の剛体メッシュ用とスキニングメッシュ用のシェーダー
 			ShaderUseClass					m_Shader_Skin4_DepthShadow_Step2;
 			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
-			VECTOR_ref		m_ShadowVec{VECTOR_ref::up()};
+			Vector3DX		m_ShadowVec{Vector3DX::up()};
 			bool			m_isUpdate{false};
 		public:
-			void			SetVec(const VECTOR_ref& Vec) noexcept { m_ShadowVec = Vec; }
+			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 			void SetisUpdate(bool value) noexcept { m_isUpdate = value; }
 
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey);
-			void Update(std::function<void()> Shadowdoing, VECTOR_ref Center);
+			void Update(std::function<void()> Shadowdoing, Vector3DX Center);
 			void SetDraw(std::function<void()> doing);
 
 			void Draw() {
@@ -174,7 +174,7 @@ namespace DXLib_ref {
 
 		std::array<ShadowControl, 3> m_Shadow;
 		ShadowDraw					m_ShadowDraw;
-		VECTOR_ref					m_LightVec;
+		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{GetColorF(0, 0, 0, 0)};
 		GraphHandle					m_OutScreen;							//スクリーンバッファ
 		GraphHandle					UI_Screen;								//UI
@@ -184,8 +184,8 @@ namespace DXLib_ref {
 		float						m_SendCamShakeTime{1.f};
 		float						m_SendCamShakePower{1.f};
 		float						m_CamShake{0.f};
-		VECTOR_ref					m_CamShake1;
-		VECTOR_ref					m_CamShake2;
+		Vector3DX					m_CamShake1;
+		Vector3DX					m_CamShake2;
 		//
 		float						m_AberrationPower{1.f};
 		//
@@ -227,8 +227,8 @@ namespace DXLib_ref {
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 	public:
-		void			SetAmbientLight(const VECTOR_ref& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-		void			SetShadow(const VECTOR_ref& Vec, const VECTOR_ref& MinSize, const VECTOR_ref& MaxSize, int shadowSelect) noexcept {
+		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
+		void			SetShadow(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept {
 			if (shadowSelect == 0) {
 				m_ShadowDraw.SetVec(Vec);
 			}
@@ -253,7 +253,7 @@ namespace DXLib_ref {
 			SetUseShadowMap(0, -1);
 			SetUseShadowMap(1, -1);
 		}
-		void			Update_Shadow(std::function<void()> doing, const VECTOR_ref& CenterPos, int shadowSelect) noexcept;
+		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept;
 
 		void			Update_NearShadow(std::function<void()> doing) noexcept;
 	public:
@@ -281,14 +281,14 @@ namespace DXLib_ref {
 		VRControl*			GetVRControl() noexcept { return m_VRControl; }
 		const VRControl*	GetVRControl() const noexcept { return m_VRControl; }
 	public:
-		void				Get_VR_HMDPositionVR(VECTOR_ref* pos_, MATRIX_ref*mat) noexcept;
+		void				Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX*mat) noexcept;
 		void				Reset_VR_HMD(void) noexcept;
 		bool				Get_VR_Hand1PadPress(VR_PAD) const noexcept;
 		bool				Get_VR_Hand1TouchPress(VR_PAD) const noexcept;
-		VECTOR_ref			Get_VR_Hand1TouchPadPoint() const noexcept;
+		Vector3DX			Get_VR_Hand1TouchPadPoint() const noexcept;
 		bool				Get_VR_Hand2PadPress(VR_PAD) const noexcept;
 		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
-		VECTOR_ref			Get_VR_Hand2TouchPadPoint() const noexcept;
+		Vector3DX			Get_VR_Hand2TouchPadPoint() const noexcept;
 		void				VR_Haptic(char id_, unsigned short times) noexcept;	//VRコントローラー振動
 	};
 
