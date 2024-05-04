@@ -2,6 +2,7 @@
 
 namespace DXLib_ref {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
+	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -125,6 +126,28 @@ namespace DXLib_ref {
 			return value;
 		}
 	};
+	//
+	void SideLog::Draw() noexcept {
+		auto* Fonts = FontPool::Instance();
+
+		int xp1, yp1;
+		xp1 = y_r(64);
+		yp1 = y_r(256);
+
+		for (auto& d : data) {
+			if (d.ActivePer() > 0.f) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
+				int yp = yp1 - y_r(24.f * d.GetFlip());
+				DrawBox(
+					xp1 - y_r(6), yp + y_r(18),
+					xp1 - y_r(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), d.GetMsg()), y_r(200))*d.ActivePer()), yp + y_r(18) + y_r(5),
+					Black, TRUE);
+				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+																	  xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
+			}
+		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 	//
 	void			PopUpDrawClass::Set(const char* WindowName, int sizex, int sizey, std::function<void(int xsize, int ysize, bool EndSwitch)> doing) noexcept {
 		sprintf_s(m_WindwoName, 64, WindowName);

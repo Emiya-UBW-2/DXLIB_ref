@@ -55,16 +55,19 @@ namespace DXLib_ref {
 	//
 	bool SceneControl::Execute(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		auto* ItemLogParts = SideLog::Instance();
 		PadControl::Instance()->Execute();
 		auto SelEnd = !this->m_ScenesPtr->Update();		//更新
 		Set3DSoundListenerPosAndFrontPosAndUpVec(DrawParts->SetMainCamera().GetCamPos().get(), DrawParts->SetMainCamera().GetCamVec().get(), DrawParts->SetMainCamera().GetCamUp().get());		//音位置指定
 		OptionWindowClass::Instance()->Execute();
 		DrawParts->Execute();
+		ItemLogParts->Update();
 		return SelEnd;
 	}
 	//描画
 	void SceneControl::Draw(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		auto* ItemLogParts = SideLog::Instance();
 		//
 		EffectResource::Instance()->Calc(DrawParts->IsPause());//エフェクシアのアプデを60FPS相当に変更
 		//
@@ -83,6 +86,7 @@ namespace DXLib_ref {
 			auto* Fonts = FontPool::Instance();
 			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
 		}
+		ItemLogParts->Draw();
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {

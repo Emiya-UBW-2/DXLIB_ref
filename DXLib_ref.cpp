@@ -507,6 +507,7 @@ namespace DXLib_ref {
 	//
 	void			DXDraw::Init(void) noexcept {
 		PostPassEffect::Create();						//シェーダー
+		SideLog::Create();
 		OptionWindowClass::Instance()->Init();
 		//
 		m_PopUpDrawClass.Set(LocalizePool::Instance()->Get(100), y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {

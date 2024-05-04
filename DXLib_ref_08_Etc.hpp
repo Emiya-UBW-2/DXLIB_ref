@@ -961,6 +961,70 @@ namespace DXLib_ref {
 	};
 
 	//--------------------------------------------------------------------------------------------------
+	// サイドログ
+	//--------------------------------------------------------------------------------------------------
+
+	class SideLog : public SingletonBase<SideLog> {
+	private:
+		friend class SingletonBase<SideLog>;
+	private:
+		class SideLogData {
+			unsigned int m_Color{0};
+			char m_Message[64]{};
+			float m_TimeMax{-1.f};
+			float m_Time{-1.f};
+			float m_Flip{0.f};
+			float m_Flip_Y{0.f};
+		public:
+			void AddFlip(float value) noexcept { m_Flip += value; }
+			template <typename... Args>
+			void SetData(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
+				snprintfDx(m_Message, 64, Mes, args...);
+				m_TimeMax = second;
+				m_Time = m_TimeMax;
+				m_Flip = 0.f;
+				m_Flip_Y = -1.f;
+				m_Color = Color;
+			}
+			void UpdateActive() noexcept {
+				if (m_Time > 0.f) {
+					float FPS = GetFrameRate();
+					m_Time -= 1.f / FPS;
+				}
+				else {
+					m_Time = -1.f;
+				}
+				Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
+			}
+		public:
+			const float GetFlip() { return m_Flip_Y; }
+			const float ActivePer() { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time)*5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
+			const char* GetMsg() { return m_Message; }
+			const unsigned int GetMsgColor() { return m_Color; }
+		};
+	private:
+		std::array<SideLogData, 16> data;
+		int LastSel{0};
+	public:
+		template <typename... Args>
+		void AddLog(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
+			for (auto& d : data) {
+				d.AddFlip(1.f);
+			}
+			data.at(LastSel).SetData(second, Color, Mes, args...);
+			++LastSel %= ((int)data.size());
+		}
+		void Update() noexcept {
+			for (auto& d : data) {
+				if (d.ActivePer() > 0.f) {
+					d.UpdateActive();
+				}
+			}
+		}
+		void Draw() noexcept;
+	};
+
+	//--------------------------------------------------------------------------------------------------
 	// ポップアップ
 	//--------------------------------------------------------------------------------------------------
 	class PopUpDrawClass {

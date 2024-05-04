@@ -38,20 +38,26 @@ namespace DXLib_ref {
 		GraphHandle SSRNormalScreen;	//法線のGバッファ
 		GraphHandle	SSRDepthScreen;	//深度のGバッファ
 		GraphHandle SSRScreen;		//描画スクリーン
+		GraphHandle SSRScreen0;		//描画スクリーン
+		GraphHandle SSRScreen1;		//描画スクリーン
 		GraphHandle SSRScreen2;		//描画スクリーン
 		GraphHandle bkScreen2;		//SSRぼかし
 		ShaderUseClass::ScreenVertex	m_SSRScreenVertex;				// 頂点データ
 		ShaderUseClass		m_SSR;										// シェーダー
 
-		int RayInterval = 500;//レイの分割間隔
+		int SP = 1;
+		int RayInterval = 150;//レイの分割間隔
 		float SSRScale = 12.5f;
-		float DepthThreshold = 1.8f;
+		float DepthThreshold = 10.f;
 
-		static const int SSREX = 2;
+		static const int SSREX = 4;
+		static const int SSREX2 = 8;
 	public:
 		PostPassSSR(void) {
 			auto* DrawParts = DXDraw::Instance();
 			SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, true);							//描画スクリーン
+			SSRScreen0 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, true);							//描画スクリーン
+			SSRScreen1 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX2, DrawParts->m_DispYSize / SSREX2, true);							//描画スクリーン
 			SSRScreen2 = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
 			{
 				bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);							//ふち黒
@@ -120,6 +126,26 @@ namespace DXLib_ref {
 					if (CheckHitKeyWithCheck(KEY_INPUT_6) != 0) {
 						DepthThreshold += 0.05f;
 					}
+
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD1) != 0) {
+						SP = 1;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD2) != 0) {
+						SP = 2;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD3) != 0) {
+						SP = 3;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD4) != 0) {
+						SP = 4;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD5) != 0) {
+						SP = 5;
+					}
+					if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD6) != 0) {
+						SP = 6;
+					}
+
 					DebugClass::Create();
 					printfDx("RayInterval   :%d\n", RayInterval);
 					printfDx("DepthThreshold:%f\n", DepthThreshold);
@@ -135,10 +161,23 @@ namespace DXLib_ref {
 					SetUseTextureToShader(1, -1);
 					SetUseTextureToShader(2, -1);
 				}
+				SSRScreen0.SetDraw_Screen();
+				{
+					int i = SP;
+					for (int x = -i;x <= i;x++) {
+						for (int y = -i;y <= i;y++) {
+							SSRScreen.DrawGraph(x, y, true);
+						}
+					}
+				}
+				//GraphBlend(SSRScreen0.get(), SSRScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+				//		   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_A);
+
+				GraphFilterBlt(SSRScreen0.get(), SSRScreen1.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX2 / SSREX);
 				SSRScreen2.SetDraw_Screen();
 				{
 					TargetGraph->DrawGraph(0, 0, true);
-					SSRScreen.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
+					SSRScreen1.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
 					//DrawBox_2D(0, 0, 1920, 1080, Red, TRUE);
 				}
 				GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
@@ -146,6 +185,8 @@ namespace DXLib_ref {
 				TargetGraph->SetDraw_Screen(false);
 				{
 					SSRScreen2.DrawGraph(0, 0, true);
+
+					//SSRScreen0.DrawExtendGraph(0, 0, DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, true);
 				}
 			}
 			if (OptionParts->GetParamBoolean(EnumSaveParam::bloom)) {
