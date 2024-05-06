@@ -180,6 +180,8 @@
     <ClInclude Include="DXLib_ref_09_KeyControl.hpp" />
     <ClInclude Include="DXLib_ref_100_PostPass.hpp" />
     <ClInclude Include="DXLib_ref_101_sequence.hpp" />
+    <ClInclude Include="DXLib_ref_102_ObjectManager.hpp" />
+    <ClInclude Include="DXLib_ref_103_ObjectBase.hpp" />
     <ClInclude Include="DXLib_ref_10_Option.hpp" />
     <ClInclude Include="DXLib_ref_20_Debug.hpp" />
     <ClInclude Include="DXLib_ref_30_Box2D.hpp" />
@@ -198,6 +200,8 @@
     <ClCompile Include="DXLib_ref_09_KeyControl.cpp" />
     <ClCompile Include="DXLib_ref_100_PostPass.cpp" />
     <ClCompile Include="DXLib_ref_101_sequence.cpp" />
+    <ClCompile Include="DXLib_ref_102_ObjectManager.cpp" />
+    <ClCompile Include="DXLib_ref_103_ObjectBase.cpp" />
     <ClCompile Include="DXLib_ref_10_Option.cpp" />
     <ClCompile Include="DXLib_ref_20_Debug.cpp" />
     <ClCompile Include="DXLib_ref_30_Box2D.cpp" />

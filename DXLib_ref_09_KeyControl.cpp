@@ -282,6 +282,7 @@ namespace DXLib_ref {
 			Reset();
 			//
 			Key.resize(Key.size() + 1);
+			//
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			for (int i = 0; i < KeyNum; i++) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
@@ -289,6 +290,7 @@ namespace DXLib_ref {
 					break;
 				}
 			}
+			AddGuide(PADS::INVENTORY, LocalizePool::Instance()->Get(9913));
 			//
 			Guide_Pad();
 		}
@@ -308,6 +310,11 @@ namespace DXLib_ref {
 				m_ControlType = NextControlType;
 				m_IsUpdate = true;
 				Load();
+				if (GetJoypadNum() > 0) {
+					auto* ItemLogParts = SideLog::Instance();
+					ItemLogParts->AddLog(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(298));
+					ItemLogParts->AddLog(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(299));
+				}
 			}
 		}
 		//ƒ^ƒCƒv‚É‡‚í‚¹‚½‘€ì

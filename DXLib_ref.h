@@ -162,6 +162,8 @@ namespace DXLib_ref {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 				BaseShadowHandle.DrawGraph(0, 0, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+				//DepthBaseScreenHandle.DrawExtendGraph(0, 0, 960, 960, false);
 			}
 		};
 	public:
@@ -296,3 +298,4 @@ namespace DXLib_ref {
 
 #include "DXLib_ref_100_PostPass.hpp"
 #include "DXLib_ref_101_sequence.hpp"
+#include "DXLib_ref_102_ObjectManager.hpp"

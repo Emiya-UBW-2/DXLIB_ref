@@ -304,14 +304,14 @@ namespace DXLib_ref {
 		DepthScreenHandle.SetDraw_Screen();
 		DepthBaseScreenHandle.SetDraw_Screen();
 		{
-			SetupCamera_Ortho(15.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
-			SetCameraNearFar(0.05f*12.5f, 30.f*12.5f);		// 描画する奥行き範囲をセット
+			SetupCamera_Ortho(30.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+			SetCameraNearFar(0.05f*12.5f, 60.f*12.5f);		// 描画する奥行き範囲をセット
 			// カメラの位置と注視点はステージ全体が見渡せる位置
 			auto Vec = m_ShadowVec;
 			if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
 				Vec.z = (0.1f);
 			}
-			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (15.f*12.5f)).get(), Center.get());
+			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f*12.5f)).get(), Center.get());
 
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
@@ -336,11 +336,11 @@ namespace DXLib_ref {
 		//後処理
 		//*
 		GraphFilter(BaseShadowHandle.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
-		GraphBlend(BaseShadowHandle.get(), BaseShadowHandle.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+		GraphBlend(BaseShadowHandle.get(), DepthBaseScreenHandle.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				   DX_RGBA_SELECT_SRC_G,    // 出力結果の赤成分は AlphaHandle の緑成分
 				   DX_RGBA_SELECT_SRC_G,    // 出力結果の緑成分は AlphaHandle の赤成分
 				   DX_RGBA_SELECT_SRC_G,    // 出力結果の青成分は AlphaHandle の青成分
-				   DX_RGBA_SELECT_BLEND_R    // 出力結果のアルファ成分は BlendHandle の赤成分
+				   DX_RGBA_SELECT_SRC_R    // 出力結果のアルファ成分は BlendHandle の赤成分
 		);
 		//*/
 	}
@@ -382,7 +382,7 @@ namespace DXLib_ref {
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-			SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
+			//SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
 		}
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync) ? TRUE : FALSE);	//垂直同期
@@ -432,6 +432,7 @@ namespace DXLib_ref {
 		OptionWindowClass::Create();
 		PadControl::Create();
 		SaveDataClass::Create();
+		ObjectManager::Create();
 
 		auto* SE = SoundPool::Instance();
 		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
