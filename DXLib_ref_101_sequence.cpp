@@ -74,7 +74,7 @@ namespace DXLib_ref {
 		this->m_ScenesPtr->Draw();
 		//デバッグ
 		{
-			FPSAvgs.at(m_FPSAvg) = GetFPS();
+			FPSAvgs.at(m_FPSAvg) = DrawParts->GetFps();
 			++m_FPSAvg %= ((int)FPSAvgs.size());
 
 			float Avg = 0.f;

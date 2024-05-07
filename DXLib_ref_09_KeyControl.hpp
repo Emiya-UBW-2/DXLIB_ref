@@ -785,4 +785,66 @@ namespace DXLib_ref {
 		void Draw() const noexcept;
 		void Dispose(void) noexcept;
 	};
+
+	//“ü—Í
+	class InputControl {
+	private:
+		float			m_AddxRad{0.f};
+		float			m_AddyRad{0.f};
+		unsigned long long	m_Flags{0};
+	public:
+		void			ResetKeyInput() {
+			this->m_Flags = 0;
+		}
+		void			ResetAllInput() {
+			this->m_AddxRad = 0.f;
+			this->m_AddyRad = 0.f;
+			this->m_Flags = 0;
+		}
+		void			SetInputStart(float pAddxRad, float pAddyRad) {
+			this->m_AddxRad = pAddxRad;
+			this->m_AddyRad = pAddyRad;
+			this->m_Flags = 0;
+		}
+		void			SetInputPADS(PADS select, bool value) {
+			if (value) { this->m_Flags |= ((unsigned long long)1 << (0 + (int)select)); }
+		}
+
+		void			SetAddxRad(float AddxRad) { this->m_AddxRad = AddxRad; }
+		void			SetAddyRad(float AddyRad) { this->m_AddyRad = AddyRad; }
+		void			SetKeyInputFlags(const InputControl& o) { this->m_Flags = o.m_Flags; }
+
+		const auto&		GetAddxRad(void) const noexcept { return this->m_AddxRad; }
+		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
+
+		const auto	GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + (int)select))) != 0; }
+
+		const auto operator+(const InputControl& o) const noexcept {
+			InputControl tmp;
+			tmp.m_AddxRad = this->m_AddxRad + o.m_AddxRad;
+			tmp.m_AddyRad = this->m_AddyRad + o.m_AddyRad;
+			tmp.m_Flags = this->m_Flags;
+			return tmp;
+		}
+		const auto operator-(const InputControl& o) const noexcept {
+			InputControl tmp;
+			tmp.m_AddxRad = this->m_AddxRad - o.m_AddxRad;
+			tmp.m_AddyRad = this->m_AddyRad - o.m_AddyRad;
+			tmp.m_Flags = this->m_Flags;
+			return tmp;
+		}
+		const auto operator*(float per) const noexcept {
+			InputControl tmp;
+			tmp.m_AddxRad = this->m_AddxRad *per;
+			tmp.m_AddyRad = this->m_AddyRad *per;
+			tmp.m_Flags = this->m_Flags;
+			return tmp;
+		}
+
+		void operator=(const InputControl& o) noexcept {
+			this->m_AddxRad = o.m_AddxRad;
+			this->m_AddyRad = o.m_AddyRad;
+			this->m_Flags = o.m_Flags;
+		}
+	};
 };

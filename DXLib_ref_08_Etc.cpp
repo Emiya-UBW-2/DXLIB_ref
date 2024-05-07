@@ -6,6 +6,15 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
+	float GetEasingRatio(EasingType EasingType, float ratio) {
+		auto* DrawParts = DXDraw::Instance();
+		switch (EasingType) {
+			case DXLib_ref::EasingType::OutExpo:
+				return (1.f - std::powf(ratio, 60.f / DrawParts->GetFps()));
+			default:
+				return 1.f;
+		}
+	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
 		int ScrX = y_r(1920);
 		int ScrY = y_r(1080);
@@ -57,19 +66,19 @@ namespace DXLib_ref {
 		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
 			auto* DrawParts = DXDraw::Instance();
 			*yp1 = *yp1 + (yp2 - *yp1) / 2;
-			if ((*yp1 - size / 2) > DrawParts->m_DispYSize || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
+			if ((*yp1 - size / 2) > DrawParts->GetDispYSize() || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
 			switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
 					*xp1 = *xp1 + y_r(6);
-					if ((*xp1) > DrawParts->m_DispXSize || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
+					if ((*xp1) > DrawParts->GetDispXSize() || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::MIDDLE:
 					*xp1 = *xp1 + (xp2 - *xp1) / 2;
-					if ((*xp1 - xSize / 2) > DrawParts->m_DispXSize || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
+					if ((*xp1 - xSize / 2) > DrawParts->GetDispXSize() || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::RIGHT:
 					*xp1 = xp2 - y_r(6);
-					if ((*xp1 - xSize) > DrawParts->m_DispXSize || (*xp1) < 0) { return false; }						//画面外は表示しない
+					if ((*xp1 - xSize) > DrawParts->GetDispXSize() || (*xp1) < 0) { return false; }						//画面外は表示しない
 					break;
 				default:
 					break;
@@ -127,6 +136,53 @@ namespace DXLib_ref {
 		}
 	};
 	//
+	void			moves::Update_Physics(float speed_randam, float rate) {
+		auto* DrawParts = DXDraw::Instance();
+		this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
+		this->vec.y += M_GR / powf((DrawParts->GetFps() / rate), 2.f);
+
+		//this->gun_m.pos += this->gun_m.vec;
+		//this->gun_m.vec.yadd(M_GR / std::powf(DrawParts->GetFps(), 2.f));
+	}
+	void			switchs::Execute(bool key) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		m_press = key;
+		if (m_press) {
+			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
+
+			m_repeat = trigger();
+			m_repeatcount -= 60.f / DrawParts->GetFps();
+			if (m_repeatcount <= 0.f) {
+				m_repeatcount += 2.f;
+				m_repeat = true;
+			}
+		}
+		else {
+			m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
+
+			m_repeat = false;
+			m_repeatcount = 30.f;
+		}
+		if (trigger()) {
+			m_on ^= 1;
+		}
+	}
+	void			Pendulum2D::Update() {
+		auto* DrawParts = DXDraw::Instance();
+		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / DrawParts->GetFps();
+		m_rad += this->m_vel / DrawParts->GetFps();
+	}
+	//
+	void SideLog::SideLogData::UpdateActive() noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		if (m_Time > 0.f) {
+			m_Time -= 1.f / DrawParts->GetFps();
+		}
+		else {
+			m_Time = -1.f;
+		}
+		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
+	}
 	void SideLog::Draw() noexcept {
 		auto* Fonts = FontPool::Instance();
 

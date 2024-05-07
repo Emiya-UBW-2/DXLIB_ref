@@ -80,7 +80,7 @@ namespace DXLib_ref {
 				SetParamFloat(EnumSaveParam::Ysensing, 0.5f);
 				SetParamBoolean(EnumSaveParam::HeadBobbing, true);
 				SetParamBoolean(EnumSaveParam::EnableCheck, true);
-				SetParamInt(EnumSaveParam::ControlType, 1);
+				SetParamInt(EnumSaveParam::ControlType, 2);
 				SetParamBoolean(EnumSaveParam::EX_UI, true);
 				SetParamBoolean(EnumSaveParam::EX_UI2, true);
 				SetParamBoolean(EnumSaveParam::AA, true);

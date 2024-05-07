@@ -166,9 +166,14 @@ namespace DXLib_ref {
 				//DepthBaseScreenHandle.DrawExtendGraph(0, 0, 960, 960, false);
 			}
 		};
-	public:
+	private:
 		int							m_DispXSize{deskx};
 		int							m_DispYSize{desky};
+		float						m_FPS{60.f};
+	public:
+		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
+		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
+		const auto&		GetFps(void) const noexcept { return m_FPS; }
 	private:
 		switchs						m_PauseActive;
 		LONGLONG					m_StartTime{0};

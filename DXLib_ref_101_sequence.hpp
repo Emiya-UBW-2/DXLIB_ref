@@ -49,7 +49,7 @@ namespace DXLib_ref {
 
 		virtual void BG_Draw_Sub(void) noexcept {
 			auto* DrawParts = DXDraw::Instance();
-			DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispXSize, Gray25, TRUE);
+			DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Gray25, TRUE);
 		}
 		virtual void Depth_Draw_Sub(void) noexcept {}
 		virtual void MainDraw_Sub(void) noexcept {}

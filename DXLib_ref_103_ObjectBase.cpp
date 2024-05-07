@@ -167,6 +167,7 @@ namespace DXLib_ref {
 	}
 	//
 	void			ObjectBaseClass::ExecuteCommon(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
@@ -182,17 +183,16 @@ namespace DXLib_ref {
 				this->GetObj().PhysicsResetState();
 			}
 			else {
-				float FPS = GetFrameRate();
 				auto NowMat = this->GetObj().GetMatrix();
 				int Max = 2;
-				if (FPS > 120.f) {
+				if (DrawParts->GetFps() > 120.f) {
 					Max = 1;
 				}
 				for (int i = 0; i < Max; i++) {
 					this->GetObj().SetMatrix(
 						Lerp_Matrix(this->m_PrevMat.rotation(), NowMat.rotation(), (float)(i + 1) / (float)Max)
 						* Matrix4x4DX::Mtrans(Lerp(this->m_PrevMat.pos(), NowMat.pos(), (float)(i + 1) / (float)Max)));
-					this->GetObj().PhysicsCalculation(1000.0f *60.f / FPS / Max);
+					this->GetObj().PhysicsCalculation(1000.0f *60.f / DrawParts->GetFps() / Max);
 				}
 			}
 		}

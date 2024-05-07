@@ -2,16 +2,13 @@
 #include "DXLib_ref.h"
 
 //リサイズ
-#define x_r(p1) (int(p1) * DXDraw::Instance()->m_DispXSize / 1920)
-#define y_r(p1) (int(p1) * DXDraw::Instance()->m_DispYSize / 1080)
+#define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / 1920)
+#define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / 1080)
 
 #define EdgeSize	y_r(2)
 #define LineHeight	y_r(18)
 
 namespace DXLib_ref {
-	//
-	static float GetFrameRate() noexcept { return std::max(GetFPS(), 30.f); }
-
 	//--------------------------------------------------------------------------------------------------
 	// 補完
 	//--------------------------------------------------------------------------------------------------
@@ -20,6 +17,7 @@ namespace DXLib_ref {
 		OutExpo,
 	};
 	//線形補完
+	extern float GetEasingRatio(EasingType EasingType, float ratio);
 	template <class T>
 	static T Lerp(const T& A, const T& B, float Per) noexcept {
 		if (Per == 0.f) {
@@ -34,13 +32,7 @@ namespace DXLib_ref {
 	}
 	template <class T>
 	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) {
-		switch (EasingType) {
-			case DXLib_ref::EasingType::OutExpo:
-				*A = Lerp(*A, B, (1.f - std::powf(ratio, 60.f / GetFrameRate())));
-				break;
-			default:
-				break;
-		}
+		*A = Lerp(*A, B, GetEasingRatio(EasingType, ratio));
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*関数																																		*/
@@ -54,13 +46,7 @@ namespace DXLib_ref {
 	}
 	//Matrix版のイージング
 	static void Easing_Matrix(Matrix4x4DX* A, const Matrix4x4DX& B, float ratio, EasingType EasingType) noexcept {
-		switch (EasingType) {
-			case DXLib_ref::EasingType::OutExpo:
-				*A = Lerp_Matrix(*A, B, (1.f - std::powf(ratio, 60.f / GetFrameRate())));
-				break;
-			default:
-				break;
-		}
+		*A = Lerp_Matrix(*A, B, GetEasingRatio(EasingType, ratio));
 	}
 	//クリップボードに画像をコピー
 	static const auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
@@ -590,13 +576,7 @@ namespace DXLib_ref {
 			this->repos = this->posbuf;
 		}
 
-		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f) {
-			this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
-			this->vec.y+= M_GR / powf((GetFrameRate() / rate), 2.f);
-
-			//this->gun_m.pos += this->gun_m.vec;
-			//this->gun_m.vec.yadd(M_GR / std::powf(GetFrameRate(), 2.f));
-		}
+		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f);
 
 		void			HitGround(const MV1_COLL_RESULT_POLY& colres, float hight) {//0.005f
 			this->pos = Vector3DX(colres.HitPosition) + Vector3DX(colres.Normal)*hight;
@@ -621,28 +601,7 @@ namespace DXLib_ref {
 		//使用前の用意
 		void			Set(bool on) noexcept { m_on = on; }
 		//更新
-		void			Execute(bool key) noexcept {
-			m_press = key;
-			if (m_press) {
-				m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
-
-				m_repeat = trigger();
-				m_repeatcount -= 60.f / GetFrameRate();
-				if (m_repeatcount <= 0.f) {
-					m_repeatcount += 2.f;
-					m_repeat = true;
-				}
-			}
-			else {
-				m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
-
-				m_repeat = false;
-				m_repeatcount = 30.f;
-			}
-			if (trigger()) {
-				m_on ^= 1;
-			}
-		}
+		void			Execute(bool key) noexcept;
 		//オンオフの取得
 		const bool on(void) const noexcept { return m_on; }
 		//押した瞬間
@@ -671,11 +630,7 @@ namespace DXLib_ref {
 			m_rad = rad;
 			m_vel = 0.f;
 		}
-		void Update() {
-			float FPS = GetFrameRate();
-			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / FPS;
-			m_rad += this->m_vel / FPS;
-		}
+		void Update();
 	public:
 		const auto GetRad() const noexcept { return this->m_rad; }
 		void AddRad(float value) noexcept { this->m_rad += value; }
@@ -986,16 +941,7 @@ namespace DXLib_ref {
 				m_Flip_Y = -1.f;
 				m_Color = Color;
 			}
-			void UpdateActive() noexcept {
-				if (m_Time > 0.f) {
-					float FPS = GetFrameRate();
-					m_Time -= 1.f / FPS;
-				}
-				else {
-					m_Time = -1.f;
-				}
-				Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
-			}
+			void UpdateActive() noexcept;
 		public:
 			const float GetFlip() { return m_Flip_Y; }
 			const float ActivePer() { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time)*5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }

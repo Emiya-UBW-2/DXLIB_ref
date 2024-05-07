@@ -47,21 +47,7 @@ namespace DXLib_ref {
 				this->alltime = MV1GetAttachAnimTotalTime(model->get(), this->handle);
 			}
 
-			void Update(const bool& loop, float speed) {
-				this->time += 30.f / GetFPS()*speed;
-				if (loop) {
-					if (speed >= 0.f) {
-						if (this->time >= this->alltime) {
-							this->time = 0.f;
-						}
-					}
-					else {
-						if (this->time <= 0.f) {
-							this->time = this->alltime;
-						}
-					}
-				}
-			}
+			void Update(const bool& loop, float speed);
 
 			//void update_(void) noexcept {
 				//MV1SetAttachAnimTime(this->handle_, a.handle, a.time);

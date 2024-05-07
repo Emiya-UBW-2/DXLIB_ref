@@ -36,6 +36,7 @@ namespace DXLib_ref {
 		}
 	}
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		int DrawCall = GetDrawCallCount();
 		auto PMax = PointMax + 1;
 		SetPoint("End");
@@ -53,7 +54,7 @@ namespace DXLib_ref {
 				m_Point[0][index] = m_Point[0][m_PointSel - 1];
 			}
 			if (index == PointMax) {
-				m_Point[0][index].first = 1000.0f / GetFPS();
+				m_Point[0][index].first = 1000.0f / DrawParts->GetFps();
 			}
 			for (int j = (int)(m_Point.size() - 1); j >= 1; --j) {
 				m_Point[j][index] = m_Point[j - 1][index];
@@ -86,7 +87,7 @@ namespace DXLib_ref {
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
 			"Drawcall   :%d", DrawCall); yp_f += FontSize;
 		Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp_f + 2, yp_f, White, black,
-			"FPS        :%5.2f fps", GetFPS()); yp_f += FontSize;
+			"FPS        :%5.2f fps", DrawParts->GetFps()); yp_f += FontSize;
 		for (int index = 0; index < PMax; ++index) {
 			if (m_PointSel - 1 >= index || index == PointMax) {
 				if (index == 0) {

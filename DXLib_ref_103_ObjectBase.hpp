@@ -71,13 +71,13 @@ namespace DXLib_ref {
 		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
 		void			SetShaderTexHandle(int id, int value) noexcept { this->m_ShaderTex[id] = value; }
 		void			SetAnimOnce(int ID, float speed) {
-			float FPS = GetFrameRate();
-			this->GetObj().get_anime(ID).time += 30.f / FPS * speed;
+			auto* DrawParts = DXDraw::Instance();
+			this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
 			if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoEnd(); }
 		}
 		void			SetAnimLoop(int ID, float speed) {
-			float FPS = GetFrameRate();
-			this->GetObj().get_anime(ID).time += 30.f / FPS * speed;
+			auto* DrawParts = DXDraw::Instance();
+			this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
 			if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoStart(); }
 		}
 		void			ResetMove(const Matrix4x4DX& mat, const Vector3DX& pos) noexcept {

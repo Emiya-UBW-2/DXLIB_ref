@@ -355,7 +355,7 @@ namespace DXLib_ref {
 					}
 					//右スティック
 					{
-						int mx = DrawParts->m_DispXSize / 2, my = DrawParts->m_DispYSize / 2;
+						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
 						MouseX = mx;
 						MouseY = my;
@@ -413,7 +413,7 @@ namespace DXLib_ref {
 					}
 					//右スティック
 					{
-						int mx = DrawParts->m_DispXSize / 2, my = DrawParts->m_DispYSize / 2;
+						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
 						MouseX = mx;
 						MouseY = my;
@@ -441,7 +441,7 @@ namespace DXLib_ref {
 			case DXLib_ref::ControlType::PC:
 				//右スティック
 				{
-					int mx = DrawParts->m_DispXSize / 2, my = DrawParts->m_DispYSize / 2;
+					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 					GetMousePoint(&mx, &my);
 					MouseX = mx;
 					MouseY = my;
@@ -452,11 +452,11 @@ namespace DXLib_ref {
 						}
 						else {
 							if (!DrawParts->IsPause()) {
-								SetMousePoint(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2);
+								SetMousePoint(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2);
 								SetMouseDispFlag(FALSE);
 								auto* OptionParts = OPTION::Instance();
-								Look_XradAdd = std::clamp((float)(MouseX - DrawParts->m_DispXSize / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-								Look_YradAdd = std::clamp(-(float)(MouseY - DrawParts->m_DispYSize / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+								Look_XradAdd = std::clamp((float)(MouseX - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+								Look_YradAdd = std::clamp(-(float)(MouseY - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 							}
 							else {
 								SetMouseDispFlag(TRUE);

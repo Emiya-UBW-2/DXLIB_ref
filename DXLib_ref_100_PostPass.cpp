@@ -55,19 +55,19 @@ namespace DXLib_ref {
 	public:
 		PostPassSSR(void) {
 			auto* DrawParts = DXDraw::Instance();
-			SSRScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, true);							//描画スクリーン
-			SSRScreen0 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, true);							//描画スクリーン
-			SSRScreen1 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX2, DrawParts->m_DispYSize / SSREX2, true);							//描画スクリーン
-			SSRScreen2 = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+			SSRScreen = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, true);							//描画スクリーン
+			SSRScreen0 = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, true);							//描画スクリーン
+			SSRScreen1 = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX2, DrawParts->GetDispYSize() / SSREX2, true);							//描画スクリーン
+			SSRScreen2 = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 			{
-				bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);							//ふち黒
+				bkScreen2 = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, false);							//ふち黒
 				bkScreen2.SetDraw_Screen(true);
 				{
-					int xr = DrawParts->m_DispXSize / SSREX * 30 / 100;
-					int yr = DrawParts->m_DispYSize / SSREX * 60 / 100;
+					int xr = DrawParts->GetDispXSize() / SSREX * 30 / 100;
+					int yr = DrawParts->GetDispYSize() / SSREX * 60 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, Black, TRUE);
-					DrawOval(DrawParts->m_DispXSize / SSREX / 2, DrawParts->m_DispYSize / SSREX / 2, xr, yr, White, TRUE);
+					DrawBox_2D(0, 0, DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, Black, TRUE);
+					DrawOval(DrawParts->GetDispXSize() / SSREX / 2, DrawParts->GetDispYSize() / SSREX / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -75,13 +75,13 @@ namespace DXLib_ref {
 					for (r = 0; r < 255; r += p) {
 						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
 
-						DrawOval(DrawParts->m_DispXSize / SSREX / 2, DrawParts->m_DispYSize / SSREX / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(DrawParts->GetDispXSize() / SSREX / 2, DrawParts->GetDispYSize() / SSREX / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
 				}
 			}
 			{
-				SSRColorScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);
-				SSRNormalScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);			// 法線
+				SSRColorScreen = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, false);
+				SSRNormalScreen = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, false);			// 法線
 				{
 					// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
 					auto prevMip = GetCreateDrawValidGraphChannelNum();
@@ -90,13 +90,13 @@ namespace DXLib_ref {
 					SetCreateDrawValidGraphChannelNum(2);
 					SetDrawValidFloatTypeGraphCreateFlag(TRUE);
 					SetCreateGraphChannelBitDepth(32);
-					SSRDepthScreen = GraphHandle::Make(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX, false);
+					SSRDepthScreen = GraphHandle::Make(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX, false);
 					SetCreateDrawValidGraphChannelNum(prevMip);
 					SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
 					SetCreateGraphChannelBitDepth(prevBit);
 				}
 			}
-			m_SSRScreenVertex.SetScreenVertex(DrawParts->m_DispXSize / SSREX, DrawParts->m_DispYSize / SSREX);	// 頂点データの準備
+			m_SSRScreenVertex.SetScreenVertex(DrawParts->GetDispXSize() / SSREX, DrawParts->GetDispYSize() / SSREX);	// 頂点データの準備
 			m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		}
 		~PostPassSSR(void) {
@@ -177,7 +177,7 @@ namespace DXLib_ref {
 				SSRScreen2.SetDraw_Screen();
 				{
 					TargetGraph->DrawGraph(0, 0, true);
-					SSRScreen1.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
+					SSRScreen1.DrawExtendGraph(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);
 					//DrawBox_2D(0, 0, 1920, 1080, Red, TRUE);
 				}
 				GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
@@ -186,7 +186,7 @@ namespace DXLib_ref {
 				{
 					SSRScreen2.DrawGraph(0, 0, true);
 
-					//SSRScreen0.DrawExtendGraph(0, 0, DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, true);
+					//SSRScreen0.DrawExtendGraph(0, 0, DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, true);
 				}
 			}
 			if (OptionParts->GetParamBoolean(EnumSaveParam::bloom)) {
@@ -204,8 +204,8 @@ namespace DXLib_ref {
 	public:
 		PostPassDoF(void) {
 			auto* DrawParts = DXDraw::Instance();
-			DoFScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
-			m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);							// 頂点データの準備
+			DoFScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetDispXSize(), DrawParts->GetDispYSize());							// 頂点データの準備
 			m_DoF.Init("shader/VS_DoF.vso", "shader/PS_DoF.pso");					// DoF
 		}
 		~PostPassDoF(void) {
@@ -224,7 +224,7 @@ namespace DXLib_ref {
 						SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
 						SetUseTextureToShader(1, DoFScreen.get());
 						SetUseTextureToShader(2, m_DepthScreenPtr->get());
-						m_DoF.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+						m_DoF.SetPixelDispSize(DrawParts->GetDispXSize(), DrawParts->GetDispYSize());
 						m_DoF.SetPixelParam(3, PostPassParts->Get_near_DoF(), PostPassParts->Get_far_DoF(), PostPassParts->Get_near_DoFMax(), PostPassParts->Get_far_DoFMin());
 						{
 							m_DoF.Draw(m_ScreenVertex);
@@ -244,8 +244,8 @@ namespace DXLib_ref {
 	public:
 		PostPassBloom(void) {
 			auto* DrawParts = DXDraw::Instance();
-			GaussScreen_ = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, true);
-			BufScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+			GaussScreen_ = GraphHandle::Make(DrawParts->GetDispXSize() / EXTEND, DrawParts->GetDispYSize() / EXTEND, true);
+			BufScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 		}
 		~PostPassBloom(void) {
 			GaussScreen_.Dispose();
@@ -264,8 +264,8 @@ namespace DXLib_ref {
 				{
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
 					SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-					GaussScreen_.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
-					GaussScreen_.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);
+					GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);
+					GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);
 					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 				}
 			}
@@ -278,7 +278,7 @@ namespace DXLib_ref {
 		PostPassAberration(void) {
 			auto* DrawParts = DXDraw::Instance();
 			for (auto&buf : BufScreen) {
-				buf = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+				buf = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 			}
 		}
 		~PostPassAberration(void) {
@@ -292,11 +292,11 @@ namespace DXLib_ref {
 			if (OptionParts->GetParamBoolean(EnumSaveParam::aberration)) {
 				auto* DrawParts = DXDraw::Instance();
 				BufScreen[0].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+				DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
 				BufScreen[1].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+				DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
 				BufScreen[2].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+				DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
 				GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 				GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
@@ -306,11 +306,11 @@ namespace DXLib_ref {
 				//output_high = 255;
 				TargetGraph->SetDraw_Screen(true);
 				{
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+					DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
 					SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-					BufScreen[0].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
-					BufScreen[1].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f, 0.f, true);
-					BufScreen[2].DrawRotaGraph(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, 1.f - 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
+					BufScreen[0].DrawRotaGraph(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
+					BufScreen[1].DrawRotaGraph(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, 1.f, 0.f, true);
+					BufScreen[2].DrawRotaGraph(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, 1.f - 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
 					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 				}
 			}
@@ -331,7 +331,7 @@ namespace DXLib_ref {
 				auto* DrawParts = DXDraw::Instance();
 
 				for (int i = 0; i < MAX; ++i) {
-					m_screen[i] = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+					m_screen[i] = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize());
 				}
 				m_current = 0;
 				m_alpha = t_alpha;
@@ -359,7 +359,7 @@ namespace DXLib_ref {
 						int drawMode = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
-						m_screen[next].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->m_DispXSize + m_offsetX2, DrawParts->m_DispYSize + offsetY2, false);
+						m_screen[next].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->GetDispXSize() + m_offsetX2, DrawParts->GetDispYSize() + offsetY2, false);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 						SetDrawMode(drawMode);
 					}
@@ -400,16 +400,16 @@ namespace DXLib_ref {
 	public:
 		PostPassCornerBlur(void) {
 			auto* DrawParts = DXDraw::Instance();
-			AberrationScreen = GraphHandle::Make(DrawParts->m_DispXSize / EXTEND, DrawParts->m_DispYSize / EXTEND, true);	//描画スクリーン
+			AberrationScreen = GraphHandle::Make(DrawParts->GetDispXSize() / EXTEND, DrawParts->GetDispYSize() / EXTEND, true);	//描画スクリーン
 			{
-				bkScreen2 = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);							//ふち黒
+				bkScreen2 = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);							//ふち黒
 				bkScreen2.SetDraw_Screen(true);
 				{
-					int xr = DrawParts->m_DispXSize * 60 / 100;
-					int yr = DrawParts->m_DispYSize * 70 / 100;
+					int xr = DrawParts->GetDispXSize() * 60 / 100;
+					int yr = DrawParts->GetDispYSize() * 70 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
-					DrawOval(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, xr, yr, White, TRUE);
+					DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
+					DrawOval(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -417,11 +417,11 @@ namespace DXLib_ref {
 					for (r = 0; r < 255; r += p) {
 						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
 
-						DrawOval(DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
 				}
 			}
-			BufScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+			BufScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 		}
 		~PostPassCornerBlur(void) {
 			AberrationScreen.Dispose();
@@ -445,7 +445,7 @@ namespace DXLib_ref {
 					DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 				TargetGraph->SetDraw_Screen(false);
 				{
-					AberrationScreen.DrawExtendGraph(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
+					AberrationScreen.DrawExtendGraph(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);
 					BufScreen.DrawGraph(0, 0, true);
 				}
 			}
@@ -460,25 +460,25 @@ namespace DXLib_ref {
 			auto* DrawParts = DXDraw::Instance();
 			//auto* OptionParts = OPTION::Instance();
 			{
-				bkScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);							//ふち黒
+				bkScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);							//ふち黒
 				bkScreen.SetDraw_Screen(true);
 				{
 					int y = 0, c = 0, p = 2;
-					DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, White, TRUE);
+					DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), White, TRUE);
 
 					p = 1;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f)*64.f);
-						DrawLine_2D(0, y / p, DrawParts->m_DispXSize, y / p, GetColor(c, c, c));
+						DrawLine_2D(0, y / p, DrawParts->GetDispXSize(), y / p, GetColor(c, c, c));
 					}
 					p = 2;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f)*128.f);
-						DrawLine_2D(0, DrawParts->m_DispYSize - y / p, DrawParts->m_DispXSize, DrawParts->m_DispYSize - y / p, GetColor(c, c, c));
+						DrawLine_2D(0, DrawParts->GetDispYSize() - y / p, DrawParts->GetDispXSize(), DrawParts->GetDispYSize() - y / p, GetColor(c, c, c));
 					}
 				}
 			}
-			BufScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+			BufScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 		}
 		~PostPassVignette(void) {
 			BufScreen.Dispose();
@@ -496,7 +496,7 @@ namespace DXLib_ref {
 
 			TargetGraph->SetDraw_Screen();
 			{
-				DrawBox_2D(0, 0, DrawParts->m_DispXSize, DrawParts->m_DispYSize, Black, TRUE);
+				DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Black, TRUE);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
@@ -508,7 +508,7 @@ namespace DXLib_ref {
 	public:
 		PostPassDistortion(void) {
 			auto* DrawParts = DXDraw::Instance();
-			BufScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);							//描画スクリーン
+			BufScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);							//描画スクリーン
 		}
 		~PostPassDistortion(void) {
 			BufScreen.Dispose();
@@ -621,8 +621,8 @@ namespace DXLib_ref {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Vert->pos.x + AbsorptionMoveX) / DrawParts->m_DispXSize;
-					Vert->v = (Vert->pos.y + AbsorptionMoveY) / DrawParts->m_DispYSize;
+					Vert->u = (Vert->pos.x + AbsorptionMoveX) / DrawParts->GetDispXSize();
+					Vert->v = (Vert->pos.y + AbsorptionMoveY) / DrawParts->GetDispYSize();
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -658,8 +658,8 @@ namespace DXLib_ref {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Cos * GraphCenterDistance + CenterX) / DrawParts->m_DispXSize;
-					Vert->v = (Sin * GraphCenterDistance + CenterY) / DrawParts->m_DispYSize;
+					Vert->u = (Cos * GraphCenterDistance + CenterX) / DrawParts->GetDispXSize();
+					Vert->v = (Sin * GraphCenterDistance + CenterY) / DrawParts->GetDispYSize();
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -683,8 +683,8 @@ namespace DXLib_ref {
 			{
 				// 画面を歪ませて描画
 				DrawCircleScreen(
-					DrawParts->m_DispXSize / 2, DrawParts->m_DispYSize / 2,	// 中心座標
-					(float)(DrawParts->m_DispXSize * 2 / 3),	// 円のサイズ
+					DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2,	// 中心座標
+					(float)(DrawParts->GetDispXSize() * 2 / 3),	// 円のサイズ
 					120.0f,	// 内側に引き込まれるドット数
 					BufScreen);
 				//BufScreen.DrawGraph(0, 0, true);
@@ -699,7 +699,7 @@ namespace DXLib_ref {
 	public:
 		PostPassFXAA(void) {
 			auto* DrawParts = DXDraw::Instance();
-			m_ScreenVertex.SetScreenVertex(DrawParts->m_DispXSize, DrawParts->m_DispYSize);							// 頂点データの準備
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetDispXSize(), DrawParts->GetDispYSize());							// 頂点データの準備
 			m_FXAA.Init("shader/FXAA_VS.vso", "shader/FXAA_PS.pso");					// FXAA
 		}
 		~PostPassFXAA(void) {}
@@ -712,7 +712,7 @@ namespace DXLib_ref {
 				TargetGraph->SetDraw_Screen();
 				{
 					SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
-					m_FXAA.SetPixelDispSize(DrawParts->m_DispXSize, DrawParts->m_DispYSize);
+					m_FXAA.SetPixelDispSize(DrawParts->GetDispXSize(), DrawParts->GetDispYSize());
 					{
 						m_FXAA.Draw(m_ScreenVertex);
 					}
@@ -728,14 +728,14 @@ namespace DXLib_ref {
 	//
 	PostPassEffect::PostPassEffect(void) {
 		auto* DrawParts = DXDraw::Instance();
-		FarScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);		//描画スクリーン
-		NearScreen_ = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, true);		//描画スクリーン
-		MAIN_Screen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);		//最終描画用
+		FarScreen_ = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);		//描画スクリーン
+		NearScreen_ = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), true);		//描画スクリーン
+		MAIN_Screen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);		//最終描画用
 		//Gバッファ
 		auto* OptionParts = OPTION::Instance();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-			ColorScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
-			NormalScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);	// 法線Gバッファ
+			ColorScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);
+			NormalScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);	// 法線Gバッファ
 			{
 				// 深度を描画するテクスチャGバッファの作成( 2チャンネル浮動小数点32ビットテクスチャ )
 				auto prevMip = GetCreateDrawValidGraphChannelNum();
@@ -744,7 +744,7 @@ namespace DXLib_ref {
 				SetCreateDrawValidGraphChannelNum(2);
 				SetDrawValidFloatTypeGraphCreateFlag(TRUE);
 				SetCreateGraphChannelBitDepth(32);
-				DepthScreen = GraphHandle::Make(DrawParts->m_DispXSize, DrawParts->m_DispYSize, false);
+				DepthScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);
 				SetCreateDrawValidGraphChannelNum(prevMip);
 				SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
 				SetCreateGraphChannelBitDepth(prevBit);
