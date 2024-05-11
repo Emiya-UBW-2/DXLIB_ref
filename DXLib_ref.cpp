@@ -408,11 +408,9 @@ namespace DXLib_ref {
 		//MV1SetLoadModelPhysicsWorldGravity(M_GR);					//重力
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			int DPI = 96;
-			if (IsWindows10OrGreater()) {
-				//DPI = GetDpiForWindow(GetMainWindowHandle());
-				if (DPI == 0) {
-					//強制終了
-				}
+			if (SetProcessDPIAware() != 0) {
+				auto hdc = GetDC(nullptr);                 // カレントのスクリーン全体のデバイスコンテキスト取得.
+				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
 			}
 			SetWindowSize(deskx * DPI / 96, desky * DPI / 96);
 			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
