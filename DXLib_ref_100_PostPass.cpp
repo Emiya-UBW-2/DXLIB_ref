@@ -855,15 +855,39 @@ namespace DXLib_ref {
 			   });
 		//fovを記憶しておく
 		fov = cams.GetCamFov();
-
+		//ソフトシャドウ重ね
 		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			Plus_Draw([&]() {
-				DrawParts->GetShadowAfterDraw();
-									 });
-
+			NearScreen_.SetDraw_Screen(false);
+			{
+				DrawParts->DrawAfterShadow();
+			}
 		}
-		//ポストパスエフェクトの適用
-		SetPostpassEffect();
+		//色味補正
+		{
+			int output_low = 0;
+			int output_high = 255;
+			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
+		}
+		//ポストパスエフェクトのbufに描画
+		for (auto& P : m_PostPass) {
+			if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
+				ColorScreen.SetDraw_Screen();
+				{
+					NearScreen_.DrawGraph(0, 0, false);
+				}
+			}
+			P->SetEffect(&NearScreen_, &ColorScreen);
+		}
+		//ポストパスエフェクトの結果描画
+		MAIN_Screen.SetDraw_Screen();
+		{
+			SetDrawBright(r_brt, g_brt, b_brt);
+			NearScreen_.DrawGraph(0, 0, false);
+			SetDrawBright(255, 255, 255);
+
+			//NormalScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
+			//DepthScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
+		}
 	}
 	//
 	void PostPassEffect::Plus_Draw(std::function<void()> doing) noexcept {
@@ -875,38 +899,6 @@ namespace DXLib_ref {
 		MAIN_Screen.SetDraw_Screen();
 		{
 			NearScreen_.DrawGraph(0, 0, false);
-		}
-	}
-	//
-	void PostPassEffect::SetPostpassEffect(void) noexcept {
-		//色味補正
-		{
-			int output_low = 0;
-			int output_high = 255;
-			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
-		}
-		//bufに描画
-		/**/
-		auto* OptionParts = OPTION::Instance();
-		for (auto& P : m_PostPass) {
-			if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-				ColorScreen.SetDraw_Screen();
-				{
-					NearScreen_.DrawGraph(0, 0, false);
-				}
-			}
-			P->SetEffect(&NearScreen_, &ColorScreen);
-		}
-		//*/
-		//結果描画
-		MAIN_Screen.SetDraw_Screen();
-		{
-			SetDrawBright(r_brt, g_brt, b_brt);
-			NearScreen_.DrawGraph(0, 0, false);
-			SetDrawBright(255, 255, 255);
-			
-			//NormalScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
-			//DepthScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
 		}
 	}
 };

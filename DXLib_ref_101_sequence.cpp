@@ -4,26 +4,43 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
+	void TEMPSCENE::Load(void) noexcept {
+		if (!m_IsLoading) {
+			m_IsLoading = true;
+			Load_Sub();
+		}
+	}
+	void TEMPSCENE::Set(void) noexcept {
+		m_IsFirstLoop = true;
+		Set_Sub();
+	}
+	bool TEMPSCENE::Update() noexcept {
+		auto ans = Update_Sub();
+		m_IsFirstLoop = false;
+		return ans;
+	}
 	void TEMPSCENE::Draw(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		//影をセット
-		DrawParts->Update_Shadow([&] {ShadowDraw_Far(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
+		DrawParts->Update_Shadow([&] { ShadowDraw_Far_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
 		DrawParts->Update_Shadow([&] { ShadowDraw_NearFar_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 1);
 		DrawParts->Update_Shadow([&] { ShadowDraw_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 0);
 		DrawParts->Update_NearShadow([&] {MainDraw_Sub(); });
 		//画面に反映
 		DrawParts->Draw(
-			[&](const Camera3DInfo& cams) {
-				auto* PostPassParts = PostPassEffect::Instance();
-				PostPassParts->Draw(
-					[&]() { BG_Draw_Sub(); },
-					[&]() { MainDraw_Sub(); },
-					[&]() { MainDrawFront_Sub(); },
-					cams);
-			},
+			[&]() { BG_Draw_Sub(); },
+			[&]() { MainDraw_Sub(); },
+			[&]() { MainDrawFront_Sub(); },
 			[&]() { DrawUI_Base_Sub(); },
 			[&]() { DrawUI_In_Sub(); }
 		);
+	}
+	void TEMPSCENE::Dispose(void) noexcept { Dispose_Sub(); }
+	void TEMPSCENE::Dispose_Load(void) noexcept {
+		if (m_IsLoading) {
+			m_IsLoading = false;
+			Dispose_Load_Sub();
+		}
 	}
 
 	//開始
@@ -54,27 +71,19 @@ namespace DXLib_ref {
 	}
 	//
 	bool SceneControl::Execute(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		auto* ItemLogParts = SideLog::Instance();
 		PadControl::Instance()->Execute();
 		auto SelEnd = !this->m_ScenesPtr->Update();		//更新
-		Set3DSoundListenerPosAndFrontPosAndUpVec(DrawParts->SetMainCamera().GetCamPos().get(), DrawParts->SetMainCamera().GetCamVec().get(), DrawParts->SetMainCamera().GetCamUp().get());		//音位置指定
 		OptionWindowClass::Instance()->Execute();
-		DrawParts->Execute();
-		ItemLogParts->Update();
+		DXDraw::Instance()->Execute();
+		SideLog::Instance()->Update();
 		return SelEnd;
 	}
 	//描画
 	void SceneControl::Draw(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		auto* ItemLogParts = SideLog::Instance();
-		//
-		EffectResource::Instance()->Calc(DrawParts->IsPause());//エフェクシアのアプデを60FPS相当に変更
-		//
 		this->m_ScenesPtr->Draw();
 		//デバッグ
 		{
-			FPSAvgs.at(m_FPSAvg) = DrawParts->GetFps();
+			FPSAvgs.at(m_FPSAvg) = DXDraw::Instance()->GetFps();
 			++m_FPSAvg %= ((int)FPSAvgs.size());
 
 			float Avg = 0.f;
@@ -86,7 +95,8 @@ namespace DXLib_ref {
 			auto* Fonts = FontPool::Instance();
 			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
 		}
-		ItemLogParts->Draw();
+		//
+		SideLog::Instance()->Draw();
 	}
 	//
 	void SceneControl::NextScene(void) noexcept {

@@ -90,9 +90,5 @@ namespace DXLib_ref {
 		void Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
 		//
 		void Plus_Draw(std::function<void()> doing) noexcept;
-		//
-		void SetPostpassEffect(void) noexcept;
-		//‘‚«‚ñ‚¾[“x‚É‰‚¶‚Ä‘Î‰
-		void DrawByDepth(std::function<void()> doing) noexcept;
 	};
 };

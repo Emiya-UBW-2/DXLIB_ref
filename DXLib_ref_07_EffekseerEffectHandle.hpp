@@ -286,10 +286,7 @@ namespace DXLib_ref {
 			ef_ThunderHit,		//雷ヒット
 			effects,			//読み込む総量
 		};
-	private:
-		LONGLONG Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
 	public:
-		bool Update_effect_f{ true };					//エフェクトのアップデートタイミングフラグ
 		std::vector<EffekseerEffectHandle> effsorce;	/*エフェクトリソース*/
 	private:
 		EffectResource() {
@@ -304,23 +301,10 @@ namespace DXLib_ref {
 			}
 			effsorce.resize(effsorce.size() + 1);
 			effsorce.back() = EffekseerEffectHandle::load("data/effect/gndsmk.efk");								//戦車用エフェクト
-			Update_effect_was = GetNowHiPerformanceCount();
 		}
 		~EffectResource() {
 			for (auto& e : effsorce) {
 				e.Dispose();
-			}
-		}
-	public:
-		void			Calc(bool isStop) noexcept {
-			if (!isStop) {
-				Update_effect_f = ((GetNowHiPerformanceCount() - Update_effect_was) >= 1000000 / 60);
-				if (Update_effect_f) {
-					Update_effect_was = GetNowHiPerformanceCount();
-				}
-			}
-			else {
-				Update_effect_f = false;
 			}
 		}
 	};

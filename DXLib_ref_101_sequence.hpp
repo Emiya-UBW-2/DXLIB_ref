@@ -15,29 +15,12 @@ namespace DXLib_ref {
 		TEMPSCENE(void) noexcept {}
 		~TEMPSCENE(void) noexcept {}
 	public://ÉÅÉCÉìçXêV
-		void Load(void) noexcept {
-			if (!m_IsLoading) {
-				m_IsLoading = true;
-				Load_Sub();
-			}
-		}
-		void Set(void) noexcept {
-			m_IsFirstLoop = true;
-			Set_Sub();
-		}
-		bool Update() noexcept {
-			auto ans = Update_Sub();
-			m_IsFirstLoop = false;
-			return ans;
-		}
+		void Load(void) noexcept;
+		void Set(void) noexcept;
+		bool Update() noexcept;
 		void Draw(void) noexcept;
-		void Dispose(void) noexcept { Dispose_Sub(); }
-		void Dispose_Load(void) noexcept {
-			if (m_IsLoading) {
-				m_IsLoading = false;
-				Dispose_Load_Sub();
-			}
-		}
+		void Dispose(void) noexcept;
+		void Dispose_Load(void) noexcept;
 		//
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 	protected://åpè≥ï®

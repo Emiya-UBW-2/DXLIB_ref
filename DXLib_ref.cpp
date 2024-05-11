@@ -380,7 +380,6 @@ namespace DXLib_ref {
 		SetDirectInputMouseMode(TRUE);								//
 		SetGraphMode(this->GetDispXSize(), this->GetDispYSize(), 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
-		//SetFullSceneAntiAliasingMode(4, 3);						//アンチエイリアス
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
 			//SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
 		}
@@ -389,7 +388,6 @@ namespace DXLib_ref {
 		SetZBufferBitDepth(32);										//
 		DxLib_Init();												//
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
-		//SetCreateDrawValidGraphMultiSample(4, 3);					//アンチエイリアス
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizePool::Instance()->Get(10), "", MB_OK);
 		}
@@ -486,7 +484,7 @@ namespace DXLib_ref {
 		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
 			// 影用の深度記録画像の準備を行う
 			if (shadowSelect==0) {
-				m_ShadowDraw.Update(doing, CenterPos);
+				m_ShadowDraw.Update(doing, SetMainCamera().GetCamPos());
 			}
 			else {
 				m_Shadow[shadowSelect].Update(doing, CenterPos);
@@ -554,74 +552,71 @@ namespace DXLib_ref {
 				}
 			}
 									});
+		Update_effect_was = GetNowHiPerformanceCount();
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
+		auto* Pad = PadControl::Instance();
 		m_FPS = std::max(GetFPS(), 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
 		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger() || (m_RestartPopUpDrawClass.IsActive() && m_PopUpDrawClass.IsActive()));
-		{
-			if (m_PopUpDrawClass.GetActiveSwitch()) {
-				if (m_PopUpDrawClass.IsActive()) {
-					m_PrevPausePopupOpen = IsPause();
-					PauseIn();
-					OptionWindowClass::Instance()->OffSwitch();
-				}
-				else {
-					if (!m_PrevPausePopupOpen) {
-						PauseExit();
-					}
-				}
-			}
+		if (m_PopUpDrawClass.GetActiveSwitch()) {
 			if (m_PopUpDrawClass.IsActive()) {
-				auto* Pad = PadControl::Instance();
-				Pad->ChangeGuide(
-					[&]() {
-						auto* KeyGuide = PadControl::Instance();
-						KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
-					}
-				);
+				m_PrevPausePopupOpen = IsPause();
+				PauseIn();
+				OptionWindowClass::Instance()->OffSwitch();
 			}
+			else {
+				if (!m_PrevPausePopupOpen) {
+					PauseExit();
+				}
+			}
+		}
+		if (m_PopUpDrawClass.IsActive()) {
+			Pad->ChangeGuide(
+				[&]() {
+					auto* KeyGuide = PadControl::Instance();
+					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
+				}
+			);
 		}
 		m_RestartPopUpDrawClass.Update(OptionWindowClass::Instance()->IsRestartSwitch());
-		{
-			if (m_RestartPopUpDrawClass.GetActiveSwitch()) {
-				if (m_RestartPopUpDrawClass.IsActive()) {
-					m_PrevPausePopupOpen = IsPause();
-					PauseIn();
-					OptionWindowClass::Instance()->OffSwitch();
-				}
-				else {
-					if (!m_PrevPausePopupOpen) {
-						PauseExit();
-					}
-				}
-			}
+		if (m_RestartPopUpDrawClass.GetActiveSwitch()) {
 			if (m_RestartPopUpDrawClass.IsActive()) {
-				auto* Pad = PadControl::Instance();
-				Pad->ChangeGuide(
-					[&]() {
-						auto* KeyGuide = PadControl::Instance();
-						KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
-					}
-				);
+				m_PrevPausePopupOpen = IsPause();
+				PauseIn();
+				OptionWindowClass::Instance()->OffSwitch();
+			}
+			else {
+				if (!m_PrevPausePopupOpen) {
+					PauseExit();
+				}
 			}
 		}
-
+		if (m_RestartPopUpDrawClass.IsActive()) {
+			Pad->ChangeGuide(
+				[&]() {
+					auto* KeyGuide = PadControl::Instance();
+					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
+				}
+			);
+		}
 		return (ProcessMessage() == 0) && !m_IsEnd;
 	}
 	void			DXDraw::Execute(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		Set3DSoundListenerPosAndFrontPosAndUpVec(SetMainCamera().GetCamPos().get(), SetMainCamera().GetCamVec().get(), SetMainCamera().GetCamUp().get());		//音位置指定
 		this->GetVRControl()->Execute();		//VR空間に適用
 		//
-		m_PauseFlashCount += 1.f / DrawParts->GetFps();
+		m_PauseFlashCount += 1.f / GetFps();
 		if (m_PauseFlashCount > 1.f) { m_PauseFlashCount -= 1.f; }
 		//
-		if (EffectResource::Instance()->Update_effect_f) {
-			UpdateEffekseer3D();
-		}
 		m_PauseActive.Execute(PadControl::Instance()->GetKey(PADS::INVENTORY).press() && !OptionWindowClass::Instance()->IsActive());
 		if (m_PauseActive.trigger()) {
 			PadControl::Instance()->SetGuideUpdate();
+		}
+		//
+		if (!IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
+			UpdateEffekseer3D();
+			Update_effect_was = m_StartTime;
 		}
 		if (m_SendCamShakeTime > 0.f) {
 			if (m_SendCamShake) {
@@ -631,11 +626,13 @@ namespace DXLib_ref {
 			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
 			Easing(&this->m_CamShake1, Vector3DX::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
 			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
-			this->m_CamShake = std::max(this->m_CamShake - 1.f / DrawParts->GetFps(), 0.f);
+			this->m_CamShake = std::max(this->m_CamShake - 1.f / GetFps(), 0.f);
 		}
 	}
 	void			DXDraw::Draw(
-		std::function<void(const Camera3DInfo&)> doing,
+		std::function<void()> sky_doing,
+		std::function<void()> doing,
+		std::function<void()> doingFront,
 		std::function<void()> doingUI,
 		std::function<void()> doingUI2
 	) noexcept {
@@ -651,7 +648,11 @@ namespace DXLib_ref {
 					GetMainCamera().GetCamVec() + this->GetVRControl()->GetEyePosition(i),
 					GetMainCamera().GetCamUp()
 				);
-				doing(tmp_cam);
+				PostPassParts->Draw(
+					[&]() { sky_doing(); },
+					[&]() { doing(); },
+					[&]() { doingFront(); },
+					tmp_cam);
 				//完成した画面に対して後処理の2Dシェーダーを反映
 				if (this->m_ShaderParam[0].use) {
 					//レンズ
@@ -723,7 +724,11 @@ namespace DXLib_ref {
 			}
 		}
 		else {
-			doing(GetMainCamera());
+			PostPassParts->Draw(
+				[&]() { sky_doing(); },
+				[&]() { doing(); },
+				[&]() { doingFront(); },
+				GetMainCamera());
 			//完成した画面に対して後処理の2Dシェーダーを反映
 			if (this->m_ShaderParam[0].use) {
 				//レンズ

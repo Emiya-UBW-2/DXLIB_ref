@@ -170,11 +170,7 @@ namespace DXLib_ref {
 		int							m_DispXSize{deskx};
 		int							m_DispYSize{desky};
 		float						m_FPS{60.f};
-	public:
-		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
-		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
-		const auto&		GetFps(void) const noexcept { return m_FPS; }
-	private:
+
 		switchs						m_PauseActive;
 		LONGLONG					m_StartTime{0};
 		bool						m_IsEnd{false};
@@ -201,10 +197,16 @@ namespace DXLib_ref {
 		bool						m_PrevPausePopupOpen{false};
 		float						m_PauseFlashCount{0.f};
 
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;								// 頂点データ
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;						// 頂点データ
 		std::array<ShaderUseClass, 2>	m_Shader2D;
-		std::array<shaderparam, 2> m_ShaderParam;		//シェーダーパラメーター
+		std::array<shaderparam, 2>		m_ShaderParam;						//シェーダーパラメーター
+
+		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
 	public://ゲッター
+		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
+		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
+		const auto&		GetFps(void) const noexcept { return m_FPS; }
+
 		const auto&		is_lens(void) const noexcept { return m_ShaderParam[0].use; }
 		const auto&		zoom_lens(void) const noexcept { return m_ShaderParam[0].param[3]; }
 
@@ -216,8 +218,6 @@ namespace DXLib_ref {
 
 		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
-
-		void			GetShadowAfterDraw() { m_ShadowDraw.Draw(); }
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
@@ -263,6 +263,8 @@ namespace DXLib_ref {
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept;
 
 		void			Update_NearShadow(std::function<void()> doing) noexcept;
+
+		void			DrawAfterShadow() { m_ShadowDraw.Draw(); }
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -275,7 +277,9 @@ namespace DXLib_ref {
 		bool			FirstExecute(void) noexcept;
 		void			Execute(void) noexcept;
 		void			Draw(
-			std::function<void(const Camera3DInfo&)> doing,
+			std::function<void()> sky_doing,
+			std::function<void()> doing,
+			std::function<void()> doingFront,
 			std::function<void()> doingUI,
 			std::function<void()> doingUI2
 		) noexcept;
