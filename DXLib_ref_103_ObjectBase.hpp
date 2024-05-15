@@ -103,7 +103,6 @@ namespace DXLib_ref {
 		}
 
 		void			UpdateMove(void) noexcept {
-			this->m_PrevMat = this->GetObj().GetMatrix();
 			this->GetObj().SetMatrix(this->m_move.MatIn());
 			if (this->m_col.IsActive()) {
 				this->m_col.SetMatrix(this->m_move.MatIn());

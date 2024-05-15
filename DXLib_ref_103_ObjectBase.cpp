@@ -189,12 +189,11 @@ namespace DXLib_ref {
 					Max = 1;
 				}
 				for (int i = 0; i < Max; i++) {
-					this->GetObj().SetMatrix(
-						Lerp_Matrix(this->m_PrevMat.rotation(), NowMat.rotation(), (float)(i + 1) / (float)Max)
-						* Matrix4x4DX::Mtrans(Lerp(this->m_PrevMat.pos(), NowMat.pos(), (float)(i + 1) / (float)Max)));
+					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, (float)(i + 1) / (float)Max));
 					this->GetObj().PhysicsCalculation(1000.0f *60.f / DrawParts->GetFps() / Max);
 				}
 			}
+			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
 		//Å‰‚Ìƒ‹[ƒvI‚í‚è
 		this->m_IsFirstLoop = false;

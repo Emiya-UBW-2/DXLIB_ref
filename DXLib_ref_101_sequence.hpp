@@ -2,6 +2,9 @@
 #include "DXLib_ref.h"
 
 namespace DXLib_ref {
+	//--------------------------------------------------------------------------------------------------
+	//
+	//--------------------------------------------------------------------------------------------------
 	class TEMPSCENE {
 	private:
 		std::shared_ptr<TEMPSCENE> Next_ptr{nullptr};
@@ -21,8 +24,6 @@ namespace DXLib_ref {
 		void Draw(void) noexcept;
 		void Dispose(void) noexcept;
 		void Dispose_Load(void) noexcept;
-		//
-		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 	protected://åpè≥ï®
 		virtual void Load_Sub(void) noexcept {}
 		virtual void Set_Sub(void) noexcept {}
@@ -46,7 +47,9 @@ namespace DXLib_ref {
 		virtual void ShadowDraw_NearFar_Sub(void) noexcept {}
 		virtual void ShadowDraw_Sub(void) noexcept {}
 	};
+	//--------------------------------------------------------------------------------------------------
 	//
+	//--------------------------------------------------------------------------------------------------
 	class SceneControl {
 		std::shared_ptr<TEMPSCENE> m_ScenesPtr{nullptr};
 		std::array<float, 60> FPSAvgs;

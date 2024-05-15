@@ -16,10 +16,10 @@ namespace DXLib_ref {
 	enum class EasingType {
 		OutExpo,
 	};
-	//線形補完
 	extern float GetEasingRatio(EasingType EasingType, float ratio);
+	//線形補完
 	template <class T>
-	static T Lerp(const T& A, const T& B, float Per) noexcept {
+	inline T Lerp(const T& A, const T& B, float Per) noexcept {
 		if (Per == 0.f) {
 			return A;
 		}
@@ -30,6 +30,15 @@ namespace DXLib_ref {
 			return A + (T)((B - A)*Per);
 		}
 	}
+	//Matrix版の線形補完
+	template <>
+	inline Matrix4x4DX Lerp(const Matrix4x4DX& A, const Matrix4x4DX& B, float Per) noexcept {
+		return Matrix4x4DX::Axis1(
+			Lerp(A.yvec(), B.yvec(), Per).normalized(),
+			Lerp(A.zvec(), B.zvec(), Per).normalized(),
+			Lerp(A.pos(), B.pos(), Per));
+	}
+	//
 	template <class T>
 	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) {
 		*A = Lerp(*A, B, GetEasingRatio(EasingType, ratio));
@@ -37,17 +46,6 @@ namespace DXLib_ref {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	//Matrix版の線形補完
-	static Matrix4x4DX Lerp_Matrix(const Matrix4x4DX& A, const Matrix4x4DX& B, float Per) noexcept {
-		return Matrix4x4DX::Axis1(
-			Lerp(A.yvec(), B.yvec(), Per).normalized(),
-			Lerp(A.zvec(), B.zvec(), Per).normalized(),
-			Lerp(A.pos(), B.pos(), Per));
-	}
-	//Matrix版のイージング
-	static void Easing_Matrix(Matrix4x4DX* A, const Matrix4x4DX& B, float ratio, EasingType EasingType) noexcept {
-		*A = Lerp_Matrix(*A, B, GetEasingRatio(EasingType, ratio));
-	}
 	//クリップボードに画像をコピー
 	static const auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
 		HWND   hwnd = GetMainWindowHandle();
@@ -802,7 +800,7 @@ namespace DXLib_ref {
 	//キューブマップ生成
 	class RealTimeCubeMap {
 	private:
-		int dynamicCubeTex;		// 周囲を回る小さいモデルたちを映りこませるための描画対象にできるキューブマップテクスチャ
+		GraphHandle dynamicCubeTex;		// 周囲を回る小さいモデルたちを映りこませるための描画対象にできるキューブマップテクスチャ
 		VECTOR lookAt[6];	// 映りこむ周囲の環境を描画する際のカメラの注視点
 		VECTOR up[6];		// 移りこむ周囲の環境を描画する際のカメラの上方向
 		int MIPLEVEL = 2;
@@ -811,7 +809,7 @@ namespace DXLib_ref {
 			// 描画対象にできるキューブマップテクスチャを作成
 			SetCreateDrawValidGraphMipLevels(MIPLEVEL);
 			SetCubeMapTextureCreateFlag(TRUE);
-			dynamicCubeTex = MakeScreen(512, 512, TRUE);
+			dynamicCubeTex = GraphHandle::Make(512, 512, true);
 			SetCubeMapTextureCreateFlag(FALSE);
 			SetCreateDrawValidGraphMipLevels(0);
 			// 映りこむ環境を描画する際に使用するカメラの注視点とカメラの上方向を設定
@@ -832,7 +830,7 @@ namespace DXLib_ref {
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) {
 			for (int i = 0; i < 6; i++) {		// 映りこむ環境を描画する面の数だけ繰り返し
 				for (int j = 0; j < MIPLEVEL; j++) {			// ミップマップの数だけ繰り返し
-					SetRenderTargetToShader(0, dynamicCubeTex, i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
+					SetRenderTargetToShader(0, dynamicCubeTex.get(), i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
@@ -844,7 +842,7 @@ namespace DXLib_ref {
 			}
 		}
 
-		auto GetCubeMapTex() { return dynamicCubeTex; }
+		const auto& GetCubeMapTex() const noexcept { return dynamicCubeTex; }
 	};
 
 

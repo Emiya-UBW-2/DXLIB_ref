@@ -194,7 +194,7 @@ namespace DXLib_ref {
 			if (d.ActivePer() > 0.f) {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
 				int yp = yp1 - y_r(24.f * d.GetFlip());
-				DrawBox(
+				DrawBox_2D(
 					xp1 - y_r(6), yp + y_r(18),
 					xp1 - y_r(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), d.GetMsg()), y_r(200))*d.ActivePer()), yp + y_r(18) + y_r(5),
 					Black, TRUE);

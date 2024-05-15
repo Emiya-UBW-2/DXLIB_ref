@@ -12,7 +12,22 @@ namespace DXLib_ref {
 	}
 	void TEMPSCENE::Set(void) noexcept {
 		m_IsFirstLoop = true;
+		//カメラの初期設定
+		auto* OptionParts = OPTION::Instance();
+		auto* DrawParts = DXDraw::Instance();
+		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::SSAO)), 0.05f, 200.f);
+		//環境光と影の初期化
+		Vector3DX DefaultVec = Vector3DX::vget(0.25f, -1.f, 0.25f);
+		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 0);
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 1);
+		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 2);
+		DrawParts->SetIsUpdateShadow(0, true);
+		DrawParts->SetIsUpdateShadow(1, true);
 		Set_Sub();
+		DrawParts->SetIsUpdateShadow(2, true);
+		DrawParts->Update_Shadow([&]() { ShadowDraw_Far_Sub(); }, Vector3DX::zero(), 2);		//遠影をセット
+		DrawParts->SetIsUpdateShadow(2, false);
 	}
 	bool TEMPSCENE::Update() noexcept {
 		auto ans = Update_Sub();
@@ -42,26 +57,12 @@ namespace DXLib_ref {
 			Dispose_Load_Sub();
 		}
 	}
-
-	//開始
+	//--------------------------------------------------------------------------------------------------
+	//
+	//--------------------------------------------------------------------------------------------------
 	void SceneControl::StartScene(void) noexcept {
 		SetUseMaskScreenFlag(FALSE);//←一部画面でエフェクトが出なくなるため入れる
-		//カメラの初期設定
-		auto* OptionParts = OPTION::Instance();
-		auto* DrawParts = DXDraw::Instance();
-		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::SSAO)), 0.05f, 200.f);
-		//環境光と影の初期化
-		Vector3DX DefaultVec = Vector3DX::vget(0.25f, -1.f, 0.25f);
-		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 0);
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 1);
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 2);
-		DrawParts->SetIsUpdateShadow(0, true);
-		DrawParts->SetIsUpdateShadow(1, true);
 		this->m_ScenesPtr->Set();
-		DrawParts->SetIsUpdateShadow(2, true);
-		DrawParts->Update_Shadow([&]() {this->m_ScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), 2);		//遠影をセット
-		DrawParts->SetIsUpdateShadow(2, false);
 		PadControl::Instance()->SetGuideUpdate();
 		//FPS表示
 		for (auto& f : FPSAvgs) {
@@ -69,7 +70,6 @@ namespace DXLib_ref {
 		}
 		m_FPSAvg = 0;
 	}
-	//
 	bool SceneControl::Execute(void) noexcept {
 		PadControl::Instance()->Execute();
 		auto SelEnd = !this->m_ScenesPtr->Update();		//更新
@@ -78,7 +78,6 @@ namespace DXLib_ref {
 		SideLog::Instance()->Update();
 		return SelEnd;
 	}
-	//描画
 	void SceneControl::Draw(void) noexcept {
 		this->m_ScenesPtr->Draw();
 		//デバッグ
@@ -98,11 +97,9 @@ namespace DXLib_ref {
 		//
 		SideLog::Instance()->Draw();
 	}
-	//
 	void SceneControl::NextScene(void) noexcept {
 		this->m_ScenesPtr->Dispose();							//解放
 		this->m_ScenesPtr = this->m_ScenesPtr->Get_Next();		//遷移
 		PadControl::Instance()->Dispose();
 	}
-	//
 };

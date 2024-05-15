@@ -636,97 +636,13 @@ namespace DXLib_ref {
 	) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-		//画面に映す
-		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			//VRに移す
-			Camera3DInfo tmp_cam = GetMainCamera();
-			for (char i = 0; i < 2; i++) {
-				tmp_cam.SetCamPos(
-					GetMainCamera().GetCamPos() + this->GetVRControl()->GetEyePosition(i),
-					GetMainCamera().GetCamVec() + this->GetVRControl()->GetEyePosition(i),
-					GetMainCamera().GetCamUp()
-				);
-				PostPassParts->Draw(
-					[&]() { sky_doing(); },
-					[&]() { doing(); },
-					[&]() { doingFront(); },
-					tmp_cam);
-				//完成した画面に対して後処理の2Dシェーダーを反映
-				if (this->m_ShaderParam[0].use) {
-					//レンズ
-					PostPassParts->Plus_Draw([&]() {
-						this->m_Shader2D[0].SetPixelDispSize(this->GetDispXSize(), this->GetDispYSize());
-						this->m_Shader2D[0].SetPixelParam(3, this->m_ShaderParam[0].param[0], this->m_ShaderParam[0].param[1], this->m_ShaderParam[0].param[2], this->m_ShaderParam[0].param[3]);
-						SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
-						this->m_Shader2D[0].Draw(this->m_ScreenVertex);
-						SetUseTextureToShader(0, -1);
-											 });
-				}
-				if (this->m_ShaderParam[1].use) {
-					//ブラックアウト
-					PostPassParts->Plus_Draw([&]() {
-						this->m_Shader2D[1].SetPixelDispSize(this->GetDispXSize(), this->GetDispYSize());
-						this->m_Shader2D[1].SetPixelParam(3, this->m_ShaderParam[1].param[0], 0, 0, 0);
-						SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
-						this->m_Shader2D[1].Draw(this->m_ScreenVertex);
-						SetUseTextureToShader(0, -1);
-											 });
-				}
-				UI_Screen.SetDraw_Screen();	//UIをスクリーンに描画しておく
-				{
-					doingUI();
-				}
-				m_OutScreen.SetDraw_Screen(tmp_cam);
-				{
-					//結果を描画
-					PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);	//デフォ描画
-					//視差に対応しているUI
-					{
-						SetCameraNearFar(0.01f, 2.f);
-						SetUseZBuffer3D(FALSE);												//zbufuse
-						SetWriteZBuffer3D(FALSE);											//zbufwrite
-						{
-							DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).normalized()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
-						}
-						SetUseZBuffer3D(TRUE);												//zbufuse
-						SetWriteZBuffer3D(TRUE);											//zbufwrite
-					}
-					if (IsPause()) {
-						//
-						SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.5f), 0, 255));
-						DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), Black, TRUE);
-						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-						//
-						if (m_PauseFlashCount > 0.5f) {
-							auto* Fonts = FontPool::Instance();
-							Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
-						}
-					}
-					doingUI2();										//UI2
-				}
-				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK);
-				{
-					m_OutScreen.DrawGraph(0, 0, false);
-				}
-				this->GetVRControl()->Submit(i);//それぞれの目にDX_SCREEN_BACKの内容を送信
-			}
-			//ディスプレイ描画
-			GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
-			{
-				DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), White, TRUE);
-				m_OutScreen.DrawRotaGraph(this->GetDispXSize() / 2, this->GetDispYSize() / 2, 0.5f, 0, false);
-				OptionWindowClass::Instance()->Draw();
-				PadControl::Instance()->Draw();
-				m_PopUpDrawClass.Draw();
-				m_RestartPopUpDrawClass.Draw();
-			}
-		}
-		else {
+
+		auto MainDraw = [&](const Camera3DInfo& cams) {
 			PostPassParts->Draw(
 				[&]() { sky_doing(); },
 				[&]() { doing(); },
 				[&]() { doingFront(); },
-				GetMainCamera());
+				cams);
 			//完成した画面に対して後処理の2Dシェーダーを反映
 			if (this->m_ShaderParam[0].use) {
 				//レンズ
@@ -736,7 +652,7 @@ namespace DXLib_ref {
 					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[0].Draw(this->m_ScreenVertex);
 					SetUseTextureToShader(0, -1);
-										 });
+					});
 			}
 			if (this->m_ShaderParam[1].use) {
 				//ブラックアウト
@@ -746,30 +662,82 @@ namespace DXLib_ref {
 					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[1].Draw(this->m_ScreenVertex);
 					SetUseTextureToShader(0, -1);
-										 });
+					});
 			}
+			};
+		auto DrawFrontUI = [&]() {
+			if (IsPause()) {
+				//
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * 0.5f), 0, 255));
+				DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), Black, TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				//
+				if (m_PauseFlashCount > 0.5f) {
+					auto* Fonts = FontPool::Instance();
+					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
+				}
+			}
+			doingUI2();										//UI2
+			OptionWindowClass::Instance()->Draw();
+			PadControl::Instance()->Draw();
+			m_PopUpDrawClass.Draw();
+			m_RestartPopUpDrawClass.Draw();
+			};
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			//VRに移す
+			Camera3DInfo tmp_cam = GetMainCamera();
+			for (char i = 0; i < 2; i++) {
+				tmp_cam.SetCamPos(
+					GetMainCamera().GetCamPos() + this->GetVRControl()->GetEyePosition(i),
+					GetMainCamera().GetCamVec() + this->GetVRControl()->GetEyePosition(i),
+					GetMainCamera().GetCamUp()
+				);
+				MainDraw(tmp_cam);
+				//UIをスクリーンに描画しておく
+				UI_Screen.SetDraw_Screen();
+				{
+					doingUI();
+				}
+				//目線用に合成
+				m_OutScreen.SetDraw_Screen(tmp_cam);
+				{
+					PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);
+					{
+						//視差に対応しているUI
+						SetCameraNearFar(0.01f, 2.f);
+						SetUseZBuffer3D(FALSE);												//zbufuse
+						SetWriteZBuffer3D(FALSE);											//zbufwrite
+						{
+							DrawBillboard3D((tmp_cam.GetCamPos() + (tmp_cam.GetCamVec() - tmp_cam.GetCamPos()).normalized()*1.0f).get(), 0.5f, 0.5f, 1.8f, 0.f, UI_Screen.get(), TRUE);
+						}
+						SetUseZBuffer3D(TRUE);												//zbufuse
+						SetWriteZBuffer3D(TRUE);											//zbufwrite
+					}
+					DrawFrontUI();
+				}
+				//合成したものをBACKに持ってきて
+				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK);
+				{
+					m_OutScreen.DrawGraph(0, 0, false);
+				}
+				//それぞれの目にDX_SCREEN_BACKの内容を送信
+				this->GetVRControl()->Submit(i);
+			}
+			//ディスプレイ描画
+			GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
+			{
+				DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), White, TRUE);
+				m_OutScreen.DrawRotaGraph(this->GetDispXSize() / 2, this->GetDispYSize() / 2, 0.5f, 0, false);
+			}
+		}
+		else {
+			MainDraw(GetMainCamera());
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			{
-				PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);	//デフォ描画
-
-				doingUI();										//UI1
-				if (IsPause()) {
-					//
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.5f), 0, 255));
-					DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), Black, TRUE);
-					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-					//
-					if (m_PauseFlashCount > 0.5f) {
-						auto* Fonts = FontPool::Instance();
-						Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
-					}
-				}
-				doingUI2();										//UI2
-				OptionWindowClass::Instance()->Draw();
-				PadControl::Instance()->Draw();
-				m_PopUpDrawClass.Draw();
-				m_RestartPopUpDrawClass.Draw();
+				PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);
+				doingUI();
+				DrawFrontUI();
 			}
 		}
 	}

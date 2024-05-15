@@ -805,9 +805,7 @@ namespace DXLib_ref {
 			SetRenderTargetToShader(2, -1);
 		};
 		//‹ó
-		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() {
-			sky_doing();
-			   });
+		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() { sky_doing(); });
 		//‰“‹——£
 		G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
 			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
