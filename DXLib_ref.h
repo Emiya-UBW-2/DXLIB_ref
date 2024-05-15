@@ -192,9 +192,8 @@ namespace DXLib_ref {
 		//
 		float						m_AberrationPower{1.f};
 		//
-		PopUpDrawClass				m_PopUpDrawClass;
-		PopUpDrawClass				m_RestartPopUpDrawClass;
-		bool						m_PrevPausePopupOpen{false};
+		bool						m_IsExitSelect{ false };
+		bool						m_IsRestartSelect{ false };
 		float						m_PauseFlashCount{0.f};
 
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;						// 頂点データ
@@ -222,8 +221,13 @@ namespace DXLib_ref {
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;
 	public:
-		const auto		IsExit() const noexcept { return m_PopUpDrawClass.IsActive(); }
-		const auto		IsRestart() const noexcept { return m_RestartPopUpDrawClass.IsActive(); }
+		const auto		IsExit() const noexcept { return m_IsExitSelect; }
+		const auto		IsRestart() const noexcept { return m_IsRestartSelect; }
+
+		const auto		IsPopActive() const noexcept {
+			auto* PopUpParts = PopUp::Instance();
+			return PopUpParts->IsActivePop();
+		}
 		const auto		IsPause() const noexcept { return m_PauseActive.on(); }
 		void			PauseIn() noexcept;
 		void			PauseExit() noexcept;

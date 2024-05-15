@@ -279,25 +279,20 @@ namespace DXLib_ref {
 		int m_tabsel{0};
 		int m_select{0};
 		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
-		PopUpDrawClass				m_PopUpDrawClass;
+		bool						m_Active{ false };
 		bool						m_ActiveSwitch{false};
 		bool						m_RestartSwitch{false};
 	public:
 		void SetRestart() noexcept { m_RestartSwitch = true; }
 		void SetActive() noexcept { m_ActiveSwitch = true; }
-		void OffSwitch() noexcept {
-			if (m_PopUpDrawClass.IsActive()) {
-				m_ActiveSwitch = true;
-			}
-		}
 		const auto IsRestartSwitch() noexcept {
-			auto Res = !m_PopUpDrawClass.IsActive() && m_RestartSwitch;
-			if (Res) {
+			if (!m_Active && m_RestartSwitch) {
 				m_RestartSwitch = false;
+				return true;
 			}
-			return Res;
+			return false;
 		}
-		const auto& IsActive() const noexcept { return m_PopUpDrawClass.IsActive(); }
+		const auto& IsActive() const noexcept { return m_Active; }
 	public:
 		void Init() noexcept;
 		void Execute(void)noexcept;

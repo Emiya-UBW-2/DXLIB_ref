@@ -1095,58 +1095,57 @@ namespace DXLib_ref {
 		m_Tabs.at(3) = std::make_unique<ControlTabsInfo>();
 		m_Tabs.at(3)->Init(3, "Control");
 		//
-		m_PopUpDrawClass.Set("Option", y_r(720), y_r(720), [&](int WinSizeX, int WinSizeY, bool EndSwitch) {
-			auto* Pad = PadControl::Instance();
-			auto* SE = SoundPool::Instance();
-			int xp1, yp1;
-
-
-			xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-			yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
-			for (auto& t : m_Tabs) {
-				t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
-			}
-			//ƒKƒCƒh
-			xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-			yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 5 / 2;
-			m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
-
-			//
-			if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
-				--m_tabsel;
-				if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
-				m_select = 0;
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-			}
-			if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
-				++m_tabsel;
-				if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
-				m_select = 0;
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-			}
-
-			m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
-			//
-			if (EndSwitch) {
-				Pad->SetGuideUpdate();
-				OPTION::Instance()->Save();
-				Pad->Save();
-				m_tabsel = 0;
-				m_select = 0;
-			}
-							 });
-		//
 	}
 	void OptionWindowClass::Execute(void) noexcept {
-		m_PopUpDrawClass.Update(m_ActiveSwitch);
-		if (m_PopUpDrawClass.IsActive()) {
-			auto* Pad = PadControl::Instance();
-			Pad->ChangeGuide(
+		if (m_ActiveSwitch) {
+			m_ActiveSwitch = false;
+			auto* PopUpParts = PopUp::Instance();
+			PopUpParts->AddLog("Option", y_r(720), y_r(720),
+				[&](int WinSizeX, int WinSizeY, bool EndSwitch) {
+				auto* Pad = PadControl::Instance();
+				auto* SE = SoundPool::Instance();
+				int xp1, yp1;
+
+
+				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
+				for (auto& t : m_Tabs) {
+					t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
+				}
+				//ƒKƒCƒh
+				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 5 / 2;
+				m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
+
+				//
+				if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
+					--m_tabsel;
+					if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
+					m_select = 0;
+					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				}
+				if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
+					++m_tabsel;
+					if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
+					m_select = 0;
+					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				}
+
+				m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
+				//
+				if (EndSwitch) {
+					Pad->SetGuideUpdate();
+					OPTION::Instance()->Save();
+					Pad->Save();
+					m_tabsel = 0;
+					m_select = 0;
+				}
+				},
+				[&]() {},
 				[&]() {
 					auto* KeyGuide = PadControl::Instance();
 
 					KeyGuide->AddGuide(PADS::INTERACT, LocalizePool::Instance()->Get(9992));
-					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
 
 					KeyGuide->AddGuide(PADS::LEAN_L, "");
 					KeyGuide->AddGuide(PADS::LEAN_R, LocalizePool::Instance()->Get(9994));
@@ -1155,12 +1154,11 @@ namespace DXLib_ref {
 					KeyGuide->AddGuide(PADS::MOVE_S, "");
 					KeyGuide->AddGuide(PADS::MOVE_D, "");
 					KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizePool::Instance()->Get(9993));
-				}
+				},
+				true
 			);
 		}
-		m_ActiveSwitch = false;
 	}
 	void OptionWindowClass::Draw() noexcept {
-		m_PopUpDrawClass.Draw();
 	}
 };

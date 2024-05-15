@@ -76,6 +76,7 @@ namespace DXLib_ref {
 		OptionWindowClass::Instance()->Execute();
 		DXDraw::Instance()->Execute();
 		SideLog::Instance()->Update();
+		PopUp::Instance()->Update();
 		return SelEnd;
 	}
 	void SceneControl::Draw(void) noexcept {
@@ -96,6 +97,7 @@ namespace DXLib_ref {
 		}
 		//
 		SideLog::Instance()->Draw();
+		PopUp::Instance()->Draw();
 	}
 	void SceneControl::NextScene(void) noexcept {
 		this->m_ScenesPtr->Dispose();							//‰ð•ú

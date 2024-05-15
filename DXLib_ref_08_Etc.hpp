@@ -971,26 +971,63 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	// ポップアップ
 	//--------------------------------------------------------------------------------------------------
-	class PopUpDrawClass {
+	class PopUp : public SingletonBase<PopUp> {
 	private:
-		bool m_Active{false};
-		bool m_ActiveSwitch{false};
-		float m_ActivePer{0.f};
-		char m_WindwoName[64]{};
+		friend class SingletonBase<PopUp>;
+	private:
+		class PopUpDrawClass {
+		private:
+			bool m_Active{ false };
+			bool m_ActiveSwitch{ false };
+			float m_ActivePer{ 0.f };
+			char m_WindwoName[64]{};
 
-		int WinSizeX{720};
-		int WinSizeY{720};
+			int WinSizeX{ 720 };
+			int WinSizeY{ 720 };
 
-		std::function<void(int xsize,int ysize, bool EndSwitch)> m_Doing;
+			std::function<void(int xsize, int ysize, bool EndSwitch)> m_Doing;
+			std::function<void()> m_ExitDoing;
+			std::function<void()> m_GuideDoing;
+		public:
+			PopUpDrawClass() {}
+			~PopUpDrawClass() {}
+		public:
+			void			Set(const char* WindowName, int sizex, int sizey,
+				std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+				std::function<void()> ExitDoing,
+				std::function<void()> GuideDoing
+			) noexcept {
+				sprintf_s(m_WindwoName, 64, WindowName);
+				WinSizeX = sizex;
+				WinSizeY = sizey;
+				m_Doing = doing;
+				m_ExitDoing = ExitDoing;
+				m_GuideDoing = GuideDoing;
+			}
+			void			Start() noexcept;
+			void			End() noexcept;
+			void			Update() noexcept;
+			void			Draw(void) noexcept;
+		public:
+			const auto& IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
+		};
+	private:
+		std::array<PopUpDrawClass, 24> que;
+		int NowSel{ 0 };
+		int LastSel{ 0 };
+		bool PrevPause{false};
 	public:
-		PopUpDrawClass() {}
-		~PopUpDrawClass() {}
+		const auto IsActivePop() const noexcept { return (NowSel != LastSel); }
 	public:
-		void			Set(const char* WindowName, int sizex, int sizey, std::function<void(int xsize, int ysize, bool EndSwitch)> doing) noexcept;
-		void			Update(bool KeyTrigger) noexcept;
-		void			Draw(void) noexcept;
-	public:
-		const auto& IsActive() const noexcept { return m_Active; }
-		const auto& GetActiveSwitch() const noexcept { return m_ActiveSwitch; }
+		void AddLog(const char* WindowName, int sizex, int sizey,
+					std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+					std::function<void()> ExitDoing,
+					std::function<void()> GuideDoing,
+					bool IsInsert = false) noexcept;
+		void Update() noexcept;
+		void Draw() noexcept {
+			if (!IsActivePop()) { return; }
+			que.at(NowSel).Draw();
+		}
 	};
 };

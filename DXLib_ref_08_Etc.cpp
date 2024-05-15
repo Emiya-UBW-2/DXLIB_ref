@@ -3,6 +3,8 @@
 namespace DXLib_ref {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
+	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
+	
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -205,40 +207,49 @@ namespace DXLib_ref {
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	//
-	void			PopUpDrawClass::Set(const char* WindowName, int sizex, int sizey, std::function<void(int xsize, int ysize, bool EndSwitch)> doing) noexcept {
-		sprintf_s(m_WindwoName, 64, WindowName);
-		WinSizeX = sizex;
-		WinSizeY = sizey;
-		m_Doing = doing;
-	}
-	void			PopUpDrawClass::Update(bool KeyTrigger) noexcept {
+	void PopUp::PopUpDrawClass::Start() noexcept
+	{
 		auto* SE = SoundPool::Instance();
+		auto* Pad = PadControl::Instance();
+
+		Pad->SetGuideUpdate();
+		Pad->ChangeGuide(
+			[&]() {
+				auto* KeyGuide = PadControl::Instance();
+				KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
+				m_GuideDoing();
+			}
+		);
+		SE->Get((int)SoundEnumCommon::UI_OK).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+		m_Active = true;
+		m_ActiveSwitch = true;
+	}
+	void PopUp::PopUpDrawClass::End() noexcept
+	{
+		auto* SE = SoundPool::Instance();
+		auto* Pad = PadControl::Instance();
+
+		SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		m_Active = false;
+		m_ActiveSwitch = true;
+		Pad->SetGuideUpdate();
+		m_ExitDoing();
+	}
+	void PopUp::PopUpDrawClass::Update() noexcept {
 		auto* Pad = PadControl::Instance();
 		m_ActiveSwitch = false;
 		Easing(&m_ActivePer, m_Active ? 1.f : 0.f, m_Active ? 0.7f : 0.3f, EasingType::OutExpo);
 
-		if (!m_Active) {
-			if (KeyTrigger) {
-				Pad->SetGuideUpdate();
-				m_Active = true;
-				m_ActiveSwitch = true;
-				SE->Get((int)SoundEnumCommon::UI_OK).Play(0, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-		else {
+		if (m_Active) {
 			Pad->SetMouseMoveEnable(false);
-			if (KeyTrigger) {
-				SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				m_Active = false;
-				m_ActiveSwitch = true;
-				Pad->SetGuideUpdate();
+			if (Pad->GetKey(PADS::RELOAD).trigger()) {
+				End();
 			}
 		}
 	}
-	void			PopUpDrawClass::Draw(void) noexcept {
-		auto* Pad = PadControl::Instance();
+	void PopUp::PopUpDrawClass::Draw(void) noexcept {
 		auto* Fonts = FontPool::Instance();
-		auto* SE = SoundPool::Instance();
 
 		int xp1, yp1;
 
@@ -264,11 +275,8 @@ namespace DXLib_ref {
 			if (m_Active) {
 				xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
-				if (Pad->GetKey(PADS::RELOAD).trigger() || WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizePool::Instance()->Get(20))) {
-					SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
-					m_Active = false;
-					m_ActiveSwitch = true;
-					Pad->SetGuideUpdate();
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizePool::Instance()->Get(20))) {
+					End();
 				}
 			}
 			//îwåi
@@ -283,6 +291,42 @@ namespace DXLib_ref {
 			//
 			m_Doing(WinSizeX, WinSizeY, m_ActiveSwitch);
 			//
+		}
+	}
+
+	void PopUp::AddLog(const char* WindowName, int sizex, int sizey,
+				std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+				std::function<void()> ExitDoing,
+				std::function<void()> GuideDoing,
+				bool IsInsert) noexcept {
+		que.at(LastSel).Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
+		if (!IsActivePop()) {
+			que.at(LastSel).Start();
+			auto* DrawParts = DXDraw::Instance();
+			PrevPause = DrawParts->IsPause();
+			DrawParts->PauseIn();
+		}
+		else if (IsInsert) {
+			que.at(NowSel).End();
+			NowSel = LastSel;
+			que.at(LastSel).Start();
+		}
+		++LastSel %= ((int)que.size());
+	}
+	void PopUp::Update() noexcept {
+		if (!IsActivePop()) { return; }
+		que.at(NowSel).Update();
+		if (que.at(NowSel).IsEnd()) {
+			++NowSel %= ((int)que.size());
+			if (IsActivePop()) {
+				que.at(NowSel).Start();
+			}
+			else {
+				if (!PrevPause) {
+					auto* DrawParts = DXDraw::Instance();
+					DrawParts->PauseExit();
+				}
+			}
 		}
 	}
 };

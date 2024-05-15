@@ -505,97 +505,71 @@ namespace DXLib_ref {
 	void			DXDraw::Init(void) noexcept {
 		PostPassEffect::Create();						//シェーダー
 		SideLog::Create();
+		PopUp::Create();
 		OptionWindowClass::Instance()->Init();
-		//
-		m_PopUpDrawClass.Set(LocalizePool::Instance()->Get(100), y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
-			int xp1, yp1;
-			//タイトル
-			{
-				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
-
-				WindowSystem::SetMsgWW(xp1,yp1,xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
-			}
-			//
-			{
-				xp1 = y_r(960) - y_r(54);
-				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
-
-				auto* Pad = PadControl::Instance();
-				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(102));
-				if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
-					m_IsEnd = true;
-				}
-			}
-							 });
-		m_RestartPopUpDrawClass.Set(LocalizePool::Instance()->Get(100), y_r(480), y_r(240), [&](int WinSizeX, int WinSizeY, bool) {
-			int xp1, yp1;
-			//タイトル
-			{
-				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
-
-				WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
-			}
-			//
-			{
-				xp1 = y_r(960) - y_r(54);
-				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
-
-				auto* Pad = PadControl::Instance();
-				bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(2102));
-				if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
-					m_IsEnd = true;
-					StartMe();
-				}
-			}
-									});
 		Update_effect_was = GetNowHiPerformanceCount();
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
-		auto* Pad = PadControl::Instance();
+		auto* PopUpParts = PopUp::Instance();
 		m_FPS = std::max(GetFPS(), 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
-		m_PopUpDrawClass.Update(PadControl::Instance()->GetEsc().trigger() || (m_RestartPopUpDrawClass.IsActive() && m_PopUpDrawClass.IsActive()));
-		if (m_PopUpDrawClass.GetActiveSwitch()) {
-			if (m_PopUpDrawClass.IsActive()) {
-				m_PrevPausePopupOpen = IsPause();
-				PauseIn();
-				OptionWindowClass::Instance()->OffSwitch();
-			}
-			else {
-				if (!m_PrevPausePopupOpen) {
-					PauseExit();
-				}
-			}
-		}
-		if (m_PopUpDrawClass.IsActive()) {
-			Pad->ChangeGuide(
-				[&]() {
-					auto* KeyGuide = PadControl::Instance();
-					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
-				}
+		if (PadControl::Instance()->GetEsc().trigger() && !m_IsExitSelect) {
+			m_IsExitSelect = true;
+			PopUpParts->AddLog(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+				[&](int WinSizeX, int WinSizeY, bool) {
+					int xp1, yp1;
+					//タイトル
+					{
+						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+
+						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
+					}
+					//
+					{
+						xp1 = y_r(960) - y_r(54);
+						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+
+						auto* Pad = PadControl::Instance();
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(102));
+						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+							m_IsEnd = true;
+						}
+					}
+				},
+				[&]() {m_IsExitSelect = false; },
+				[&]() {},
+				true
 			);
 		}
-		m_RestartPopUpDrawClass.Update(OptionWindowClass::Instance()->IsRestartSwitch());
-		if (m_RestartPopUpDrawClass.GetActiveSwitch()) {
-			if (m_RestartPopUpDrawClass.IsActive()) {
-				m_PrevPausePopupOpen = IsPause();
-				PauseIn();
-				OptionWindowClass::Instance()->OffSwitch();
-			}
-			else {
-				if (!m_PrevPausePopupOpen) {
-					PauseExit();
-				}
-			}
-		}
-		if (m_RestartPopUpDrawClass.IsActive()) {
-			Pad->ChangeGuide(
-				[&]() {
-					auto* KeyGuide = PadControl::Instance();
-					KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
-				}
+		if (OptionWindowClass::Instance()->IsRestartSwitch() && !m_IsRestartSelect) {
+			m_IsRestartSelect = true;
+			PopUpParts->AddLog(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+				[&](int WinSizeX, int WinSizeY, bool) {
+					int xp1, yp1;
+					//タイトル
+					{
+						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+
+						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
+					}
+					//
+					{
+						xp1 = y_r(960) - y_r(54);
+						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+
+						auto* Pad = PadControl::Instance();
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(2102));
+						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+							m_IsEnd = true;
+							StartMe();
+						}
+					}
+				},
+				[&]() {m_IsRestartSelect = false; },
+				[&]() {},
+				true
 			);
 		}
 		return (ProcessMessage() == 0) && !m_IsEnd;
@@ -680,8 +654,6 @@ namespace DXLib_ref {
 			doingUI2();										//UI2
 			OptionWindowClass::Instance()->Draw();
 			PadControl::Instance()->Draw();
-			m_PopUpDrawClass.Draw();
-			m_RestartPopUpDrawClass.Draw();
 			};
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//VRに移す
