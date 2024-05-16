@@ -19,15 +19,11 @@ namespace DXLib_ref {
 		//ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
 		Vector3DX DefaultVec = Vector3DX::vget(0.25f, -1.f, 0.25f);
 		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 0);
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 1);
-		DrawParts->SetShadow(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 2);
-		DrawParts->SetIsUpdateShadow(0, true);
-		DrawParts->SetIsUpdateShadow(1, true);
+		DrawParts->SetupShadowDir(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 0);
+		DrawParts->SetupShadowDir(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 1);
+		DrawParts->SetupShadowDir(DefaultVec, Vector3DX::vget(-100.f, -10.f, -100.f), Vector3DX::vget(100.f, 10.f, 100.f), 2);
 		Set_Sub();
-		DrawParts->SetIsUpdateShadow(2, true);
 		DrawParts->Update_Shadow([&]() { ShadowDraw_Far_Sub(); }, Vector3DX::zero(), 2);		//‰“‰e‚ðƒZƒbƒg
-		DrawParts->SetIsUpdateShadow(2, false);
 	}
 	bool TEMPSCENE::Update() noexcept {
 		auto ans = Update_Sub();
@@ -37,7 +33,6 @@ namespace DXLib_ref {
 	void TEMPSCENE::Draw(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		//‰e‚ðƒZƒbƒg
-		DrawParts->Update_Shadow([&] { ShadowDraw_Far_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 2);
 		DrawParts->Update_Shadow([&] { ShadowDraw_NearFar_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 1);
 		DrawParts->Update_Shadow([&] { ShadowDraw_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), 0);
 		DrawParts->Update_NearShadow([&] {MainDraw_Sub(); });

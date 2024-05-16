@@ -312,8 +312,8 @@ namespace DXLib_ref {
 				Load();
 				if (GetJoypadNum() > 0) {
 					auto* ItemLogParts = SideLog::Instance();
-					ItemLogParts->AddLog(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(298));
-					ItemLogParts->AddLog(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(299));
+					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(298));
+					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(299));
 				}
 			}
 		}

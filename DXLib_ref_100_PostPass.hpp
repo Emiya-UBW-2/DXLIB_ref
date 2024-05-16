@@ -10,19 +10,47 @@ namespace DXLib_ref {
 		//Gバッファ
 		GraphHandle* m_NormalScreenPtr{ nullptr };
 		GraphHandle* m_DepthScreenPtr{ nullptr };
+		bool m_PrevActive{false};
 	public:
 		PostPassBase(void) {}
 		virtual ~PostPassBase(void) {}
 	protected:
+		virtual void Load_Sub() noexcept {}
+		virtual void Dispose_Sub() noexcept {}
+		virtual bool IsActive_Sub() noexcept { return true; }
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*) noexcept {}
 	public:
-		void SetPtr(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
+		void Init(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
 			m_NormalScreenPtr = NormalPtr;
 			m_DepthScreenPtr = DepthPtr;
+
+			bool active = IsActive_Sub();
+			m_PrevActive = active;
+			if (active) {
+				Load_Sub();
+			}
 		}
-	public:
+		void UpdateActive() noexcept {
+			bool active = IsActive_Sub();
+			if (m_PrevActive != active) {
+				m_PrevActive = active;
+				if (active) {
+					Load_Sub();
+				}
+				else {
+					Dispose_Sub();
+				}
+			}
+		}
+		void Dispose() noexcept {
+			if (IsActive_Sub()) {
+				Dispose_Sub();
+			}
+		}
 		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
-			SetEffect_Sub(TargetGraph, ColorGraph);
+			if (IsActive_Sub()) {
+				SetEffect_Sub(TargetGraph, ColorGraph);
+			}
 		}
 	};
 	//
@@ -86,9 +114,21 @@ namespace DXLib_ref {
 		PostPassEffect(void);
 		~PostPassEffect(void) noexcept;
 	public:
-		//
+		void Update() noexcept;
 		void Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
-		//
-		void Plus_Draw(std::function<void()> doing) noexcept;
+		void Plus_Draw(std::function<void()> doing) noexcept {
+			NearScreen_.SetDraw_Screen(false);
+			{
+				doing();
+			}
+			//結果描画
+			MAIN_Screen.SetDraw_Screen();
+			{
+				NearScreen_.DrawGraph(0, 0, false);
+			}
+		}
+	private:
+		void LoadGBuffer() noexcept;
+		void DisposeGBuffer() noexcept;
 	};
 };

@@ -293,13 +293,10 @@ namespace DXLib_ref {
 			SetCreateDrawValidGraphChannelNum(4);
 			SetCreateGraphColorBitDepth(32);
 		}
-		m_isUpdate = true;
-
 		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
 		m_Shader_Skin4_DepthShadow_Step2.Init("shader/SkinMesh4_DirLight_DepthShadow_Step2VS.vso", "shader/DirLight_DepthShadow_Step2PS.pso");
 	}
 	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) {
-		if (!m_isUpdate) { return; }
 		// 影用の深度記録画像の準備を行う
 		DepthScreenHandle.SetDraw_Screen();
 		DepthBaseScreenHandle.SetDraw_Screen();
@@ -322,7 +319,6 @@ namespace DXLib_ref {
 		}
 	}
 	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing) {
-		if (!m_isUpdate) { return; }
 		auto* DrawParts = DXDraw::Instance();
 		// 影の結果を出力
 		Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
@@ -344,7 +340,18 @@ namespace DXLib_ref {
 		);
 		//*/
 	}
-
+	void DXDraw::ShadowDraw::Draw() {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+		BaseShadowHandle.DrawGraph(0, 0, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		//DepthBaseScreenHandle.DrawExtendGraph(0, 0, 960, 960, false);
+	}
+	void DXDraw::ShadowDraw::Dispose() {
+		BaseShadowHandle.Dispose();
+		DepthBaseScreenHandle.Dispose();
+		DepthScreenHandle.Dispose();
+		m_Shader_Skin4_DepthShadow_Step2.Dispose();
+	}
 	//
 	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
@@ -380,9 +387,7 @@ namespace DXLib_ref {
 		SetDirectInputMouseMode(TRUE);								//
 		SetGraphMode(this->GetDispXSize(), this->GetDispYSize(), 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-			//SetEnableXAudioFlag(TRUE);								//Xaudio(ロードが長いとロストするので必要に応じて)
-		}
+		SetEnableXAudioFlag(TRUE);									//Xaudio(ロードが長いとロストするので必要に応じて)
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync) ? TRUE : FALSE);	//垂直同期
 		SetZBufferBitDepth(32);										//
@@ -437,11 +442,9 @@ namespace DXLib_ref {
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 		//影生成
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-			m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
-			m_Shadow.at(1).Init();
-			m_Shadow.at(2).Init();
-		}
+		m_PrevShadow = false;
+		InitShadow();
+		m_Shadow.at(1).Init();
 		//Init
 		m_PauseActive.Set(false);
 		//
@@ -457,8 +460,8 @@ namespace DXLib_ref {
 		this->GetVRControl()->Dispose();
 		delete m_VRControl;
 		//影削除
+		DisposeShadow();
 		m_Shadow.at(1).Dispose();
-		m_Shadow.at(2).Dispose();
 		//
 		Effkseer_End();
 		DxLib_End();
@@ -475,23 +478,6 @@ namespace DXLib_ref {
 		if (IsPause()) {
 			m_PauseActive.Execute(true);
 			PadControl::Instance()->SetGuideUpdate();
-		}
-	}
-	//
-	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			// 影用の深度記録画像の準備を行う
-			if (shadowSelect==0) {
-				m_ShadowDraw.Update(doing, SetMainCamera().GetCamPos());
-			}
-			else {
-				m_Shadow[shadowSelect].Update(doing, CenterPos);
-			}
-		}
-	}
-	void			DXDraw::Update_NearShadow(std::function<void()> doing) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			m_ShadowDraw.SetDraw(doing);
 		}
 	}
 	//
@@ -515,7 +501,7 @@ namespace DXLib_ref {
 		m_StartTime = GetNowHiPerformanceCount();
 		if (PadControl::Instance()->GetEsc().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
-			PopUpParts->AddLog(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+			PopUpParts->Add(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
 				[&](int WinSizeX, int WinSizeY, bool) {
 					int xp1, yp1;
 					//タイトル
@@ -544,7 +530,7 @@ namespace DXLib_ref {
 		}
 		if (OptionWindowClass::Instance()->IsRestartSwitch() && !m_IsRestartSelect) {
 			m_IsRestartSelect = true;
-			PopUpParts->AddLog(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+			PopUpParts->Add(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
 				[&](int WinSizeX, int WinSizeY, bool) {
 					int xp1, yp1;
 					//タイトル
@@ -572,6 +558,9 @@ namespace DXLib_ref {
 				true
 			);
 		}
+		UpdateShadowActive();
+		auto* PostPassParts = PostPassEffect::Instance();
+		PostPassParts->Update();
 		return (ProcessMessage() == 0) && !m_IsEnd;
 	}
 	void			DXDraw::Execute(void) noexcept {
@@ -740,4 +729,68 @@ namespace DXLib_ref {
 	Vector3DX				DXDraw::Get_VR_Hand2TouchPadPoint() const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->GetTouchPadPoint() : Vector3DX::zero(); }
 
 	void					DXDraw::VR_Haptic(char id_, unsigned short times) noexcept { this->GetVRControl()->Haptic(id_, times); }
+	//
+	void					DXDraw::InitShadow() noexcept {
+		m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
+		m_Shadow.at(0).Init();
+	}
+	void					DXDraw::UpdateShadowActive() noexcept {
+		bool shadow = OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow);
+		if (m_PrevShadow != shadow) {
+			m_PrevShadow = shadow;
+			if (shadow) {
+				InitShadow();
+			}
+			else {
+				DisposeShadow();
+			}
+		}
+	}
+	void					DXDraw::DisposeShadow() noexcept {
+		m_ShadowDraw.Dispose();
+		m_Shadow.at(0).Dispose();
+	}
+	//
+	void			DXDraw::SetupShadowDir(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept {
+		if (shadowSelect == 0) {
+			m_ShadowDraw.SetVec(Vec);
+		}
+		else {
+			m_Shadow[shadowSelect - 1].Set(Vec, MinSize, MaxSize);
+		}
+	}
+
+	void			DXDraw::SetUseShadow(void) noexcept {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+			SetUseShadowMap(0, m_Shadow.at(0).GetHandle());
+		}
+		SetUseShadowMap(1, m_Shadow.at(1).GetHandle());
+	}
+	void			DXDraw::ResetUseShadow(void) noexcept {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+			SetUseShadowMap(0, -1);
+		}
+		SetUseShadowMap(1, -1);
+	}
+	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+			// 影用の深度記録画像の準備を行う
+			if (shadowSelect == 0) {
+				m_ShadowDraw.Update(doing, SetMainCamera().GetCamPos());
+			}
+			else {
+				m_Shadow[shadowSelect - 1].Update(doing, CenterPos);
+			}
+		}
+	}
+	void			DXDraw::Update_NearShadow(std::function<void()> doing) noexcept {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+			m_ShadowDraw.SetDraw(doing);
+		}
+	}
+	void			DXDraw::DrawAfterShadow() noexcept {
+		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+			m_ShadowDraw.Draw();
+		}
+	}
 };

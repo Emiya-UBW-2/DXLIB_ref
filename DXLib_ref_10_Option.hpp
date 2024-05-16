@@ -3,10 +3,10 @@
 
 namespace DXLib_ref {
 	enum class EnumSaveParam {
-		LightMode,
+		GraphicsPreset,
 		DirectXVer,
 		usevr,
-		grass_level,
+		ObjLevel,
 		DoF,
 		bloom,
 		shadow,
@@ -33,10 +33,10 @@ namespace DXLib_ref {
 		Max,
 	};
 	static const char* OptionStr[(int)EnumSaveParam::Max] = {
-		"LightMode",
+		"GraphicsPreset",
 		"DirectXVer",
 		"usevr",
-		"grass_level",
+		"ObjLevel",
 		"DoF",
 		"bloom",
 		"shadow",
@@ -127,20 +127,9 @@ namespace DXLib_ref {
 				case EnumSaveParam::SSAO:
 				case EnumSaveParam::SSR:
 				case EnumSaveParam::AA:
-					
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
-					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
-					break;
 				case EnumSaveParam::DoF:
-				case EnumSaveParam::bloom:
-					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
 					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
-					break;
-				case EnumSaveParam::shadow:
-				case EnumSaveParam::aberration:
-				case EnumSaveParam::MotionBlur:
-					if (GetParamBoolean(EnumSaveParam::LightMode)) { use = false; }
 					break;
 				case EnumSaveParam::usevr:
 #ifndef _USE_OPENVR_
@@ -148,7 +137,11 @@ namespace DXLib_ref {
 #endif
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
 					break;
-				case EnumSaveParam::grass_level:
+				case EnumSaveParam::bloom:
+					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
+					break;
+				case EnumSaveParam::GraphicsPreset:
+				case EnumSaveParam::ObjLevel:
 				case EnumSaveParam::fov:
 				case EnumSaveParam::vsync:
 				case EnumSaveParam::FpsLimit:
@@ -161,11 +154,13 @@ namespace DXLib_ref {
 				case EnumSaveParam::Ysensing:
 				case EnumSaveParam::HeadBobbing:
 				case EnumSaveParam::EnableCheck:
-				case EnumSaveParam::LightMode:
 				case EnumSaveParam::ControlType:
 				case EnumSaveParam::Language:
 				case EnumSaveParam::EX_UI:
 				case EnumSaveParam::EX_UI2:
+				case EnumSaveParam::shadow:
+				case EnumSaveParam::aberration:
+				case EnumSaveParam::MotionBlur:
 					break;
 				default:
 					break;

@@ -107,7 +107,6 @@ namespace DXLib_ref {
 			Vector3DX		m_ShadowVec;
 			Vector3DX		m_ShadowMax;
 			Vector3DX		m_ShadowMin;
-			bool			m_isUpdate{false};
 		public:
 			const auto&		GetHandle(void) const noexcept { return m_ShadowHandle; }
 			void			Set(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize) noexcept {
@@ -115,7 +114,6 @@ namespace DXLib_ref {
 				m_ShadowMin = MinSize;
 				m_ShadowMax = MaxSize;
 			}
-			void SetisUpdate(bool value) noexcept { m_isUpdate = value; }
 		public:
 			void			Init() noexcept {
 				if (m_ShadowHandle == -1) {
@@ -125,7 +123,7 @@ namespace DXLib_ref {
 				}
 			}
 			void			Update(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
-				if (m_ShadowHandle != -1 && m_isUpdate) {
+				if (m_ShadowHandle != -1) {
 					SetShadowMapLightDirection(m_ShadowHandle, m_ShadowVec.get());
 					SetShadowMapDrawArea(m_ShadowHandle, (CenterPos + m_ShadowMin).get(), (CenterPos + m_ShadowMax).get());
 					ShadowMap_DrawSetup(m_ShadowHandle);
@@ -148,23 +146,14 @@ namespace DXLib_ref {
 			ShaderUseClass					m_Shader_Skin4_DepthShadow_Step2;
 			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
 			Vector3DX		m_ShadowVec{Vector3DX::up()};
-			bool			m_isUpdate{false};
 		public:
 			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
-			void SetisUpdate(bool value) noexcept { m_isUpdate = value; }
 
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey);
 			void Update(std::function<void()> Shadowdoing, Vector3DX Center);
 			void SetDraw(std::function<void()> doing);
-
-			void Draw() {
-				if (!m_isUpdate) { return; }
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-				BaseShadowHandle.DrawGraph(0, 0, true);
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-
-				//DepthBaseScreenHandle.DrawExtendGraph(0, 0, 960, 960, false);
-			}
+			void Draw();
+			void Dispose();
 		};
 	private:
 		int							m_DispXSize{deskx};
@@ -175,8 +164,11 @@ namespace DXLib_ref {
 		LONGLONG					m_StartTime{0};
 		bool						m_IsEnd{false};
 
-		std::array<ShadowControl, 3> m_Shadow;
+		bool						m_PrevShadow{false};
+
+		std::array<ShadowControl, 2> m_Shadow;
 		ShadowDraw					m_ShadowDraw;
+
 		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{GetColorF(0, 0, 0, 0)};
 		GraphHandle					m_OutScreen;							//スクリーンバッファ
@@ -239,36 +231,13 @@ namespace DXLib_ref {
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 	public:
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-		void			SetShadow(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept {
-			if (shadowSelect == 0) {
-				m_ShadowDraw.SetVec(Vec);
-			}
-			else {
-				m_Shadow[shadowSelect].Set(Vec, MinSize, MaxSize);
-			}
-		}
-		void			SetIsUpdateShadow(int shadowSelect, bool value) noexcept {
-			if (shadowSelect == 0) {
-				m_ShadowDraw.SetisUpdate(value);
-			}
-			else {
-				m_Shadow[shadowSelect].SetisUpdate(value);
-			}
-		}
 
-		void			SetUseShadow(void) noexcept {
-			SetUseShadowMap(0, m_Shadow.at(1).GetHandle());
-			SetUseShadowMap(1, m_Shadow.at(2).GetHandle());
-		}
-		void			ResetUseShadow(void) noexcept {
-			SetUseShadowMap(0, -1);
-			SetUseShadowMap(1, -1);
-		}
+		void			SetupShadowDir(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept;
+		void			SetUseShadow(void) noexcept;
+		void			ResetUseShadow(void) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept;
-
 		void			Update_NearShadow(std::function<void()> doing) noexcept;
-
-		void			DrawAfterShadow() { m_ShadowDraw.Draw(); }
+		void			DrawAfterShadow() noexcept;
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -305,6 +274,10 @@ namespace DXLib_ref {
 		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
 		Vector3DX			Get_VR_Hand2TouchPadPoint() const noexcept;
 		void				VR_Haptic(char id_, unsigned short times) noexcept;	//VRコントローラー振動
+	private:
+		void			InitShadow() noexcept;
+		void			UpdateShadowActive() noexcept;
+		void			DisposeShadow() noexcept;
 	};
 
 };

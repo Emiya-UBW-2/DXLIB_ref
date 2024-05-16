@@ -10,10 +10,10 @@ namespace DXLib_ref {
 	const OPTION* SingletonBase<OPTION>::m_Singleton = nullptr;
 
 	void			OPTION::Load(void) noexcept {
-		m_SaveParams.at((int)EnumSaveParam::LightMode).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at((int)EnumSaveParam::GraphicsPreset).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at((int)EnumSaveParam::DirectXVer).SetEnumParamType(EnumParamType::Else);//DirectXVer
 		m_SaveParams.at((int)EnumSaveParam::usevr).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::grass_level).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at((int)EnumSaveParam::ObjLevel).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at((int)EnumSaveParam::DoF).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at((int)EnumSaveParam::bloom).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at((int)EnumSaveParam::shadow).SetEnumParamType(EnumParamType::Boolean);
@@ -58,10 +58,10 @@ namespace DXLib_ref {
 			}
 			else {
 				//デフォ値
-				SetParamBoolean(EnumSaveParam::LightMode, false);
+				SetParamInt(EnumSaveParam::GraphicsPreset, 4);
 				SetParamInt(EnumSaveParam::DirectXVer, 1);
 				SetParamBoolean(EnumSaveParam::usevr, false);
-				SetParamInt(EnumSaveParam::grass_level, 1);
+				SetParamInt(EnumSaveParam::ObjLevel, 1);
 				SetParamBoolean(EnumSaveParam::DoF, true);
 				SetParamBoolean(EnumSaveParam::bloom, true);
 				SetParamBoolean(EnumSaveParam::shadow, true);
@@ -69,9 +69,9 @@ namespace DXLib_ref {
 				SetParamInt(EnumSaveParam::fov, 90);
 				SetParamBoolean(EnumSaveParam::vsync, true);
 				SetParamInt(EnumSaveParam::FpsLimit, 60);
-				SetParamFloat(EnumSaveParam::SE, 1.f);
-				SetParamFloat(EnumSaveParam::VOICE, 1.f);
-				SetParamFloat(EnumSaveParam::BGM, 1.f);
+				SetParamFloat(EnumSaveParam::SE, 0.5f);
+				SetParamFloat(EnumSaveParam::VOICE, 0.5f);
+				SetParamFloat(EnumSaveParam::BGM, 0.5f);
 				SetParamBoolean(EnumSaveParam::AllWaysFront, false);
 				SetParamBoolean(EnumSaveParam::aberration, true);
 				SetParamBoolean(EnumSaveParam::SSR, true);
@@ -307,25 +307,135 @@ namespace DXLib_ref {
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Light Mode", LocalizePool::Instance()->Get(1120),
+		this->m_Elements.back().Init("Graphics Preset", LocalizePool::Instance()->Get(1120),
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::LightMode);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
+											 case 0:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, false);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
+												 break;
+											 case 1:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
+												 break;
+											 case 2:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
+												 break;
+											 case 3:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
+												 break;
+											 case 4:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
+												 break;
+										 }
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::LightMode);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) + 1, 0, 4));
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
+											 case 0:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, false);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
+												 break;
+											 case 1:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
+												 break;
+											 case 2:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
+												 break;
+											 case 3:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
+												 break;
+											 case 4:
+												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+												 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
+												 break;
+										 }
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
-										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::LightMode);
-										 OptionParts->SetParamBoolean(EnumSaveParam::LightMode, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::LightMode)));
-										 if (prev != OptionParts->GetParamBoolean(EnumSaveParam::LightMode)) {
-											 OptionWindowClass::Instance()->SetRestart();
+										 auto prev = OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset);
+										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 0, 4));
+										 if (prev != OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
+											 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
+												 case 0:
+													 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::shadow, false);
+													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
+													 break;
+												 case 1:
+													 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
+													 break;
+												 case 2:
+													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSR, false);
+													 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
+													 break;
+												 case 3:
+													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
+													 break;
+												 case 4:
+													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::SSR, true);
+													 OptionParts->SetParamBoolean(EnumSaveParam::shadow, true);
+													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
+													 break;
+											 }
 										 }
 									 }
 									 );
@@ -569,22 +679,22 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Object", LocalizePool::Instance()->Get(1130),
+		this->m_Elements.back().Init("Object Level", LocalizePool::Instance()->Get(1130),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::grass_level, 1 - OptionParts->GetParamInt(EnumSaveParam::grass_level));
+										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::grass_level, 1 - OptionParts->GetParamInt(EnumSaveParam::grass_level));
+										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) + 1, 0, 4));
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::grass_level, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamInt(EnumSaveParam::grass_level) > 0) ? 1 : 0);
+										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 0, 4));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1099,64 +1209,65 @@ namespace DXLib_ref {
 	void OptionWindowClass::Execute(void) noexcept {
 		if (m_ActiveSwitch) {
 			m_ActiveSwitch = false;
+			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
-			PopUpParts->AddLog("Option", y_r(720), y_r(720),
-				[&](int WinSizeX, int WinSizeY, bool EndSwitch) {
-				auto* Pad = PadControl::Instance();
-				auto* SE = SoundPool::Instance();
-				int xp1, yp1;
+			PopUpParts->Add("Option", y_r(720), y_r(720),
+							   [&](int WinSizeX, int WinSizeY, bool EndSwitch) {
+								   auto* Pad = PadControl::Instance();
+								   auto* SE = SoundPool::Instance();
+								   int xp1, yp1;
 
 
-				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
-				for (auto& t : m_Tabs) {
-					t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
-				}
-				//ガイド
-				xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-				yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 5 / 2;
-				m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
+								   xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+								   yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
+								   for (auto& t : m_Tabs) {
+									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
+								   }
+								   //ガイド
+								   xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
+								   yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 5 / 2;
+								   m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
 
-				//
-				if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
-					--m_tabsel;
-					if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
-					m_select = 0;
-					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				}
-				if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
-					++m_tabsel;
-					if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
-					m_select = 0;
-					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				}
+								   //
+								   if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
+									   --m_tabsel;
+									   if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
+									   m_select = 0;
+									   SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+								   }
+								   if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
+									   ++m_tabsel;
+									   if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
+									   m_select = 0;
+									   SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+								   }
 
-				m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
-				//
-				if (EndSwitch) {
-					Pad->SetGuideUpdate();
-					OPTION::Instance()->Save();
-					Pad->Save();
-					m_tabsel = 0;
-					m_select = 0;
-				}
-				},
-				[&]() {},
-				[&]() {
-					auto* KeyGuide = PadControl::Instance();
+								   m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
+								   //
+								   if (EndSwitch) {
+									   Pad->SetGuideUpdate();
+									   OPTION::Instance()->Save();
+									   Pad->Save();
+									   m_tabsel = 0;
+									   m_select = 0;
+								   }
+							   },
+							   [&]() {m_Active = false;},
+								   [&]() {
+								   auto* KeyGuide = PadControl::Instance();
 
-					KeyGuide->AddGuide(PADS::INTERACT, LocalizePool::Instance()->Get(9992));
+								   KeyGuide->AddGuide(PADS::INTERACT, LocalizePool::Instance()->Get(9992));
 
-					KeyGuide->AddGuide(PADS::LEAN_L, "");
-					KeyGuide->AddGuide(PADS::LEAN_R, LocalizePool::Instance()->Get(9994));
-					KeyGuide->AddGuide(PADS::MOVE_W, "");
-					KeyGuide->AddGuide(PADS::MOVE_A, "");
-					KeyGuide->AddGuide(PADS::MOVE_S, "");
-					KeyGuide->AddGuide(PADS::MOVE_D, "");
-					KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizePool::Instance()->Get(9993));
-				},
-				true
-			);
+								   KeyGuide->AddGuide(PADS::LEAN_L, "");
+								   KeyGuide->AddGuide(PADS::LEAN_R, LocalizePool::Instance()->Get(9994));
+								   KeyGuide->AddGuide(PADS::MOVE_W, "");
+								   KeyGuide->AddGuide(PADS::MOVE_A, "");
+								   KeyGuide->AddGuide(PADS::MOVE_S, "");
+								   KeyGuide->AddGuide(PADS::MOVE_D, "");
+								   KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizePool::Instance()->Get(9993));
+							   },
+								   true
+								   );
 		}
 	}
 	void OptionWindowClass::Draw() noexcept {

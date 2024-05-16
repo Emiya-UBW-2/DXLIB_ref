@@ -951,7 +951,7 @@ namespace DXLib_ref {
 		int LastSel{0};
 	public:
 		template <typename... Args>
-		void AddLog(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
+		void Add(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
 			for (auto& d : data) {
 				d.AddFlip(1.f);
 			}
@@ -1019,7 +1019,7 @@ namespace DXLib_ref {
 	public:
 		const auto IsActivePop() const noexcept { return (NowSel != LastSel); }
 	public:
-		void AddLog(const char* WindowName, int sizex, int sizey,
+		void Add(const char* WindowName, int sizex, int sizey,
 					std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
 					std::function<void()> ExitDoing,
 					std::function<void()> GuideDoing,

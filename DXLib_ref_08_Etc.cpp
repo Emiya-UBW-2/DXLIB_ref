@@ -294,7 +294,7 @@ namespace DXLib_ref {
 		}
 	}
 
-	void PopUp::AddLog(const char* WindowName, int sizex, int sizey,
+	void PopUp::Add(const char* WindowName, int sizex, int sizey,
 				std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing,
