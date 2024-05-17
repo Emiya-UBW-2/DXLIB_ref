@@ -193,6 +193,7 @@ namespace DXLib_ref {
 		std::array<shaderparam, 2>		m_ShaderParam;						//シェーダーパラメーター
 
 		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
+		bool						m_IsFirstBoot{false};
 	public://ゲッター
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
@@ -216,10 +217,6 @@ namespace DXLib_ref {
 		const auto		IsExit() const noexcept { return m_IsExitSelect; }
 		const auto		IsRestart() const noexcept { return m_IsRestartSelect; }
 
-		const auto		IsPopActive() const noexcept {
-			auto* PopUpParts = PopUp::Instance();
-			return PopUpParts->IsActivePop();
-		}
 		const auto		IsPause() const noexcept { return m_PauseActive.on(); }
 		void			PauseIn() noexcept;
 		void			PauseExit() noexcept;
@@ -245,6 +242,7 @@ namespace DXLib_ref {
 			this->m_SendCamShakePower = power;
 		}
 		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
+		const auto&		IsFirstBoot(void) const noexcept { return m_IsFirstBoot; }
 	public:
 		void			Init(void) noexcept;
 		bool			FirstExecute(void) noexcept;

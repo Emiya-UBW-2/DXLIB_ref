@@ -356,13 +356,24 @@ namespace DXLib_ref {
 	DXDraw::DXDraw(void) noexcept {
 		OPTION::Create();
 		LocalizePool::Create();
-
+		SaveDataClass::Create();
+		auto* SaveDataParts = SaveDataClass::Instance();
 		auto* OptionParts = OPTION::Instance();
+		//ロード
+		m_IsFirstBoot = false;
+		if (!SaveDataParts->Load()) {
+			m_IsFirstBoot = true;
+			//初回データ作成
+			SaveDataParts->Save();
+		}
+
 		//VR初期化
-		m_VRControl = new VRControl;
-		this->GetVRControl()->Init();
+		if (!m_IsFirstBoot) {
+			m_VRControl = new VRControl;
+			this->GetVRControl()->Init();
+		}
 		//
-		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && !m_IsFirstBoot) {
 			//解像度指定
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
@@ -380,7 +391,12 @@ namespace DXLib_ref {
 		}
 		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
 		SetOutApplicationLogValidFlag(TRUE);						//log
-		SetMainWindowText("Loading...");							//タイトル
+		if (m_IsFirstBoot) {
+			SetMainWindowText("FirstBoot Option");						//タイトル
+		}
+		else {
+			SetMainWindowText("Loading...");							//タイトル
+		}
 		ChangeWindowMode(TRUE);										//窓表示
 		SetUseDirect3DVersion(DXVer);								//directX ver
 		SetUseDirectInputFlag(TRUE);								//
@@ -396,29 +412,31 @@ namespace DXLib_ref {
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizePool::Instance()->Get(10), "", MB_OK);
 		}
-		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) || m_IsFirstBoot) {
 			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->GetDispXSize()) / 2, (desky - this->GetDispYSize()) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		else {
 			SetWindowStyleMode(2);
 			SetWindowPos(GetMainWindowHandle(), HWND_TOP, (deskx - this->GetDispXSize()) / 2, (desky - this->GetDispYSize()) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
-		Effekseer_Init(8000);										//Effekseer
-		SetSysCommandOffFlag(TRUE);									//
-		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//Effekseer
-		Effekseer_SetGraphicsDeviceLostCallbackFunctions();			//Effekseer
+		if (!m_IsFirstBoot) {
+			Effekseer_Init(8000);										//Effekseer
+			SetSysCommandOffFlag(TRUE);									//
+			SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//Effekseer
+			Effekseer_SetGraphicsDeviceLostCallbackFunctions();			//Effekseer
+		}
 		SetAlwaysRunFlag(TRUE);										//background
 		SetUseZBuffer3D(TRUE);										//zbufuse
 		SetWriteZBuffer3D(TRUE);									//zbufwrite
 		//MV1SetLoadModelPhysicsWorldGravity(M_GR);					//重力
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr) || m_IsFirstBoot) {
 			int DPI = 96;
 			if (SetProcessDPIAware() != 0) {
 				auto hdc = GetDC(nullptr);                 // カレントのスクリーン全体のデバイスコンテキスト取得.
 				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
 			}
 			SetWindowSize(deskx * DPI / 96, desky * DPI / 96);
-			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) || m_IsFirstBoot) {
 				DxLib::GetWindowSize(&this->m_DispXSize, &this->m_DispYSize);
 			}
 		}
@@ -432,8 +450,9 @@ namespace DXLib_ref {
 		PadControl::Create();							//キー
 		OptionWindowClass::Create();
 		PadControl::Create();
-		SaveDataClass::Create();
 		ObjectManager::Create();
+		SideLog::Create();
+		PopUp::Create();
 
 		auto* SE = SoundPool::Instance();
 		SE->Add((int)SoundEnumCommon::UI_Select, 2, "data/Sound/UI/cursor.wav", false);
@@ -441,29 +460,29 @@ namespace DXLib_ref {
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/ok.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
-		//影生成
-		m_PrevShadow = false;
-		InitShadow();
-		m_Shadow.at(1).Init();
-		//Init
-		m_PauseActive.Set(false);
-		//
-		this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());								// 頂点データの準備
-		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
-		this->m_Shader2D[1].Init("shader/DepthVS.vso", "shader/DepthPS.pso");						//レンズ
-		//初回データ作成
-		auto* SaveDataParts = SaveDataClass::Instance();
-		SaveDataParts->Load();
-		SaveDataParts->Save();
+		if (!m_IsFirstBoot) {
+			//影生成
+			m_PrevShadow = false;
+			InitShadow();
+			m_Shadow.at(1).Init();
+			//Init
+			m_PauseActive.Set(false);
+			//
+			this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());								// 頂点データの準備
+			this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
+			this->m_Shader2D[1].Init("shader/DepthVS.vso", "shader/DepthPS.pso");						//レンズ
+		}
 	}
 	DXDraw::~DXDraw(void) noexcept {
-		this->GetVRControl()->Dispose();
-		delete m_VRControl;
-		//影削除
-		DisposeShadow();
-		m_Shadow.at(1).Dispose();
-		//
-		Effkseer_End();
+		if (!m_IsFirstBoot) {
+			this->GetVRControl()->Dispose();
+			delete m_VRControl;
+			//影削除
+			DisposeShadow();
+			m_Shadow.at(1).Dispose();
+			//
+			Effkseer_End();
+		}
 		DxLib_End();
 	}
 	//
@@ -489,11 +508,30 @@ namespace DXLib_ref {
 	}
 	//
 	void			DXDraw::Init(void) noexcept {
-		PostPassEffect::Create();						//シェーダー
-		SideLog::Create();
-		PopUp::Create();
 		OptionWindowClass::Instance()->Init();
 		Update_effect_was = GetNowHiPerformanceCount();
+
+		if (m_IsFirstBoot) {
+			OptionWindowClass::Instance()->SetActive();
+			while (ProcessMessage() == 0) {
+				PadControl::Instance()->Execute();
+				OptionWindowClass::Instance()->Execute();
+				PopUp::Instance()->Update();
+				if (!PopUp::Instance()->IsActivePop()) {
+					break;
+				}
+				//
+				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
+				{
+					PopUp::Instance()->Draw();
+				}
+				Screen_Flip();
+			}
+			StartMe();
+		}
+		else {
+			PostPassEffect::Create();						//シェーダー
+		}
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
 		auto* PopUpParts = PopUp::Instance();

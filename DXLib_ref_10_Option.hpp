@@ -140,6 +140,10 @@ namespace DXLib_ref {
 				case EnumSaveParam::bloom:
 					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
 					break;
+				case EnumSaveParam::shadow:
+				case EnumSaveParam::aberration:
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
+					break;
 				case EnumSaveParam::GraphicsPreset:
 				case EnumSaveParam::ObjLevel:
 				case EnumSaveParam::fov:
@@ -158,8 +162,6 @@ namespace DXLib_ref {
 				case EnumSaveParam::Language:
 				case EnumSaveParam::EX_UI:
 				case EnumSaveParam::EX_UI2:
-				case EnumSaveParam::shadow:
-				case EnumSaveParam::aberration:
 				case EnumSaveParam::MotionBlur:
 					break;
 				default:

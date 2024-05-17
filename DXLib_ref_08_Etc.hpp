@@ -894,11 +894,12 @@ namespace DXLib_ref {
 			}
 			outputfile.close();
 		}
-		void Load() noexcept {
+		bool Load() noexcept {
 
 			m_data.clear();
 
 			std::ifstream inputputfile("Save/new.svf");
+			if (!inputputfile) { return false; }
 			std::string line;
 			while (std::getline(inputputfile, line)) {
 				auto Start = line.find("=");
@@ -907,6 +908,7 @@ namespace DXLib_ref {
 				}
 			}
 			inputputfile.close();
+			return true;
 		}
 		void Reset() noexcept {
 			m_data.clear();
@@ -1009,7 +1011,7 @@ namespace DXLib_ref {
 			void			Update() noexcept;
 			void			Draw(void) noexcept;
 		public:
-			const auto& IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
+			const auto IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
 	private:
 		std::array<PopUpDrawClass, 24> que;
