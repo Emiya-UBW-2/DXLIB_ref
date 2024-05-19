@@ -426,15 +426,9 @@ namespace DXLib_ref {
 							RS_Y = input.Y;
 						}
 
-						if (!DrawParts->IsPause()) {
-							auto* OptionParts = OPTION::Instance();
-							Look_XradAdd = std::clamp((float)RS_X / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-							Look_YradAdd = std::clamp(-(float)RS_Y / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
-						}
-						else {
-							Look_XradAdd = 0.f;
-							Look_YradAdd = 0.f;
-						}
+						auto* OptionParts = OPTION::Instance();
+						Look_XradAdd = (float)RS_X / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+						Look_YradAdd = -(float)RS_Y / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					}
 				}
 				break;
@@ -446,6 +440,7 @@ namespace DXLib_ref {
 					MouseX = mx;
 					MouseY = my;
 					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
+
 					if (m_MouseMoveEnable) {
 						if (GetMainWindowHandle() != GetForegroundWindow()) {//ŽŸ‰æ–Ê‚ªÅ‘O‚Å‚Í‚È‚¢‚æ‚ñ
 							SetMouseDispFlag(TRUE);
@@ -454,22 +449,18 @@ namespace DXLib_ref {
 							if (!DrawParts->IsPause()) {
 								SetMousePoint(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2);
 								SetMouseDispFlag(FALSE);
-								auto* OptionParts = OPTION::Instance();
-								Look_XradAdd = std::clamp((float)(MouseX - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-								Look_YradAdd = std::clamp(-(float)(MouseY - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 							}
 							else {
 								SetMouseDispFlag(TRUE);
-								Look_XradAdd = 0.f;
-								Look_YradAdd = 0.f;
 							}
 						}
 					}
 					else {
 						SetMouseDispFlag(TRUE);
-						Look_XradAdd = 0.f;
-						Look_YradAdd = 0.f;
 					}
+					auto* OptionParts = OPTION::Instance();
+					Look_XradAdd = (float)(MouseX - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					Look_YradAdd = -(float)(MouseY - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				break;
 			default:
