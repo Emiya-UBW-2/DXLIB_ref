@@ -115,6 +115,18 @@ namespace DXLib_ref {
 		float len = 0.001f;
 		return (Result->SegA_SegB_MinDist_Square <= (len*len));
 	}
+
+	static bool GetSegmenttoTriangle(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &SegmentBPos1, const Vector3DX &SegmentBPos2, const Vector3DX &SegmentBPos3, SEGMENT_TRIANGLE_RESULT *Result) noexcept {
+		VECTOR Pos1t = SegmentAPos1.get();
+		VECTOR Pos2t = SegmentAPos2.get();
+		VECTOR PosAt = SegmentBPos1.get();
+		VECTOR PosBt = SegmentBPos2.get();
+		VECTOR PosCt = SegmentBPos3.get();
+
+		Segment_Triangle_Analyse(&Pos1t, &Pos2t, &PosAt, &PosBt, &PosCt, Result);
+		float len = 0.001f;
+		return (Result->Seg_Tri_MinDist_Square <= (len*len));
+	}
 	//ü•ª‚Æ“_‚ÌÅÚ‹ß“_î•ñ‚ð‰ðÍ‚·‚é
 	static bool GetSegmenttoPoint(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &PointPos, SEGMENT_POINT_RESULT *Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
