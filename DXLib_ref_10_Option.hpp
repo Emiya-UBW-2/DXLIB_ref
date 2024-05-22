@@ -293,6 +293,5 @@ namespace DXLib_ref {
 	public:
 		void Init() noexcept;
 		void Execute(void)noexcept;
-		void Draw() noexcept;
 	};
 }

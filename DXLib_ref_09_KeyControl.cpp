@@ -277,6 +277,7 @@ namespace DXLib_ref {
 
 
 	void PadControl::ChangeGuide(std::function<void()>Guide_Pad) noexcept {
+		auto* LocalizeParts = LocalizePool::Instance();
 		if (m_IsUpdate) {
 			m_IsUpdate = false;
 			Reset();
@@ -286,11 +287,11 @@ namespace DXLib_ref {
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			for (int i = 0; i < KeyNum; i++) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
-					Key.back()->AddGuidePC(i, LocalizePool::Instance()->Get(9990));
+					Key.back()->AddGuidePC(i, LocalizeParts->Get(9990));
 					break;
 				}
 			}
-			AddGuide(PADS::INVENTORY, LocalizePool::Instance()->Get(9913));
+			AddGuide(PADS::INVENTORY, LocalizeParts->Get(9913));
 			//
 			Guide_Pad();
 		}
@@ -298,6 +299,7 @@ namespace DXLib_ref {
 
 	void PadControl::Execute(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
 		//コントロールタイプ決定
 		{
 			ControlType NextControlType = ControlType::PC;
@@ -312,8 +314,8 @@ namespace DXLib_ref {
 				Load();
 				if (GetJoypadNum() > 0) {
 					auto* ItemLogParts = SideLog::Instance();
-					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(298));
-					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizePool::Instance()->Get(299));
+					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizeParts->Get(298));
+					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizeParts->Get(299));
 				}
 			}
 		}

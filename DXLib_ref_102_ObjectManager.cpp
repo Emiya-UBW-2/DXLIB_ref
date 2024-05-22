@@ -7,18 +7,21 @@ namespace DXLib_ref {
 		this->m_Object.resize(this->m_Object.size() + 1);
 		this->m_Object.back() = NewObj;
 	}
-	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) const noexcept {
-		for (auto& o : this->m_Object) {
-			if (!o->GetIsBaseModel()) { continue; }
+	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+		const SharedModel* Ptr = nullptr;
+		for (auto& o : this->m_Model) {
 			if (!o->GetPathCompare(filepath, objfilename, colfilename)) { continue; }
-			pObj->CopyModel(o);
-			if (pAnim) {
-				MV1::SetAnime(&pObj->GetObj(), pAnim->GetObj());
-			}
-			return;
+			Ptr = &o;
+			break;
 		}
-		pObj->LoadModel(PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
-		pObj->SaveModel(false);
+		if (!Ptr) {
+			m_Model.emplace_back(std::make_shared<ModelBaseClass>());
+			m_Model.back()->LoadModel(pObj, PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
+			m_Model.back()->SaveModel(false);
+			Ptr = &m_Model.back();
+		}
+		pObj->CopyModel(*Ptr);
+		pObj->SetupCol();
 		if (pAnim) {
 			MV1::SetAnime(&pObj->GetObj(), pAnim->GetObj());
 		}
@@ -109,5 +112,11 @@ namespace DXLib_ref {
 			}
 		}
 		this->m_Object.clear();
+		for (auto& o : this->m_Model) {
+			if (o) {
+				o->DisposeModel();
+			}
+		}
+		this->m_Model.clear();
 	}
 };

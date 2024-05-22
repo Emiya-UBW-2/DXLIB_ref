@@ -1,8 +1,9 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLib_ref {
-	void			ObjectBaseClass::LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
-		this->m_IsBaseModel = true;
+	void			ModelBaseClass::LoadModel(
+		const std::shared_ptr<ObjectBaseClass>& pBase,
+		PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		this->m_PHYSICS_SETUP = TYPE;
 		this->m_FilePath = filepath;
 		this->m_ObjFileName = objfilename;
@@ -33,27 +34,24 @@ namespace DXLib_ref {
 		}
 		//col
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
-		if (this->m_col.IsActive()) {
-			for (int i = 0; i < this->m_col.mesh_num(); ++i) { this->m_col.SetupCollInfo(8, 8, 8, -1, i); }
-		}
 		//フレーム
 		{
 			this->m_Frames.clear();
-			if (GetFrameNum() > 0) {
-				this->m_Frames.resize(GetFrameNum());
+			if (pBase->GetFrameNum() > 0) {
+				this->m_Frames.resize(pBase->GetFrameNum());
 			}
 			for (auto& f : this->m_Frames) {
 				f.first = -1;
 			}
 			if (this->m_Frames.size() > 0) {
 				int count = 0;
-				for (int frameNum = 0; frameNum < this->GetObj().frame_num(); frameNum++) {
-					if (this->GetObj().frame_name(frameNum) == GetFrameStr(count)) {
+				for (int frameNum = 0; frameNum < this->m_obj.frame_num(); frameNum++) {
+					if (this->m_obj.frame_name(frameNum) == pBase->GetFrameStr(count)) {
 						//そのフレームを登録
 						this->m_Frames[count].first = frameNum;
-						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->GetObj().GetFrameLocalMatrix(this->m_Frames[count].first).pos());
+						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[count].first).pos());
 					}
-					else if (frameNum < this->GetObj().frame_num() - 1) {
+					else if (frameNum < this->m_obj.frame_num() - 1) {
 						continue;//飛ばす
 					}
 					count++;
@@ -67,11 +65,11 @@ namespace DXLib_ref {
 		//シェイプ
 		{
 			this->m_Shapes.clear();
-			if (GetShapeNum() > 0) {
-				this->m_Shapes.resize(GetShapeNum());
+			if (pBase->GetShapeNum() > 0) {
+				this->m_Shapes.resize(pBase->GetShapeNum());
 			}
 			for (int j = 0; j < (int)this->m_Shapes.size(); j++) {
-				auto s = MV1SearchShape(this->GetObj().get(), GetShapeStr(j));
+				auto s = MV1SearchShape(this->m_obj.get(), pBase->GetShapeStr(j));
 				if (s >= 0) {
 					this->m_Shapes[j].first = s;
 					this->m_Shapes[j].second = 0.f;
@@ -83,8 +81,49 @@ namespace DXLib_ref {
 			}
 		}
 	}
-	void			ObjectBaseClass::CopyModel(const std::shared_ptr<ObjectBaseClass>& pBase) noexcept {
-		this->m_IsBaseModel = false;
+	void			ModelBaseClass::SaveModel(bool UseToonWhenCreateFile) noexcept {
+		auto Save = [&](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
+			FILEINFO FileInfo;
+			if (
+				!(FileRead_findFirst((Path + NameAdd + ".mv1").c_str(), &FileInfo) != (DWORD_PTR)-1) &&
+				(FileRead_findFirst((Path + ".pmx").c_str(), &FileInfo) != (DWORD_PTR)-1)
+				) {
+				MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
+				if (!UseToonWhenCreateFile) {
+					MV1SetMaterialTypeAll(obj->get(), DX_MATERIAL_TYPE_NORMAL);
+					int num = MV1GetMaterialNum(obj->get());
+					for (int i = 0; i < num; i++) {
+						MV1SetMaterialDifColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
+						MV1SetMaterialSpcColor(obj->get(), i, GetColorF(0.f, 0.f, 0.f, 0.f));
+						MV1SetMaterialAmbColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
+					}
+				}
+				MV1SaveModelToMV1File(obj->get(), (Path + NameAdd + ".mv1").c_str());
+				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
+			}
+			};
+		//model
+		switch (this->m_PHYSICS_SETUP) {
+		case PHYSICS_SETUP::DISABLE:
+			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
+			break;
+		case PHYSICS_SETUP::LOADCALC:
+			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
+			break;
+		case PHYSICS_SETUP::REALTIME:
+			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
+			break;
+		default:
+			break;
+		}
+		//col
+		Save(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
+	}
+	void			ModelBaseClass::DisposeModel(void) noexcept {
+		this->m_obj.Dispose();
+		this->m_col.Dispose();
+	}
+	void			ModelBaseClass::CopyModel(const std::shared_ptr<ModelBaseClass>& pBase) noexcept {
 		this->m_PHYSICS_SETUP = pBase->m_PHYSICS_SETUP;
 		this->m_FilePath = pBase->m_FilePath;
 		this->m_ObjFileName = pBase->m_ObjFileName;
@@ -94,9 +133,6 @@ namespace DXLib_ref {
 		//col
 		if (pBase->m_col.IsActive()) {
 			this->m_col = pBase->m_col.Duplicate();
-		}
-		if (this->m_col.IsActive()) {
-			for (int i = 0; i < this->m_col.mesh_num(); ++i) { this->m_col.SetupCollInfo(8, 8, 8, -1, i); }
 		}
 		//フレーム
 		this->m_Frames.resize(pBase->m_Frames.size());
@@ -115,46 +151,6 @@ namespace DXLib_ref {
 			if (f.first != -1) {
 				f.second = pBase->m_Shapes.at(index).second;
 			}
-		}
-	}
-	void			ObjectBaseClass::SaveModel(bool UseToonWhenCreateFile) noexcept {
-		if (this->m_IsBaseModel) {
-			auto Save = [&](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
-				FILEINFO FileInfo;
-				if (
-					!(FileRead_findFirst((Path + NameAdd + ".mv1").c_str(), &FileInfo) != (DWORD_PTR)-1) &&
-					(FileRead_findFirst((Path + ".pmx").c_str(), &FileInfo) != (DWORD_PTR)-1)
-					) {
-					MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
-					if (!UseToonWhenCreateFile) {
-						MV1SetMaterialTypeAll(obj->get(), DX_MATERIAL_TYPE_NORMAL);
-						int num = MV1GetMaterialNum(obj->get());
-						for (int i = 0;i < num;i++) {
-							MV1SetMaterialDifColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
-							MV1SetMaterialSpcColor(obj->get(), i, GetColorF(0.f, 0.f, 0.f, 0.f));
-							MV1SetMaterialAmbColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
-						}
-					}
-					MV1SaveModelToMV1File(obj->get(), (Path + NameAdd + ".mv1").c_str());
-					MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
-				}
-			};
-			//model
-			switch (this->m_PHYSICS_SETUP) {
-				case PHYSICS_SETUP::DISABLE:
-					Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
-					break;
-				case PHYSICS_SETUP::LOADCALC:
-					Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
-					break;
-				case PHYSICS_SETUP::REALTIME:
-					Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
-					break;
-				default:
-					break;
-			}
-			//col
-			Save(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
 		}
 	}
 	//
@@ -236,8 +232,7 @@ namespace DXLib_ref {
 	}
 	//
 	void			ObjectBaseClass::Dispose(void) noexcept {
-		this->GetObj().Dispose();
-		this->m_col.Dispose();
+		DisposeModel();
 		Dispose_Sub();
 	}
 };

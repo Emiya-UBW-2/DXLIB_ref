@@ -298,6 +298,7 @@ namespace DXLib_ref {
 			}
 
 			void			Set(FontType type, int fontSize = -1) noexcept {
+				auto* LocalizeParts = LocalizePool::Instance();
 				this->m_fontsize = fontSize;
 				this->m_Type = type;
 				switch (this->m_Type) {
@@ -305,55 +306,55 @@ namespace DXLib_ref {
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
 					}
 					break;
 				case FontType::Nomal_EdgeL:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 					}
 					break;
 				case FontType::Nomal_AA:
 					this->m_size = 92;
 					this->m_scaleType = DX_DRAWMODE_NEAREST;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
 					}
 					break;
 				case FontType::Nomal_ItalicAA:
 					this->m_size = 92;
 					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(0), (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, -1, -1, true);
+					this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, -1, -1, true);
 					break;
 				case FontType::Gothic_Edge:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
 					}
 					break;
 				case FontType::Gothic_AA:
 					this->m_size = 32;
 					this->m_scaleType = DX_DRAWMODE_BILINEAR;
 					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
 					}
 					else {
-						this->m_Handle = FontHandle::Create(LocalizePool::Instance()->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
+						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
 					}
 					break;
 				case FontType::WW_Gothic:

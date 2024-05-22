@@ -216,7 +216,8 @@ namespace DXLib_ref {
 		Pad->ChangeGuide(
 			[&]() {
 				auto* KeyGuide = PadControl::Instance();
-				KeyGuide->AddGuide(PADS::RELOAD, LocalizePool::Instance()->Get(9991));
+				auto* LocalizeParts = LocalizePool::Instance();
+				KeyGuide->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
 				m_GuideDoing();
 			}
 		);
@@ -250,6 +251,7 @@ namespace DXLib_ref {
 	}
 	void PopUp::PopUpDrawClass::Draw(void) noexcept {
 		auto* Fonts = FontPool::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
 
 		int xp1, yp1;
 
@@ -275,7 +277,7 @@ namespace DXLib_ref {
 			if (m_Active) {
 				xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
 				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizePool::Instance()->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
@@ -304,7 +306,7 @@ namespace DXLib_ref {
 			que.at(LastSel).Start();
 			auto* DrawParts = DXDraw::Instance();
 			PrevPause = DrawParts->IsPause();
-			DrawParts->PauseIn();
+			DrawParts->SetPause(true);
 		}
 		else if (IsInsert) {
 			que.at(NowSel).End();
@@ -324,7 +326,7 @@ namespace DXLib_ref {
 			else {
 				if (!PrevPause) {
 					auto* DrawParts = DXDraw::Instance();
-					DrawParts->PauseExit();
+					DrawParts->SetPause(false);
 				}
 			}
 		}

@@ -250,8 +250,9 @@ namespace DXLib_ref {
 	}
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub() noexcept {
+		auto* LocalizeParts = LocalizePool::Instance();
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("BGM", LocalizePool::Instance()->Get(1110),
+		this->m_Elements.back().Init("BGM", LocalizeParts->Get(1110),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) - 0.1f, 0.f, 1.f));
@@ -274,7 +275,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SE", LocalizePool::Instance()->Get(1111),
+		this->m_Elements.back().Init("SE", LocalizeParts->Get(1111),
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
@@ -301,13 +302,14 @@ namespace DXLib_ref {
 									 );
 	}
 	void OptionWindowClass::GraphicTabsInfo::Init_Sub() noexcept {
+		auto* LocalizeParts = LocalizePool::Instance();
 		HDC hdc;
 		hdc = GetDC(GetMainWindowHandle());	// デバイスコンテキストの取得
 		RefreshRate = GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Graphics Preset", LocalizePool::Instance()->Get(1120),
+		this->m_Elements.back().Init("Graphics Preset", LocalizeParts->Get(1120),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
@@ -440,7 +442,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Window Mode", LocalizePool::Instance()->Get(1121),
+		this->m_Elements.back().Init("Window Mode", LocalizeParts->Get(1121),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AllWaysFront);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -454,7 +456,8 @@ namespace DXLib_ref {
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
-										 auto* OptionParts = OPTION::Instance();
+				auto* LocalizeParts = LocalizePool::Instance();
+				auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront);
 
 										 OptionParts->SetParamBoolean(EnumSaveParam::AllWaysFront, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)));
@@ -463,11 +466,11 @@ namespace DXLib_ref {
 										 }
 
 										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
-																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) ? LocalizePool::Instance()->Get(1135) : LocalizePool::Instance()->Get(1136));
+																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Fov", LocalizePool::Instance()->Get(1122),
+		this->m_Elements.back().Init("Fov", LocalizeParts->Get(1122),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
@@ -486,7 +489,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("V Sync", LocalizePool::Instance()->Get(1123),
+		this->m_Elements.back().Init("V Sync", LocalizeParts->Get(1123),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::vsync);
@@ -520,7 +523,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("FPS Limit", LocalizePool::Instance()->Get(1124),
+		this->m_Elements.back().Init("FPS Limit", LocalizeParts->Get(1124),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 
@@ -582,7 +585,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("DirectX Version", LocalizePool::Instance()->Get(1125),
+		this->m_Elements.back().Init("DirectX Version", LocalizeParts->Get(1125),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
@@ -609,7 +612,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("AntiAlias", LocalizePool::Instance()->Get(1126),
+		this->m_Elements.back().Init("AntiAlias", LocalizeParts->Get(1126),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AA);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -627,7 +630,7 @@ namespace DXLib_ref {
 									 );
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SSAO", LocalizePool::Instance()->Get(1127),
+		this->m_Elements.back().Init("SSAO", LocalizeParts->Get(1127),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::SSAO);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -644,7 +647,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("SSR", LocalizePool::Instance()->Get(1128),
+		this->m_Elements.back().Init("SSR", LocalizeParts->Get(1128),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::SSR);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -662,7 +665,7 @@ namespace DXLib_ref {
 									 );
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Shadow", LocalizePool::Instance()->Get(1129),
+		this->m_Elements.back().Init("Shadow", LocalizeParts->Get(1129),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::shadow);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -679,7 +682,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Object Level", LocalizePool::Instance()->Get(1130),
+		this->m_Elements.back().Init("Object Level", LocalizeParts->Get(1130),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
@@ -698,7 +701,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Bloom Effect", LocalizePool::Instance()->Get(1131),
+		this->m_Elements.back().Init("Bloom Effect", LocalizeParts->Get(1131),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::bloom);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -715,7 +718,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Color Aberration", LocalizePool::Instance()->Get(1132),
+		this->m_Elements.back().Init("Color Aberration", LocalizeParts->Get(1132),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::aberration);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -732,7 +735,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("DoF", LocalizePool::Instance()->Get(1133),
+		this->m_Elements.back().Init("DoF", LocalizeParts->Get(1133),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::DoF);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -749,7 +752,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("MotionBlur", LocalizePool::Instance()->Get(1134),
+		this->m_Elements.back().Init("MotionBlur", LocalizeParts->Get(1134),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::MotionBlur);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -767,8 +770,9 @@ namespace DXLib_ref {
 									 );
 	}
 	void OptionWindowClass::ElseTabsInfo::Init_Sub() noexcept {
+		auto* LocalizeParts = LocalizePool::Instance();
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Language", LocalizePool::Instance()->Get(1145),
+		this->m_Elements.back().Init("Language", LocalizeParts->Get(1145),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
@@ -819,7 +823,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("X sensing", LocalizePool::Instance()->Get(1140),
+		this->m_Elements.back().Init("X sensing", LocalizeParts->Get(1140),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) - 0.01f, 0.01f, 1.f));
@@ -839,7 +843,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Y sensing", LocalizePool::Instance()->Get(1141),
+		this->m_Elements.back().Init("Y sensing", LocalizeParts->Get(1141),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) - 0.01f, 0.f, 1.f));
@@ -859,7 +863,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("HeadBobbing", LocalizePool::Instance()->Get(1142),
+		this->m_Elements.back().Init("HeadBobbing", LocalizeParts->Get(1142),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -876,7 +880,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("CheckMagazine", LocalizePool::Instance()->Get(1143),
+		this->m_Elements.back().Init("CheckMagazine", LocalizeParts->Get(1143),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::EnableCheck);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -893,7 +897,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("PadType", LocalizePool::Instance()->Get(1144),
+		this->m_Elements.back().Init("PadType", LocalizeParts->Get(1144),
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
@@ -966,7 +970,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("EX UI", LocalizePool::Instance()->Get(1146),
+		this->m_Elements.back().Init("EX UI", LocalizeParts->Get(1146),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::EX_UI);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -983,7 +987,7 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("EX UI2", LocalizePool::Instance()->Get(1147),
+		this->m_Elements.back().Init("EX UI2", LocalizeParts->Get(1147),
 									 [&]() {
 										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::EX_UI2);
 										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -1010,10 +1014,11 @@ namespace DXLib_ref {
 
 
 	void OptionWindowClass::ControlTabsInfo::Init_Sub() noexcept {
-		const char* KeyInfo = LocalizePool::Instance()->Get(1151);
+		auto* LocalizeParts = LocalizePool::Instance();
+		const char* KeyInfo = LocalizeParts->Get(1151);
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Reset", LocalizePool::Instance()->Get(1150),
+		this->m_Elements.back().Init("Reset", LocalizeParts->Get(1150),
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1026,7 +1031,7 @@ namespace DXLib_ref {
 									 }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1153), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1034,7 +1039,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1154), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1042,7 +1047,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1155), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1050,7 +1055,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1156), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1058,7 +1063,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1157), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1066,7 +1071,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1158), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1074,7 +1079,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1159), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1082,7 +1087,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1160), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1090,7 +1095,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1161), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1098,7 +1103,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1162), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1106,7 +1111,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1163), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1114,7 +1119,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1164), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1122,7 +1127,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1165), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1130,7 +1135,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1166), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1138,7 +1143,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1167), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1146,7 +1151,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1168), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1154,7 +1159,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1169), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1162,7 +1167,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1170), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1170,7 +1175,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizePool::Instance()->Get(1171), KeyInfo,
+		this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1178,7 +1183,7 @@ namespace DXLib_ref {
 									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 25); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Save", LocalizePool::Instance()->Get(1152),
+		this->m_Elements.back().Init("Save", LocalizeParts->Get(1152),
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
@@ -1255,21 +1260,20 @@ namespace DXLib_ref {
 							   [&]() {m_Active = false;},
 								   [&]() {
 								   auto* KeyGuide = PadControl::Instance();
+								   auto* LocalizeParts = LocalizePool::Instance();
 
-								   KeyGuide->AddGuide(PADS::INTERACT, LocalizePool::Instance()->Get(9992));
+								   KeyGuide->AddGuide(PADS::INTERACT, LocalizeParts->Get(9992));
 
 								   KeyGuide->AddGuide(PADS::LEAN_L, "");
-								   KeyGuide->AddGuide(PADS::LEAN_R, LocalizePool::Instance()->Get(9994));
+								   KeyGuide->AddGuide(PADS::LEAN_R, LocalizeParts->Get(9994));
 								   KeyGuide->AddGuide(PADS::MOVE_W, "");
 								   KeyGuide->AddGuide(PADS::MOVE_A, "");
 								   KeyGuide->AddGuide(PADS::MOVE_S, "");
 								   KeyGuide->AddGuide(PADS::MOVE_D, "");
-								   KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizePool::Instance()->Get(9993));
+								   KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizeParts->Get(9993));
 							   },
 								   true
 								   );
 		}
-	}
-	void OptionWindowClass::Draw() noexcept {
 	}
 };

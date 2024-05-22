@@ -102,46 +102,11 @@ namespace DXLib_ref {
 	private:
 		friend class SingletonBase<DXDraw>;
 	private:
-		class ShadowControl {
-			int				m_ShadowHandle{-1};
-			Vector3DX		m_ShadowVec;
-			Vector3DX		m_ShadowMax;
-			Vector3DX		m_ShadowMin;
-		public:
-			const auto&		GetHandle(void) const noexcept { return m_ShadowHandle; }
-			void			Set(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize) noexcept {
-				m_ShadowVec = Vec;
-				m_ShadowMin = MinSize;
-				m_ShadowMax = MaxSize;
-			}
-		public:
-			void			Init() noexcept {
-				if (m_ShadowHandle == -1) {
-					auto size = int(pow(2, 12));
-					m_ShadowHandle = MakeShadowMap(size, size);
-					SetShadowMapAdjustDepth(m_ShadowHandle, 0.0005f);
-				}
-			}
-			void			Update(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
-				if (m_ShadowHandle != -1) {
-					SetShadowMapLightDirection(m_ShadowHandle, m_ShadowVec.get());
-					SetShadowMapDrawArea(m_ShadowHandle, (CenterPos + m_ShadowMin).get(), (CenterPos + m_ShadowMax).get());
-					ShadowMap_DrawSetup(m_ShadowHandle);
-					doing();
-					ShadowMap_DrawEnd();
-				}
-			}
-			void			Dispose() noexcept {
-				if (m_ShadowHandle != -1) {
-					DeleteShadowMap(m_ShadowHandle);
-					m_ShadowHandle = -1;
-				}
-			}
-		};
 		class ShadowDraw {
 			GraphHandle	BaseShadowHandle;			// モデルハンドル
 			GraphHandle DepthBaseScreenHandle;
 			GraphHandle DepthScreenHandle;
+			GraphHandle DepthFarScreenHandle;
 			// 深度記録画像を使ったディレクショナルライト一つ付きの描画用の剛体メッシュ用とスキニングメッシュ用のシェーダー
 			ShaderUseClass					m_Shader_Skin4_DepthShadow_Step2;
 			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
@@ -151,7 +116,8 @@ namespace DXLib_ref {
 
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey);
 			void Update(std::function<void()> Shadowdoing, Vector3DX Center);
-			void SetDraw(std::function<void()> doing);
+			void UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center);
+			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam);
 			void Draw();
 			void Dispose();
 		};
@@ -166,7 +132,6 @@ namespace DXLib_ref {
 
 		bool						m_PrevShadow{false};
 
-		std::array<ShadowControl, 2> m_Shadow;
 		ShadowDraw					m_ShadowDraw;
 
 		Vector3DX					m_LightVec;
@@ -218,8 +183,7 @@ namespace DXLib_ref {
 		const auto		IsRestart() const noexcept { return m_IsRestartSelect; }
 
 		const auto		IsPause() const noexcept { return m_PauseActive.on(); }
-		void			PauseIn() noexcept;
-		void			PauseExit() noexcept;
+		void			SetPause(bool value) noexcept;
 	public:
 		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
 		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
@@ -228,12 +192,7 @@ namespace DXLib_ref {
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 	public:
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-
-		void			SetupShadowDir(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept;
-		void			SetUseShadow(void) noexcept;
-		void			ResetUseShadow(void) noexcept;
-		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept;
-		void			Update_NearShadow(std::function<void()> doing) noexcept;
+		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept;
 		void			DrawAfterShadow() noexcept;
 	public:
 		void			SetCamShake(float time, float power) noexcept {
@@ -246,6 +205,7 @@ namespace DXLib_ref {
 	public:
 		void			Init(void) noexcept;
 		bool			FirstExecute(void) noexcept;
+		bool			UpdateShadowActive() noexcept;
 		void			Execute(void) noexcept;
 		void			Draw(
 			std::function<void()> sky_doing,
@@ -273,9 +233,6 @@ namespace DXLib_ref {
 		Vector3DX			Get_VR_Hand2TouchPadPoint() const noexcept;
 		void				VR_Haptic(char id_, unsigned short times) noexcept;	//VRコントローラー振動
 	private:
-		void			InitShadow() noexcept;
-		void			UpdateShadowActive() noexcept;
-		void			DisposeShadow() noexcept;
 	};
 
 };

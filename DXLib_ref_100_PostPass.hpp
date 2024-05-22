@@ -115,7 +115,8 @@ namespace DXLib_ref {
 		~PostPassEffect(void) noexcept;
 	public:
 		void Update() noexcept;
-		void Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
+		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
+		void Draw();
 		void Plus_Draw(std::function<void()> doing) noexcept {
 			NearScreen_.SetDraw_Screen(false);
 			{
@@ -128,6 +129,7 @@ namespace DXLib_ref {
 			}
 		}
 	private:
+		void DrawGBuffer(GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams);
 		void LoadGBuffer() noexcept;
 		void DisposeGBuffer() noexcept;
 	};

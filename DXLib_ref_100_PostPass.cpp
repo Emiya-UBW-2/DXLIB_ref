@@ -755,76 +755,44 @@ namespace DXLib_ref {
 			P->UpdateActive();
 		}
 	}
-	void PostPassEffect::Draw(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams) {
-		//fovを記憶しておく
-		fov = cams.GetCamFov();
-		//nearに描画
-		auto* DrawParts = DXDraw::Instance();
+	void PostPassEffect::DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams) {
 		auto* OptionParts = OPTION::Instance();
+		fov = cams.GetCamFov();		//fovを記憶しておく
 		//全ての画面を初期化
 		{
-			if (true) {
-				NormalScreen.SetDraw_Screen();//リセット替わり
-				DepthScreen.SetDraw_Screen();//リセット替わり
-			}
+			NormalScreen.SetDraw_Screen();//リセット替わり
+			DepthScreen.SetDraw_Screen();//リセット替わり
 			FarScreen_.SetDraw_Screen();//リセット替わり
 			NearScreen_.SetDraw_Screen();//リセット替わり
 		}
-		//Gバッファに描画
-		auto G_Draw = [&](GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done) {
-			// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
-			SetRenderTargetToShader(0, TargetDraw->get());
-			if (true) {
-				SetRenderTargetToShader(1, NormalScreen.get());
-				SetRenderTargetToShader(2, DepthScreen.get());
-			}
-			SetCameraNearFar(near_len, far_len);
-			SetupCamera_Perspective(cams.GetCamFov());
-			SetCameraPositionAndTargetAndUpVec(cams.GetCamPos().get(), cams.GetCamVec().get(), cams.GetCamUp().get());
-			{
-				done();
-			}
-			SetRenderTargetToShader(0, -1);
-			SetRenderTargetToShader(1, -1);
-			SetRenderTargetToShader(2, -1);
-		};
 		//空
-		G_Draw(&FarScreen_, 1000.0f, 50000.0f, [&]() { sky_doing(); });
+		DrawGBuffer(&FarScreen_, 1000.0f, 50000.0f, [&]() { sky_doing(); }, cams);
 		//遠距離
-		G_Draw(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
-			DrawParts->SetUseShadow();
+		DrawGBuffer(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
 			doing();
 			doingFront();
-			DrawParts->ResetUseShadow();
-			   });
+			}, cams);
 		//遠距離の強烈なぼかし
 		if (OptionParts->GetParamBoolean(EnumSaveParam::DoF)) {
 			GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
 		}
 		//中間
-		G_Draw(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
+		DrawGBuffer(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
 			FarScreen_.DrawGraph(0, 0, false);
 			Effekseer_Sync3DSetting();
-			DrawParts->SetUseShadow();
 			doing();
 			DrawEffekseer3D();
 			doingFront();
-			DrawParts->ResetUseShadow();
-			   });
+			}, cams);
 		//至近
-		G_Draw(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
+		DrawGBuffer(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
 			Effekseer_Sync3DSetting();
-			DrawParts->SetUseShadow();
 			doing();
 			DrawEffekseer3D();
 			doingFront();
-			DrawParts->ResetUseShadow();
-			   });
-		//ソフトシャドウ重ね
-		NearScreen_.SetDraw_Screen(false);
-		{
-			DrawParts->DrawAfterShadow();
-		}
+			}, cams);
+	}
+	void PostPassEffect::Draw() {
 		//色味補正
 		{
 			int output_low = 0;
@@ -851,6 +819,21 @@ namespace DXLib_ref {
 		}
 	}
 	//
+	void PostPassEffect::DrawGBuffer(GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams) {
+		// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
+		SetRenderTargetToShader(0, TargetDraw->get());
+		SetRenderTargetToShader(1, NormalScreen.get());
+		SetRenderTargetToShader(2, DepthScreen.get());
+		SetCameraNearFar(near_len, far_len);
+		SetupCamera_Perspective(cams.GetCamFov());
+		SetCameraPositionAndTargetAndUpVec(cams.GetCamPos().get(), cams.GetCamVec().get(), cams.GetCamUp().get());
+		{
+			done();
+		}
+		SetRenderTargetToShader(0, -1);
+		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(2, -1);
+	}
 	void PostPassEffect::LoadGBuffer() noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		ColorScreen = GraphHandle::Make(DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), false);

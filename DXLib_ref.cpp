@@ -287,6 +287,7 @@ namespace DXLib_ref {
 			SetCreateDrawValidGraphChannelNum(2);
 			SetCreateGraphChannelBitDepth(32);
 			DepthScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
+			DepthFarScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
 
 			// 設定を元に戻す
 			SetDrawValidFloatTypeGraphCreateFlag(FALSE);
@@ -298,9 +299,11 @@ namespace DXLib_ref {
 	}
 	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) {
 		// 影用の深度記録画像の準備を行う
-		DepthScreenHandle.SetDraw_Screen();
-		DepthBaseScreenHandle.SetDraw_Screen();
+		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
+		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
+			ClearDrawScreen();
 			SetupCamera_Ortho(30.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
 			SetCameraNearFar(0.05f*12.5f, 60.f*12.5f);		// 描画する奥行き範囲をセット
 			// カメラの位置と注視点はステージ全体が見渡せる位置
@@ -313,22 +316,48 @@ namespace DXLib_ref {
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
 
-			SetRenderTargetToShader(2, DepthScreenHandle.get());
 			Shadowdoing();
-			SetRenderTargetToShader(2, -1);
 		}
+		SetRenderTargetToShader(0, -1);
+		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(2, -1);
 	}
-	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing) {
-		auto* DrawParts = DXDraw::Instance();
+	void DXDraw::ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center) {
+		// 影用の深度記録画像の準備を行う
+		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
+		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
+		{
+			ClearDrawScreen();
+			SetupCamera_Ortho(640.f * 12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+			SetCameraNearFar(20.f * 12.5f, 960.f * 12.5f);		// 描画する奥行き範囲をセット
+			// カメラの位置と注視点はステージ全体が見渡せる位置
+			auto Vec = m_ShadowVec;
+			if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
+				Vec.z = (0.1f);
+			}
+			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (480.f * 12.5f)).get(), Center.get());
+
+			// 設定したカメラのビュー行列と射影行列を取得しておく
+			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(5);
+
+			Shadowdoing();
+		}
+		SetRenderTargetToShader(0, -1);
+		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(2, -1);
+	}
+	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam) {
+		SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
+		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
-		Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f*12.5f, 15.f*12.5f);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f*12.5f, 100.f*12.5f);
 		BaseShadowHandle.SetDraw_Screen(tmp_cam);
 		{
-			SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
 			m_Shader_Skin4_DepthShadow_Step2.Draw_lamda(doing);
-			SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
 		}
+		SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
+		SetUseTextureToShader(2, -1);				// 使用テクスチャの設定を解除
 		//後処理
 		//*
 		GraphFilter(BaseShadowHandle.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
@@ -350,6 +379,7 @@ namespace DXLib_ref {
 		BaseShadowHandle.Dispose();
 		DepthBaseScreenHandle.Dispose();
 		DepthScreenHandle.Dispose();
+		DepthFarScreenHandle.Dispose();
 		m_Shader_Skin4_DepthShadow_Step2.Dispose();
 	}
 	//
@@ -359,6 +389,7 @@ namespace DXLib_ref {
 		SaveDataClass::Create();
 		auto* SaveDataParts = SaveDataClass::Instance();
 		auto* OptionParts = OPTION::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
 		//ロード
 		m_IsFirstBoot = false;
 		if (!SaveDataParts->Load()) {
@@ -410,7 +441,7 @@ namespace DXLib_ref {
 		DxLib_Init();												//
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		if (GetUseDirect3DVersion() != DXVer) {
-			MessageBox(NULL, LocalizePool::Instance()->Get(10), "", MB_OK);
+			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
 		}
 		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) || m_IsFirstBoot) {
 			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->GetDispXSize()) / 2, (desky - this->GetDispYSize()) / 2, 0, 0, SWP_FRAMECHANGED);
@@ -463,8 +494,7 @@ namespace DXLib_ref {
 		if (!m_IsFirstBoot) {
 			//影生成
 			m_PrevShadow = false;
-			InitShadow();
-			m_Shadow.at(1).Init();
+			m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
 			//Init
 			m_PauseActive.Set(false);
 			//
@@ -478,25 +508,18 @@ namespace DXLib_ref {
 			this->GetVRControl()->Dispose();
 			delete m_VRControl;
 			//影削除
-			DisposeShadow();
-			m_Shadow.at(1).Dispose();
+			m_ShadowDraw.Dispose();
 			//
 			Effkseer_End();
 		}
 		DxLib_End();
 	}
 	//
-	void			DXDraw::PauseIn() noexcept {
-		if (!IsPause()) {
+	void			DXDraw::SetPause(bool value) noexcept {
+		auto* Pad = PadControl::Instance();
+		if (value != IsPause()) {
 			m_PauseActive.Execute(true);
-			PadControl::Instance()->SetGuideUpdate();
-		}
-	}
-	//
-	void			DXDraw::PauseExit() noexcept {
-		if (IsPause()) {
-			m_PauseActive.Execute(true);
-			PadControl::Instance()->SetGuideUpdate();
+			Pad->SetGuideUpdate();
 		}
 	}
 	//
@@ -505,25 +528,29 @@ namespace DXLib_ref {
 		m_LightColorF = LightColor;
 		SetGlobalAmbientLight(LightColor);
 		SetLightDirection(AmbientLightVec.get());
+		m_ShadowDraw.SetVec(AmbientLightVec);
 	}
 	//
 	void			DXDraw::Init(void) noexcept {
-		OptionWindowClass::Instance()->Init();
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* Pad = PadControl::Instance();
+		auto* PopUpParts = PopUp::Instance();
+		OptionWindowParts->Init();
 		Update_effect_was = GetNowHiPerformanceCount();
 
 		if (m_IsFirstBoot) {
-			OptionWindowClass::Instance()->SetActive();
+			OptionWindowParts->SetActive();
 			while (ProcessMessage() == 0) {
-				PadControl::Instance()->Execute();
-				OptionWindowClass::Instance()->Execute();
-				PopUp::Instance()->Update();
-				if (!PopUp::Instance()->IsActivePop()) {
+				Pad->Execute();
+				OptionWindowParts->Execute();
+				PopUpParts->Update();
+				if (!PopUpParts->IsActivePop()) {
 					break;
 				}
 				//
 				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 				{
-					PopUp::Instance()->Draw();
+					PopUpParts->Draw();
 				}
 				Screen_Flip();
 			}
@@ -534,20 +561,26 @@ namespace DXLib_ref {
 		}
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
+		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
+
 		m_FPS = std::max(GetFPS(), 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
-		if (PadControl::Instance()->GetEsc().trigger() && !m_IsExitSelect) {
+		if (Pad->GetEsc().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
-			PopUpParts->Add(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+			PopUpParts->Add(LocalizeParts->Get(100), y_r(480), y_r(240),
 				[&](int WinSizeX, int WinSizeY, bool) {
+					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
 						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
 
-						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(101));
+						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					//
 					{
@@ -555,7 +588,7 @@ namespace DXLib_ref {
 						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 						}
@@ -566,17 +599,18 @@ namespace DXLib_ref {
 				true
 			);
 		}
-		if (OptionWindowClass::Instance()->IsRestartSwitch() && !m_IsRestartSelect) {
+		if (OptionWindowParts->IsRestartSwitch() && !m_IsRestartSelect) {
 			m_IsRestartSelect = true;
-			PopUpParts->Add(LocalizePool::Instance()->Get(100), y_r(480), y_r(240),
+			PopUpParts->Add(LocalizeParts->Get(100), y_r(480), y_r(240),
 				[&](int WinSizeX, int WinSizeY, bool) {
+					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
 						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
 						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
 
-						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizePool::Instance()->Get(2101));
+						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 					}
 					//
 					{
@@ -584,7 +618,7 @@ namespace DXLib_ref {
 						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizePool::Instance()->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(2102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 							StartMe();
@@ -596,21 +630,21 @@ namespace DXLib_ref {
 				true
 			);
 		}
-		UpdateShadowActive();
-		auto* PostPassParts = PostPassEffect::Instance();
 		PostPassParts->Update();
 		return (ProcessMessage() == 0) && !m_IsEnd;
 	}
 	void			DXDraw::Execute(void) noexcept {
+		auto* Pad = PadControl::Instance();
+		auto* OptionWindowParts = OptionWindowClass::Instance();
 		Set3DSoundListenerPosAndFrontPosAndUpVec(SetMainCamera().GetCamPos().get(), SetMainCamera().GetCamVec().get(), SetMainCamera().GetCamUp().get());		//音位置指定
 		this->GetVRControl()->Execute();		//VR空間に適用
 		//
 		m_PauseFlashCount += 1.f / GetFps();
 		if (m_PauseFlashCount > 1.f) { m_PauseFlashCount -= 1.f; }
 		//
-		m_PauseActive.Execute(PadControl::Instance()->GetKey(PADS::INVENTORY).press() && !OptionWindowClass::Instance()->IsActive());
+		m_PauseActive.Execute(Pad->GetKey(PADS::INVENTORY).press() && !OptionWindowParts->IsActive());
 		if (m_PauseActive.trigger()) {
-			PadControl::Instance()->SetGuideUpdate();
+			Pad->SetGuideUpdate();
 		}
 		//
 		if (!IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
@@ -637,13 +671,24 @@ namespace DXLib_ref {
 	) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-
+		auto* Pad = PadControl::Instance();
+		auto* Fonts = FontPool::Instance();
+		//描画
 		auto MainDraw = [&](const Camera3DInfo& cams) {
-			PostPassParts->Draw(
+			//影画像の用意
+			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
+				m_ShadowDraw.SetDraw(doing, cams);
+			}
+			PostPassParts->DrawDoF(
 				[&]() { sky_doing(); },
 				[&]() { doing(); },
 				[&]() { doingFront(); },
 				cams);
+			//ソフトシャドウ重ね
+			if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
+				PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });
+			}
+			PostPassParts->Draw();
 			//完成した画面に対して後処理の2Dシェーダーを反映
 			if (this->m_ShaderParam[0].use) {
 				//レンズ
@@ -674,13 +719,11 @@ namespace DXLib_ref {
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//
 				if (m_PauseFlashCount > 0.5f) {
-					auto* Fonts = FontPool::Instance();
 					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_r(16), y_r(16), Green, Black, "Pause");
 				}
 			}
 			doingUI2();										//UI2
-			OptionWindowClass::Instance()->Draw();
-			PadControl::Instance()->Draw();
+			Pad->Draw();
 			};
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//VRに移す
@@ -741,9 +784,8 @@ namespace DXLib_ref {
 		}
 	}
 	bool					DXDraw::Screen_Flip(void) noexcept {
-		ScreenFlip();
-		//*
 		auto* OptionParts = OPTION::Instance();
+		ScreenFlip();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			//4msだけスリープ
 			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 1000 * 4) {
@@ -752,7 +794,6 @@ namespace DXLib_ref {
 			}
 			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit)) {}
 		}
-		//*/
 		this->GetVRControl()->WaitSync();
 		return true;
 	}
@@ -768,67 +809,32 @@ namespace DXLib_ref {
 
 	void					DXDraw::VR_Haptic(char id_, unsigned short times) noexcept { this->GetVRControl()->Haptic(id_, times); }
 	//
-	void					DXDraw::InitShadow() noexcept {
-		m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
-		m_Shadow.at(0).Init();
-	}
-	void					DXDraw::UpdateShadowActive() noexcept {
-		bool shadow = OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow);
+	bool					DXDraw::UpdateShadowActive() noexcept {
+		auto* OptionParts = OPTION::Instance();
+		bool shadow = OptionParts->GetParamBoolean(EnumSaveParam::shadow);
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
 			if (shadow) {
-				InitShadow();
+				m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
+				return true;
 			}
 			else {
-				DisposeShadow();
+				m_ShadowDraw.Dispose();
 			}
 		}
-	}
-	void					DXDraw::DisposeShadow() noexcept {
-		m_ShadowDraw.Dispose();
-		m_Shadow.at(0).Dispose();
-	}
-	//
-	void			DXDraw::SetupShadowDir(const Vector3DX& Vec, const Vector3DX& MinSize, const Vector3DX& MaxSize, int shadowSelect) noexcept {
-		if (shadowSelect == 0) {
-			m_ShadowDraw.SetVec(Vec);
-		}
-		else {
-			m_Shadow[shadowSelect - 1].Set(Vec, MinSize, MaxSize);
-		}
+		return false;
 	}
 
-	void			DXDraw::SetUseShadow(void) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			SetUseShadowMap(0, m_Shadow.at(0).GetHandle());
-		}
-		SetUseShadowMap(1, m_Shadow.at(1).GetHandle());
-	}
-	void			DXDraw::ResetUseShadow(void) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			SetUseShadowMap(0, -1);
-		}
-		SetUseShadowMap(1, -1);
-	}
-	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, int shadowSelect) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
+	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		if (OptionParts->GetParamBoolean(EnumSaveParam::shadow)) {
 			// 影用の深度記録画像の準備を行う
-			if (shadowSelect == 0) {
-				m_ShadowDraw.Update(doing, SetMainCamera().GetCamPos());
+			if (!IsFar) {
+				m_ShadowDraw.Update(doing, CenterPos);
 			}
 			else {
-				m_Shadow[shadowSelect - 1].Update(doing, CenterPos);
+				m_ShadowDraw.UpdateFar(doing, CenterPos);
 			}
-		}
-	}
-	void			DXDraw::Update_NearShadow(std::function<void()> doing) noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			m_ShadowDraw.SetDraw(doing);
-		}
-	}
-	void			DXDraw::DrawAfterShadow() noexcept {
-		if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::shadow)) {
-			m_ShadowDraw.Draw();
 		}
 	}
 };

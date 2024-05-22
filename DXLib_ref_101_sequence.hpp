@@ -44,7 +44,6 @@ namespace DXLib_ref {
 		virtual void DrawUI_In_Sub(void) noexcept {}
 
 		virtual void ShadowDraw_Far_Sub(void) noexcept {}
-		virtual void ShadowDraw_NearFar_Sub(void) noexcept {}
 		virtual void ShadowDraw_Sub(void) noexcept {}
 	};
 	//--------------------------------------------------------------------------------------------------
