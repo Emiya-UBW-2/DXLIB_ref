@@ -19,6 +19,7 @@ namespace DXLib_ref {
 		virtual void Dispose_Sub() noexcept {}
 		virtual bool IsActive_Sub() noexcept { return true; }
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*) noexcept {}
+		virtual void Update_Sub() noexcept {}
 	public:
 		void Init(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
 			m_NormalScreenPtr = NormalPtr;
@@ -50,6 +51,11 @@ namespace DXLib_ref {
 		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
 			if (IsActive_Sub()) {
 				SetEffect_Sub(TargetGraph, ColorGraph);
+			}
+		}
+		void Update() noexcept {
+			if (IsActive_Sub()) {
+				Update_Sub();
 			}
 		}
 	};

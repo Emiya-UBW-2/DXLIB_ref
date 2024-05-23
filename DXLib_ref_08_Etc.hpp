@@ -2,8 +2,8 @@
 #include "DXLib_ref.h"
 
 //リサイズ
-#define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / 1920)
-#define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / 1080)
+#define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / deskx)
+#define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / desky)
 
 #define EdgeSize	y_r(2)
 #define LineHeight	y_r(18)
@@ -769,6 +769,16 @@ namespace DXLib_ref {
 			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle[0]);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
+		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		void			SetPixelCameraMatrix(int Slot) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			// 設定したカメラのビュー行列と射影行列を取得しておく
+			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
+			LightCameraMatrixConst->ViewMatrix = MInverse(GetCameraViewMatrix());
+			LightCameraMatrixConst->ProjectionMatrix = MInverse(GetCameraProjectionMatrix());
+			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
+			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4), DX_SHADERTYPE_PIXEL, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
+		}
 		//ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
 		void			SetPixelDispSize(int dispx, int dispy) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
@@ -851,12 +861,16 @@ namespace DXLib_ref {
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
-						SetCameraNearFar(0.5f, 1000.0f);												// Nearクリップ面とFarクリップ面の距離を設定
+						SetCameraNearFar(0.5f*12.5f, 1000.0f*12.5f);									// Nearクリップ面とFarクリップ面の距離を設定
 						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[i]).get(), up[i]);	// カメラの位置と注視点、カメラの上方向を設定
 						Doing();
 					}
 				}
 			}
+		}
+
+		void Dispose() {
+			dynamicCubeTex.Dispose();
 		}
 
 		const auto& GetCubeMapTex() const noexcept { return dynamicCubeTex; }
@@ -1004,7 +1018,7 @@ namespace DXLib_ref {
 			int WinSizeX{ 720 };
 			int WinSizeY{ 720 };
 
-			std::function<void(int xsize, int ysize, bool EndSwitch)> m_Doing;
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing;
 			std::function<void()> m_ExitDoing;
 			std::function<void()> m_GuideDoing;
 		public:
@@ -1012,7 +1026,7 @@ namespace DXLib_ref {
 			~PopUpDrawClass() {}
 		public:
 			void			Set(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing
 			) noexcept {
@@ -1026,7 +1040,7 @@ namespace DXLib_ref {
 			void			Start() noexcept;
 			void			End() noexcept;
 			void			Update() noexcept;
-			void			Draw(void) noexcept;
+			void			Draw(int xcenter,int ycenter) noexcept;
 		public:
 			const auto IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
@@ -1039,14 +1053,14 @@ namespace DXLib_ref {
 		const auto IsActivePop() const noexcept { return (NowSel != LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
-					std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 					std::function<void()> ExitDoing,
 					std::function<void()> GuideDoing,
 					bool IsInsert = false) noexcept;
 		void Update() noexcept;
-		void Draw() noexcept {
+		void Draw(int xcenter, int ycenter) noexcept {
 			if (!IsActivePop()) { return; }
-			que.at(NowSel).Draw();
+			que.at(NowSel).Draw(xcenter, ycenter);
 		}
 	};
 };

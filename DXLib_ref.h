@@ -66,6 +66,9 @@ constexpr float M_GR{-122.5f};				/*重力加速度*/
 const int32_t deskx{(int32_t)(GetSystemMetrics(SM_CXSCREEN)) / 1};
 const int32_t desky{(int32_t)(GetSystemMetrics(SM_CYSCREEN)) / 1};
 
+const int32_t basex{ 1920 };
+const int32_t basey{ 1080 };
+
 enum class VR_PAD {
 	TRIGGER,
 	SIDEBUTTON,
@@ -120,10 +123,19 @@ namespace DXLib_ref {
 			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam);
 			void Draw();
 			void Dispose();
+		private:
+			void SetupCam(Vector3DX Center, float scale);
 		};
 	private:
-		int							m_DispXSize{deskx};
-		int							m_DispYSize{desky};
+		int							m_DispXSize{basex};
+		int							m_DispYSize{basey};
+
+		int							m_DispXSize_Win{ basex };
+		int							m_DispYSize_Win{ basey };
+
+		int							m_DispXSize_Border{basex};
+		int							m_DispYSize_Border{basey};
+
 		float						m_FPS{60.f};
 
 		switchs						m_PauseActive;
@@ -159,6 +171,8 @@ namespace DXLib_ref {
 
 		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
 		bool						m_IsFirstBoot{false};
+
+		RealTimeCubeMap				m_RealTimeCubeMap;
 	public://ゲッター
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
@@ -193,7 +207,7 @@ namespace DXLib_ref {
 	public:
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept;
-		void			DrawAfterShadow() noexcept;
+		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -202,6 +216,7 @@ namespace DXLib_ref {
 		}
 		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
 		const auto&		IsFirstBoot(void) const noexcept { return m_IsFirstBoot; }
+		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 	public:
 		void			Init(void) noexcept;
 		bool			FirstExecute(void) noexcept;

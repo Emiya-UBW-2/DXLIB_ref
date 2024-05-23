@@ -49,8 +49,8 @@ namespace DXLib_ref {
 		float SSRScale = 12.5f;
 		float DepthThreshold = 10.f;
 
-		static const int SSREX = 4;
-		static const int SSREX2 = 8;
+		static const int SSREX = 1;
+		static const int SSREX2 = 1;
 	public:
 		void Load_Sub() noexcept override {
 			auto* DrawParts = DXDraw::Instance();
@@ -162,6 +162,8 @@ namespace DXLib_ref {
 				SetUseTextureToShader(0, SSRColorScreen.get());	//使用するテクスチャをセット
 				SetUseTextureToShader(1, SSRNormalScreen.get());
 				SetUseTextureToShader(2, SSRDepthScreen.get());
+				SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
+				auto pos = DrawParts->GetMainCamera().GetCamPos();
 				m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(PostPassParts->Get_fov() / 2.f), DepthThreshold);
 				{
 					m_SSR.Draw(m_SSRScreenVertex);
@@ -169,6 +171,7 @@ namespace DXLib_ref {
 				SetUseTextureToShader(0, -1);
 				SetUseTextureToShader(1, -1);
 				SetUseTextureToShader(2, -1);
+				SetUseTextureToShader(3, -1);
 			}
 			SSRScreen0.SetDraw_Screen();
 			{
@@ -197,6 +200,9 @@ namespace DXLib_ref {
 
 				//SSRScreen0.DrawExtendGraph(0, 0, DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2, true);
 			}
+		}
+		void Update_Sub() noexcept override {
+			m_SSR.SetPixelCameraMatrix(4);
 		}
 	};
 	class PostPassDoF : public PostPassBase {
@@ -791,6 +797,12 @@ namespace DXLib_ref {
 			DrawEffekseer3D();
 			doingFront();
 			}, cams);
+
+		//ポストパスエフェクトのアップデート
+		MAIN_Screen.SetDraw_Screen(cams);
+		for (auto& P : m_PostPass) {
+			P->Update();
+		}
 	}
 	void PostPassEffect::Draw() {
 		//色味補正

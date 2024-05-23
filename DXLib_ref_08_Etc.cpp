@@ -18,8 +18,8 @@ namespace DXLib_ref {
 		}
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
-		int ScrX = y_r(1920);
-		int ScrY = y_r(1080);
+		int ScrX = y_r(basex);
+		int ScrY = y_r(basey);
 		// ÉrÉÖÅ[çsóÒÇ∆éÀâeçsóÒÇÃéÊìæ
 		MATRIX mat_view;					// ÉrÉÖÅ[çsóÒ
 		VECTOR vec_from = campos.get();		// ÉJÉÅÉâÇÃà íu
@@ -249,55 +249,59 @@ namespace DXLib_ref {
 			}
 		}
 	}
-	void PopUp::PopUpDrawClass::Draw(void) noexcept {
-		auto* Fonts = FontPool::Instance();
+	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
 
-		int xp1, yp1;
+		int xm1, ym1;
+		int xm2, ym2;
 
-		//îwåi
+		int xp1, yp1;
+		int xp2, yp2;
+
 		if (m_ActivePer > 1.f / 255.f) {
+			xm1 = xcenter - WinSizeX / 2;
+			ym1 = ycenter - WinSizeY / 2;
+			xm2 = xcenter + WinSizeX / 2;
+			ym2 = ycenter + WinSizeY / 2;
+
+			//îwåi
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
-			DrawBox_2D(y_r(960) - WinSizeX / 2, y_r(540) - WinSizeY / 2, y_r(960) + WinSizeX / 2, y_r(540) + WinSizeY / 2, Gray50, true);
+			DrawBox_2D(xm1, ym1, xm2, ym2, Gray50, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//É^ÉCÉgÉã
 			{
-				xp1 = y_r(960) - WinSizeX / 2 + y_r(32);
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4;
-
-				int xpos = xp1 + y_r(6);
-				int ypos = yp1 + (yp1 + LineHeight * 2 - yp1) / 2;
-
-				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(LineHeight * 2, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE,
-																	   xpos, ypos, White, Black, m_WindwoName);
+				xp1 = xm1 + y_r(32);
+				yp1 = ym1 + LineHeight / 4;
+				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 			}
 			//
 			if (m_Active) {
-				xp1 = y_r(960) + WinSizeX / 2 - y_r(140);
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight / 4 + LineHeight / 2;
+				xp1 = xm2 - y_r(140);
+				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
 				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
+			xp1 = xm1 + y_r(24);
+			yp1 = ym1 + LineHeight * 3;
+			xp2 = xm2 - y_r(24);
+			yp2 = ym2 - LineHeight;
 			//îwåi
 			{
-				xp1 = y_r(960) - WinSizeX / 2;
-				yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
-
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
-				DrawBox_2D(xp1 + y_r(24), yp1, xp1 + WinSizeX - y_r(24), y_r(540) + WinSizeY / 2 - LineHeight, Gray50, true);
+				DrawBox_2D(xp1, yp1, xp2, yp2, Gray50, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//
-			m_Doing(WinSizeX, WinSizeY, m_ActiveSwitch);
+			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
 			//
 		}
 	}
 
 	void PopUp::Add(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xsize, int ysize, bool EndSwitch)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing,
 				bool IsInsert) noexcept {

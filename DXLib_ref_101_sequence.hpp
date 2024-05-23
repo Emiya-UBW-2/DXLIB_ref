@@ -36,6 +36,7 @@ namespace DXLib_ref {
 			DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Gray25, TRUE);
 		}
 		virtual void Depth_Draw_Sub(void) noexcept {}
+		virtual void CubeMap_Sub(void) noexcept {}
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
 		virtual void MainDrawbyDepth_Sub(void) noexcept {}
@@ -59,9 +60,9 @@ namespace DXLib_ref {
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_ScenesPtr; }
 	public:
-		void StartScene(void) noexcept;		//ŠJŽn
-		bool Execute(void) noexcept;		//
-		void Draw(void) noexcept;			//•`‰æ
-		void NextScene(void) noexcept;		//
+		void StartScene(void) noexcept;
+		bool FirstExecute(void) noexcept;
+		bool Execute(void) noexcept;
+		void NextScene(void) noexcept;
 	};
 };

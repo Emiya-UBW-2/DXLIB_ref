@@ -1217,20 +1217,20 @@ namespace DXLib_ref {
 			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", y_r(720), y_r(720),
-							   [&](int WinSizeX, int WinSizeY, bool EndSwitch) {
+							   [&](int xmin, int ymin, int xmax, int ymax, bool EndSwitch) {
 								   auto* Pad = PadControl::Instance();
 								   auto* SE = SoundPool::Instance();
 								   int xp1, yp1;
 
 
-								   xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-								   yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3;
+								   xp1 = xmin + y_r(24);
+								   yp1 = ymin;
 								   for (auto& t : m_Tabs) {
 									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
 								   }
 								   //ƒKƒCƒh
-								   xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-								   yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 5 / 2;
+								   xp1 = xmin + y_r(24);
+								   yp1 = ymax - LineHeight * 3 / 2;
 								   m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
 
 								   //

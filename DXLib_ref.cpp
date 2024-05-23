@@ -297,22 +297,26 @@ namespace DXLib_ref {
 		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
 		m_Shader_Skin4_DepthShadow_Step2.Init("shader/SkinMesh4_DirLight_DepthShadow_Step2VS.vso", "shader/DirLight_DepthShadow_Step2PS.pso");
 	}
+	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) {
+		float Scale_Rate = 12.5f;
+		ClearDrawScreen();
+		SetupCamera_Ortho(30.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+		SetCameraNearFar(0.05f * scale * Scale_Rate, 60.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
+		// カメラの位置と注視点はステージ全体が見渡せる位置
+		auto Vec = m_ShadowVec;
+		if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
+			Vec.z = (0.1f);
+		}
+		SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f * scale * Scale_Rate)).get(), Center.get());
+	}
 	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) {
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
 		SetRenderTargetToShader(1, -1);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
-			ClearDrawScreen();
-			SetupCamera_Ortho(30.f*12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
-			SetCameraNearFar(0.05f*12.5f, 60.f*12.5f);		// 描画する奥行き範囲をセット
-			// カメラの位置と注視点はステージ全体が見渡せる位置
-			auto Vec = m_ShadowVec;
-			if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
-				Vec.z = (0.1f);
-			}
-			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f*12.5f)).get(), Center.get());
-
+			SetupCam(Center, 1.f);
+			Shadowdoing();
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
 
@@ -328,20 +332,10 @@ namespace DXLib_ref {
 		SetRenderTargetToShader(1, -1);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			ClearDrawScreen();
-			SetupCamera_Ortho(640.f * 12.5f);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
-			SetCameraNearFar(20.f * 12.5f, 960.f * 12.5f);		// 描画する奥行き範囲をセット
-			// カメラの位置と注視点はステージ全体が見渡せる位置
-			auto Vec = m_ShadowVec;
-			if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
-				Vec.z = (0.1f);
-			}
-			SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (480.f * 12.5f)).get(), Center.get());
-
+			SetupCam(Center, 24.f);
+			Shadowdoing();
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(5);
-
-			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, -1);
 		SetRenderTargetToShader(1, -1);
@@ -351,7 +345,8 @@ namespace DXLib_ref {
 		SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f*12.5f, 100.f*12.5f);
+		float Scale_Rate = 12.5f;
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f* Scale_Rate, 100.f* Scale_Rate);
 		BaseShadowHandle.SetDraw_Screen(tmp_cam);
 		{
 			m_Shader_Skin4_DepthShadow_Step2.Draw_lamda(doing);
@@ -404,7 +399,7 @@ namespace DXLib_ref {
 			this->GetVRControl()->Init();
 		}
 		//
-		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && !m_IsFirstBoot) {
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//解像度指定
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
@@ -417,8 +412,29 @@ namespace DXLib_ref {
 		}
 		else {
 			//解像度指定
-			this->m_DispXSize = deskx;
-			this->m_DispYSize = desky;
+			int dx = deskx;
+			int dy = desky;
+			if (dy < (deskx * basey / basex)) {//16:9より横長
+				dx = (desky * basex / basey);
+				dy = desky;
+			}
+			else {//4:3
+				dx = deskx;
+				dy = (deskx * basey / basex);
+			}
+			this->m_DispXSize = std::min(dx, basex);
+			this->m_DispYSize = std::min(dy, basey);
+		}
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			int DPI = 96;
+			//GetMonitorDpi(NULL,&DPI);
+			if (SetProcessDPIAware() != 0) {
+				auto hdc = GetDC(nullptr);                 // カレントのスクリーン全体のデバイスコンテキスト取得.
+				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
+			}
+			this->m_DispXSize = this->m_DispXSize * DPI / 96;
+			this->m_DispYSize = this->m_DispYSize * DPI / 96;
+			//
 		}
 		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
 		SetOutApplicationLogValidFlag(TRUE);						//log
@@ -432,7 +448,7 @@ namespace DXLib_ref {
 		SetUseDirect3DVersion(DXVer);								//directX ver
 		SetUseDirectInputFlag(TRUE);								//
 		SetDirectInputMouseMode(TRUE);								//
-		SetGraphMode(this->GetDispXSize(), this->GetDispYSize(), 32);		//解像度
+		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		SetEnableXAudioFlag(TRUE);									//Xaudio(ロードが長いとロストするので必要に応じて)
 		Set3DSoundOneMetre(1.0f);									//
@@ -442,13 +458,6 @@ namespace DXLib_ref {
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
-		}
-		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) || m_IsFirstBoot) {
-			SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, (deskx - this->GetDispXSize()) / 2, (desky - this->GetDispYSize()) / 2, 0, 0, SWP_FRAMECHANGED);
-		}
-		else {
-			SetWindowStyleMode(2);
-			SetWindowPos(GetMainWindowHandle(), HWND_TOP, (deskx - this->GetDispXSize()) / 2, (desky - this->GetDispYSize()) / 2, 0, 0, SWP_FRAMECHANGED);
 		}
 		if (!m_IsFirstBoot) {
 			Effekseer_Init(8000);										//Effekseer
@@ -460,15 +469,31 @@ namespace DXLib_ref {
 		SetUseZBuffer3D(TRUE);										//zbufuse
 		SetWriteZBuffer3D(TRUE);									//zbufwrite
 		//MV1SetLoadModelPhysicsWorldGravity(M_GR);					//重力
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr) || m_IsFirstBoot) {
-			int DPI = 96;
-			if (SetProcessDPIAware() != 0) {
-				auto hdc = GetDC(nullptr);                 // カレントのスクリーン全体のデバイスコンテキスト取得.
-				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			//SetWindowPos(GetMainWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED);
+
+			int x1, y1, x2, y2;
+			GetWindowEdgeWidth(&x1, &y1, &x2, &y2);
+			SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+			this->m_DispXSize_Win = this->m_DispXSize - (x2 + x1) + 24;
+			this->m_DispYSize_Win = this->m_DispYSize - (y2 + y1) - 24;
+			this->m_DispXSize_Border = this->m_DispXSize;
+			this->m_DispYSize_Border = this->m_DispYSize;
+		}
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
+				this->m_DispXSize = this->m_DispXSize_Win;
+				this->m_DispYSize = this->m_DispYSize_Win;
+				SetWindowStyleMode(0);
+				SetWindowPosition(0, 0);
+				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
 			}
-			SetWindowSize(deskx * DPI / 96, desky * DPI / 96);
-			if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) || m_IsFirstBoot) {
-				DxLib::GetWindowSize(&this->m_DispXSize, &this->m_DispYSize);
+			else {
+				this->m_DispXSize = this->m_DispXSize_Border;
+				this->m_DispYSize = this->m_DispYSize_Border;
+				SetWindowStyleMode(4);
+				SetWindowPosition(0, 0);
+				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
 			}
 		}
 #ifdef DEBUG
@@ -507,9 +532,8 @@ namespace DXLib_ref {
 		if (!m_IsFirstBoot) {
 			this->GetVRControl()->Dispose();
 			delete m_VRControl;
-			//影削除
 			m_ShadowDraw.Dispose();
-			//
+			m_RealTimeCubeMap.Dispose();
 			Effkseer_End();
 		}
 		DxLib_End();
@@ -550,7 +574,7 @@ namespace DXLib_ref {
 				//
 				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 				{
-					PopUpParts->Draw();
+					PopUpParts->Draw(y_r(960), y_r(540));
 				}
 				Screen_Flip();
 			}
@@ -558,6 +582,7 @@ namespace DXLib_ref {
 		}
 		else {
 			PostPassEffect::Create();						//シェーダー
+			m_RealTimeCubeMap.Init();
 		}
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
@@ -572,20 +597,20 @@ namespace DXLib_ref {
 		if (Pad->GetEsc().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), y_r(480), y_r(240),
-				[&](int WinSizeX, int WinSizeY, bool) {
+				[&](int xmin, int ymin, int xmax, int ymax, bool) {
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
-						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+						xp1 = xmin + y_r(24);
+						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					//
 					{
-						xp1 = y_r(960) - y_r(54);
-						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+						xp1 = (xmax + xmin) / 2 - y_r(54);
+						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(102));
@@ -602,20 +627,20 @@ namespace DXLib_ref {
 		if (OptionWindowParts->IsRestartSwitch() && !m_IsRestartSelect) {
 			m_IsRestartSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), y_r(480), y_r(240),
-				[&](int WinSizeX, int WinSizeY, bool) {
+				[&](int xmin, int ymin, int xmax, int ymax, bool) {
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
-						xp1 = y_r(960) - WinSizeX / 2 + y_r(48);
-						yp1 = y_r(540) - WinSizeY / 2 + LineHeight * 3 + LineHeight;
+						xp1 = xmin + y_r(24);
+						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsgWW(xp1, yp1, xp1, yp1 + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 					}
 					//
 					{
-						xp1 = y_r(960) - y_r(54);
-						yp1 = y_r(540) + WinSizeY / 2 - LineHeight * 4;
+						xp1 = (xmax + xmin) / 2 - y_r(54);
+						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + y_r(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(2102));
@@ -836,5 +861,9 @@ namespace DXLib_ref {
 				m_ShadowDraw.UpdateFar(doing, CenterPos);
 			}
 		}
+	}
+
+	void			DXDraw::Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
+		m_RealTimeCubeMap.ReadyDraw(CenterPos, doing);
 	}
 };

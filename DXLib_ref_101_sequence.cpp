@@ -11,21 +11,21 @@ namespace DXLib_ref {
 		}
 	}
 	void TEMPSCENE::Set(void) noexcept {
-		m_IsFirstLoop = true;
-		//カメラの初期設定
 		auto* OptionParts = OPTION::Instance();
 		auto* DrawParts = DXDraw::Instance();
-		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::SSAO)), 0.05f, 200.f);
+		//カメラの初期設定
+		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
 		//環境光と影の初期化
-		Vector3DX DefaultVec = Vector3DX::vget(0.25f, -1.f, 0.25f);
-		DrawParts->SetAmbientLight(DefaultVec, GetColorF(1.f, 1.f, 1.f, 0.0f));
+		DrawParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
+		//
 		Set_Sub();
-		DrawParts->Update_Shadow([&]() { ShadowDraw_Far_Sub(); }, Vector3DX::zero(), true);		//遠影をセット
+		m_IsFirstLoop = true;
 	}
 	bool TEMPSCENE::Update() noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (DrawParts->UpdateShadowActive() || m_IsFirstLoop) {
 			DrawParts->Update_Shadow([&]() { ShadowDraw_Far_Sub(); }, Vector3DX::zero(), true);		//遠影をセット
+			DrawParts->Update_CubeMap([&]() { CubeMap_Sub(); }, Vector3DX::vget(0.f, 1.f*12.5f, 0.f));		//遠影をセット
 		}
 		auto ans = Update_Sub();
 		m_IsFirstLoop = false;
@@ -64,20 +64,42 @@ namespace DXLib_ref {
 		}
 		m_FPSAvg = 0;
 	}
+	bool SceneControl::FirstExecute(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		return DrawParts->FirstExecute();
+	}
+
 	bool SceneControl::Execute(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		auto* OptionParts = OPTION::Instance();
+		auto* ItemLogParts = SideLog::Instance();
+		auto* PopUpParts = PopUp::Instance();
 		PadControl::Instance()->Execute();
 		auto SelEnd = !this->m_ScenesPtr->Update();		//更新
 		OptionWindowClass::Instance()->Execute();
-		DXDraw::Instance()->Execute();
-		SideLog::Instance()->Update();
-		PopUp::Instance()->Update();
-		return SelEnd;
-	}
-	void SceneControl::Draw(void) noexcept {
+		DrawParts->Execute();
+		ItemLogParts->Update();
+		PopUpParts->Update();
+		//描画
 		this->m_ScenesPtr->Draw();
-		//デバッグ
+		ItemLogParts->Draw();
+		PopUpParts->Draw(y_r(960), y_r(540));
+
 		{
 			FPSAvgs.at(m_FPSAvg) = DXDraw::Instance()->GetFps();
+			auto color = White;
+			//危険
+			if (FPSAvgs.at(m_FPSAvg) < 45.f) {
+				color = Red;
+			}
+			else if (FPSAvgs.at(m_FPSAvg) < 58.f) {
+				color = Yellow;
+			}
+			//十分！
+			if (FPSAvgs.at(m_FPSAvg) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+				color = Green;
+			}
+
 			++m_FPSAvg %= ((int)FPSAvgs.size());
 
 			float Avg = 0.f;
@@ -87,11 +109,10 @@ namespace DXLib_ref {
 			Avg = Avg / ((float)FPSAvgs.size());
 
 			auto* Fonts = FontPool::Instance();
-			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
+			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																  y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
 		}
-		//
-		SideLog::Instance()->Draw();
-		PopUp::Instance()->Draw();
+		return SelEnd;
 	}
 	void SceneControl::NextScene(void) noexcept {
 		this->m_ScenesPtr->Dispose();							//解放
