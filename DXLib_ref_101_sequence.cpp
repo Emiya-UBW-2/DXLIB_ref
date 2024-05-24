@@ -41,7 +41,13 @@ namespace DXLib_ref {
 			[&]() { MainDraw_Sub(); },
 			[&]() { MainDrawFront_Sub(); },
 			[&]() { DrawUI_Base_Sub(); },
-			[&]() { DrawUI_In_Sub(); }
+			[&]() {
+				auto* ItemLogParts = SideLog::Instance();
+				auto* PopUpParts = PopUp::Instance();
+				DrawUI_In_Sub();
+				ItemLogParts->Draw();
+				PopUpParts->Draw(y_r(960), y_r(540));
+			}
 		);
 	}
 	void TEMPSCENE::Dispose(void) noexcept { Dispose_Sub(); }
@@ -82,8 +88,6 @@ namespace DXLib_ref {
 		PopUpParts->Update();
 		//•`‰æ
 		this->m_ScenesPtr->Draw();
-		ItemLogParts->Draw();
-		PopUpParts->Draw(y_r(960), y_r(540));
 
 		{
 			FPSAvgs.at(m_FPSAvg) = DXDraw::Instance()->GetFps();
@@ -109,8 +113,8 @@ namespace DXLib_ref {
 			Avg = Avg / ((float)FPSAvgs.size());
 
 			auto* Fonts = FontPool::Instance();
-			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																  y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
+			Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(18, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																  DrawParts->GetDispXSize() - 8, 8, White, Black, "%5.2f FPS", Avg);
 		}
 		return SelEnd;
 	}

@@ -32,8 +32,7 @@ namespace DXLib_ref {
 		virtual void Dispose_Load_Sub(void) noexcept {}
 
 		virtual void BG_Draw_Sub(void) noexcept {
-			auto* DrawParts = DXDraw::Instance();
-			DrawBox_2D(0, 0, DrawParts->GetDispXSize(), DrawParts->GetDispYSize(), Gray25, TRUE);
+			DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE);
 		}
 		virtual void Depth_Draw_Sub(void) noexcept {}
 		virtual void CubeMap_Sub(void) noexcept {}

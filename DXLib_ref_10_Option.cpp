@@ -1217,7 +1217,7 @@ namespace DXLib_ref {
 			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", y_r(720), y_r(720),
-							   [&](int xmin, int ymin, int xmax, int ymax, bool EndSwitch) {
+							   [&](int xmin, int ymin, int, int ymax, bool EndSwitch) {
 								   auto* Pad = PadControl::Instance();
 								   auto* SE = SoundPool::Instance();
 								   int xp1, yp1;

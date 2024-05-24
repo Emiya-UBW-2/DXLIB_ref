@@ -407,8 +407,7 @@ namespace DXLib_ref {
 			this->m_DispXSize = int(t_x) * 2;
 			this->m_DispYSize = int(t_y) * 2;
 			//画面セット
-			m_OutScreen = GraphHandle::Make(this->GetDispXSize(), this->GetDispYSize());	//左目
-			UI_Screen = GraphHandle::Make(this->GetDispXSize(), this->GetDispYSize(), true);	//UI
+			m_OutScreen = GraphHandle::Make(this->m_DispXSize, this->m_DispYSize);	//左目
 		}
 		else {
 			//解像度指定
@@ -422,8 +421,8 @@ namespace DXLib_ref {
 				dx = deskx;
 				dy = (deskx * basey / basex);
 			}
-			this->m_DispXSize = std::min(dx, basex);
-			this->m_DispYSize = std::min(dy, basey);
+			this->m_DispXSize = dx;
+			this->m_DispYSize = dy;
 		}
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			int DPI = 96;
@@ -583,6 +582,7 @@ namespace DXLib_ref {
 		else {
 			PostPassEffect::Create();						//シェーダー
 			m_RealTimeCubeMap.Init();
+			UI_Screen = GraphHandle::Make(y_r(1920), y_r(1080), true);	//UI
 		}
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
@@ -718,7 +718,7 @@ namespace DXLib_ref {
 			if (this->m_ShaderParam[0].use) {
 				//レンズ
 				PostPassParts->Plus_Draw([&]() {
-					this->m_Shader2D[0].SetPixelDispSize(this->GetDispXSize(), this->GetDispYSize());
+					this->m_Shader2D[0].SetPixelDispSize(y_r(1920), y_r(1080));
 					this->m_Shader2D[0].SetPixelParam(3, this->m_ShaderParam[0].param[0], this->m_ShaderParam[0].param[1], this->m_ShaderParam[0].param[2], this->m_ShaderParam[0].param[3]);
 					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[0].Draw(this->m_ScreenVertex);
@@ -728,7 +728,7 @@ namespace DXLib_ref {
 			if (this->m_ShaderParam[1].use) {
 				//ブラックアウト
 				PostPassParts->Plus_Draw([&]() {
-					this->m_Shader2D[1].SetPixelDispSize(this->GetDispXSize(), this->GetDispYSize());
+					this->m_Shader2D[1].SetPixelDispSize(y_r(1920), y_r(1080));
 					this->m_Shader2D[1].SetPixelParam(3, this->m_ShaderParam[1].param[0], 0, 0, 0);
 					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[1].Draw(this->m_ScreenVertex);
@@ -740,7 +740,7 @@ namespace DXLib_ref {
 			if (IsPause()) {
 				//
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * 0.5f), 0, 255));
-				DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), Black, TRUE);
+				DrawBox_2D(0, 0, y_r(1920), y_r(1080), Black, TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//
 				if (m_PauseFlashCount > 0.5f) {
@@ -793,18 +793,23 @@ namespace DXLib_ref {
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
 			{
-				DrawBox_2D(0, 0, this->GetDispXSize(), this->GetDispYSize(), White, TRUE);
-				m_OutScreen.DrawRotaGraph(this->GetDispXSize() / 2, this->GetDispYSize() / 2, 0.5f, 0, false);
+				DrawBox_2D(0, 0, y_r(1920), y_r(1080), White, TRUE);
+				m_OutScreen.DrawRotaGraph(y_r(1920) / 2, y_r(1080) / 2, 0.5f, 0, false);
 			}
 		}
 		else {
 			MainDraw(GetMainCamera());
+			//UIをスクリーンに描画しておく
+			UI_Screen.SetDraw_Screen();
+			{
+				doingUI();
+				DrawFrontUI();
+			}
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			{
-				PostPassParts->Get_MAIN_Screen().DrawGraph(0, 0, true);
-				doingUI();
-				DrawFrontUI();
+				PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->GetDispXSize(), this->GetDispYSize(), false);
+				UI_Screen.DrawExtendGraph(0, 0, this->GetDispXSize(), this->GetDispYSize(), true);
 			}
 		}
 	}
@@ -840,7 +845,7 @@ namespace DXLib_ref {
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
 			if (shadow) {
-				m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
+				m_ShadowDraw.Init(12, y_r(1920), y_r(1080));
 				return true;
 			}
 			else {

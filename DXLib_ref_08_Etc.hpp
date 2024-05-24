@@ -2,8 +2,8 @@
 #include "DXLib_ref.h"
 
 //リサイズ
-#define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / deskx)
-#define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / desky)
+#define x_r(p1) (int(p1) * std::min(DXDraw::Instance()->GetDispXSize(),basey) / deskx)
+#define y_r(p1) (int(p1) * std::min(DXDraw::Instance()->GetDispYSize(),basey) / desky)
 
 #define EdgeSize	y_r(2)
 #define LineHeight	y_r(18)
@@ -774,8 +774,9 @@ namespace DXLib_ref {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
-			LightCameraMatrixConst->ViewMatrix = MInverse(GetCameraViewMatrix());
-			LightCameraMatrixConst->ProjectionMatrix = MInverse(GetCameraProjectionMatrix());
+			LightCameraMatrixConst->ViewMatrix = GetCameraViewMatrix();
+			LightCameraMatrixConst->ProjectionMatrix = GetCameraProjectionMatrix();
+
 			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
 			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4), DX_SHADERTYPE_PIXEL, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
 		}

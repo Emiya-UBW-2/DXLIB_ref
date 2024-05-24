@@ -18,7 +18,7 @@ namespace DXLib_ref {
 		}
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
-		int ScrX = y_r(basex);
+		int ScrX = y_r(1920);
 		int ScrY = y_r(basey);
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
@@ -66,21 +66,20 @@ namespace DXLib_ref {
 		};
 		//文字
 		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
-			auto* DrawParts = DXDraw::Instance();
 			*yp1 = *yp1 + (yp2 - *yp1) / 2;
-			if ((*yp1 - size / 2) > DrawParts->GetDispYSize() || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
+			if ((*yp1 - size / 2) > y_r(1080) || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
 			switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
 					*xp1 = *xp1 + y_r(6);
-					if ((*xp1) > DrawParts->GetDispXSize() || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
+					if ((*xp1) > y_r(1920) || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::MIDDLE:
 					*xp1 = *xp1 + (xp2 - *xp1) / 2;
-					if ((*xp1 - xSize / 2) > DrawParts->GetDispXSize() || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
+					if ((*xp1 - xSize / 2) > y_r(1920) || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::RIGHT:
 					*xp1 = xp2 - y_r(6);
-					if ((*xp1 - xSize) > DrawParts->GetDispXSize() || (*xp1) < 0) { return false; }						//画面外は表示しない
+					if ((*xp1 - xSize) > y_r(1920) || (*xp1) < 0) { return false; }						//画面外は表示しない
 					break;
 				default:
 					break;
