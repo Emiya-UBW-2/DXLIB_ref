@@ -17,6 +17,12 @@ namespace DXLib_ref {
 				return 1.f;
 		}
 	}
+	bool IntoMouse(int x1, int  y1, int  x2, int  y2) {
+		auto* Pad = PadControl::Instance();
+		int mx =Pad->GetMS_X();
+		int my = Pad->GetMS_Y();
+		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
+	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
 		int ScrX = y_r(1920);
 		int ScrY = y_r(basey);
@@ -60,7 +66,7 @@ namespace DXLib_ref {
 		};
 		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp1, yp1, xp2, yp2);
+			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2);
 			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && Pad->GetMouseClick().trigger());
 		};
@@ -94,7 +100,7 @@ namespace DXLib_ref {
 			int yp4 = yp1 + LineHeight - EdgeSize;
 
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xp3, yp3, xp4, yp4);
+			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4);
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				switchturn ^= 1;
 				auto* SE = SoundPool::Instance();
@@ -117,7 +123,7 @@ namespace DXLib_ref {
 				int xpmax = xmax - 1;
 
 				auto* Pad = PadControl::Instance();
-				bool MouseOver = in2_(Pad->GetMS_X(), Pad->GetMS_Y(), xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight);
+				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
 				if (MouseOver && Pad->GetMouseClick().trigger()) {
 					auto* SE = SoundPool::Instance();
 					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -133,6 +139,25 @@ namespace DXLib_ref {
 			xp = (xmin + (xmax - xmin) / 2);
 			SetMsgWW(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
+			return value;
+		}
+
+		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) {
+			{
+				int width = LineHeight;
+				int r = LineHeight / 3;
+				int xps = (xmax + xmin) / 2;
+				int yps = yp + LineHeight / 2;
+				for (int loop = 0; loop < valueMax; loop++) {
+					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
+					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+
+						value = loop;
+					}
+				}
+			}
 			return value;
 		}
 	};
@@ -195,10 +220,10 @@ namespace DXLib_ref {
 			if (d.ActivePer() > 0.f) {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
 				int yp = yp1 - y_r(24.f * d.GetFlip());
-				DrawBox_2D(
+				WindowSystem::SetBox(
 					xp1 - y_r(6), yp + y_r(18),
 					xp1 - y_r(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), d.GetMsg()), y_r(200))*d.ActivePer()), yp + y_r(18) + y_r(5),
-					Black, TRUE);
+					Black);
 				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
 																	  xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
 			}
@@ -266,7 +291,7 @@ namespace DXLib_ref {
 			//îwåi
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
-			DrawBox_2D(xm1, ym1, xm2, ym2, Gray50, true);
+			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//É^ÉCÉgÉã
@@ -290,7 +315,7 @@ namespace DXLib_ref {
 			//îwåi
 			{
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
-				DrawBox_2D(xp1, yp1, xp2, yp2, Gray50, true);
+				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//

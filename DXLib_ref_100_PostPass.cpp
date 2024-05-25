@@ -110,9 +110,10 @@ namespace DXLib_ref {
 		}
 		bool IsActive_Sub() noexcept override {
 			auto* OptionParts = OPTION::Instance();
-			return OptionParts->GetParamBoolean(EnumSaveParam::SSR);
+			return OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0;
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept override {
+			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 
@@ -153,8 +154,6 @@ namespace DXLib_ref {
 				if (CheckHitKeyWithCheck(KEY_INPUT_NUMPAD6) != 0) {
 					SP = 6;
 				}
-
-				DebugClass::Create();
 				printfDx("RayInterval   :%d\n", RayInterval);
 				printfDx("DepthThreshold:%f\n", DepthThreshold);
 #endif // DEBUG
@@ -164,6 +163,7 @@ namespace DXLib_ref {
 				SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
 				auto pos = DrawParts->GetMainCamera().GetCamPos();
 				m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(PostPassParts->Get_fov() / 2.f), DepthThreshold);
+				m_SSR.SetPixelParam(5, (float)OptionParts->GetParamInt(EnumSaveParam::Reflection),0.f,0.f, 0.f);
 				{
 					m_SSR.Draw(m_SSRScreenVertex);
 				}
@@ -189,14 +189,12 @@ namespace DXLib_ref {
 			{
 				TargetGraph->DrawGraph(0, 0, true);
 				SSRScreen1.DrawExtendGraph(0, 0, y_r(1920), y_r(1080), true);
-				//DrawBox_2D(0, 0, 1920, 1080, Red, TRUE);
 			}
 			GraphBlend(SSRScreen2.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				SSRScreen2.DrawGraph(0, 0, true);
-
 				//SSRScreen0.DrawExtendGraph(0, 0, y_r(1920) / 2, y_r(1080) / 2, true);
 			}
 		}
@@ -290,7 +288,7 @@ namespace DXLib_ref {
 		}
 		bool IsActive_Sub() noexcept override {
 			auto* OptionParts = OPTION::Instance();
-			return OptionParts->GetParamBoolean(EnumSaveParam::aberration);
+			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
@@ -397,7 +395,7 @@ namespace DXLib_ref {
 		GraphHandle bkScreen2;
 		GraphHandle	BufScreen;
 	public:
-		PostPassCornerBlur(void) {
+		void Load_Sub() noexcept override {
 			AberrationScreen = GraphHandle::Make(y_r(1920) / EXTEND, y_r(1080) / EXTEND, true);	//描画スクリーン
 			{
 				bkScreen2 = GraphHandle::Make(y_r(1920), y_r(1080), false);							//ふち黒
@@ -421,30 +419,29 @@ namespace DXLib_ref {
 			}
 			BufScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);							//描画スクリーン
 		}
-		~PostPassCornerBlur(void) {
+		void Dispose_Sub() noexcept override {
 			AberrationScreen.Dispose();
 			bkScreen2.Dispose();
 			BufScreen.Dispose();
 		}
-	public:
-		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept override {
+		bool IsActive_Sub() noexcept override {
 			auto* OptionParts = OPTION::Instance();
-			//結果描画
-			if (OptionParts->GetParamBoolean(EnumSaveParam::aberration)) {
-				GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-				GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
+			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
+		}
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept override {
+			GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+			GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 
-				BufScreen.SetDraw_Screen();
-				{
-					TargetGraph->DrawGraph(0, 0, true);
-				}
-				GraphBlend(BufScreen.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-						   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
-				TargetGraph->SetDraw_Screen(false);
-				{
-					AberrationScreen.DrawExtendGraph(0, 0, y_r(1920), y_r(1080), false);
-					BufScreen.DrawGraph(0, 0, true);
-				}
+			BufScreen.SetDraw_Screen();
+			{
+				TargetGraph->DrawGraph(0, 0, true);
+			}
+			GraphBlend(BufScreen.get(), bkScreen2.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
+			TargetGraph->SetDraw_Screen(false);
+			{
+				AberrationScreen.DrawExtendGraph(0, 0, y_r(1920), y_r(1080), false);
+				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
 	};
@@ -453,7 +450,7 @@ namespace DXLib_ref {
 		GraphHandle bkScreen;
 		GraphHandle	BufScreen;
 	public:
-		PostPassVignette(void) {
+		void Load_Sub() noexcept override {
 			{
 				bkScreen = GraphHandle::Make(y_r(1920), y_r(1080), false);							//ふち黒
 				bkScreen.SetDraw_Screen(true);
@@ -475,10 +472,14 @@ namespace DXLib_ref {
 			}
 			BufScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);							//描画スクリーン
 		}
-		~PostPassVignette(void) {
+		void Dispose_Sub() noexcept override {
+			bkScreen.Dispose();
 			BufScreen.Dispose();
 		}
-	public:
+		bool IsActive_Sub() noexcept override {
+			auto* OptionParts = OPTION::Instance();
+			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
+		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept override {
 			BufScreen.SetDraw_Screen();
 			{
@@ -704,6 +705,7 @@ namespace DXLib_ref {
 	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	//
 	PostPassEffect::PostPassEffect(void) {
+
 		FarScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), false);		//描画スクリーン
 		NearScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), true);		//描画スクリーン
 		MAIN_Screen = GraphHandle::Make(y_r(1920), y_r(1080), false);		//最終描画用

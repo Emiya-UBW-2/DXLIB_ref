@@ -18,17 +18,14 @@ namespace DXLib_ref {
 		VOICE,
 		BGM,
 		AllWaysFront,
-		aberration,
-		SSR,
+		ScreenEffect,
+		Reflection,
 		MotionBlur,
 		Xsensing,
 		Ysensing,
 		HeadBobbing,
-		EnableCheck,
 		ControlType,
 		Language,
-		EX_UI,
-		EX_UI2,
 		AA,
 		Max,
 	};
@@ -48,17 +45,14 @@ namespace DXLib_ref {
 		"VOICE",
 		"BGM",
 		"AllWaysFront",
-		"aberration",
-		"SSR",
+		"ScreenEffect",
+		"Reflection",
 		"MotionBlur",
 		"Xsensing",
 		"Ysensing",
 		"HeadBobbing",
-		"EnableCheck",
 		"ControlType",
 		"Language",
-		"EX_UI",
-		"EX_UI2",
 		"AA",
 	};
 
@@ -125,7 +119,6 @@ namespace DXLib_ref {
 		void			SetParamBoolean(EnumSaveParam id, bool use) {
 			switch (id) {
 				case EnumSaveParam::SSAO:
-				case EnumSaveParam::SSR:
 				case EnumSaveParam::AA:
 				case EnumSaveParam::DoF:
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
@@ -140,29 +133,8 @@ namespace DXLib_ref {
 				case EnumSaveParam::bloom:
 					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
 					break;
-				case EnumSaveParam::shadow:
-				case EnumSaveParam::aberration:
+				case EnumSaveParam::ScreenEffect:
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					break;
-				case EnumSaveParam::GraphicsPreset:
-				case EnumSaveParam::ObjLevel:
-				case EnumSaveParam::fov:
-				case EnumSaveParam::vsync:
-				case EnumSaveParam::FpsLimit:
-				case EnumSaveParam::SE:
-				case EnumSaveParam::VOICE:
-				case EnumSaveParam::BGM:
-				case EnumSaveParam::AllWaysFront:
-				case EnumSaveParam::DirectXVer:
-				case EnumSaveParam::Xsensing:
-				case EnumSaveParam::Ysensing:
-				case EnumSaveParam::HeadBobbing:
-				case EnumSaveParam::EnableCheck:
-				case EnumSaveParam::ControlType:
-				case EnumSaveParam::Language:
-				case EnumSaveParam::EX_UI:
-				case EnumSaveParam::EX_UI2:
-				case EnumSaveParam::MotionBlur:
 					break;
 				default:
 					break;
@@ -171,7 +143,20 @@ namespace DXLib_ref {
 		}
 		void			ChangeParamBoolean(EnumSaveParam id) { m_SaveParams.at((int)id).ChangeBoolean(); }
 
-		void			SetParamInt(EnumSaveParam id, int use) { m_SaveParams.at((int)id).SetInt(use); }
+		void			SetParamInt(EnumSaveParam id, int use) {
+			switch (id) {
+				case EnumSaveParam::Reflection:
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
+					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
+					break;
+				case EnumSaveParam::shadow:
+					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = 0; }
+					break;
+				default:
+					break;
+			}
+			m_SaveParams.at((int)id).SetInt(use);
+		}
 		void			SetParamFloat(EnumSaveParam id, float use) { m_SaveParams.at((int)id).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
@@ -185,7 +170,7 @@ namespace DXLib_ref {
 		class OptionElementsInfo {
 		private:
 			std::string m_Name;
-			std::string m_Info;
+			int m_Info{0};
 			std::function<void()> m_LeftPush;
 			std::function<void()> m_RightPush;
 			std::function<void()> m_OKPush;
@@ -195,20 +180,20 @@ namespace DXLib_ref {
 			float selanim{0.f};
 		public:
 			const auto& GetName() const noexcept { return m_Name; }
-			const auto& GetInfo() const noexcept { return m_Info; }
+			const auto& GetInfoTextID() const noexcept { return m_Info; }
 
 			void GetLeftPush() const noexcept { m_LeftPush(); }
 			void GetRightPush() const noexcept { m_RightPush(); }
 			void GetOKPush() const noexcept { m_OKPush(); }
 			void GetAnyDoing() const noexcept { m_AnyDoing(); }
 		public:
-			void Init(const char* name, const char* info, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
+			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
 					  std::function<void()> AnyDoing,
 					  std::function<void(int xpos, int ypos, bool isMine)> draw) {
 				selanim = 0;
 
 				m_Name = name;
-				m_Info = info;
+				m_Info = infoTextID;
 				m_LeftPush = LeftPush;
 				m_RightPush = RightPush;
 				m_OKPush = OKPush;

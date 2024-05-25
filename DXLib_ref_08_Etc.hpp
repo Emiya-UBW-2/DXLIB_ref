@@ -2,8 +2,8 @@
 #include "DXLib_ref.h"
 
 //リサイズ
-#define x_r(p1) (int(p1) * std::min(DXDraw::Instance()->GetDispXSize(),basey) / deskx)
-#define y_r(p1) (int(p1) * std::min(DXDraw::Instance()->GetDispYSize(),basey) / desky)
+#define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSizeMax() / DXDraw::Instance()->GetDispXSizeMin())
+#define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSizeMax() / DXDraw::Instance()->GetDispYSizeMin())
 
 #define EdgeSize	y_r(2)
 #define LineHeight	y_r(18)
@@ -40,9 +40,7 @@ namespace DXLib_ref {
 	}
 	//
 	template <class T>
-	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) {
-		*A = Lerp(*A, B, GetEasingRatio(EasingType, ratio));
-	};
+	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) { *A = Lerp(*A, B, GetEasingRatio(EasingType, ratio)); };
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -79,6 +77,10 @@ namespace DXLib_ref {
 		*RetHandle = graphhandle;
 		return true;
 	}
+	//矩形と点との2D判定
+	static bool HitPointToRectangle(int xp, int  yp, int x1, int  y1, int  x2, int  y2) { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
+	//マウスと矩形の判定
+	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2);
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -381,6 +383,8 @@ namespace DXLib_ref {
 		extern bool CheckBox(int xp1, int yp1, bool switchturn);
 
 		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax);
+
+		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax);
 		//
 		/*
 		class ScrollBoxClass {
@@ -400,12 +404,12 @@ namespace DXLib_ref {
 				int Yp_e = std::min(yp2, Yp_s + length);
 
 				if (IsActive) {
-					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp1, yp1, xp2, yp2)) {
+					if (IntoMouse(xp1, yp1, xp2, yp2)) {
 						if (Pad->GetWheelAdd() != 0.f) {
 							m_NowScrollYPer = std::clamp(m_NowScrollYPer + (float)(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
-					if (in2_(Pad->GetMouseX(), Pad->GetMouseY(), xp2 - y_r(24), yp1, xp2, yp2)) {
+					if (IntoMouse(xp2 - y_r(24), yp1, xp2, yp2)) {
 						if (Pad->GetINTERACTKey().trigger()) {
 							m_IsChangeScrollY = true;
 						}
@@ -792,13 +796,13 @@ namespace DXLib_ref {
 		//ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle[0]);				// ピクセルシェーダー用の定数バッファのアドレスを取得
+			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle.at(Slot - 3));				// ピクセルシェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
 			f4->w = param4;
-			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle[0]);											// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_PixelShadercbhandle[0], DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
+			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle.at(Slot - 3));											// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
+			SetShaderConstantBuffer(this->m_PixelShadercbhandle.at(Slot - 3), DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
 		}
 		//3D空間に適用する場合の関数(引数に3D描画のラムダ式を代入)
 		void			Draw_lamda(std::function<void()> doing) noexcept {

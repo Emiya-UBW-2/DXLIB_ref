@@ -359,8 +359,8 @@ namespace DXLib_ref {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = mx;
-						MouseY = my;
+						MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
+						MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.ThumbRX;
@@ -417,8 +417,8 @@ namespace DXLib_ref {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = mx;
-						MouseY = my;
+						MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
+						MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.Z;
@@ -439,8 +439,8 @@ namespace DXLib_ref {
 				{
 					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 					GetMousePoint(&mx, &my);
-					MouseX = mx;
-					MouseY = my;
+					MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
+					MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
 					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 					if (m_MouseMoveEnable) {
@@ -461,8 +461,8 @@ namespace DXLib_ref {
 						SetMouseDispFlag(TRUE);
 					}
 					auto* OptionParts = OPTION::Instance();
-					Look_XradAdd = (float)(MouseX - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					Look_YradAdd = -(float)(MouseY - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					Look_XradAdd = (float)(mx - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					Look_YradAdd = -(float)(my - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				break;
 			default:

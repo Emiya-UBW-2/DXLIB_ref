@@ -9,7 +9,6 @@ namespace DXLib_ref {
 	private:
 		static const int	PointMax{ 12 };
 	private:
-		float																	m_FrameRate{ 60.f };
 		LONGLONG																m_StartTime{ 0 };
 		std::vector<std::array<std::pair<float, std::string>, PointMax + 1>>	m_Point;
 		size_t																	m_PointSel{ 0 };

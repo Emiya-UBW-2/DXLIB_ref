@@ -66,8 +66,8 @@ constexpr float M_GR{-122.5f};				/*重力加速度*/
 const int32_t deskx{(int32_t)(GetSystemMetrics(SM_CXSCREEN)) / 1};
 const int32_t desky{(int32_t)(GetSystemMetrics(SM_CYSCREEN)) / 1};
 
-const int32_t basex{ 1920 };
-const int32_t basey{ 1080 };
+const int32_t basex{1920 / 1};
+const int32_t basey{1080 / 1};
 
 enum class VR_PAD {
 	TRIGGER,
@@ -148,7 +148,6 @@ namespace DXLib_ref {
 
 		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{GetColorF(0, 0, 0, 0)};
-		GraphHandle					m_OutScreen;							//スクリーンバッファ
 		GraphHandle					UI_Screen;								//UI
 		Camera3DInfo				m_MainCamera;							//カメラ
 		//カメラシェイク
@@ -176,6 +175,12 @@ namespace DXLib_ref {
 	public://ゲッター
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
+
+		const auto&		GetDispXSizeMin(void) const noexcept { return m_DispXSize_Win; }
+		const auto&		GetDispYSizeMin(void) const noexcept { return m_DispYSize_Win; }
+		const auto&		GetDispXSizeMax(void) const noexcept { return std::min(m_DispXSize_Border, basex); }
+		const auto&		GetDispYSizeMax(void) const noexcept { return std::min(m_DispYSize_Border, basey); }
+
 		const auto&		GetFps(void) const noexcept { return m_FPS; }
 
 		const auto&		is_lens(void) const noexcept { return m_ShaderParam[0].use; }
@@ -217,6 +222,8 @@ namespace DXLib_ref {
 		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
 		const auto&		IsFirstBoot(void) const noexcept { return m_IsFirstBoot; }
 		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
+
+		void			SetWindowOrBorderless() noexcept;
 	public:
 		void			Init(void) noexcept;
 		bool			FirstExecute(void) noexcept;

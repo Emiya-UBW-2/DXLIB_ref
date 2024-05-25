@@ -18,33 +18,55 @@ namespace DXLib_ref {
 		TEMPSCENE(void) noexcept {}
 		~TEMPSCENE(void) noexcept {}
 	public://ÉÅÉCÉìçXêV
-		void Load(void) noexcept;
-		void Set(void) noexcept;
-		bool Update() noexcept;
-		void Draw(void) noexcept;
-		void Dispose(void) noexcept;
-		void Dispose_Load(void) noexcept;
+		void Load(void) noexcept {
+			if (!m_IsLoading) {
+				m_IsLoading = true;
+				Load_Sub();
+			}
+		}
+		void Set(void) noexcept {
+			Set_Sub();
+			m_IsFirstLoop = true;
+		}
+		bool Update() noexcept {
+			auto ans = Update_Sub();
+			m_IsFirstLoop = false;
+			return ans;
+		}
+
+		void CubeMapDraw(void) noexcept { CubeMap_Sub(); }
+		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
+		void MainDraw(void) noexcept { MainDraw_Sub(); }
+		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
+		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
+		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
+		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
+		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
+
+		void Dispose(void) noexcept { Dispose_Sub(); }
+		void Dispose_Load(void) noexcept {
+			if (m_IsLoading) {
+				m_IsLoading = false;
+				Dispose_Load_Sub();
+			}
+		}
 	protected://åpè≥ï®
 		virtual void Load_Sub(void) noexcept {}
 		virtual void Set_Sub(void) noexcept {}
 		virtual bool Update_Sub(void) noexcept { return true; }
+
+		virtual void CubeMap_Sub(void) noexcept {}
+		virtual void BG_Draw_Sub(void) noexcept { DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE); }
+		virtual void MainDraw_Sub(void) noexcept {}
+		virtual void MainDrawFront_Sub(void) noexcept {}
+		virtual void DrawUI_Base_Sub(void) noexcept {}
+		virtual void DrawUI_In_Sub(void) noexcept {}
+		virtual void ShadowDraw_Far_Sub(void) noexcept {}
+		virtual void ShadowDraw_Sub(void) noexcept {}
+
 		virtual void Dispose_Sub(void) noexcept {}
 		virtual void Dispose_Load_Sub(void) noexcept {}
 
-		virtual void BG_Draw_Sub(void) noexcept {
-			DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE);
-		}
-		virtual void Depth_Draw_Sub(void) noexcept {}
-		virtual void CubeMap_Sub(void) noexcept {}
-		virtual void MainDraw_Sub(void) noexcept {}
-		virtual void MainDrawFront_Sub(void) noexcept {}
-		virtual void MainDrawbyDepth_Sub(void) noexcept {}
-
-		virtual void DrawUI_Base_Sub(void) noexcept {}
-		virtual void DrawUI_In_Sub(void) noexcept {}
-
-		virtual void ShadowDraw_Far_Sub(void) noexcept {}
-		virtual void ShadowDraw_Sub(void) noexcept {}
 	};
 	//--------------------------------------------------------------------------------------------------
 	//
