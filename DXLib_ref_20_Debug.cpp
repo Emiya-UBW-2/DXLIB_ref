@@ -71,36 +71,39 @@ namespace DXLib_ref {
 			//”wŒi
 			WindowSystem::SetBox(xp, yp, xp + wide, yp + height, Black);
 			DrawBox_2D(xp, yp, xp + wide, yp + height, White, FALSE);
-			//“à—e
-			auto* OptionParts = OPTION::Instance();
-			int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
-			auto xs = (float)wide / 180;
-			auto ys = (float)border / (1000.0f / value);
-			for (int j = (int)(m_Point.size() - 1 - 1); j >= 0; --j) {
-				int xnow = xp + (int)((float)j * xs);
-				int xnext = xp + (int)((float)(j + 1) * xs);
-				for (int index = PMax - 1; index >= 0; --index) {
-					int ynow = yp + height - (int)(m_Point[j][index].first * ys);
-					int ynext = yp + height - (int)(m_Point[j + 1][index].first * ys);
-					DrawQuadrangle(
-						xnow, ynow,
-						xnext, ynext,
-						xnext, yp + height,
-						xnow, yp + height,
-						Colors[index],
-						TRUE);
-				}
-				for (int index = 0; index < PMax; ++index) {
-					int ynow = yp + height - (int)(m_Point[j][index].first * ys);
-					int ynext = yp + height - (int)(m_Point[j + 1][index].first * ys);
-					DrawLine_2D(
-						xnow, ynow,
-						xnext, ynext,
-						GetColor(64, 64, 64));
-				}
-			}
-			DrawLine_2D(xp, yp + height - border, xp + wide, yp + height - border, White);//Šî€ü
 
+			//if (IntoMouse(xp, yp, xp + wide, yp + height))
+			{
+				//“à—e
+				auto* OptionParts = OPTION::Instance();
+				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
+				auto xs = (float)wide / 180;
+				auto ys = (float)border / (1000.0f / value);
+				for (int j = (int)(m_Point.size() - 1 - 1); j >= 0; --j) {
+					int xnow = xp + (int)((float)j * xs);
+					int xnext = xp + (int)((float)(j + 1) * xs);
+					for (int index = PMax - 1; index >= 0; --index) {
+						int ynow = yp + height - (int)(m_Point[j][index].first * ys);
+						int ynext = yp + height - (int)(m_Point[j + 1][index].first * ys);
+						DrawQuadrangle(
+							xnow, ynow,
+							xnext, ynext,
+							xnext, yp + height,
+							xnow, yp + height,
+							Colors[index],
+							TRUE);
+					}
+					for (int index = 0; index < PMax; ++index) {
+						int ynow = yp + height - (int)(m_Point[j][index].first * ys);
+						int ynext = yp + height - (int)(m_Point[j + 1][index].first * ys);
+						DrawLine_2D(
+							xnow, ynow,
+							xnext, ynext,
+							GetColor(64, 64, 64));
+					}
+				}
+				DrawLine_2D(xp, yp + height - border, xp + wide, yp + height - border, White);//Šî€ü
+			}
 			yp += height;
 		}
 		{

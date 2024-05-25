@@ -172,6 +172,8 @@ namespace DXLib_ref {
 		bool						m_IsFirstBoot{false};
 
 		RealTimeCubeMap				m_RealTimeCubeMap;
+
+		CheckPCSpec					m_CheckPCSpec;
 	public://ÉQÉbÉ^Å[
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }

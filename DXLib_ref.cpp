@@ -616,18 +616,27 @@ namespace DXLib_ref {
 		auto* PopUpParts = PopUp::Instance();
 		auto* Fonts = FontPool::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
+		auto* OptionParts = OPTION::Instance();
 
 		OptionWindowParts->Init();
 		Update_effect_was = GetNowHiPerformanceCount();
 
 		if (m_IsFirstBoot) {
-			int xsize = y_r(720);
-			int ysize = y_r(720+32);
-			SetWindowPosition((deskx - xsize) / 2, (desky - ysize) / 2);
-			SetWindowSize(xsize, ysize);
+			//this->GetDispXSize(), this->GetDispYSize()
+			m_CheckPCSpec.Set();
+
+			int xsize = y_r(1366);
+			int ysize = y_r(768);
+
+			UI_Screen = GraphHandle::Make(xsize, ysize, false);	//UI
 			//初期設定画面
 			OptionWindowParts->SetActive();
 			while (ProcessMessage() == 0) {
+				int xopt = xsize * this->GetDispXSize() / y_r(1920);
+				int yopt = ysize * this->GetDispYSize() / y_r(1080);
+				SetWindowPosition((deskx - xopt) / 2, (desky - yopt) / 2);
+				SetWindowSize(xopt, yopt);
+
 				Pad->Execute();
 				OptionWindowParts->Execute();
 				PopUpParts->Update();
@@ -635,13 +644,64 @@ namespace DXLib_ref {
 					break;
 				}
 				//
+				UI_Screen.SetDraw_Screen();
+				{
+					PopUpParts->Draw(y_r(720 / 2 + 16), y_r(720 / 2 + 16));
+					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_r(32), y_r(720 + 16) + y_r(32 / 2), Green, Black, LocalizeParts->Get(109));
+
+					int xp = y_r(720 + 16 + 16);
+					int yp = y_r(16);
+					if (WindowSystem::SetMsgClickBox(xp, yp, xp + y_r(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
+						m_CheckPCSpec.StartSearch();
+					}
+					yp += y_r(24);
+					if (m_CheckPCSpec.GetCPUDatas()) {
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001));yp += LineHeight;
+						for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
+							int TextID = 0;
+							unsigned int Color = White;
+							if (c.m_Score >= 17276) {//
+								Color = Green;
+								TextID = 2002;
+							}
+							else if (c.m_Score >= 6600) {//
+								Color = Yellow;
+								TextID = 2003;
+							}
+							else {//
+								Color = Red;
+								TextID = 2004;
+							}
+
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score);yp += LineHeight;
+							yp += LineHeight;
+						}
+						{
+							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011));yp += LineHeight;
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());yp += LineHeight;
+							int TextID = 0;
+							unsigned int Color = White;
+							if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
+								Color = Green;
+								TextID = 2002;
+							}
+							else {//
+								Color = Yellow;
+								TextID = 2013;
+							}
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
+						}
+					}
+				}
 				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 				{
-					PopUpParts->Draw(y_r(720 / 2), y_r(720 / 2));
-					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_r(32), y_r(720 + 32 / 2), Green, Black, LocalizeParts->Get(109));
+					UI_Screen.DrawExtendGraph(0, 0, xopt, yopt, false);
 				}
 				Screen_Flip();
 			}
+			OptionParts->Save();
 			StartMe();
 		}
 		else {
@@ -928,7 +988,7 @@ namespace DXLib_ref {
 			else {
 				this->m_DispXSize = this->m_DispXSize_Border;
 				this->m_DispYSize = this->m_DispYSize_Border;
-				SetWindowStyleMode(4);
+				SetWindowStyleMode(2);
 				SetWindowPosition(0, 0);
 				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
 			}

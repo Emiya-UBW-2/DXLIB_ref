@@ -69,7 +69,7 @@ namespace DXLib_ref {
 				SetParamFloat(EnumSaveParam::SE, 0.5f);
 				SetParamFloat(EnumSaveParam::VOICE, 0.5f);
 				SetParamFloat(EnumSaveParam::BGM, 0.5f);
-				SetParamBoolean(EnumSaveParam::AllWaysFront, false);
+				SetParamBoolean(EnumSaveParam::AllWaysFront, true);
 				SetParamBoolean(EnumSaveParam::ScreenEffect, true);
 				SetParamInt(EnumSaveParam::Reflection, 2);
 				SetParamBoolean(EnumSaveParam::MotionBlur, false);
@@ -510,25 +510,6 @@ namespace DXLib_ref {
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Fov", 1122,
-									 [&]() {
-										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-									 },
-									 [&]() {
-										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
-									 },
-										 [&]() {},
-										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
-										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
-									 }
-									 );
-		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("V Sync", 1123,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
@@ -810,6 +791,25 @@ namespace DXLib_ref {
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamBoolean(EnumSaveParam::MotionBlur, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur)));
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Fov", 1122,
+									 [&]() {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
+										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+									 [&]() {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
+										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool) {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
 									 }
 									 );
 	}

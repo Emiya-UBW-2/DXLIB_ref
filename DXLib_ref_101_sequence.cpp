@@ -23,6 +23,9 @@ namespace DXLib_ref {
 	}
 	bool SceneControl::FirstExecute(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+#ifdef DEBUG
+		clsDx();
+#endif // DEBUG
 		return DrawParts->FirstExecute();
 	}
 
@@ -37,7 +40,6 @@ namespace DXLib_ref {
 #endif // DEBUG
 
 #ifdef DEBUG
-		clsDx();
 		DebugParts->SetStartPoint();
 #endif // DEBUG
 		if (DrawParts->UpdateShadowActive() || this->m_ScenesPtr->GetIsFirstLoop()) {
