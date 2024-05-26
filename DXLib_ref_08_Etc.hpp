@@ -1062,6 +1062,7 @@ namespace DXLib_ref {
 					std::function<void()> ExitDoing,
 					std::function<void()> GuideDoing,
 					bool IsInsert = false) noexcept;
+		void EndAll() noexcept;
 		void Update() noexcept;
 		void Draw(int xcenter, int ycenter) noexcept {
 			if (!IsActivePop()) { return; }
@@ -1073,21 +1074,23 @@ namespace DXLib_ref {
 	// ポップアップ
 	//--------------------------------------------------------------------------------------------------
 	class CheckPCSpec {
-		struct MatchCPU {
+		struct MatchScore {
 			std::string		m_Name;
 			int				m_Score{0};
 			int				m_HitCount{0};
 		};
 	private:
 		bool IsEnd = false;
-		std::vector<MatchCPU> Result;//Result.reserve(64);
+		std::vector<MatchScore> CPUResult;
+		std::vector<MatchScore> GPUResult;
 
 		TCHAR CPUString[256];
 		double FreeMemorySize = 0;
 		double TotalMemorySize = 0;
 		TCHAR GPUString[256];
 
-		std::array<std::string, 12> String;
+		std::array<std::string, 12> CPUStr;
+		std::array<std::string, 12> GPUStr;
 		std::thread m_thread;
 	public:
 		static void GetOnlyNumber(const char* Target, std::array<std::string, 12>* String) {
@@ -1115,41 +1118,84 @@ namespace DXLib_ref {
 	public:
 		void FindCPU() {
 			IsEnd = false;
-			Result.clear();
-			std::ifstream inputputfile("data/PassMark.txt");
-			if (inputputfile) {
-				std::vector<MatchCPU> Tmp;Tmp.reserve(64);
-				std::string ALL;
-				std::array<std::string, 12> TmpString;
-				int HitCount = 0;
-				int border = 0;
-				while (std::getline(inputputfile, ALL)) {
-					if (ALL == "") { continue; }
-					auto LEFT = getparams::getleft(ALL);
-					auto RIGHT = getparams::getright(ALL);
-					GetOnlyNumber(LEFT.c_str(), &TmpString);
-					HitCount = 0;
-					for (auto& s : String) {
-						if (s == "") { continue; }
-						for (auto& t : TmpString) {
-							if (t == "") { continue; }
-							if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
-								HitCount++;
+			std::vector<MatchScore> Tmp;Tmp.reserve(64);
+			{
+				CPUResult.clear();
+				std::ifstream inputputfile("data/PassMarkCPU.txt");
+				if (inputputfile) {
+					Tmp.clear();
+					std::string ALL;
+					std::array<std::string, 12> TmpString;
+					int HitCount = 0;
+					int border = 0;
+					while (std::getline(inputputfile, ALL)) {
+						if (ALL == "") { continue; }
+						auto LEFT = getparams::getleft(ALL);
+						auto RIGHT = getparams::getright(ALL);
+						GetOnlyNumber(LEFT.c_str(), &TmpString);
+						HitCount = 0;
+						for (auto& s : CPUStr) {
+							if (s == "") { continue; }
+							for (auto& t : TmpString) {
+								if (t == "") { continue; }
+								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
+									HitCount++;
+								}
 							}
 						}
+						if (HitCount > 0) {
+							border = std::max(HitCount, border);
+							Tmp.resize(Tmp.size() + 1);
+							Tmp.back().m_Name = LEFT;
+							Tmp.back().m_Score = std::stoi(RIGHT);
+							Tmp.back().m_HitCount = HitCount;
+						}
 					}
-					if (HitCount > 0) {
-						border = std::max(HitCount, border);
-						Tmp.resize(Tmp.size() + 1);
-						Tmp.back().m_Name = LEFT;
-						Tmp.back().m_Score = std::stoi(RIGHT);
-						Tmp.back().m_HitCount = HitCount;
+					inputputfile.close();
+					for (auto& n : Tmp) {
+						if (n.m_HitCount >= border) {
+							CPUResult.emplace_back(n);
+						}
 					}
 				}
-				inputputfile.close();
-				for (auto& n : Tmp) {
-					if (n.m_HitCount >= border) {
-						Result.emplace_back(n);
+			}
+			{
+				GPUResult.clear();
+				std::ifstream inputputfile("data/PassMarkGPU.txt");
+				if (inputputfile) {
+					Tmp.clear();
+					std::string ALL;
+					std::array<std::string, 12> TmpString;
+					int HitCount = 0;
+					int border = 0;
+					while (std::getline(inputputfile, ALL)) {
+						if (ALL == "") { continue; }
+						auto LEFT = getparams::getleft(ALL);
+						auto RIGHT = getparams::getright(ALL);
+						GetOnlyNumber(LEFT.c_str(), &TmpString);
+						HitCount = 0;
+						for (auto& s : GPUStr) {
+							if (s == "") { continue; }
+							for (auto& t : TmpString) {
+								if (t == "") { continue; }
+								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
+									HitCount++;
+								}
+							}
+						}
+						if (HitCount > 0) {
+							border = std::max(HitCount, border);
+							Tmp.resize(Tmp.size() + 1);
+							Tmp.back().m_Name = LEFT;
+							Tmp.back().m_Score = std::stoi(RIGHT);
+							Tmp.back().m_HitCount = HitCount;
+						}
+					}
+					inputputfile.close();
+					for (auto& n : Tmp) {
+						if (n.m_HitCount >= border) {
+							GPUResult.emplace_back(n);
+						}
 					}
 				}
 			}
@@ -1165,16 +1211,15 @@ namespace DXLib_ref {
 			}
 		}
 	public:
-		const auto* GetCPUDatas() const noexcept { return IsEnd ? &Result : nullptr; }
+		const auto* GetCPUDatas() const noexcept { return IsEnd ? &CPUResult : nullptr; }
+		const auto* GetGPUDatas() const noexcept { return IsEnd ? &GPUResult : nullptr; }
 		const auto& GetFreeMemorySize() const noexcept { return FreeMemorySize; }
 		const auto& GetTotalMemorySize() const noexcept { return TotalMemorySize; }
 	public:
 		void Set() {
 			GetPcInfo(NULL, NULL, CPUString, NULL, &FreeMemorySize, &TotalMemorySize, NULL, GPUString, NULL, NULL);
-			GetOnlyNumber(CPUString, &String);
-			//printfDx("%s\n", CPUString);
-			//printfDx("DRAM Mem : %lf MB / %lf MB\n", FreeMemorySize, TotalMemorySize);
-			//printfDx("GPU : %s\n", GPUString);
+			GetOnlyNumber(CPUString, &CPUStr);
+			GetOnlyNumber(GPUString, &GPUStr);
 		}
 		void StartSearch() {
 			if (m_thread.joinable()) {

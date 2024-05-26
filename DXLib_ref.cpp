@@ -656,6 +656,8 @@ namespace DXLib_ref {
 					}
 					yp += y_r(24);
 					if (m_CheckPCSpec.GetCPUDatas()) {
+						int MouseOverID = -1;
+						//CPU
 						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001));yp += LineHeight;
 						for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
 							int TextID = 0;
@@ -672,27 +674,121 @@ namespace DXLib_ref {
 								Color = Red;
 								TextID = 2004;
 							}
-
+							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+								switch (TextID) {
+									case 2002:
+										MouseOverID = 2040;
+										break;
+									case 2003:
+										MouseOverID = 2041;
+										break;
+									case 2004:
+										MouseOverID = 2042;
+										break;
+									default:
+										break;
+								}
+							}
 							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
 							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
 							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score);yp += LineHeight;
 							yp += LineHeight;
 						}
+						if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
+							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005));yp += LineHeight;
+						}
+						//Mem
 						{
 							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011));yp += LineHeight;
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());yp += LineHeight;
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
 							int TextID = 0;
 							unsigned int Color = White;
 							if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
 								Color = Green;
-								TextID = 2002;
+								TextID = 2012;
 							}
 							else {//
 								Color = Yellow;
 								TextID = 2013;
 							}
+							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 1)) {
+								switch (TextID) {
+									case 2012:
+										MouseOverID = 2043;
+										break;
+									case 2013:
+										MouseOverID = 2044;
+										break;
+									default:
+										break;
+								}
+							}
 							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
+							yp += LineHeight;
 						}
+						//GPU
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021));yp += LineHeight;
+						for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
+							int TextID = 0;
+							unsigned int Color = White;
+							if (c.m_Score >= 14649) {//
+								Color = Green;
+								TextID = 2022;
+							}
+							else if (c.m_Score >= 5003) {//
+								Color = Yellow;
+								TextID = 2023;
+							}
+							else {//
+								Color = Red;
+								TextID = 2024;
+							}
+							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+								switch (TextID) {
+									case 2022:
+										MouseOverID = 2045;
+										break;
+									case 2023:
+										MouseOverID = 2046;
+										break;
+									case 2024:
+										MouseOverID = 2047;
+										break;
+									default:
+										break;
+								}
+							}
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
+							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score);yp += LineHeight;
+							yp += LineHeight;
+						}
+						if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
+							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025));yp += LineHeight;
+						}
+						//DirectX
+						int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
+						for (int loop = 0;loop < 2;loop++) {
+							if (GetUseDirect3DVersion() == DirectXVerID[loop]) {
+								NowSet = loop;
+							}
+						}
+						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+							MouseOverID = 2048;
+						}
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]);yp += LineHeight;
+						if (MouseOverID > 0) {
+							xp = Pad->GetMS_X();
+							yp = Pad->GetMS_Y();
+							WindowSystem::SetMsg(xp, yp - LineHeight, xp, yp, LineHeight, FontHandle::FontXCenter::RIGHT, Green, DarkGreen, LocalizeParts->Get(MouseOverID));
+						}
+					}
+
+					xp = y_r(720 + 16 + 32);
+					yp = y_r(720);
+					if (WindowSystem::SetMsgClickBox(xp, yp, xsize-y_r(32), yp + y_r(32), Green, "Start Game!")) {
+						PopUpParts->EndAll();
 					}
 				}
 				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);

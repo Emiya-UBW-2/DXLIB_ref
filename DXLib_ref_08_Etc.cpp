@@ -343,6 +343,11 @@ namespace DXLib_ref {
 		}
 		++LastSel %= ((int)que.size());
 	}
+	void PopUp::EndAll() noexcept {
+		if (!IsActivePop()) { return; }
+		que.at(NowSel).End();
+		NowSel = LastSel;
+	}
 	void PopUp::Update() noexcept {
 		if (!IsActivePop()) { return; }
 		que.at(NowSel).Update();
