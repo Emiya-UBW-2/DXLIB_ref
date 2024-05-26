@@ -34,7 +34,6 @@ namespace DXLib_ref {
 		auto* ItemLogParts = SideLog::Instance();
 		auto* PopUpParts = PopUp::Instance();
 		auto* Pad = PadControl::Instance();
-		auto* OptionParts = OPTION::Instance();
 #ifdef DEBUG
 		auto* DebugParts = DebugClass::Instance();		//デバッグ
 #endif // DEBUG
@@ -75,7 +74,7 @@ namespace DXLib_ref {
 				ItemLogParts->Draw(scale);
 				PopUpParts->Draw(y_r(960), y_r(540), scale);
 				{
-					FPSAvgs.at(m_FPSAvg) = DXDraw::Instance()->GetFps();
+					FPSAvgs.at(m_FPSAvg) = GetFPS();
 					auto color = White;
 					//危険
 					if (FPSAvgs.at(m_FPSAvg) < 45.f) {
@@ -100,13 +99,15 @@ namespace DXLib_ref {
 					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18.f*scale), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 						y_r((1920 - 8)*scale), y_r(8.f*scale), White, Black, "%5.2f FPS", Avg);
 				}
+#ifdef DEBUG
+				DebugParts->DebugWindow(y_r(1920 - 250), y_r(150), scale);
+#endif // DEBUG
 			}
 		);
 
 		//デバッグ
 #ifdef DEBUG
-		DebugParts->DebugWindow(DXDraw::Instance()->GetDispXSize() - y_r(250), y_r(150));
-		//TestDrawShadowMap(DrawParts->m_Shadow[0].GetHandle(), 0, 0, 960, 540);
+		DebugParts->SetEndPoint();
 #endif // DEBUG
 		DrawParts->Screen_Flip();//画面の反映
 		return SelEnd;

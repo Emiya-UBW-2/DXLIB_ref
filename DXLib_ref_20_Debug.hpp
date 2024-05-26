@@ -12,13 +12,15 @@ namespace DXLib_ref {
 		LONGLONG																m_StartTime{ 0 };
 		std::vector<std::array<std::pair<float, std::string>, PointMax + 1>>	m_Point;
 		size_t																	m_PointSel{ 0 };
+		switchs																	m_Switch;
 	private:
 		DebugClass();
 		~DebugClass();
 	public:
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;
-		void DebugWindow(int xpos, int ypos) noexcept;
+		void SetEndPoint() noexcept;
+		void DebugWindow(int xpos, int ypos, float scale) noexcept;
 	};
 #endif // DEBUG
 };

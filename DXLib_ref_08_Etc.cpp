@@ -62,7 +62,7 @@ namespace DXLib_ref {
 	namespace WindowSystem {
 		//” 
 		void SetBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
-			DrawBox_2D((int)((float)xp1*scale), (int)((float)yp1*scale), (int)((float)xp2*scale), (int)((float)yp2*scale), colorSet, true);
+			DrawBox_2D((int)(xp1*scale), (int)(yp1*scale), (int)(xp2*scale), (int)(yp2*scale), colorSet, true);
 		}
 		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
 			auto* Pad = PadControl::Instance();
