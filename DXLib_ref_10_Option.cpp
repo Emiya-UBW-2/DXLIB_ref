@@ -34,6 +34,7 @@ namespace DXLib_ref {
 		m_SaveParams.at((int)EnumSaveParam::ControlType).SetEnumParamType(EnumParamType::Else);//ControlType
 		m_SaveParams.at((int)EnumSaveParam::Language).SetEnumParamType(EnumParamType::Else);//Language
 		m_SaveParams.at((int)EnumSaveParam::AA).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at((int)EnumSaveParam::DrawScale).SetEnumParamType(EnumParamType::Float);
 
 		//SetOutApplicationLogValidFlag(FALSE);
 		int mdata = -1;
@@ -78,6 +79,7 @@ namespace DXLib_ref {
 				SetParamBoolean(EnumSaveParam::HeadBobbing, true);
 				SetParamInt(EnumSaveParam::ControlType, 2);
 				SetParamBoolean(EnumSaveParam::AA, true);
+				SetParamFloat(EnumSaveParam::DrawScale, 1.f);
 				return;
 			}
 		}
@@ -173,11 +175,11 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	const OptionWindowClass* SingletonBase<OptionWindowClass>::m_Singleton = nullptr;
 	//
-	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
+	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine, float scale) const noexcept {
 		ypos += y_r((int)selanim);
-		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight,
+		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight, scale,
 							   LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
-		m_Draw(xpos + y_r(720 - 324), ypos, isMine);
+		m_Draw(xpos + y_r(720 - 324), ypos, isMine, scale);
 	}
 	//
 	void OptionWindowClass::OptionTabsInfo::Execute(int *select, bool CanPress) noexcept {
@@ -212,13 +214,13 @@ namespace DXLib_ref {
 			Easing(&e.selanim, 0.f, 0.95f, EasingType::OutExpo);
 		}
 	}
-	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept {
+	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select, float scale) noexcept {
 		int xp1, yp1;
 		//タブ
 		{
 			xp1 = xpos + (y_r(140) + y_r(12)) * m_id;
 			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 - y_r(5), (isActive ? Gray25 : Gray75), m_name)) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(140), yp1 + LineHeight * 2 - y_r(5), scale, (isActive ? Gray25 : Gray75), m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
@@ -231,16 +233,16 @@ namespace DXLib_ref {
 			yp1 = ypos + LineHeight * 2;
 			for (int i = 0; i < (int)m_Elements.size(); i++) {
 				yp1 += (LineHeight + y_r(6));
-				if (IntoMouse(xp1, yp1, xp1 + y_r(500), yp1 + (LineHeight + y_r(6)))) {
+				if (IntoMouse(xp1, yp1, xp1 + y_r(500), yp1 + (LineHeight + y_r(6)), scale)) {
 					*select = i;
 				}
-				m_Elements.at(i).Draw(xp1, yp1, (*select == i));
+				m_Elements.at(i).Draw(xp1, yp1, (*select == i), scale);
 			}
 		}
 	}
-	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
+	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select, float scale) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(select).GetInfoTextID()));
+		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight, scale, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(select).GetInfoTextID()));
 	}
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub() noexcept {
@@ -260,9 +262,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100, scale);
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, (float)value / 100.f);
 										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 }
@@ -285,10 +287,10 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::SE)*100.f + 0.5f), 0, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::SE)*100.f + 0.5f), 0, 100, scale);
 										 OptionParts->SetParamFloat(EnumSaveParam::SE, (float)value / 100.f);
 										 SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 									 }
@@ -418,10 +420,10 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset);
-										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4, scale));
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 												 case 0:
@@ -494,18 +496,18 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 				auto* LocalizeParts = LocalizePool::Instance();
 				auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront);
 
-										 OptionParts->SetParamBoolean(EnumSaveParam::AllWaysFront, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::AllWaysFront, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront), scale));
 										 if (prev != OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
 											 auto* DrawParts = DXDraw::Instance();
 											 DrawParts->SetWindowOrBorderless();
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight, scale,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
 									 }
 									 );
@@ -529,10 +531,10 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::vsync);
-										 OptionParts->SetParamBoolean(EnumSaveParam::vsync, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::vsync)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::vsync, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::vsync), scale));
 										 if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 											 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 										 }
@@ -587,7 +589,7 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-											[&](int xpos, int ypos, bool) {
+											[&](int xpos, int ypos, bool,float scale) {
 												auto* OptionParts = OPTION::Instance();
 												int ret = 0;
 												//結果から一番近いやつに指定
@@ -599,9 +601,9 @@ namespace DXLib_ref {
 														ret = i;
 													}
 												}
-												int value = WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, ret, FrameLimitsNum);
+												int value = WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, ret, FrameLimitsNum, scale);
 												OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
-												WindowSystem::SetMsgWW(xpos + y_r(250), ypos, xpos + y_r(250), ypos + LineHeight,
+												WindowSystem::SetMsgWW(xpos + y_r(250), ypos, xpos + y_r(250), ypos + LineHeight, scale,
 													LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 											}
 									 );
@@ -621,14 +623,14 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
-										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1)) ? 1 : 0);
+										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1), scale) ? 1 : 0);
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
 											 OptionWindowClass::Instance()->SetRestart();
 										 }
-										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(100), ypos, xpos + y_r(100), ypos + LineHeight, scale,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 									 }
 									 );
@@ -644,9 +646,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::AA, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AA)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::AA, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AA), scale));
 									 }
 									 );
 
@@ -662,9 +664,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::SSAO)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::SSAO, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::SSAO), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -681,9 +683,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
+										 OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3, scale));
 									 }
 									 );
 
@@ -701,9 +703,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4, scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -720,9 +722,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4, scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -737,9 +739,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::bloom, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::bloom)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::bloom, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::bloom), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -754,9 +756,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -771,9 +773,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::DoF, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::DoF)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::DoF, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::DoF), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -788,9 +790,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::MotionBlur, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::MotionBlur, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -807,9 +809,35 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
+										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110, scale));
+									 }
+									 );
+		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.back().Init("Render Scale", 1137,
+									 [&]() {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) - 0.1f, 0.25f, 1.f));
+										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
+									 },
+									 [&]() {
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f));
+										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowClass::Instance()->SetRestart();
+									 },
+										 [&]() {},
+										 [&]() {},
+										 [&](int xpos, int ypos, bool, float scale) {
+										 auto* OptionParts = OPTION::Instance();
+										 int prev = (int)(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f), 25, 100, scale);
+										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, (float)value / 100.f);
+										 if (prev != value) {
+											 OptionWindowClass::Instance()->SetRestart();
+										 }
 									 }
 									 );
 	}
@@ -856,10 +884,10 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::Language);
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == (int)LanguageType::Eng))) {
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == (int)LanguageType::Eng), scale)) {
 											 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Eng);
 										 }
 										 else {
@@ -872,7 +900,7 @@ namespace DXLib_ref {
 											 LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight,
+										 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight, scale,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 									 }
 									 );
@@ -890,9 +918,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Xsensing)*100.f + 0.5f), 10, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Xsensing)*100.f + 0.5f), 10, 100, scale);
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, (float)value / 100.f);
 									 }
 									 );
@@ -910,9 +938,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Ysensing)*100.f + 0.5f), 10, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + y_r(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Ysensing)*100.f + 0.5f), 10, 100, scale);
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, (float)value / 100.f);
 									 }
 									 );
@@ -928,9 +956,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamBoolean(EnumSaveParam::HeadBobbing, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::HeadBobbing)));
+										 OptionParts->SetParamBoolean(EnumSaveParam::HeadBobbing, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::HeadBobbing), scale));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -965,9 +993,9 @@ namespace DXLib_ref {
 									 },
 										 [&]() {},
 										 [&]() {},
-										 [&](int xpos, int ypos, bool) {
+										 [&](int xpos, int ypos, bool, float scale) {
 										 auto* OptionParts = OPTION::Instance();
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == (int)ControlType::PS4))) {
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == (int)ControlType::PS4), scale)) {
 											 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::PS4);
 										 }
 										 else {
@@ -975,11 +1003,11 @@ namespace DXLib_ref {
 										 }
 										 ypos -= LineHeight * 1 / 6;
 										 if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == (int)ControlType::XBox) {
-											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3, scale,
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
 										 }
 										 else {
-											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3,
+											 WindowSystem::SetMsgWW(xpos + y_r(125), ypos, xpos + y_r(125), ypos + LineHeight * 2 / 3, scale,
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
 										 }
 
@@ -992,12 +1020,12 @@ namespace DXLib_ref {
 												 case DX_PADTYPE_SWITCH_JOY_CON_R:
 												 case DX_PADTYPE_SWITCH_PRO_CTRL:
 												 case DX_PADTYPE_SWITCH_HORI_PAD:
-													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3, scale,
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:DirectInput");
 													 break;
 												 case DX_PADTYPE_XBOX_360:
 												 case DX_PADTYPE_XBOX_ONE:
-													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3,
+													 WindowSystem::SetMsgWW(xpos + y_r(125), ypos + LineHeight * 2 / 3, xpos + y_r(125), ypos + LineHeight * 4 / 3, scale,
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:XInput");
 													 break;
 												 default:
@@ -1007,9 +1035,9 @@ namespace DXLib_ref {
 									 }
 									 );
 	}
-	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
+	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel, float scale) noexcept {
 		auto* Pad = PadControl::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight,
+		WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, scale,
 							   LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
 							   "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
@@ -1026,11 +1054,11 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
-									 [&](int xpos, int ypos, bool isMine) {
+									 [&](int xpos, int ypos, bool isMine, float scale) {
 										 if (isMine && PadControl::Instance()->GetMouseClick().trigger()) {
 											 PadControl::Instance()->ResetAssign();
 										 }
-										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, scale, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1039,7 +1067,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)0); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 0, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
@@ -1047,7 +1075,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)2); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 2, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
@@ -1055,7 +1083,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)1); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 1, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
@@ -1063,7 +1091,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)3); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 3, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
@@ -1071,7 +1099,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)10); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 10, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
@@ -1079,7 +1107,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)11); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 11, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
@@ -1087,7 +1115,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)12); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 12, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
@@ -1095,7 +1123,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)13); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 13, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
@@ -1103,7 +1131,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)14); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 14, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
@@ -1111,7 +1139,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)15); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 15, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
@@ -1119,7 +1147,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)16); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 16, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
@@ -1127,7 +1155,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)18); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 18, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
@@ -1135,7 +1163,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)19); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 19, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
@@ -1143,7 +1171,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)20); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 20, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
@@ -1151,7 +1179,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)21); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 21, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
@@ -1159,7 +1187,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)22); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 22, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
@@ -1167,7 +1195,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)23); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 23, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
@@ -1175,7 +1203,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)24); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 24, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
@@ -1183,7 +1211,7 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)25); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 25); }
+									 [&](int xpos, int ypos, bool isMine, float scale) { KeyDraw(xpos, ypos, isMine, 25, scale); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Save", 1152,
@@ -1191,13 +1219,13 @@ namespace DXLib_ref {
 									 [&]() {},
 									 [&]() {},
 									 [&]() {},
-									 [&](int xpos, int ypos, bool isMine) {
+									 [&](int xpos, int ypos, bool isMine, float scale) {
 										 auto* Pad = PadControl::Instance();
 										 if (isMine && Pad->GetMouseClick().trigger()) {
 											 Pad->FlipAssign();
 											 Pad->Save();
 										 }
-										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_r(200), ypos + LineHeight, scale, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 	}
@@ -1220,7 +1248,7 @@ namespace DXLib_ref {
 			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", y_r(720), y_r(720),
-							   [&](int xmin, int ymin, int, int ymax, bool EndSwitch) {
+							   [&](int xmin, int ymin, int, int ymax, bool EndSwitch, float scale) {
 								   auto* Pad = PadControl::Instance();
 								   auto* SE = SoundPool::Instance();
 								   int xp1, yp1;
@@ -1229,12 +1257,12 @@ namespace DXLib_ref {
 								   xp1 = xmin + y_r(24);
 								   yp1 = ymin;
 								   for (auto& t : m_Tabs) {
-									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
+									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select, scale);
 								   }
 								   //ガイド
 								   xp1 = xmin + y_r(24);
 								   yp1 = ymax - LineHeight * 3 / 2;
-								   m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
+								   m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select, scale);
 
 								   //
 								   if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {

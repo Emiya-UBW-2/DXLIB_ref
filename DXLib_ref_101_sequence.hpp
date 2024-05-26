@@ -38,8 +38,8 @@ namespace DXLib_ref {
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
 		void MainDraw(void) noexcept { MainDraw_Sub(); }
 		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
-		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
-		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
+		void DrawUI_Base(float scale) noexcept { DrawUI_Base_Sub(scale); }
+		void DrawUI_In(float scale) noexcept { DrawUI_In_Sub(scale); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 
@@ -59,8 +59,8 @@ namespace DXLib_ref {
 		virtual void BG_Draw_Sub(void) noexcept { DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE); }
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
-		virtual void DrawUI_Base_Sub(void) noexcept {}
-		virtual void DrawUI_In_Sub(void) noexcept {}
+		virtual void DrawUI_Base_Sub(float) noexcept {}
+		virtual void DrawUI_In_Sub(float) noexcept {}
 		virtual void ShadowDraw_Far_Sub(void) noexcept {}
 		virtual void ShadowDraw_Sub(void) noexcept {}
 
@@ -73,7 +73,7 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	class SceneControl {
 		std::shared_ptr<TEMPSCENE> m_ScenesPtr{nullptr};
-		std::array<float, 60> FPSAvgs;
+		std::array<float, 60> FPSAvgs{};
 		int m_FPSAvg = 0;
 	public:
 		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { this->m_ScenesPtr = ptr; }

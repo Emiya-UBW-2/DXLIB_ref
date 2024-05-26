@@ -21,6 +21,7 @@ namespace DXLib_ref {
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*) noexcept {}
 		virtual void Update_Sub() noexcept {}
 	public:
+		bool IsActive() noexcept { return IsActive_Sub(); }
 		void Init(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
 			m_NormalScreenPtr = NormalPtr;
 			m_DepthScreenPtr = DepthPtr;
@@ -66,7 +67,7 @@ namespace DXLib_ref {
 	private:
 
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
-
+		bool										m_IsActiveGBuffer{true};
 		GraphHandle FarScreen_;		//描画スクリーン
 		GraphHandle NearScreen_;	//描画スクリーン
 

@@ -59,29 +59,29 @@ namespace DXLib_ref {
 		}
 		GuideString = GuideStr;
 	}
-	int PadControl::KeyGuideGraphs::GetDrawSize() const noexcept {
+	int PadControl::KeyGuideGraphs::GetDrawSize(float scale) const noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			ofs += xsize + y_r(3);
+			ofs += (int)(xsize * scale) + y_r(3.f* scale);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), GuideString) + y_r(12);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18.f*scale), GuideString) + y_r(12.f*scale);
 		}
 		return ofs;
 	}
 
-	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
+	int PadControl::KeyGuideGraphs::Draw(int x, int y, float scale) const noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + xsize, y + ysize, true);
-			ofs += xsize + y_r(3);
+			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize * scale), y + (int)(ysize * scale), true);
+			ofs += (int)(xsize * scale) + y_r(3.f* scale);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_r(24) / 2, White, Black, GuideString);
-		return GetDrawSize();
+		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18 * scale), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_r(24 * scale) / 2, White, Black, GuideString);
+		return GetDrawSize(scale);
 	}
 
 	const bool PadControl::GetButtonPress(int ID) {
@@ -487,14 +487,14 @@ namespace DXLib_ref {
 		//
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 	}
-	void PadControl::Draw() const noexcept {
+	void PadControl::Draw(float scale) const noexcept {
 		int xp = 0;
-		int y = y_r(1080 - 21 - 16);
+		int y = y_r((1080 - 21 - 16)*scale);
 		for (const auto& k : Key) {
-			xp += k->Draw(y_r(32) + xp, y);
-			if (xp > y_r(960)) {
+			xp += k->Draw(y_r(32 * scale) + xp, y, scale);
+			if (xp > y_r(960 * scale)) {
 				xp = 0;
-				y -= y_r(28);
+				y -= y_r(28 * scale);
 			}
 		}
 	}

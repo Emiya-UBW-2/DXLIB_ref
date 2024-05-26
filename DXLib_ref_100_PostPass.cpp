@@ -500,12 +500,8 @@ namespace DXLib_ref {
 	private:
 		GraphHandle	BufScreen;
 	public:
-		PostPassDistortion(void) {
-			BufScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);							//描画スクリーン
-		}
-		~PostPassDistortion(void) {
-			BufScreen.Dispose();
-		}
+		PostPassDistortion(void) {}
+		~PostPassDistortion(void) {}
 	private:
 		// 画面を歪ませながら描画する関数
 		void DrawCircleScreen(
@@ -652,6 +648,16 @@ namespace DXLib_ref {
 			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
 		}
 	public:
+		void Load_Sub() noexcept override {
+			BufScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);							//描画スクリーン
+		}
+		void Dispose_Sub() noexcept override {
+			BufScreen.Dispose();
+		}
+		bool IsActive_Sub() noexcept override {
+			auto* OptionParts = OPTION::Instance();
+			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
+		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*) noexcept override {
 			BufScreen.SetDraw_Screen();
 			{
@@ -709,8 +715,6 @@ namespace DXLib_ref {
 		FarScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), false);		//描画スクリーン
 		NearScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), true);		//描画スクリーン
 		MAIN_Screen = GraphHandle::Make(y_r(1920), y_r(1080), false);		//最終描画用
-		//Gバッファ
-		LoadGBuffer();
 		//ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
@@ -725,10 +729,24 @@ namespace DXLib_ref {
 		for (auto& P : m_PostPass) {
 			P->Init(&NormalScreen, &DepthScreen);
 		}
+		//Gバッファ
+		bool ActiveGBuffer = false;
+		for (auto& P : m_PostPass) {
+			if (P->IsActive()) {
+				ActiveGBuffer = true;
+				false;
+			}
+		}
+		m_IsActiveGBuffer = ActiveGBuffer;
+		if (m_IsActiveGBuffer) {
+			LoadGBuffer();
+		}
 	}
 	PostPassEffect::~PostPassEffect(void) noexcept {
 		//Gバッファ
-		DisposeGBuffer();
+		if (!m_IsActiveGBuffer) {
+			DisposeGBuffer();
+		}
 		//ポストエフェクト
 		for (auto& P : m_PostPass) {
 			P.reset();
@@ -737,6 +755,22 @@ namespace DXLib_ref {
 	}
 	//
 	void PostPassEffect::Update() noexcept {
+		bool ActiveGBuffer = false;
+		for (auto& P : m_PostPass) {
+			if (P->IsActive()) {
+				ActiveGBuffer = true;
+				false;
+			}
+		}
+		if (m_IsActiveGBuffer!= ActiveGBuffer) {
+			m_IsActiveGBuffer = ActiveGBuffer;
+			if (m_IsActiveGBuffer) {
+				LoadGBuffer();
+			}
+			else {
+				DisposeGBuffer();
+			}
+		}
 		for (auto& P : m_PostPass) {
 			P->UpdateActive();
 		}
@@ -746,10 +780,18 @@ namespace DXLib_ref {
 		fov = cams.GetCamFov();		//fovを記憶しておく
 		//全ての画面を初期化
 		{
-			NormalScreen.SetDraw_Screen();//リセット替わり
-			DepthScreen.SetDraw_Screen();//リセット替わり
-			FarScreen_.SetDraw_Screen();//リセット替わり
-			NearScreen_.SetDraw_Screen();//リセット替わり
+			if (m_IsActiveGBuffer) {
+				NormalScreen.SetDraw_Screen();//リセット替わり
+				DepthScreen.SetDraw_Screen();//リセット替わり
+			}
+			FarScreen_.SetDraw_Screen(false);
+			{
+				ClearDrawScreenZBuffer();
+			}
+			NearScreen_.SetDraw_Screen(false);//リセット替わり
+			{
+				ClearDrawScreenZBuffer();
+			}
 		}
 		//空
 		DrawGBuffer(&FarScreen_, 1000.0f, 50000.0f, [&]() { sky_doing(); }, cams);
@@ -757,7 +799,7 @@ namespace DXLib_ref {
 		DrawGBuffer(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
 			doing();
 			doingFront();
-			}, cams);
+					}, cams);
 		//遠距離の強烈なぼかし
 		if (OptionParts->GetParamBoolean(EnumSaveParam::DoF)) {
 			GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);

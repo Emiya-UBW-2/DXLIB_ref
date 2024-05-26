@@ -80,7 +80,7 @@ namespace DXLib_ref {
 	//矩形と点との2D判定
 	static bool HitPointToRectangle(int xp, int  yp, int x1, int  y1, int  x2, int  y2) { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
 	//マウスと矩形の判定
-	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2);
+	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2, float scale);
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -327,64 +327,64 @@ namespace DXLib_ref {
 
 	namespace WindowSystem {
 		//箱
-		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
-		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
+		extern void SetBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet);
+		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet);
 		//文字
 		template <typename... Args>
-		extern const int GetMsgLen(int size, std::string_view String, Args&&... args) {
+		extern const int GetMsgLen(int size, float scale, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, size).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(6) + 2;//エッジ分:
+			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size*scale)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(8.f*scale);//エッジ分:
 		}
 
-		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX);
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, float scale, int size, int xSize, FontHandle::FontXCenter FontX);
 
 		template <typename... Args>
-		extern const int SetMsg(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+		extern const int SetMsg(int xp1, int yp1, int xp2, int yp2, float scale, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
 			if (String == "") { return 0; }
 			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLen(size, String, args...);
-			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
+			int xSize = GetMsgLen(size, scale, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, scale, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(size, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString((int)(size*scale), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
 		template <typename... Args>
-		extern const int GetMsgLenWW(int size, std::string_view String, Args&&... args) {
+		extern const int GetMsgLenWW(int size, float scale, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::WW_Gothic, size).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(6) + 2;//エッジ分:
+			return Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size*scale)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(8.f*scale);//エッジ分:
 		}
 
 		template <typename... Args>
-		extern const int SetMsgWW(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+		extern const int SetMsgWW(int xp1, int yp1, int xp2, int yp2, float scale, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
 			if (String == "") { return 0; }
 			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLenWW(size, String, args...);
-			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
+			int xSize = GetMsgLenWW(size, scale, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, scale, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString(size, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString((int)(size*scale), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
 		template <typename... Args>
-		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsgWW(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			bool ret = SetClickBox(xp1, yp1, xp2, yp2, scale, defaultcolor);
+			SetMsgWW(xp1, yp1, xp2, yp2, scale, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
 		template <typename... Args>
-		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			SetBox(xp1, yp1, xp2, yp2, scale, defaultcolor);
+			SetMsg(xp1, yp1, xp2, yp2, scale, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 		};
 
-		extern bool CheckBox(int xp1, int yp1, bool switchturn);
+		extern bool CheckBox(int xp1, int yp1, bool switchturn, float scale);
 
-		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax);
+		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax, float scale);
 
-		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax);
+		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax, float scale);
 		//
 		/*
 		class ScrollBoxClass {
@@ -833,8 +833,8 @@ namespace DXLib_ref {
 	class RealTimeCubeMap {
 	private:
 		GraphHandle dynamicCubeTex;		// 周囲を回る小さいモデルたちを映りこませるための描画対象にできるキューブマップテクスチャ
-		VECTOR lookAt[6];	// 映りこむ周囲の環境を描画する際のカメラの注視点
-		VECTOR up[6];		// 移りこむ周囲の環境を描画する際のカメラの上方向
+		VECTOR lookAt[6]{};	// 映りこむ周囲の環境を描画する際のカメラの注視点
+		VECTOR up[6]{};		// 移りこむ周囲の環境を描画する際のカメラの上方向
 		int MIPLEVEL = 2;
 	public:
 		void Init() {
@@ -1003,7 +1003,7 @@ namespace DXLib_ref {
 				}
 			}
 		}
-		void Draw() noexcept;
+		void Draw(float scale) noexcept;
 	};
 
 	//--------------------------------------------------------------------------------------------------
@@ -1023,7 +1023,7 @@ namespace DXLib_ref {
 			int WinSizeX{ 720 };
 			int WinSizeY{ 720 };
 
-			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing;
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> m_Doing;
 			std::function<void()> m_ExitDoing;
 			std::function<void()> m_GuideDoing;
 		public:
@@ -1031,7 +1031,7 @@ namespace DXLib_ref {
 			~PopUpDrawClass() {}
 		public:
 			void			Set(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing
 			) noexcept {
@@ -1045,7 +1045,7 @@ namespace DXLib_ref {
 			void			Start() noexcept;
 			void			End() noexcept;
 			void			Update() noexcept;
-			void			Draw(int xcenter,int ycenter) noexcept;
+			void			Draw(int xcenter,int ycenter, float scale) noexcept;
 		public:
 			const auto IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
@@ -1058,15 +1058,15 @@ namespace DXLib_ref {
 		const auto IsActivePop() const noexcept { return (NowSel != LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
-					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
+					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
 					std::function<void()> ExitDoing,
 					std::function<void()> GuideDoing,
 					bool IsInsert = false) noexcept;
 		void EndAll() noexcept;
 		void Update() noexcept;
-		void Draw(int xcenter, int ycenter) noexcept {
+		void Draw(int xcenter, int ycenter, float scale) noexcept {
 			if (!IsActivePop()) { return; }
-			que.at(NowSel).Draw(xcenter, ycenter);
+			que.at(NowSel).Draw(xcenter, ycenter, scale);
 		}
 	};
 
@@ -1084,10 +1084,10 @@ namespace DXLib_ref {
 		std::vector<MatchScore> CPUResult;
 		std::vector<MatchScore> GPUResult;
 
-		TCHAR CPUString[256];
-		double FreeMemorySize = 0;
-		double TotalMemorySize = 0;
-		TCHAR GPUString[256];
+		TCHAR CPUString[256]{""};
+		double FreeMemorySize{0};
+		double TotalMemorySize{0};
+		TCHAR GPUString[256]{""};
 
 		std::array<std::string, 12> CPUStr;
 		std::array<std::string, 12> GPUStr;

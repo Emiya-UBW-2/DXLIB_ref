@@ -17,11 +17,11 @@ namespace DXLib_ref {
 				return 1.f;
 		}
 	}
-	bool IntoMouse(int x1, int  y1, int  x2, int  y2) {
+	bool IntoMouse(int x1, int  y1, int  x2, int  y2, float scale) {
 		auto* Pad = PadControl::Instance();
 		int mx =Pad->GetMS_X();
 		int my = Pad->GetMS_Y();
-		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
+		return HitPointToRectangle((int)(mx*scale), (int)(my*scale), (int)(x1*scale), (int)(y1*scale), (int)(x2*scale), (int)(y2*scale));
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
 		int ScrX = y_r(1920);
@@ -61,17 +61,17 @@ namespace DXLib_ref {
 	//
 	namespace WindowSystem {
 		//î†
-		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
-			DrawBox_2D(xp1, yp1, xp2, yp2, colorSet, true);
-		};
-		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
+		void SetBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
+			DrawBox_2D((int)((float)xp1*scale), (int)((float)yp1*scale), (int)((float)xp2*scale), (int)((float)yp2*scale), colorSet, true);
+		}
+		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2);
-			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
+			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2, scale);
+			SetBox(xp1, yp1, xp2, yp2, scale, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && Pad->GetMouseClick().trigger());
 		};
 		//ï∂éö
-		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, float scale, int size, int xSize, FontHandle::FontXCenter FontX) {
 			*yp1 = *yp1 + (yp2 - *yp1) / 2;
 			if ((*yp1 - size / 2) > y_r(1080) || (*yp1 + size / 2) < 0) { return false; }				//âÊñ äOÇÕï\é¶ÇµÇ»Ç¢
 			switch (FontX) {
@@ -90,59 +90,61 @@ namespace DXLib_ref {
 				default:
 					break;
 			}
+			*xp1 = (int)(*xp1 * scale);
+			*yp1 = (int)(*yp1 * scale);
 			return true;
 		};
 		//
-		bool CheckBox(int xp1, int yp1, bool switchturn) {
+		bool CheckBox(int xp1, int yp1, bool switchturn, float scale) {
 			int xp3 = xp1 + EdgeSize;
 			int yp3 = yp1 + EdgeSize;
 			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
 			int yp4 = yp1 + LineHeight - EdgeSize;
 
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4);
+			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4, scale);
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				switchturn ^= 1;
 				auto* SE = SoundPool::Instance();
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 - y_r(5), yp4 - y_r(5), Black);
+			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 - y_r(5), yp4 - y_r(5), scale, Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 + y_r(5), yp4 - y_r(5), Gray50);
+			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 + y_r(5), yp4 - y_r(5), scale, Gray50);
 			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
 			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
-			SetBox(xp3, yp3, xp4, yp4, color);
+			SetBox(xp3, yp3, xp4, yp4, scale, color);
 			return switchturn;
 		}
 		//
-		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) {
+		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax, float scale) {
 			int xp = 0;
 			{
 				int xpmin = xmin + 1;
 				int xpmax = xmax - 1;
 
 				auto* Pad = PadControl::Instance();
-				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
+				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight, scale);
 				if (MouseOver && Pad->GetMouseClick().trigger()) {
 					auto* SE = SoundPool::Instance();
 					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 				}
 				if (MouseOver && Pad->GetMouseClick().press()) {
-					value = ((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin;
+					value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
 				}
 
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, scale, DarkGreen);
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight, scale,
 					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
-			SetMsgWW(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+			SetMsgWW(xp, yp, xp, yp + LineHeight, scale, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
 			return value;
 		}
 
-		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) {
+		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax, float scale) {
 			{
 				int width = LineHeight;
 				int r = LineHeight / 3;
@@ -150,7 +152,7 @@ namespace DXLib_ref {
 				int yps = yp + LineHeight / 2;
 				for (int loop = 0; loop < valueMax; loop++) {
 					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
-					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen)) {
+					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, scale, (value == loop) ? Green : DarkGreen)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
@@ -209,7 +211,7 @@ namespace DXLib_ref {
 		}
 		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
 	}
-	void SideLog::Draw() noexcept {
+	void SideLog::Draw(float scale) noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int xp1, yp1;
@@ -223,9 +225,10 @@ namespace DXLib_ref {
 				WindowSystem::SetBox(
 					xp1 - y_r(6), yp + y_r(18),
 					xp1 - y_r(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), d.GetMsg()), y_r(200))*d.ActivePer()), yp + y_r(18) + y_r(5),
+					scale,
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-																	  xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
+				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18.f*scale), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+																	  (int)(xp1*scale), (int)(yp*scale), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -273,7 +276,7 @@ namespace DXLib_ref {
 			}
 		}
 	}
-	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
+	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter, float scale) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
 
 		int xm1, ym1;
@@ -291,20 +294,20 @@ namespace DXLib_ref {
 			//îwåi
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
-			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
+			WindowSystem::SetBox(xm1, ym1, xm2, ym2, scale, Gray50);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//É^ÉCÉgÉã
 			{
 				xp1 = xm1 + y_r(32);
 				yp1 = ym1 + LineHeight / 4;
-				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, scale, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 			}
 			//
 			if (m_Active) {
 				xp1 = xm2 - y_r(140);
 				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), Red, LocalizeParts->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), scale, Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
@@ -315,17 +318,17 @@ namespace DXLib_ref {
 			//îwåi
 			{
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
-				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
+				WindowSystem::SetBox(xp1, yp1, xp2, yp2, scale, Gray50);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//
-			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
+			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch, scale);
 			//
 		}
 	}
 
 	void PopUp::Add(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing,
 				bool IsInsert) noexcept {

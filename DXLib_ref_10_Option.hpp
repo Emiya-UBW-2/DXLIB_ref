@@ -27,6 +27,7 @@ namespace DXLib_ref {
 		ControlType,
 		Language,
 		AA,
+		DrawScale,
 		Max,
 	};
 	static const char* OptionStr[(int)EnumSaveParam::Max] = {
@@ -54,6 +55,7 @@ namespace DXLib_ref {
 		"ControlType",
 		"Language",
 		"AA",
+		"DrawScale",
 	};
 
 	enum class EnumParamType {
@@ -175,7 +177,7 @@ namespace DXLib_ref {
 			std::function<void()> m_RightPush;
 			std::function<void()> m_OKPush;
 			std::function<void()> m_AnyDoing;
-			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
+			std::function<void(int xpos, int ypos, bool isMine, float scale)> m_Draw;
 		public:
 			float selanim{0.f};
 		public:
@@ -189,7 +191,7 @@ namespace DXLib_ref {
 		public:
 			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
 					  std::function<void()> AnyDoing,
-					  std::function<void(int xpos, int ypos, bool isMine)> draw) {
+					  std::function<void(int xpos, int ypos, bool isMine, float scale)> draw) {
 				selanim = 0;
 
 				m_Name = name;
@@ -200,7 +202,7 @@ namespace DXLib_ref {
 				m_AnyDoing = AnyDoing;
 				m_Draw = draw;
 			}
-			void Draw(int xpos, int ypos, bool isMine) const noexcept;
+			void Draw(int xpos, int ypos, bool isMine, float scale) const noexcept;
 		};
 		class OptionTabsInfo {
 		private:
@@ -219,9 +221,9 @@ namespace DXLib_ref {
 				Init_Sub();
 			}
 			void Execute(int *select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept;
+			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select, float scale) noexcept;
 
-			void DrawInfo(int xpos, int ypos, int select) noexcept;
+			void DrawInfo(int xpos, int ypos, int select, float scale) noexcept;
 		};
 
 		class SoundTabsInfo :public OptionTabsInfo {
@@ -251,7 +253,7 @@ namespace DXLib_ref {
 		protected:
 			void Init_Sub() noexcept override;
 		private:
-			void KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept;
+			void KeyDraw(int xpos, int ypos, bool isMine, int Sel, float scale) noexcept;
 		};
 		class ElseTabsInfo :public OptionTabsInfo {
 		protected:

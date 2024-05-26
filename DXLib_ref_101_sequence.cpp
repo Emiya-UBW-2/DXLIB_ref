@@ -45,9 +45,7 @@ namespace DXLib_ref {
 		if (DrawParts->UpdateShadowActive() || this->m_ScenesPtr->GetIsFirstLoop()) {
 			DrawParts->Update_Shadow([&]() { this->m_ScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), true);
 		}
-		if (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) {
-			DrawParts->Update_CubeMap([&]() { this->m_ScenesPtr->CubeMapDraw(); }, DrawParts->SetMainCamera().GetCamPos());
-		}
+		DrawParts->Update_CubeMap([&]() { this->m_ScenesPtr->CubeMapDraw(); }, DrawParts->SetMainCamera().GetCamPos());
 		Pad->Execute();
 		auto SelEnd = !this->m_ScenesPtr->Update();		//XV
 		OptionWindowClass::Instance()->Execute();
@@ -66,16 +64,16 @@ namespace DXLib_ref {
 			[&]() { this->m_ScenesPtr->BG_Draw(); },
 			[&]() { this->m_ScenesPtr->MainDraw(); },
 			[&]() { this->m_ScenesPtr->MainDrawFront(); },
-			[&]() { this->m_ScenesPtr->DrawUI_Base(); },
-			[&]() {
-				this->m_ScenesPtr->DrawUI_In();
+			[&](float scale) { this->m_ScenesPtr->DrawUI_Base(scale); },
+			[&](float scale) {
+				this->m_ScenesPtr->DrawUI_In(scale);
 				//’Ç‰Á‚Ì•`‰æ•¨
 				auto* ItemLogParts = SideLog::Instance();
 				auto* PopUpParts = PopUp::Instance();
 				auto* Fonts = FontPool::Instance();
 				auto* OptionParts = OPTION::Instance();
-				ItemLogParts->Draw();
-				PopUpParts->Draw(y_r(960), y_r(540));
+				ItemLogParts->Draw(scale);
+				PopUpParts->Draw(y_r(960), y_r(540), scale);
 				{
 					FPSAvgs.at(m_FPSAvg) = DXDraw::Instance()->GetFps();
 					auto color = White;
@@ -99,8 +97,8 @@ namespace DXLib_ref {
 					}
 					Avg = Avg / ((float)FPSAvgs.size());
 
-					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-						y_r(1920 - 8), y_r(8), White, Black, "%5.2f FPS", Avg);
+					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18.f*scale), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+						y_r((1920 - 8)*scale), y_r(8.f*scale), White, Black, "%5.2f FPS", Avg);
 				}
 			}
 		);

@@ -69,10 +69,10 @@ namespace DXLib_ref {
 			auto height = y_r(360);
 			auto border = height * 5 / 6;
 			//”wŒi
-			WindowSystem::SetBox(xp, yp, xp + wide, yp + height, Black);
+			WindowSystem::SetBox(xp, yp, xp + wide, yp + height, 1.f, Black);
 			DrawBox_2D(xp, yp, xp + wide, yp + height, White, FALSE);
 
-			//if (IntoMouse(xp, yp, xp + wide, yp + height))
+			//if (IntoMouse(xp, yp, xp + wide, yp + height, scale))
 			{
 				//“à—e
 				auto* OptionParts = OPTION::Instance();
@@ -110,7 +110,7 @@ namespace DXLib_ref {
 			auto wide = y_r(250);
 			auto height = (int)(m_PointSel + 3 + 1) * FontSize + 3;
 			//”wŒi
-			WindowSystem::SetBox(xp, yp, xp + wide, yp + height, Black);
+			WindowSystem::SetBox(xp, yp, xp + wide, yp + height, 1.f, Black);
 			DrawBox_2D(xp, yp, xp + wide, yp + height, White, FALSE);
 			//“à—e
 			Fonts->Get(FontPool::FontType::Nomal_Edge, FontSize).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp + 2, yp, White, Black,

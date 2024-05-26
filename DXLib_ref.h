@@ -127,14 +127,17 @@ namespace DXLib_ref {
 			void SetupCam(Vector3DX Center, float scale);
 		};
 	private:
-		int							m_DispXSize{basex};
-		int							m_DispYSize{basey};
+		int							m_DispXSize{deskx};
+		int							m_DispYSize{desky};
 
-		int							m_DispXSize_Win{ basex };
-		int							m_DispYSize_Win{ basey };
+		int							m_DispXSize_Win{deskx };
+		int							m_DispYSize_Win{desky };
 
-		int							m_DispXSize_Border{basex};
-		int							m_DispYSize_Border{basey};
+		int							m_DispXSize_Border{deskx};
+		int							m_DispYSize_Border{desky};
+
+		int							m_DispXSize_Max{deskx};
+		int							m_DispYSize_Max{desky};
 
 		float						m_FPS{60.f};
 
@@ -171,6 +174,7 @@ namespace DXLib_ref {
 		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
 		bool						m_IsFirstBoot{false};
 
+		bool						m_IsCubeMap{true};
 		RealTimeCubeMap				m_RealTimeCubeMap;
 
 		CheckPCSpec					m_CheckPCSpec;
@@ -180,8 +184,8 @@ namespace DXLib_ref {
 
 		const auto&		GetDispXSizeMin(void) const noexcept { return m_DispXSize_Win; }
 		const auto&		GetDispYSizeMin(void) const noexcept { return m_DispYSize_Win; }
-		const auto&		GetDispXSizeMax(void) const noexcept { return std::min(m_DispXSize_Border, basex); }
-		const auto&		GetDispYSizeMax(void) const noexcept { return std::min(m_DispYSize_Border, basey); }
+		const auto&		GetDispXSizeMax(void) const noexcept { return m_DispXSize_Max; }
+		const auto&		GetDispYSizeMax(void) const noexcept { return m_DispYSize_Max; }
 
 		const auto&		GetFps(void) const noexcept { return m_FPS; }
 
@@ -235,15 +239,15 @@ namespace DXLib_ref {
 			std::function<void()> sky_doing,
 			std::function<void()> doing,
 			std::function<void()> doingFront,
-			std::function<void()> doingUI,
-			std::function<void()> doingUI2
+			std::function<void(float)> doingUI,
+			std::function<void(float)> doingUI2
 		) noexcept;
 		bool			Screen_Flip(void) noexcept;
 
 		//VR
 	private:
 		class VRControl;
-		VRControl*			m_VRControl;
+		VRControl*			m_VRControl{nullptr};
 		VRControl*			GetVRControl() noexcept { return m_VRControl; }
 		const VRControl*	GetVRControl() const noexcept { return m_VRControl; }
 	public:
