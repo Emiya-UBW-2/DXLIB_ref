@@ -100,7 +100,7 @@ namespace DXLib_ref {
 						y_r((1920 - 8)*scale), y_r(8.f*scale), White, Black, "%5.2f FPS", Avg);
 				}
 #ifdef DEBUG
-				DebugParts->DebugWindow(y_r(1920 - 250), y_r(150), scale);
+				DebugParts->DebugWindow(y_r(1920 - 350), y_r(150), scale);
 #endif // DEBUG
 			}
 		);

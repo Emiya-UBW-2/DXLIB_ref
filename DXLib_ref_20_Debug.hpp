@@ -8,9 +8,11 @@ namespace DXLib_ref {
 		friend class SingletonBase<DebugClass>;
 	private:
 		static const int	PointMax{ 12 };
+		static const int	PointFrame{180};
 	private:
 		LONGLONG																m_StartTime{ 0 };
-		std::vector<std::array<std::pair<float, std::string>, PointMax + 1>>	m_Point;
+		std::array<std::string, PointMax + 1>									m_Str;
+		std::vector<std::array<float, PointMax + 1>>							m_Point;
 		size_t																	m_PointSel{ 0 };
 		switchs																	m_Switch;
 	private:

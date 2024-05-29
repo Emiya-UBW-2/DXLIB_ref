@@ -9,7 +9,7 @@ namespace DXLib_ref {
 
 
 	DebugClass::DebugClass() {
-		m_Point.resize(180);
+		m_Point.resize(PointFrame +1);
 		m_Switch.Set(true);
 	}
 	DebugClass::~DebugClass() {}
@@ -23,8 +23,8 @@ namespace DXLib_ref {
 	void DebugClass::SetPoint(const char* DebugMes) noexcept {
 		if (!m_Switch.on()) { return; }
 		if (m_PointSel < PointMax) {
-			m_Point[0][m_PointSel].first = (float)(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
-			m_Point[0][m_PointSel].second = DebugMes;
+			m_Point[0][m_PointSel] = (float)(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
+			m_Str[m_PointSel] = DebugMes;
 			m_PointSel++;
 			return;
 		}
@@ -32,19 +32,31 @@ namespace DXLib_ref {
 	void DebugClass::SetEndPoint() noexcept {
 		m_Switch.Execute(CheckHitKeyWithCheck(KEY_INPUT_F1) != 0);
 		if (!m_Switch.on()) { return; }
-		auto* DrawParts = DXDraw::Instance();
 		auto PMax = PointMax + 1;
 		//ÅŒã‚Ì‰‰ŽZ
 		SetPoint("-----End-----");
 		for (int index = 0; index < PMax; ++index) {
-			if (m_PointSel - 1 <= index) {
+			if (!(m_PointSel > index)) {
 				m_Point[0][index] = m_Point[0][m_PointSel - 1];
 			}
 			if (index == PointMax) {
-				m_Point[0][index].first = 1000.0f / DrawParts->GetFps();
+				m_Point[0][index] = 1000.0f / GetFPS();
 			}
-			for (int j = (int)(m_Point.size() - 1); j >= 1; --j) {
+
+			for (int j = (int)(PointFrame - 1); j >= 1; --j) {
 				m_Point[j][index] = m_Point[j - 1][index];
+			}
+
+			//•½‹Ï
+			m_Point[PointFrame][index] = 0.f;
+			for (int j = 0; j < PointFrame; ++j) {
+				m_Point[PointFrame][index] += m_Point[j][index];
+			}
+			m_Point[PointFrame][index] /= PointFrame;
+		}
+		for (int index = PMax - 1; index >= 1; --index) {
+			if (index > 0) {
+				m_Point[PointFrame][index] = m_Point[PointFrame][index] - m_Point[PointFrame][index - 1];
 			}
 		}
 	}
@@ -56,21 +68,21 @@ namespace DXLib_ref {
 				GetColor(255,255,  0),
 				GetColor(0,255,  0),
 				GetColor(0,255,255),
-				GetColor(0,  0,255),
+				GetColor(100,100,255),
 				GetColor(255,  0,255),
 				GetColor(255,  0,  0),
 				GetColor(255,255,  0),
 				GetColor(0,255,  0),
 				GetColor(0,255,255),
-				GetColor(0,  0,255),
+				GetColor(100,100,255),
 				GetColor(255,  0,255),
 				GetColor(255,  0,  0),
 		};
 		auto PMax = PointMax + 1;
 		{
-			auto wide = y_r(240);
+			auto wide = y_r(340);
 			auto height = y_r(360);
-			auto border = height * 5 / 6;
+			auto border = (int)((height * 5 / 6) * scale);
 			//”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, scale, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, scale, Black);
@@ -83,12 +95,13 @@ namespace DXLib_ref {
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 				auto xs = (float)(wide*scale) / 180;
 				auto ys = (float)border / (1000.0f / value);
-				for (int j = (int)(m_Point.size() - 1 - 1); j >= 0; --j) {
+				for (int j = (int)(PointFrame - 1 - 1); j >= 0; --j) {
 					int xnow = xp + (int)((float)j * xs);
 					int xnext = xp + (int)((float)(j + 1) * xs);
+
 					for (int index = PMax - 1; index >= 0; --index) {
-						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index].first * ys);
-						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index].first * ys);
+						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index] * ys);
+						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index] * ys);
 						DrawQuadrangle(
 							xnow, ynow,
 							xnext, ynext,
@@ -98,37 +111,35 @@ namespace DXLib_ref {
 							TRUE);
 					}
 					for (int index = 0; index < PMax; ++index) {
-						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index].first * ys);
-						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index].first * ys);
+						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index] * ys);
+						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index] * ys);
 						DrawLine_2D(
 							xnow, ynow,
 							xnext, ynext,
 							GetColor(64, 64, 64));
 					}
 				}
-				DrawLine_2D(xp, yp + (int)(height*scale) - border, xp + wide, yp + (int)(height*scale) - border, White);//Šî€ü
+				DrawLine_2D(xp, yp + (int)(height*scale) - border, xp + (int)(wide*scale), yp + (int)(height*scale) - border, White);//Šî€ü
 			}
 			ypos += height;
 		}
 		{
-			int FontSize = y_r(12);
-			auto wide = y_r(250);
-			auto height = (int)(m_PointSel + 3 + 1) * FontSize + y_r(3);
+			int FontSize = y_r(18);
+			auto wide = y_r(350);
+			auto height = (int)(m_PointSel + 3 + 1) * FontSize + y_r(10);
 			//”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, scale, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, scale, Black);
+
+			xpos += y_r(2);
+			ypos += y_r(2);
 			//“à—e
-			WindowSystem::SetMsg(xpos + 2, ypos, xpos + 2, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum()); ypos += FontSize;
-			WindowSystem::SetMsg(xpos + 2, ypos, xpos + 2, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall   :%d", GetDrawCallCount() - 350); ypos += FontSize;
-			WindowSystem::SetMsg(xpos + 2, ypos, xpos + 2, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS        :%5.2f fps", GetFPS()); ypos += FontSize;
-			for (int index = 0; index < PMax; ++index) {
-				if (m_PointSel - 1 >= index || index == PointMax) {
-					if (index == 0) {
-						WindowSystem::SetMsg(xpos + 2, ypos, xpos + 2, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], Black, "%02d(%5.2fms)[%s]", index, m_Point[0][index].first, "Start");
-					}
-					else {
-						WindowSystem::SetMsg(xpos + 2, ypos, xpos + 2, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], Black, "%02d(%5.2fms)[%s]", index, m_Point[0][index].first - m_Point[0][index - 1].first, m_Point[0][index - 1].second.c_str());
-					}
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum()); ypos += FontSize;
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall   :%d", GetDrawCallCount() - 350); ypos += FontSize;
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS        :%5.2f fps", GetFPS()); ypos += FontSize;
+			for (int index = 1; index < PMax; ++index) {
+				if (m_PointSel >= index || index == PointMax) {
+					WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[PointFrame][index], m_Str[index - 1].c_str());
 					ypos += FontSize;
 				}
 			}
