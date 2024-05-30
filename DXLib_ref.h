@@ -178,6 +178,7 @@ namespace DXLib_ref {
 		RealTimeCubeMap				m_RealTimeCubeMap;
 
 		CheckPCSpec					m_CheckPCSpec;
+		ShaderUseClass				m_PBR_Shader;
 	public://ÉQÉbÉ^Å[
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }

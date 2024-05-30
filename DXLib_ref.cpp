@@ -546,8 +546,8 @@ namespace DXLib_ref {
 			this->m_DispXSize_Border = this->m_DispXSize;
 			this->m_DispYSize_Border = this->m_DispYSize;
 		}
-		m_DispXSize_Max = std::min(m_DispXSize_Border, (int)(std::min(basex, this->m_DispXSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f)));
-		m_DispYSize_Max = std::min(m_DispYSize_Border, (int)(std::min(basey, this->m_DispYSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f)));
+		m_DispXSize_Max = std::min(m_DispXSize_Border, (int)(std::min(basex, this->m_DispXSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 10.f)));
+		m_DispYSize_Max = std::min(m_DispYSize_Border, (int)(std::min(basey, this->m_DispYSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 10.f)));
 		SetWindowOrBorderless();
 		//
 #ifdef DEBUG
@@ -580,6 +580,8 @@ namespace DXLib_ref {
 			this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());								// 頂点データの準備
 			this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
 			this->m_Shader2D[1].Init("shader/DepthVS.vso", "shader/DepthPS.pso");						//レンズ
+
+			m_PBR_Shader.Init("shader/PBR3D_VS.vso", "shader/PBR3D_PS.pso");
 		}
 	}
 	DXDraw::~DXDraw(void) noexcept {
@@ -593,6 +595,8 @@ namespace DXLib_ref {
 				m_RealTimeCubeMap.Dispose();
 			}
 			Effkseer_End();
+
+			m_PBR_Shader.Dispose();
 		}
 		DxLib_End();
 	}
@@ -947,7 +951,11 @@ namespace DXLib_ref {
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				m_ShadowDraw.SetDraw(doing, cams);
 			}
-			PostPassParts->DrawDoF(sky_doing, doing, doingFront, cams);
+			PostPassParts->DrawDoF(sky_doing,
+								   [&]() {
+									   //doing();
+									   m_PBR_Shader.Draw_lamda(doing);
+								   }, doingFront, cams);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });
@@ -1036,7 +1044,7 @@ namespace DXLib_ref {
 			//4msだけスリープ
 			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 1000 * 4) {
 				if (ProcessMessage() != 0) { return false; }
-				Sleep(1);	// 1msecスリープする
+				SleepThread(1);	// 1msecスリープする
 			}
 			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit)) {}
 		}

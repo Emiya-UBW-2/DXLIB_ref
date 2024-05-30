@@ -95,7 +95,8 @@ namespace DXLib_ref {
 					for (int i = 0; i < num; i++) {
 						MV1SetMaterialDifColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
 						MV1SetMaterialSpcColor(obj->get(), i, GetColorF(0.f, 0.f, 0.f, 0.f));
-						MV1SetMaterialAmbColor(obj->get(), i, GetColorF(1.f, 1.f, 1.f, 1.f));
+						MV1SetMaterialAmbColor(obj->get(), i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
+						MV1SetMaterialSpcPower(obj->get(), i, 0.1f);
 					}
 				}
 				MV1SaveModelToMV1File(obj->get(), (Path + NameAdd + ".mv1").c_str());
