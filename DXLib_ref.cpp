@@ -363,7 +363,7 @@ namespace DXLib_ref {
 		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
 		m_Shader_Skin4_DepthShadow_Step2.Init("shader/VS_SoftShadow.vso", "shader/PS_SoftShadow.pso");
 	}
-	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) {
+	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
 		ClearDrawScreen();
 		SetupCamera_Ortho(30.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
@@ -398,7 +398,7 @@ namespace DXLib_ref {
 		SetRenderTargetToShader(1, -1);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			SetupCam(Center, 24.f);
+			SetupCam(Center, 5.f);
 			Shadowdoing();
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(5);

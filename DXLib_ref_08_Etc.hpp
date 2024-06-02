@@ -774,12 +774,12 @@ namespace DXLib_ref {
 			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
 		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetPixelCameraMatrix(int Slot) noexcept {
+		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
-			LightCameraMatrixConst->ViewMatrix = GetCameraViewMatrix();
-			LightCameraMatrixConst->ProjectionMatrix = GetCameraProjectionMatrix();
+			LightCameraMatrixConst->ViewMatrix = View.get();
+			LightCameraMatrixConst->ProjectionMatrix = Projection.get();
 
 			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4));
 			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(Slot - 4), DX_SHADERTYPE_PIXEL, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する

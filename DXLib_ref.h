@@ -115,6 +115,10 @@ namespace DXLib_ref {
 			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
 			Vector3DX		m_ShadowVec{Vector3DX::up()};
 		public:
+			const auto&		GetDepthBaseScreen(void) const noexcept { return DepthBaseScreenHandle; }
+			const auto&		GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
+			const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }
+
 			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey);
@@ -123,8 +127,8 @@ namespace DXLib_ref {
 			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam);
 			void Draw();
 			void Dispose();
-		private:
-			void SetupCam(Vector3DX Center, float scale);
+		public:
+			void SetupCam(Vector3DX Center, float scale) const noexcept;
 		};
 	private:
 		int							m_DispXSize{deskx};
@@ -192,6 +196,8 @@ namespace DXLib_ref {
 
 		const auto&		is_lens(void) const noexcept { return m_ShaderParam[0].use; }
 		const auto&		zoom_lens(void) const noexcept { return m_ShaderParam[0].param[3]; }
+
+		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
 
 		void			Set_is_lens(bool value) noexcept { m_ShaderParam[0].use = value; }
 		void			Set_xp_lens(float value) noexcept { m_ShaderParam[0].param[0] = value; }
