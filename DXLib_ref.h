@@ -106,18 +106,22 @@ namespace DXLib_ref {
 		friend class SingletonBase<DXDraw>;
 	private:
 		class ShadowDraw {
-			GraphHandle	BaseShadowHandle;			// モデルハンドル
-			GraphHandle DepthBaseScreenHandle;
-			GraphHandle DepthScreenHandle;
-			GraphHandle DepthFarScreenHandle;
-			// 深度記録画像を使ったディレクショナルライト一つ付きの描画用の剛体メッシュ用とスキニングメッシュ用のシェーダー
-			ShaderUseClass					m_Shader_Skin4_DepthShadow_Step2;
-			ShaderUseClass					m_Shader_Normal_DepthShadow_Step2;
-			Vector3DX		m_ShadowVec{Vector3DX::up()};
+			GraphHandle			BaseShadowHandle;
+			GraphHandle			DepthBaseScreenHandle;
+			GraphHandle			DepthScreenHandle;
+			GraphHandle			DepthFarScreenHandle;
+
+			ShaderUseClass		m_Shader;
+			Vector3DX			m_ShadowVec{Vector3DX::up()};
+
+			std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
+			std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
 		public:
-			const auto&		GetDepthBaseScreen(void) const noexcept { return DepthBaseScreenHandle; }
 			const auto&		GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
 			const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }
+
+			const auto&		GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[isFar ? 1 : 0]; }
+			const auto&		GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[isFar ? 1 : 0]; }
 
 			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 
@@ -127,7 +131,7 @@ namespace DXLib_ref {
 			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam);
 			void Draw();
 			void Dispose();
-		public:
+		private:
 			void SetupCam(Vector3DX Center, float scale) const noexcept;
 		};
 	private:
@@ -183,6 +187,9 @@ namespace DXLib_ref {
 
 		CheckPCSpec					m_CheckPCSpec;
 		ShaderUseClass				m_PBR_Shader;
+
+		Matrix4x4DX					m_CamViewMatrix{};
+		Matrix4x4DX					m_CamProjectionMatrix{};
 	public://ゲッター
 		const auto&		GetDispXSize(void) const noexcept { return m_DispXSize; }
 		const auto&		GetDispYSize(void) const noexcept { return m_DispYSize; }
@@ -207,6 +214,9 @@ namespace DXLib_ref {
 
 		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
+
+		const auto&		GetCamViewMatrix() const noexcept { return m_CamViewMatrix; }
+		const auto&		GetCamProjectionMatrix() const noexcept { return m_CamProjectionMatrix; }
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		~DXDraw(void) noexcept;

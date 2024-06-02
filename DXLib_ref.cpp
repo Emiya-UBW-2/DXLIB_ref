@@ -361,7 +361,7 @@ namespace DXLib_ref {
 			SetCreateGraphColorBitDepth(32);
 		}
 		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
-		m_Shader_Skin4_DepthShadow_Step2.Init("shader/VS_SoftShadow.vso", "shader/PS_SoftShadow.pso");
+		m_Shader.Init("shader/VS_SoftShadow.vso", "shader/PS_SoftShadow.pso");
 	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
@@ -382,9 +382,11 @@ namespace DXLib_ref {
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
 			SetupCam(Center, 1.f);
+			m_CamViewMatrix[0] = GetCameraViewMatrix();
+			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
 			// 設定したカメラのビュー行列と射影行列を取得しておく
-			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(4);
+			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
 
 			Shadowdoing();
 		}
@@ -399,9 +401,11 @@ namespace DXLib_ref {
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
 			SetupCam(Center, 5.f);
+			m_CamViewMatrix[1] = GetCameraViewMatrix();
+			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
 			// 設定したカメラのビュー行列と射影行列を取得しておく
-			m_Shader_Skin4_DepthShadow_Step2.SetVertexCameraMatrix(5);
+			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 		}
 		SetRenderTargetToShader(0, -1);
 		SetRenderTargetToShader(1, -1);
@@ -416,8 +420,8 @@ namespace DXLib_ref {
 		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f* Scale_Rate, 100.f* Scale_Rate);
 		BaseShadowHandle.SetDraw_Screen(tmp_cam);
 		{
-			m_Shader_Skin4_DepthShadow_Step2.SetPixelParam(3, (float)OptionParts->GetParamInt(EnumSaveParam::shadow), 0.f, 0.f, 0.f);
-			m_Shader_Skin4_DepthShadow_Step2.Draw_lamda(doing);
+			m_Shader.SetPixelParam(3, (float)OptionParts->GetParamInt(EnumSaveParam::shadow), 0.f, 0.f, 0.f);
+			m_Shader.Draw_lamda(doing);
 		}
 		SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
 		SetUseTextureToShader(2, -1);				// 使用テクスチャの設定を解除
@@ -443,7 +447,7 @@ namespace DXLib_ref {
 		DepthBaseScreenHandle.Dispose();
 		DepthScreenHandle.Dispose();
 		DepthFarScreenHandle.Dispose();
-		m_Shader_Skin4_DepthShadow_Step2.Dispose();
+		m_Shader.Dispose();
 	}
 	//--------------------------------------------------------------------------------------------------
 	//
@@ -579,9 +583,10 @@ namespace DXLib_ref {
 			//
 			this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());								// 頂点データの準備
 			this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
-			this->m_Shader2D[1].Init("shader/DepthVS.vso", "shader/DepthPS.pso");						//レンズ
+			this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");						//レンズ
 
-			m_PBR_Shader.Init("shader/PBR3D_VS.vso", "shader/PBR3D_PS.pso");
+			m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
+			LightPool::Create();
 		}
 	}
 	DXDraw::~DXDraw(void) noexcept {
@@ -946,16 +951,25 @@ namespace DXLib_ref {
 		auto* Fonts = FontPool::Instance();
 		auto* Pad = PadControl::Instance();
 		//描画
-		auto MainDraw = [&](const Camera3DInfo& cams) {
+		auto MainDraw = [&](const Camera3DInfo& camInfo) {
 			//影画像の用意
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-				m_ShadowDraw.SetDraw(doing, cams);
+				m_ShadowDraw.SetDraw(doing, camInfo);
+			}
+			UI_Screen.SetDraw_Screen(camInfo, false);
+			{
+				SetCameraNearFar(camInfo.GetCamNear(), camInfo.GetCamFar());
+				SetupCamera_Perspective(camInfo.GetCamFov());
+				SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
+
+				m_CamViewMatrix = GetCameraViewMatrix();
+				m_CamProjectionMatrix = GetCameraProjectionMatrix();
 			}
 			PostPassParts->DrawDoF(sky_doing,
 								   [&]() {
 									   //doing();
 									   m_PBR_Shader.Draw_lamda(doing);
-								   }, doingFront, cams);
+								   }, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });

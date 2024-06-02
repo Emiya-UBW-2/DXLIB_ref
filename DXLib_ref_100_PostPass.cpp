@@ -42,10 +42,10 @@ namespace DXLib_ref {
 		GraphHandle SSRScreen2;		//描画スクリーン
 		GraphHandle bkScreen2;		//SSRぼかし
 		ShaderUseClass::ScreenVertex	m_SSRScreenVertex;				// 頂点データ
-		ShaderUseClass		m_SSR;										// シェーダー
+		ShaderUseClass		m_Shader;										// シェーダー
 
 		int SP = 1;
-		int RayInterval = 150;//レイの分割間隔
+		int RayInterval = 100;//レイの分割間隔
 		float SSRScale = 12.5f;
 		float DepthThreshold = 10.f;
 
@@ -95,7 +95,7 @@ namespace DXLib_ref {
 				}
 			}
 			m_SSRScreenVertex.SetScreenVertex(y_r(1920) / SSREX, y_r(1080) / SSREX);	// 頂点データの準備
-			m_SSR.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
+			m_Shader.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");					// レンズ
 		}
 		void Dispose_Sub() noexcept override {
 			SSRScreen.Dispose();
@@ -106,7 +106,7 @@ namespace DXLib_ref {
 			SSRColorScreen.Dispose();
 			SSRNormalScreen.Dispose();
 			SSRDepthScreen.Dispose();
-			m_SSR.Dispose();
+			m_Shader.Dispose();
 		}
 		bool IsActive_Sub() noexcept override {
 			auto* OptionParts = OPTION::Instance();
@@ -116,6 +116,7 @@ namespace DXLib_ref {
 			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
+
 
 			GraphFilterBlt(ColorGraph->get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
 			GraphFilterBlt(m_NormalScreenPtr->get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
@@ -162,10 +163,11 @@ namespace DXLib_ref {
 				SetUseTextureToShader(2, SSRDepthScreen.get());
 				SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
 				auto pos = DrawParts->GetMainCamera().GetCamPos();
-				m_SSR.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(PostPassParts->Get_fov() / 2.f), DepthThreshold);
-				m_SSR.SetPixelParam(5, (float)OptionParts->GetParamInt(EnumSaveParam::Reflection),0.f,0.f, 0.f);
+				m_Shader.SetPixelParam(3, (float)RayInterval, SSRScale, std::tan(PostPassParts->Get_fov() / 2.f), DepthThreshold);
+				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
+				m_Shader.SetPixelParam(5, (float)OptionParts->GetParamInt(EnumSaveParam::Reflection),0.f,0.f, 0.f);
 				{
-					m_SSR.Draw(m_SSRScreenVertex);
+					m_Shader.Draw(m_SSRScreenVertex);
 				}
 				SetUseTextureToShader(0, -1);
 				SetUseTextureToShader(1, -1);
@@ -197,9 +199,6 @@ namespace DXLib_ref {
 				SSRScreen2.DrawGraph(0, 0, true);
 				//SSRScreen0.DrawExtendGraph(0, 0, y_r(1920) / 2, y_r(1080) / 2, true);
 			}
-		}
-		void Update_Sub() noexcept override {
-			m_SSR.SetPixelCameraMatrix(4, GetCameraViewMatrix(), GetCameraProjectionMatrix());
 		}
 	};
 	class PostPassDoF : public PostPassBase {
@@ -679,12 +678,12 @@ namespace DXLib_ref {
 
 	class PostPassFXAA : public PostPassBase {
 	private:
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
-		ShaderUseClass		m_Shader;			// シェーダー
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;
+		ShaderUseClass		m_Shader;
 	public:
 		void Load_Sub() noexcept override {
-			m_ScreenVertex.SetScreenVertex(y_r(1920), y_r(1080));							// 頂点データの準備
-			m_Shader.Init("shader/FXAA_VS.vso", "shader/FXAA_PS.pso");					// FXAA
+			m_ScreenVertex.SetScreenVertex(y_r(1920), y_r(1080));
+			m_Shader.Init("shader/VS_FXAA.vso", "shader/PS_FXAA.pso");
 		}
 		void Dispose_Sub() noexcept override {
 			m_Shader.Dispose();
@@ -708,50 +707,88 @@ namespace DXLib_ref {
 
 	class PostPassGodRay : public PostPassBase {
 	private:
+		GraphHandle SSRColorScreen;	//そのままのGバッファ
+		GraphHandle	SSRDepthScreen;	//深度のGバッファ
+		GraphHandle SSRScreen;		//描画スクリーン
+
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderUseClass		m_Shader;			// シェーダー
 		float range = 1.f;
+
+		static const int SSREX = 4;
 	public:
 		void Load_Sub() noexcept override {
-			m_ScreenVertex.SetScreenVertex(y_r(1920), y_r(1080));							// 頂点データの準備
-			m_Shader.Init("shader/GodRay_VS.vso", "shader/GodRay_PS.pso");					// FXAA
+			m_ScreenVertex.SetScreenVertex(y_r(1920) / SSREX, y_r(1080) / SSREX);
+			m_Shader.Init("shader/VS_GodRay.vso", "shader/PS_GodRay.pso");
+			SSRScreen = GraphHandle::Make(y_r(1920) / SSREX, y_r(1080) / SSREX, true);
+			{
+				// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
+				auto prevMip = GetCreateDrawValidGraphChannelNum();
+				auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
+				auto prevBit = GetCreateGraphChannelBitDepth();
+				SetCreateDrawValidGraphChannelNum(2);
+				SetDrawValidFloatTypeGraphCreateFlag(TRUE);
+				SetCreateGraphChannelBitDepth(32);
+				SSRDepthScreen = GraphHandle::Make(y_r(1920) / SSREX, y_r(1080) / SSREX, false);
+				SetCreateDrawValidGraphChannelNum(prevMip);
+				SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
+				SetCreateGraphChannelBitDepth(prevBit);
+			}
 		}
 		void Dispose_Sub() noexcept override {
+			SSRScreen.Dispose();
+			SSRDepthScreen.Dispose();
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub() noexcept override {
-			//auto* OptionParts = OPTION::Instance();
-			return true;
+			auto* OptionParts = OPTION::Instance();
+			return OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept override {
+			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
-			TargetGraph->SetDraw_Screen();
-			//DrawParts->GetShadowDraw().GetDepthBaseScreen().SetDraw_Screen(true);
+			auto* PostPassParts = PostPassEffect::Instance();
+
+			GraphFilterBlt(m_DepthScreenPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX);
+
+			m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix().inverse(), DrawParts->GetCamProjectionMatrix().inverse());
+			m_Shader.SetPixelCameraMatrix(5, DrawParts->GetShadowDraw().GetCamViewMatrix(false), DrawParts->GetShadowDraw().GetCamProjectionMatrix(false));
+			m_Shader.SetPixelCameraMatrix(6, DrawParts->GetShadowDraw().GetCamViewMatrix(true), DrawParts->GetShadowDraw().GetCamProjectionMatrix(true));
+			SSRScreen.SetDraw_Screen();
 			{
-				DrawParts->GetShadowDraw().SetupCam(DrawParts->SetMainCamera().GetCamPos(), 1.f);
-				m_Shader.SetPixelCameraMatrix(5, GetCameraViewMatrix(), GetCameraProjectionMatrix());
-				DrawParts->GetShadowDraw().SetupCam(Vector3DX::zero(), 5.f);
-				m_Shader.SetPixelCameraMatrix(6, GetCameraViewMatrix(), GetCameraProjectionMatrix());
-			}
-			TargetGraph->SetDraw_Screen();
-			{
-				SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
-				SetUseTextureToShader(1, m_DepthScreenPtr->get());	//使用するテクスチャをセット
-				SetUseTextureToShader(2, DrawParts->GetShadowDraw().GetDepthScreen().get());	//使用するテクスチャをセット
-				SetUseTextureToShader(3, DrawParts->GetShadowDraw().GetDepthFarScreen().get());	//使用するテクスチャをセット
+				SetUseTextureToShader(0, SSRDepthScreen.get());	//使用するテクスチャをセット
+				SetUseTextureToShader(1, DrawParts->GetShadowDraw().GetDepthScreen().get());	//使用するテクスチャをセット
+				SetUseTextureToShader(2, DrawParts->GetShadowDraw().GetDepthFarScreen().get());	//使用するテクスチャをセット
 				{
-					auto* PostPassParts = PostPassEffect::Instance();
-					m_Shader.SetPixelParam(3, 0.f,0.f,std::tan(PostPassParts->Get_fov() / 2.f), 0.f);
+					float Power = 1.f;
+					switch (OptionParts->GetParamInt(EnumSaveParam::shadow)) {
+						case 1:
+							Power = 20.f;
+							break;
+						case 2:
+							Power = 35.f;
+							break;
+						case 3:
+							Power = 50.f;
+							break;
+						default:
+							break;
+					}
+					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(PostPassParts->Get_fov() / 2.f), 0.f);
 					m_Shader.Draw(m_ScreenVertex);
 				}
 				SetUseTextureToShader(0, -1);
 				SetUseTextureToShader(1, -1);
 				SetUseTextureToShader(2, -1);
-				SetUseTextureToShader(3, -1);
 			}
-		}
-		void Update_Sub() noexcept override {
-			m_Shader.SetPixelCameraMatrix(4, DxLib::MInverse(GetCameraViewMatrix()), DxLib::MInverse(GetCameraProjectionMatrix()));
+			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 300);
+			TargetGraph->SetDraw_Screen();
+			{
+				ColorGraph->DrawGraph(0, 0, true);
+				SetDrawBlendMode(DX_BLENDMODE_ADD, 255 / 2);
+				SSRScreen.DrawExtendGraph(0, 0, y_r(1920), y_r(1080), true);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+			}
 		}
 	};
 	//--------------------------------------------------------------------------------------------------
@@ -766,6 +803,7 @@ namespace DXLib_ref {
 		MAIN_Screen = GraphHandle::Make(y_r(1920), y_r(1080), false);		//最終描画用
 		//ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
+		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
 		m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
 		m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
@@ -775,7 +813,6 @@ namespace DXLib_ref {
 		m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
 		m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
 		m_PostPass.emplace_back(std::make_unique<PostPassFXAA>());
-		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
 		for (auto& P : m_PostPass) {
 			P->Init(&NormalScreen, &DepthScreen);
 		}
@@ -869,12 +906,7 @@ namespace DXLib_ref {
 			DrawEffekseer3D();
 			doingFront();
 			}, cams);
-
-		//ポストパスエフェクトのアップデート
-		MAIN_Screen.SetDraw_Screen(cams);
-		for (auto& P : m_PostPass) {
-			P->Update();
-		}
+		MAIN_Screen.SetDraw_Screen(false);
 	}
 	void PostPassEffect::Draw() {
 		//色味補正
