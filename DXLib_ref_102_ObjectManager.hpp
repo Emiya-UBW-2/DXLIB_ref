@@ -2,7 +2,7 @@
 #include "DXLib_ref.h"
 #include "DXLib_ref_103_ObjectBase.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	class ModelBaseClass;
 	class ObjectBaseClass;
 

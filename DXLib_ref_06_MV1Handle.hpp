@@ -6,7 +6,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	class MV1 {
 	public:
 		class ani {

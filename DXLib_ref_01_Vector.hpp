@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	class Vector3DX {
 	public:
 		float x{0};
@@ -43,7 +43,7 @@ namespace DXLib_ref {
 		static const Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VCross(A.get(), B.get()); }
 		static const float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
 		static const float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
-		//static const Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return DXLib_ref::Lerp<Vector3DX>(A, B, Per); }
+		//static const Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
 		//LerpUnclamped
 		static const Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
 		static const Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	enum class LightType {
 		POINT = DX_LIGHTTYPE_POINT,
 		SPOT = DX_LIGHTTYPE_SPOT,

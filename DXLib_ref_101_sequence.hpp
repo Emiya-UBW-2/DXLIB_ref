@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace DXLib_ref {
 		virtual bool Update_Sub(void) noexcept { return true; }
 
 		virtual void CubeMap_Sub(void) noexcept {}
-		virtual void BG_Draw_Sub(void) noexcept { DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE); }
+		virtual void BG_Draw_Sub(void) noexcept;
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
 		virtual void DrawUI_Base_Sub(float) noexcept {}
@@ -71,16 +71,30 @@ namespace DXLib_ref {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
-	class SceneControl {
-		std::shared_ptr<TEMPSCENE> m_ScenesPtr{nullptr};
+	class SceneControl : public SingletonBase<SceneControl> {
+	private:
+		friend class SingletonBase<SceneControl>;
+	private:
+		std::vector<std::shared_ptr<TEMPSCENE>> m_ScenesPtr{};
+		std::shared_ptr<TEMPSCENE> m_NowScenesPtr;
 		std::array<float, 60> FPSAvgs{};
 		int m_FPSAvg = 0;
 	public:
-		SceneControl(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { this->m_ScenesPtr = ptr; }
-		~SceneControl(void) noexcept { this->m_ScenesPtr->Dispose(); }
+		SceneControl() noexcept {}
+		~SceneControl(void) noexcept {
+			for (auto& s : this->m_ScenesPtr) {
+				s->Dispose();
+			}
+		}
 	public:
-		const auto& GetNowScene(void) const noexcept { return this->m_ScenesPtr; }
+		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
 	public:
+		void AddList(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
+			this->m_ScenesPtr.emplace_back(ptr);
+			if (this->m_ScenesPtr.size() == 1) {
+				this->m_NowScenesPtr = this->m_ScenesPtr.back();
+			}
+		}
 		void StartScene(void) noexcept;
 		bool FirstExecute(void) noexcept;
 		bool Execute(void) noexcept;

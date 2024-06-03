@@ -1,6 +1,6 @@
 #include "DXLib_ref_20_Debug.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 #ifdef DEBUG
 	//--------------------------------------------------------------------------------------------------
 	//ƒVƒ“ƒOƒ‹ƒgƒ“

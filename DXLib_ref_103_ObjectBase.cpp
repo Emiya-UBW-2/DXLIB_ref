@@ -1,6 +1,6 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	void			ModelBaseClass::LoadModel(
 		const std::shared_ptr<ObjectBaseClass>& pBase,
 		PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
@@ -153,6 +153,17 @@ namespace DXLib_ref {
 				f.second = pBase->m_Shapes.at(index).second;
 			}
 		}
+	}
+	//
+	void			ObjectBaseClass::SetAnimOnce(int ID, float speed) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
+		if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoEnd(); }
+	}
+	void			ObjectBaseClass::SetAnimLoop(int ID, float speed) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
+		if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoStart(); }
 	}
 	//
 	void			ObjectBaseClass::Init(void) noexcept {

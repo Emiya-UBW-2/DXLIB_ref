@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	enum class PHYSICS_SETUP {
 		DISABLE,
 		LOADCALC,
@@ -66,16 +66,8 @@ namespace DXLib_ref {
 		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[frame].second; }
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
 
-		void			SetAnimOnce(int ID, float speed) {
-			auto* DrawParts = DXDraw::Instance();
-			this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
-			if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoEnd(); }
-		}
-		void			SetAnimLoop(int ID, float speed) {
-			auto* DrawParts = DXDraw::Instance();
-			this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
-			if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoStart(); }
-		}
+		void			SetAnimOnce(int ID, float speed) noexcept;
+		void			SetAnimLoop(int ID, float speed) noexcept;
 	public:
 		const auto&		GetobjType(void) const noexcept { return this->m_objType; }
 		const auto&		GetScreenPosition(void) const noexcept { return this->m_ScreenPosition; }

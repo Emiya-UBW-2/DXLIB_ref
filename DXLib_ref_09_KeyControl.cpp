@@ -1,6 +1,6 @@
 #include "DXLib_ref_09_KeyControl.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace DXLib_ref {
 
 	const bool PadControl::GetButtonPress(int ID) {
 		switch (m_ControlType) {
-			case DXLib_ref::ControlType::XBox:
+			case ControlType::XBox:
 				{
 					XINPUT_STATE input;
 					GetJoypadXInputState(DX_INPUT_PAD1, &input);
@@ -106,7 +106,7 @@ namespace DXLib_ref {
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PS4:
+			case ControlType::PS4:
 				{
 					DINPUT_JOYSTATE input;
 					GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
@@ -142,7 +142,7 @@ namespace DXLib_ref {
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PC:
+			case ControlType::PC:
 				//ボタン
 				if (0 <= ID) {
 					if ((ID & 0xF00) != 0) {
@@ -205,21 +205,21 @@ namespace DXLib_ref {
 			}
 		}
 		switch (m_ControlType) {
-			case DXLib_ref::ControlType::XBox:
+			case ControlType::XBox:
 				for (int i = 0; i < XBoxNum; i++) {
 					if (GetPushAnySwitchLocal(select, XBoxID[i])) {
 						break;
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PS4:
+			case ControlType::PS4:
 				for (int i = 0; i < DS4Num; i++) {
 					if (GetPushAnySwitchLocal(select, DS4ID[i])) {
 						break;
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PC:
+			case ControlType::PC:
 				for (int i = 0; i < KeyNum; i++) {
 					if (GetPushAnySwitchLocal(select, KeyID[i])) {
 						break;
@@ -321,7 +321,7 @@ namespace DXLib_ref {
 		}
 		//タイプに合わせた操作
 		switch (m_ControlType) {
-			case DXLib_ref::ControlType::XBox:
+			case ControlType::XBox:
 				{
 					XINPUT_STATE input;
 					GetJoypadXInputState(DX_INPUT_PAD1, &input);
@@ -384,7 +384,7 @@ namespace DXLib_ref {
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PS4:
+			case ControlType::PS4:
 				{
 					DINPUT_JOYSTATE input;
 					GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
@@ -434,7 +434,7 @@ namespace DXLib_ref {
 					}
 				}
 				break;
-			case DXLib_ref::ControlType::PC:
+			case ControlType::PC:
 				//右スティック
 				{
 					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
@@ -470,12 +470,12 @@ namespace DXLib_ref {
 		}
 		//ボタン
 		for (int i = 0; i < (int)PADS::MAX; i++) {
-			if (m_ControlType != DXLib_ref::ControlType::PC) {
+			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
-					case DXLib_ref::PADS::MOVE_W:
-					case DXLib_ref::PADS::MOVE_A:
-					case DXLib_ref::PADS::MOVE_S:
-					case DXLib_ref::PADS::MOVE_D:
+					case PADS::MOVE_W:
+					case PADS::MOVE_A:
+					case PADS::MOVE_S:
+					case PADS::MOVE_D:
 						continue;
 						break;
 					default:

@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -619,21 +619,21 @@ namespace DXLib_ref {
 	public:
 		const std::string	GetIDtoStr(int ID) const noexcept {
 			switch (m_ControlType) {
-				case DXLib_ref::ControlType::XBox:
+				case ControlType::XBox:
 					for (int i = 0; i < XBoxNum; i++) {
 						if (XBoxID[i] == ID) {
 							return XBoxStr[i];
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PS4:
+				case ControlType::PS4:
 					for (int i = 0; i < DS4Num; i++) {
 						if (DS4ID[i] == ID) {
 							return DS4Str[i];
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PC:
+				case ControlType::PC:
 					for (int i = 0; i < KeyNum; i++) {
 						if (KeyID[i] == ID) {
 							return KeyStr[i];
@@ -648,21 +648,21 @@ namespace DXLib_ref {
 	private:
 		const int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
-				case DXLib_ref::ControlType::XBox:
+				case ControlType::XBox:
 					for (int i = 0; i < XBoxNum; i++) {
 						if (strcmpDx(XBoxStr[i], Str) == 0) {
 							return XBoxID[i];
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PS4:
+				case ControlType::PS4:
 					for (int i = 0; i < DS4Num; i++) {
 						if (strcmpDx(DS4Str[i], Str) == 0) {
 							return DS4ID[i];
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PC:
+				case ControlType::PC:
 					for (int i = 0; i < KeyNum; i++) {
 						if (strcmpDx(KeyStr[i], Str) == 0) {
 							return KeyID[i];
@@ -676,11 +676,11 @@ namespace DXLib_ref {
 		}
 		const char*			GetSavePath() const noexcept {
 			switch (m_ControlType) {
-				case DXLib_ref::ControlType::XBox:
+				case ControlType::XBox:
 					return "Save/KeyConfig_XBox.txt";
-				case DXLib_ref::ControlType::PS4:
+				case ControlType::PS4:
 					return "Save/KeyConfig_DS4.txt";
-				case DXLib_ref::ControlType::PC:
+				case ControlType::PC:
 					return "Save/KeyConfig_PC.txt";
 				default:
 					break;
@@ -689,11 +689,11 @@ namespace DXLib_ref {
 		};
 		const char*			GetBasePath() const noexcept {
 			switch (m_ControlType) {
-				case DXLib_ref::ControlType::XBox:
+				case ControlType::XBox:
 					return "data/KeyConfigBase_XBox.txt";
-				case DXLib_ref::ControlType::PS4:
+				case ControlType::PS4:
 					return "data/KeyConfigBase_DS4.txt";
-				case DXLib_ref::ControlType::PC:
+				case ControlType::PC:
 					return "data/KeyConfigBase_PC.txt";
 				default:
 					break;
@@ -751,7 +751,7 @@ namespace DXLib_ref {
 			Key.resize(Key.size() + 1);
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			switch (m_ControlType) {
-				case DXLib_ref::ControlType::XBox:
+				case ControlType::XBox:
 					for (int i = 0; i < XBoxNum; i++) {
 						if (XBoxID[i] == m_PadsInfo[(int)select].m_assign) {
 							Key.back()->AddGuideXBox(i, GuideStr);
@@ -759,7 +759,7 @@ namespace DXLib_ref {
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PS4:
+				case ControlType::PS4:
 					for (int i = 0; i < DS4Num; i++) {
 						if (DS4ID[i] == m_PadsInfo[(int)select].m_assign) {
 							Key.back()->AddGuideDS4(i, GuideStr);
@@ -767,7 +767,7 @@ namespace DXLib_ref {
 						}
 					}
 					break;
-				case DXLib_ref::ControlType::PC:
+				case ControlType::PC:
 					for (int i = 0; i < KeyNum; i++) {
 						if (KeyID[i] == m_PadsInfo[(int)select].m_assign) {
 							Key.back()->AddGuidePC(i, GuideStr);

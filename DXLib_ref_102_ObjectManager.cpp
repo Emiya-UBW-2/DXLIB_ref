@@ -1,6 +1,6 @@
 #include	"DXLib_ref_102_ObjectManager.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	const ObjectManager* SingletonBase<ObjectManager>::m_Singleton = nullptr;
 
 	void			ObjectManager::AddObject(const SharedObj& NewObj) noexcept {

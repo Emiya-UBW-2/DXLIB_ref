@@ -6,7 +6,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//共通のサウンドEnum
 	enum class SoundEnumCommon {
 		UI_Select,

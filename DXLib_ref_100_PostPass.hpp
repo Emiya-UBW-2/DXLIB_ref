@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//
 	static const int EXTEND = 4;
 	//ベース
@@ -62,10 +62,7 @@ namespace DXLib_ref {
 
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
 		bool										m_IsActiveGBuffer{true};
-		GraphHandle FarScreen_;		//描画スクリーン
-		GraphHandle NearScreen_;	//描画スクリーン
-
-		GraphHandle MAIN_Screen;	//描画スクリーン
+		GraphHandle BufferScreen;	//描画スクリーン
 
 		GraphHandle ColorScreen;	//そのまま透過なしにしたスクリーン
 		GraphHandle NormalScreen;	//法線のGバッファ
@@ -80,12 +77,8 @@ namespace DXLib_ref {
 		int InColorPerMin = 20;
 		int InColorPerMax = 255;
 		float InColorGamma = 1.1f;
-		//
-		int r_brt = 255;
-		int g_brt = 255;
-		int b_brt = 255;
 	public:
-		auto& Get_MAIN_Screen(void) noexcept { return MAIN_Screen; }
+		auto& Get_MAIN_Screen(void) noexcept { return BufferScreen; }
 
 		auto& Get_fov(void) noexcept { return fov; }
 		auto& Get_near_DoF(void) noexcept { return near_DoF; }
@@ -100,12 +93,6 @@ namespace DXLib_ref {
 			near_DoFMax = near_m;
 			far_DoFMin = far_m;
 		}
-		void Set_Bright(int r, int g, int b) {
-			r_brt = std::clamp(r, 0, 255);
-			g_brt = std::clamp(g, 0, 255);
-			b_brt = std::clamp(b, 0, 255);
-		}
-
 		void SetLevelFilter(int inMin, int inMax, float gamma) {
 			InColorPerMin = std::clamp(inMin, 0, 255);
 			InColorPerMax = std::clamp(inMax, 0, 255);
@@ -119,18 +106,13 @@ namespace DXLib_ref {
 		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
 		void Draw();
 		void Plus_Draw(std::function<void()> doing) noexcept {
-			NearScreen_.SetDraw_Screen(false);
+			BufferScreen.SetDraw_Screen(false);
 			{
 				doing();
 			}
-			//結果描画
-			MAIN_Screen.SetDraw_Screen();
-			{
-				NearScreen_.DrawGraph(0, 0, false);
-			}
 		}
 	private:
-		void DrawGBuffer(GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams);
+		void DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams);
 		void LoadGBuffer() noexcept;
 		void DisposeGBuffer() noexcept;
 	};

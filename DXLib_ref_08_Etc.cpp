@@ -1,6 +1,6 @@
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
@@ -11,7 +11,7 @@ namespace DXLib_ref {
 	float GetEasingRatio(EasingType EasingType, float ratio) {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
-			case DXLib_ref::EasingType::OutExpo:
+			case EasingType::OutExpo:
 				return (1.f - std::powf(ratio, 60.f / DrawParts->GetFps()));
 			default:
 				return 1.f;

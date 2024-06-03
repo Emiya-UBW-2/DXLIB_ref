@@ -1,6 +1,6 @@
 #include "DXLib_ref_100_PostPass.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	// ポストプロセスエフェクト
 	//--------------------------------------------------------------------------------------------------
@@ -183,9 +183,6 @@ namespace DXLib_ref {
 					}
 				}
 			}
-			//GraphBlend(SSRScreen0.get(), SSRScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-			//		   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_A);
-
 			GraphFilterBlt(SSRScreen0.get(), SSRScreen1.get(), DX_GRAPH_FILTER_DOWN_SCALE, SSREX2 / SSREX);
 			SSRScreen2.SetDraw_Screen();
 			{
@@ -494,7 +491,6 @@ namespace DXLib_ref {
 			}
 		}
 	};
-
 	class PostPassDistortion : public PostPassBase {
 	private:
 		GraphHandle	BufScreen;
@@ -675,7 +671,6 @@ namespace DXLib_ref {
 			}
 		}
 	};
-
 	class PostPassFXAA : public PostPassBase {
 	private:
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;
@@ -704,7 +699,6 @@ namespace DXLib_ref {
 			}
 		}
 	};
-
 	class PostPassGodRay : public PostPassBase {
 	private:
 		GraphHandle SSRColorScreen;	//そのままのGバッファ
@@ -798,9 +792,7 @@ namespace DXLib_ref {
 	//
 	PostPassEffect::PostPassEffect(void) {
 
-		FarScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), false);		//描画スクリーン
-		NearScreen_ = GraphHandle::Make(y_r(1920), y_r(1080), true);		//描画スクリーン
-		MAIN_Screen = GraphHandle::Make(y_r(1920), y_r(1080), false);		//最終描画用
+		BufferScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);		//描画スクリーン
 		//ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
 		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
@@ -871,79 +863,58 @@ namespace DXLib_ref {
 				NormalScreen.SetDraw_Screen();//リセット替わり
 				DepthScreen.SetDraw_Screen();//リセット替わり
 			}
-			FarScreen_.SetDraw_Screen(false);
-			{
-				ClearDrawScreenZBuffer();
-			}
-			NearScreen_.SetDraw_Screen(false);//リセット替わり
-			{
-				ClearDrawScreenZBuffer();
-			}
 		}
 		//空
-		DrawGBuffer(&FarScreen_, 1000.0f, 50000.0f, [&]() { sky_doing(); }, cams);
+		DrawGBuffer(1000.0f, 50000.0f, [&]() { sky_doing(); }, cams);
 		//遠距離
-		DrawGBuffer(&FarScreen_, cams.GetCamFar() - 10.f, 1000000.f, [&]() {
+		DrawGBuffer(cams.GetCamFar() - 10.f, 1000000.f, [&]() {
 			doing();
 			doingFront();
-					}, cams);
+			}, cams);
 		//遠距離の強烈なぼかし
 		if (OptionParts->GetParamBoolean(EnumSaveParam::DoF)) {
-			GraphFilter(FarScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
+			GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 200);
 		}
 		//中間
-		DrawGBuffer(&NearScreen_, cams.GetCamNear(), cams.GetCamFar(), [&]() {
-			FarScreen_.DrawGraph(0, 0, false);
+		DrawGBuffer(cams.GetCamNear(), cams.GetCamFar(), [&]() {
 			Effekseer_Sync3DSetting();
 			doing();
 			DrawEffekseer3D();
 			doingFront();
 			}, cams);
 		//至近
-		DrawGBuffer(&NearScreen_, 0.1f, 0.1f + cams.GetCamNear(), [&]() {
+		DrawGBuffer(0.1f, 0.1f + cams.GetCamNear(), [&]() {
 			Effekseer_Sync3DSetting();
 			doing();
 			DrawEffekseer3D();
 			doingFront();
 			}, cams);
-		MAIN_Screen.SetDraw_Screen(false);
+		BufferScreen.SetDraw_Screen(false);
 	}
 	void PostPassEffect::Draw() {
 		//色味補正
 		{
 			int output_low = 0;
 			int output_high = 255;
-			GraphFilter(NearScreen_.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
+			GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), output_low, output_high);
 		}
 		//ポストパスエフェクトのbufに描画
 		for (auto& P : m_PostPass) {
-			ColorScreen.SetDraw_Screen();
-			{
-				NearScreen_.DrawGraph(0, 0, false);
-			}
-			P->SetEffect(&NearScreen_, &ColorScreen);
-		}
-		//ポストパスエフェクトの結果描画
-		MAIN_Screen.SetDraw_Screen();
-		{
-			SetDrawBright(r_brt, g_brt, b_brt);
-			NearScreen_.DrawGraph(0, 0, false);
-			SetDrawBright(255, 255, 255);
-
-			//NormalScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
-			//DepthScreen.DrawExtendGraph(0, 0, 1920, 1080, false);
+			GraphFilterBlt(BufferScreen.get(), ColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, 1);
+			P->SetEffect(&BufferScreen, &ColorScreen);
 		}
 	}
 	//
-	void PostPassEffect::DrawGBuffer(GraphHandle* TargetDraw, float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams) {
+	void PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams) {
 		// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
-		SetRenderTargetToShader(0, TargetDraw->get());
+		SetRenderTargetToShader(0, BufferScreen.get());
 		SetRenderTargetToShader(1, NormalScreen.get());
 		SetRenderTargetToShader(2, DepthScreen.get());
 		SetCameraNearFar(near_len, far_len);
 		SetupCamera_Perspective(cams.GetCamFov());
 		SetCameraPositionAndTargetAndUpVec(cams.GetCamPos().get(), cams.GetCamVec().get(), cams.GetCamUp().get());
 		{
+			ClearDrawScreenZBuffer();
 			done();
 		}
 		SetRenderTargetToShader(0, -1);

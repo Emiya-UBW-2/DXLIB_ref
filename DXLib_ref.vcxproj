@@ -168,6 +168,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DXLib_ref_40_DXDraw.hpp" />
     <ClInclude Include="DXLib_ref.h" />
     <ClInclude Include="DXLib_ref_00_Util.hpp" />
     <ClInclude Include="DXLib_ref_01_Vector.hpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="json.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DXLib_ref_40_DXDraw.cpp" />
     <ClCompile Include="DXLib_ref.cpp" />
     <ClCompile Include="DXLib_ref_00_Util.cpp" />
     <ClCompile Include="DXLib_ref_02_SoundHandle.cpp" />

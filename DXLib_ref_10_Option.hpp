@@ -1,7 +1,7 @@
 #pragma once
 #include "DXLib_ref.h"
 
-namespace DXLib_ref {
+namespace DXLibRef {
 	enum class EnumSaveParam {
 		GraphicsPreset,
 		DirectXVer,

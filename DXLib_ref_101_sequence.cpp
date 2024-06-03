@@ -1,6 +1,13 @@
 #include "DXLib_ref_101_sequence.hpp"
 
-namespace DXLib_ref {
+namespace DXLibRef {
+	const SceneControl* SingletonBase<SceneControl>::m_Singleton = nullptr;
+	//--------------------------------------------------------------------------------------------------
+	//
+	//--------------------------------------------------------------------------------------------------
+
+	void TEMPSCENE::BG_Draw_Sub(void) noexcept { DrawBox_2D(0, 0, y_r(1920), y_r(1080), Gray25, TRUE); }
+
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -13,7 +20,7 @@ namespace DXLib_ref {
 		DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
 		//ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
 		DrawParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
-		this->m_ScenesPtr->Set();
+		GetNowScene()->Set();
 		Pad->SetGuideUpdate();
 		//FPS•\Ž¦
 		for (auto& f : FPSAvgs) {
@@ -41,12 +48,12 @@ namespace DXLib_ref {
 #ifdef DEBUG
 		DebugParts->SetStartPoint();
 #endif // DEBUG
-		if (DrawParts->UpdateShadowActive() || this->m_ScenesPtr->GetIsFirstLoop()) {
-			DrawParts->Update_Shadow([&]() { this->m_ScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), true);
+		if (DrawParts->UpdateShadowActive() || GetNowScene()->GetIsFirstLoop()) {
+			DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
 		}
-		DrawParts->Update_CubeMap([&]() { this->m_ScenesPtr->CubeMapDraw(); }, DrawParts->SetMainCamera().GetCamPos());
+		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, DrawParts->SetMainCamera().GetCamPos());
 		Pad->Execute();
-		auto SelEnd = !this->m_ScenesPtr->Update();		//XV
+		auto SelEnd = !GetNowScene()->Update();		//XV
 		OptionWindowClass::Instance()->Execute();
 		DrawParts->Execute();
 		ItemLogParts->Update();
@@ -57,15 +64,15 @@ namespace DXLib_ref {
 		DebugParts->SetPoint("-----DrawStart-----");
 #endif // DEBUG
 		//‰e‚ðƒZƒbƒg
-		DrawParts->Update_Shadow([&] { this->m_ScenesPtr->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
+		DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
 		//‰æ–Ê‚É”½‰f
 		DrawParts->Draw(
-			[&]() { this->m_ScenesPtr->BG_Draw(); },
-			[&]() { this->m_ScenesPtr->MainDraw(); },
-			[&]() { this->m_ScenesPtr->MainDrawFront(); },
-			[&](float scale) { this->m_ScenesPtr->DrawUI_Base(scale); },
+			[&]() { GetNowScene()->BG_Draw(); },
+			[&]() { GetNowScene()->MainDraw(); },
+			[&]() { GetNowScene()->MainDrawFront(); },
+			[&](float scale) { GetNowScene()->DrawUI_Base(scale); },
 			[&](float scale) {
-				this->m_ScenesPtr->DrawUI_In(scale);
+				GetNowScene()->DrawUI_In(scale);
 				//’Ç‰Á‚Ì•`‰æ•¨
 				auto* ItemLogParts = SideLog::Instance();
 				auto* PopUpParts = PopUp::Instance();
@@ -114,8 +121,12 @@ namespace DXLib_ref {
 	}
 	void SceneControl::NextScene(void) noexcept {
 		auto* Pad = PadControl::Instance();
-		this->m_ScenesPtr->Dispose();							//‰ð•ú
-		this->m_ScenesPtr = this->m_ScenesPtr->Get_Next();		//‘JˆÚ
+		if (this->m_NowScenesPtr != GetNowScene()->Get_Next()) {
+			GetNowScene()->Dispose_Load();
+		}
+		GetNowScene()->Dispose();							//‰ð•ú
+		this->m_NowScenesPtr = GetNowScene()->Get_Next();		//‘JˆÚ
 		Pad->Dispose();
+		GetNowScene()->Load();
 	}
 };

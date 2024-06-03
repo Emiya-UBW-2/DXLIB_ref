@@ -11,7 +11,7 @@ namespace std {
 	};
 }; // namespace std
 //
-namespace DXLib_ref {
+namespace DXLibRef {
 	//BOX2D
 	static auto* CreateB2Body(std::shared_ptr<b2World>& world, b2BodyType type, float32 x_, float32 y_, float angle = 0) noexcept {
 		b2BodyDef f_bodyDef;
