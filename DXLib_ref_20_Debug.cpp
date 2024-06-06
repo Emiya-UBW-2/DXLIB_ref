@@ -82,7 +82,7 @@ namespace DXLibRef {
 		{
 			auto wide = y_r(340);
 			auto height = y_r(360);
-			auto border = (int)((height * 5 / 6) * scale);
+			auto border = (int)((height * 2 / 3) * scale);
 			//”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, scale, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, scale, Black);
@@ -93,33 +93,35 @@ namespace DXLibRef {
 				//“à—e
 				auto* OptionParts = OPTION::Instance();
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
-				auto xs = (float)(wide*scale) / 180;
+				auto xs = (float)(wide*scale) / PointFrame;
 				auto ys = (float)border / (1000.0f / value);
+
+				auto ye = yp + (int)(height*scale);
 				for (int j = (int)(PointFrame - 1 - 1); j >= 0; --j) {
 					int xnow = xp + (int)((float)j * xs);
 					int xnext = xp + (int)((float)(j + 1) * xs);
 
 					for (int index = PMax - 1; index >= 0; --index) {
-						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index] * ys);
-						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index] * ys);
+						int ynow = std::max(yp, ye - (int)(m_Point[j][index] * ys));
+						int ynext = std::max(yp, ye - (int)(m_Point[j + 1][index] * ys));
 						DrawQuadrangle(
 							xnow, ynow,
 							xnext, ynext,
-							xnext, yp + (int)(height*scale),
-							xnow, yp + (int)(height*scale),
+							xnext, ye,
+							xnow, ye,
 							Colors[index],
 							TRUE);
 					}
 					for (int index = 0; index < PMax; ++index) {
-						int ynow = yp + (int)(height*scale) - (int)(m_Point[j][index] * ys);
-						int ynext = yp + (int)(height*scale) - (int)(m_Point[j + 1][index] * ys);
+						int ynow = std::max(yp, ye - (int)(m_Point[j][index] * ys));
+						int ynext = std::max(yp, ye - (int)(m_Point[j + 1][index] * ys));
 						DrawLine_2D(
 							xnow, ynow,
 							xnext, ynext,
 							GetColor(64, 64, 64));
 					}
 				}
-				DrawLine_2D(xp, yp + (int)(height*scale) - border, xp + (int)(wide*scale), yp + (int)(height*scale) - border, White);//Šî€ü
+				DrawLine_2D(xp, ye - border, xp + (int)(wide*scale), ye - border, White);//Šî€ü
 			}
 			ypos += height;
 		}

@@ -7,9 +7,6 @@ namespace DXLibRef {
 	//ベース
 	class PostPassBase {
 	protected:
-		//Gバッファ
-		GraphHandle* m_NormalScreenPtr{ nullptr };
-		GraphHandle* m_DepthScreenPtr{ nullptr };
 		bool m_PrevActive{false};
 	public:
 		PostPassBase(void) {}
@@ -18,13 +15,10 @@ namespace DXLibRef {
 		virtual void Load_Sub() noexcept {}
 		virtual void Dispose_Sub() noexcept {}
 		virtual bool IsActive_Sub() noexcept { return true; }
-		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*) noexcept {}
+		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*, GraphHandle*, GraphHandle*) noexcept {}
 	public:
 		bool IsActive() noexcept { return IsActive_Sub(); }
-		void Init(GraphHandle* NormalPtr, GraphHandle* DepthPtr)noexcept {
-			m_NormalScreenPtr = NormalPtr;
-			m_DepthScreenPtr = DepthPtr;
-
+		void Init()noexcept {
 			bool active = IsActive_Sub();
 			m_PrevActive = active;
 			if (active) {
@@ -48,9 +42,9 @@ namespace DXLibRef {
 				Dispose_Sub();
 			}
 		}
-		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph) noexcept {
+		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept {
 			if (IsActive_Sub()) {
-				SetEffect_Sub(TargetGraph, ColorGraph);
+				SetEffect_Sub(TargetGraph, ColorGraph, NormalPtr, DepthPtr);
 			}
 		}
 	};
@@ -68,7 +62,6 @@ namespace DXLibRef {
 		GraphHandle NormalScreen;	//法線のGバッファ
 		GraphHandle	DepthScreen;	//深度のGバッファ
 		//
-		float fov = 0.f;
 		float near_DoF = 0.f;
 		float far_DoF = 0.f;
 		float near_DoFMax = 0.f;
@@ -80,7 +73,6 @@ namespace DXLibRef {
 	public:
 		auto& Get_MAIN_Screen(void) noexcept { return BufferScreen; }
 
-		auto& Get_fov(void) noexcept { return fov; }
 		auto& Get_near_DoF(void) noexcept { return near_DoF; }
 		auto& Get_far_DoF(void) noexcept { return far_DoF; }
 		auto& Get_near_DoFMax(void) noexcept { return near_DoFMax; }

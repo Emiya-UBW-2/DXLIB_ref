@@ -51,7 +51,8 @@ namespace DXLibRef {
 		if (DrawParts->UpdateShadowActive() || GetNowScene()->GetIsFirstLoop()) {
 			DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
 		}
-		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, DrawParts->SetMainCamera().GetCamPos());
+		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos();Pos.y *= -1.f;
+		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
 		Pad->Execute();
 		auto SelEnd = !GetNowScene()->Update();		//XV
 		OptionWindowClass::Instance()->Execute();

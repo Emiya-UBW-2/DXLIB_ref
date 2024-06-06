@@ -317,7 +317,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, false);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+												 
 												 break;
 											 case 1:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -327,7 +327,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+												 
 												 break;
 											 case 2:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -337,7 +337,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 											 case 3:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -347,7 +347,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 											 case 4:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -357,7 +357,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 										 }
 									 },
@@ -374,7 +374,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, false);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+												 
 												 break;
 											 case 1:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -384,7 +384,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+												 
 												 break;
 											 case 2:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -394,7 +394,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 											 case 3:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -404,7 +404,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 											 case 4:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -414,7 +414,7 @@ namespace DXLibRef {
 												 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 												 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 												 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-												 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+												 
 												 break;
 										 }
 									 },
@@ -434,7 +434,7 @@ namespace DXLibRef {
 													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 													 OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 													 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, false);
-													 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+													 
 													 break;
 												 case 1:
 													 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -444,7 +444,7 @@ namespace DXLibRef {
 													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 													 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 													 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-													 OptionParts->SetParamBoolean(EnumSaveParam::DoF, false);
+													 
 													 break;
 												 case 2:
 													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -454,7 +454,7 @@ namespace DXLibRef {
 													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 													 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 													 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-													 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+													 
 													 break;
 												 case 3:
 													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -464,7 +464,7 @@ namespace DXLibRef {
 													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 													 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 													 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-													 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+													 
 													 break;
 												 case 4:
 													 OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
@@ -474,7 +474,7 @@ namespace DXLibRef {
 													 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 													 OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 													 OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-													 OptionParts->SetParamBoolean(EnumSaveParam::DoF, true);
+													 
 													 break;
 											 }
 										 }

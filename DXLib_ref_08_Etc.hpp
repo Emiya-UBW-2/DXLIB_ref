@@ -861,6 +861,7 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) {
+			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			for (int i = 0; i < 6; i++) {		// ‰f‚è‚±‚ÞŠÂ‹«‚ð•`‰æ‚·‚é–Ê‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
 				for (int j = 0; j < MIPLEVEL; j++) {			// ƒ~ƒbƒvƒ}ƒbƒv‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
 					SetRenderTargetToShader(0, dynamicCubeTex.get(), i, j);		// •`‰ææ”Ô†‚O”Ô‚Ì•`‰æ‘ÎÛ‚ð•`‰æ‘ÎÛ‚É‚Å‚«‚éƒLƒ…[ƒuƒ}ƒbƒv‚Ìi”Ô–Ú‚Ì–Ê‚ÉÝ’è
