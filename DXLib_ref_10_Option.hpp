@@ -177,7 +177,7 @@ namespace DXLibRef {
 			std::function<void()> m_RightPush;
 			std::function<void()> m_OKPush;
 			std::function<void()> m_AnyDoing;
-			std::function<void(int xpos, int ypos, bool isMine, float scale)> m_Draw;
+			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
 		public:
 			float selanim{0.f};
 		public:
@@ -191,7 +191,7 @@ namespace DXLibRef {
 		public:
 			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
 					  std::function<void()> AnyDoing,
-					  std::function<void(int xpos, int ypos, bool isMine, float scale)> draw) {
+					  std::function<void(int xpos, int ypos, bool isMine)> draw) {
 				selanim = 0;
 
 				m_Name = name;
@@ -202,7 +202,7 @@ namespace DXLibRef {
 				m_AnyDoing = AnyDoing;
 				m_Draw = draw;
 			}
-			void Draw(int xpos, int ypos, bool isMine, float scale) const noexcept;
+			void Draw(int xpos, int ypos, bool isMine) const noexcept;
 		};
 		class OptionTabsInfo {
 		private:
@@ -221,9 +221,9 @@ namespace DXLibRef {
 				Init_Sub();
 			}
 			void Execute(int *select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select, float scale) noexcept;
+			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept;
 
-			void DrawInfo(int xpos, int ypos, int select, float scale) noexcept;
+			void DrawInfo(int xpos, int ypos, int select) noexcept;
 		};
 
 		class SoundTabsInfo :public OptionTabsInfo {
@@ -253,7 +253,7 @@ namespace DXLibRef {
 		protected:
 			void Init_Sub() noexcept override;
 		private:
-			void KeyDraw(int xpos, int ypos, bool isMine, int Sel, float scale) noexcept;
+			void KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept;
 		};
 		class ElseTabsInfo :public OptionTabsInfo {
 		protected:

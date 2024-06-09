@@ -157,8 +157,8 @@ namespace DXLibRef {
 			std::function<void()> sky_doing,
 			std::function<void()> doing,
 			std::function<void()> doingFront,
-			std::function<void(float)> doingUI,
-			std::function<void(float)> doingUI2
+			std::function<void()> doingUI,
+			std::function<void()> doingUI2
 		) noexcept;
 		bool			Screen_Flip(void) noexcept;
 

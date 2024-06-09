@@ -61,7 +61,7 @@ namespace DXLibRef {
 		}
 	}
 
-	void DebugClass::DebugWindow(int xpos, int ypos, float scale) noexcept {
+	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
 		if (!m_Switch.on()) { return; }
 		const unsigned int Colors[PointMax + 1] = {
 				GetColor(255,  0,  0),
@@ -80,23 +80,23 @@ namespace DXLibRef {
 		};
 		auto PMax = PointMax + 1;
 		{
-			auto wide = y_r(340);
-			auto height = y_r(360);
-			auto border = (int)((height * 2 / 3) * scale);
+			auto wide = y_UI(340);
+			auto height = y_UI(360);
+			auto border = (int)((height * 2 / 3));
 			//îwåi
-			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, scale, White);
-			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, scale, Black);
+			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
+			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
 			{
-				auto xp = (int)(xpos*scale);
-				auto yp = (int)(ypos*scale);
+				auto xp = (int)(xpos);
+				auto yp = (int)(ypos);
 				//ì‡óe
 				auto* OptionParts = OPTION::Instance();
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
-				auto xs = (float)(wide*scale) / PointFrame;
+				auto xs = (float)(wide) / PointFrame;
 				auto ys = (float)border / (1000.0f / value);
 
-				auto ye = yp + (int)(height*scale);
+				auto ye = yp + (int)(height);
 				for (int j = (int)(PointFrame - 1 - 1); j >= 0; --j) {
 					int xnow = xp + (int)((float)j * xs);
 					int xnext = xp + (int)((float)(j + 1) * xs);
@@ -121,27 +121,27 @@ namespace DXLibRef {
 							GetColor(64, 64, 64));
 					}
 				}
-				DrawLine_2D(xp, ye - border, xp + (int)(wide*scale), ye - border, White);//äÓèÄê¸
+				DrawLine_2D(xp, ye - border, xp + (int)(wide), ye - border, White);//äÓèÄê¸
 			}
 			ypos += height;
 		}
 		{
-			int FontSize = y_r(18);
-			auto wide = y_r(350);
-			auto height = (int)(m_PointSel + 3 + 1) * FontSize + y_r(10);
+			int FontSize = y_UI(18);
+			auto wide = y_UI(350);
+			auto height = (int)(m_PointSel + 3 + 1) * FontSize + y_UI(10);
 			//îwåi
-			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, scale, White);
-			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, scale, Black);
+			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
+			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
-			xpos += y_r(2);
-			ypos += y_r(2);
+			xpos += y_UI(2);
+			ypos += y_UI(2);
 			//ì‡óe
-			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum()); ypos += FontSize;
-			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall   :%d", GetDrawCallCount() - 350); ypos += FontSize;
-			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS        :%5.2f fps", GetFPS()); ypos += FontSize;
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum()); ypos += FontSize;
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall   :%d", GetDrawCallCount() - 350); ypos += FontSize;
+			WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS        :%5.2f fps", GetFPS()); ypos += FontSize;
 			for (int index = 1; index < PMax; ++index) {
 				if (m_PointSel >= index || index == PointMax) {
-					WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, scale, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[PointFrame][index], m_Str[index - 1].c_str());
+					WindowSystem::SetMsg(xpos, ypos, xpos, ypos + FontSize, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[PointFrame][index], m_Str[index - 1].c_str());
 					ypos += FontSize;
 				}
 			}

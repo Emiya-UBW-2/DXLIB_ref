@@ -13,8 +13,8 @@ namespace DXLibRef {
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			xsize = xsize * y_r(24) / ysize;
-			ysize = ysize * y_r(24) / ysize;
+			xsize = xsize * y_UI(24) / ysize;
+			ysize = ysize * y_UI(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -29,8 +29,8 @@ namespace DXLibRef {
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			xsize = xsize * y_r(24) / ysize;
-			ysize = ysize * y_r(24) / ysize;
+			xsize = xsize * y_UI(24) / ysize;
+			ysize = ysize * y_UI(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -50,8 +50,8 @@ namespace DXLibRef {
 			}
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			xsize = xsize * y_r(21) / ysize;
-			ysize = ysize * y_r(21) / ysize;
+			xsize = xsize * y_UI(21) / ysize;
+			ysize = ysize * y_UI(21) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -59,29 +59,29 @@ namespace DXLibRef {
 		}
 		GuideString = GuideStr;
 	}
-	int PadControl::KeyGuideGraphs::GetDrawSize(float scale) const noexcept {
+	int PadControl::KeyGuideGraphs::GetDrawSize() const noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			ofs += (int)(xsize * scale) + y_r(3.f* scale);
+			ofs += (int)(xsize) + y_UI(3.f);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18.f*scale), GuideString) + y_r(12.f*scale);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18.f), GuideString) + y_UI(12.f);
 		}
 		return ofs;
 	}
 
-	int PadControl::KeyGuideGraphs::Draw(int x, int y, float scale) const noexcept {
+	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize * scale), y + (int)(ysize * scale), true);
-			ofs += (int)(xsize * scale) + y_r(3.f* scale);
+			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize), y + (int)(ysize), true);
+			ofs += (int)(xsize) + y_UI(3.f);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18 * scale), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_r(24 * scale) / 2, White, Black, GuideString);
-		return GetDrawSize(scale);
+		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_UI(24) / 2, White, Black, GuideString);
+		return GetDrawSize();
 	}
 
 	const bool PadControl::GetButtonPress(int ID) {
@@ -359,8 +359,8 @@ namespace DXLibRef {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
-						MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
+						MouseX = y_UI(mx);
+						MouseY = y_UI(my);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.ThumbRX;
@@ -417,8 +417,8 @@ namespace DXLibRef {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
-						MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
+						MouseX = y_UI(mx);
+						MouseY = y_UI(my);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.Z;
@@ -439,8 +439,8 @@ namespace DXLibRef {
 				{
 					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 					GetMousePoint(&mx, &my);
-					MouseX = (mx * y_r(1920) / DXDraw::Instance()->GetDispXSize());
-					MouseY = (my * y_r(1080) / DXDraw::Instance()->GetDispYSize());
+					MouseX = y_UI(mx);
+					MouseY = y_UI(my);
 					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 					if (m_MouseMoveEnable) {
@@ -487,14 +487,14 @@ namespace DXLibRef {
 		//
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 	}
-	void PadControl::Draw(float scale) const noexcept {
+	void PadControl::Draw() const noexcept {
 		int xp = 0;
-		int y = y_r((1080 - 21 - 16)*scale);
+		int y = y_UI((1080 - 21 - 16));
 		for (const auto& k : Key) {
-			xp += k->Draw(y_r(32 * scale) + xp, y, scale);
-			if (xp > y_r(960 * scale)) {
+			xp += k->Draw(y_UI(32) + xp, y);
+			if (xp > y_UI(960)) {
 				xp = 0;
-				y -= y_r(28 * scale);
+				y -= y_UI(28);
 			}
 		}
 	}

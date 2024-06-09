@@ -4,6 +4,7 @@ namespace DXLibRef {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
+	const UISystem* SingletonBase<UISystem>::m_Singleton = nullptr;
 	
 	//--------------------------------------------------------------------------------------------------
 	//
@@ -17,14 +18,14 @@ namespace DXLibRef {
 				return 1.f;
 		}
 	}
-	bool IntoMouse(int x1, int  y1, int  x2, int  y2, float scale) {
+	bool IntoMouse(int x1, int  y1, int  x2, int  y2) {
 		auto* Pad = PadControl::Instance();
 		int mx =Pad->GetMS_X();
 		int my = Pad->GetMS_Y();
-		return HitPointToRectangle((int)(mx*scale), (int)(my*scale), (int)(x1*scale), (int)(y1*scale), (int)(x2*scale), (int)(y2*scale));
+		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
-		int ScrX = y_r(1920);
+		int ScrX = y_r(basex);
 		int ScrY = y_r(basey);
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
@@ -61,71 +62,71 @@ namespace DXLibRef {
 	//
 	namespace WindowSystem {
 		//箱
-		void SetBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
-			DrawBox_2D((int)(xp1*scale), (int)(yp1*scale), (int)(xp2*scale), (int)(yp2*scale), colorSet, true);
+		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
+			DrawBox_2D((int)(xp1), (int)(yp1), (int)(xp2), (int)(yp2), colorSet, true);
 		}
-		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet) {
+		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2, scale);
-			SetBox(xp1, yp1, xp2, yp2, scale, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
+			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2);
+			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && Pad->GetMouseClick().trigger());
 		};
 		//文字
-		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, float scale, int size, int xSize, FontHandle::FontXCenter FontX) {
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
 			*yp1 = *yp1 + (yp2 - *yp1) / 2;
-			if ((*yp1 - size / 2) > y_r(1080) || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
+			if ((*yp1 - size / 2) > y_UI(1080) || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
 			switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
-					*xp1 = *xp1 + y_r(6);
-					if ((*xp1) > y_r(1920) || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
+					*xp1 = *xp1 + y_UI(6);
+					if ((*xp1) > y_UI(1920) || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::MIDDLE:
 					*xp1 = *xp1 + (xp2 - *xp1) / 2;
-					if ((*xp1 - xSize / 2) > y_r(1920) || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
+					if ((*xp1 - xSize / 2) > y_UI(1920) || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::RIGHT:
-					*xp1 = xp2 - y_r(6);
-					if ((*xp1 - xSize) > y_r(1920) || (*xp1) < 0) { return false; }						//画面外は表示しない
+					*xp1 = xp2 - y_UI(6);
+					if ((*xp1 - xSize) > y_UI(1920) || (*xp1) < 0) { return false; }						//画面外は表示しない
 					break;
 				default:
 					break;
 			}
-			*xp1 = (int)(*xp1 * scale);
-			*yp1 = (int)(*yp1 * scale);
+			*xp1 = (int)(*xp1);
+			*yp1 = (int)(*yp1);
 			return true;
 		};
 		//
-		bool CheckBox(int xp1, int yp1, bool switchturn, float scale) {
+		bool CheckBox(int xp1, int yp1, bool switchturn) {
 			int xp3 = xp1 + EdgeSize;
 			int yp3 = yp1 + EdgeSize;
 			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
 			int yp4 = yp1 + LineHeight - EdgeSize;
 
 			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4, scale);
+			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4);
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				switchturn ^= 1;
 				auto* SE = SoundPool::Instance();
 				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 - y_r(5), yp4 - y_r(5), scale, Black);
+			SetBox(xp3 + y_UI(5), yp3 + y_UI(5), xp4 - y_UI(5), yp4 - y_UI(5), Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + y_r(5), yp3 + y_r(5), xp4 + y_r(5), yp4 - y_r(5), scale, Gray50);
+			SetBox(xp3 + y_UI(5), yp3 + y_UI(5), xp4 + y_UI(5), yp4 - y_UI(5), Gray50);
 			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
 			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
-			SetBox(xp3, yp3, xp4, yp4, scale, color);
+			SetBox(xp3, yp3, xp4, yp4, color);
 			return switchturn;
 		}
 		//
-		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax, float scale) {
+		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) {
 			int xp = 0;
 			{
 				int xpmin = xmin + 1;
 				int xpmax = xmax - 1;
 
 				auto* Pad = PadControl::Instance();
-				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight, scale);
+				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
 				if (MouseOver && Pad->GetMouseClick().trigger()) {
 					auto* SE = SoundPool::Instance();
 					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -134,17 +135,17 @@ namespace DXLibRef {
 					value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
 				}
 
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, scale, DarkGreen);
-				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight, scale,
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
+				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
 					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
-			SetMsgWW(xp, yp, xp, yp + LineHeight, scale, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+			SetMsgWW(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
 			return value;
 		}
 
-		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax, float scale) {
+		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) {
 			{
 				int width = LineHeight;
 				int r = LineHeight / 3;
@@ -152,7 +153,7 @@ namespace DXLibRef {
 				int yps = yp + LineHeight / 2;
 				for (int loop = 0; loop < valueMax; loop++) {
 					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
-					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, scale, (value == loop) ? Green : DarkGreen)) {
+					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
@@ -211,24 +212,23 @@ namespace DXLibRef {
 		}
 		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
 	}
-	void SideLog::Draw(float scale) noexcept {
+	void SideLog::Draw() noexcept {
 		auto* Fonts = FontPool::Instance();
 
 		int xp1, yp1;
-		xp1 = y_r(64);
-		yp1 = y_r(256);
+		xp1 = y_UI(64);
+		yp1 = y_UI(256);
 
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
-				int yp = yp1 - y_r(24.f * d.GetFlip());
+				int yp = yp1 - y_UI(24.f * d.GetFlip());
 				WindowSystem::SetBox(
-					xp1 - y_r(6), yp + y_r(18),
-					xp1 - y_r(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_r(18), d.GetMsg()), y_r(200))*d.ActivePer()), yp + y_r(18) + y_r(5),
-					scale,
+					xp1 - y_UI(6), yp + y_UI(18),
+					xp1 - y_UI(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18), d.GetMsg()), y_UI(200))*d.ActivePer()), yp + y_UI(18) + y_UI(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18.f*scale), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-																	  (int)(xp1*scale), (int)(yp*scale), d.GetMsgColor(), Black, d.GetMsg());
+				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18.f), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+																	  (int)(xp1), (int)(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -276,7 +276,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter, float scale) noexcept {
+	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
 
 		int xm1, ym1;
@@ -294,41 +294,41 @@ namespace DXLibRef {
 			//背景
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
-			WindowSystem::SetBox(xm1, ym1, xm2, ym2, scale, Gray50);
+			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//タイトル
 			{
-				xp1 = xm1 + y_r(32);
+				xp1 = xm1 + y_UI(32);
 				yp1 = ym1 + LineHeight / 4;
-				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, scale, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 			}
 			//
 			if (m_Active) {
-				xp1 = xm2 - y_r(140);
+				xp1 = xm2 - y_UI(140);
 				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_r(5), xp1 + y_r(108), yp1 + LineHeight * 2 - y_r(5), scale, Red, LocalizeParts->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_UI(5), xp1 + y_UI(108), yp1 + LineHeight * 2 - y_UI(5), Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
-			xp1 = xm1 + y_r(24);
+			xp1 = xm1 + y_UI(24);
 			yp1 = ym1 + LineHeight * 3;
-			xp2 = xm2 - y_r(24);
+			xp2 = xm2 - y_UI(24);
 			yp2 = ym2 - LineHeight;
 			//背景
 			{
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
-				WindowSystem::SetBox(xp1, yp1, xp2, yp2, scale, Gray50);
+				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//
-			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch, scale);
+			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
 			//
 		}
 	}
 
 	void PopUp::Add(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing,
 				bool IsInsert) noexcept {
@@ -367,4 +367,423 @@ namespace DXLibRef {
 			}
 		}
 	}
+	//
+	void UISystem::UI_CommonParts::SetParts(const nlohmann::json& pJson) noexcept {
+		this->m_Name = pJson["Name"];
+		//
+		std::string Type = pJson["Type"];
+		for (int i = 0; i < (int)EnumUIPartsType::Max; i++) {
+			if (Type == g_UIPartsString[i]) {
+				this->m_EnumUIPartsType = (EnumUIPartsType)i;
+				break;
+			}
+		}
+		//
+		this->m_Layer = pJson["Layer"];
+		//
+		this->m_IsMouseClickActive = pJson["MouseClickActive"];
+		//
+		this->m_XPos = pJson["XPos"];
+		this->m_YPos = pJson["YPos"];
+		this->m_XSize = pJson["XSize"];
+		this->m_YSize = pJson["YSize"];
+		this->m_ZRotate = pJson["ZRotate"];
+		//
+		std::string XCenter = pJson["XCenter"];
+		for (int i = 0; i < 3; i++) {
+			if (XCenter == g_UIXCenterString[i]) {
+				this->m_UIXCenter = (UIXCenter)i;
+				break;
+			}
+		}
+		std::string YCenter = pJson["YCenter"];
+		for (int i = 0; i < 3; i++) {
+			if (YCenter == g_UIYCenterString[i]) {
+				this->m_UIYCenter = (UIYCenter)i;
+				break;
+			}
+		}
+		//色関係
+		auto GetColorByPallet = [&](const std::string& ColorStr) {
+			for (int i = 0; i < g_UIColorPalletNum; i++) {
+				if (ColorStr == g_UIColorPalletString[i]) {
+					return g_UIColorPallet[i];
+					break;
+				}
+			}
+			return Black;
+		};
+		this->m_PressColor = GetColorByPallet(pJson["PressColor"]);
+		this->m_IntoColor = GetColorByPallet(pJson["IntoColor"]);
+		this->m_BaseColor = GetColorByPallet(pJson["BaseColor"]);
+		this->m_EdgeColor = GetColorByPallet(pJson["EdgeColor"]);
+		//テキスト
+		this->m_TextID = pJson["TextID"];
+		//描画位置を決定
+		switch (this->m_UIXCenter) {
+		case UIXCenter::LEFT:
+			this->m_DrawXCenter = this->m_XPos + this->m_XSize / 2;
+			break;
+		case UIXCenter::MIDDLE:
+			this->m_DrawXCenter = this->m_XPos;
+			break;
+		case UIXCenter::RIGHT:
+			this->m_DrawXCenter = this->m_XPos - this->m_XSize / 2;
+			break;
+		default:
+			break;
+		}
+		switch (this->m_UIYCenter) {
+		case UIYCenter::TOP:
+			this->m_DrawYCenter = this->m_YPos + this->m_YSize / 2;
+			break;
+		case UIYCenter::MIDDLE:
+			this->m_DrawYCenter = this->m_YPos;
+			break;
+		case UIYCenter::BOTTOM:
+			this->m_DrawYCenter = this->m_YPos - this->m_YSize / 2;
+			break;
+		default:
+			break;
+		}
+	}
+	void UISystem::UI_CommonParts::Update() noexcept {
+		if (this->m_IsMouseClickActive) {
+			auto* Pad = PadControl::Instance();
+			int mx = Pad->GetMS_X();
+			int my = Pad->GetMS_Y();
+
+			float rad = this->m_ZRotate + this->m_FrameInfo.m_ZRotOfs;
+
+			switch (this->m_EnumUIPartsType) {
+			case EnumUIPartsType::Box:
+			{
+				int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
+				int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
+				float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
+				float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
+
+				int   x1 = (int)(-xs * cos(rad) - -ys * sin(rad));
+				int   y1 = (int)(-ys * cos(rad) + -xs * sin(rad));
+				int   x2 = (int)(xs * cos(rad) - -ys * sin(rad));
+				int   y2 = (int)(-ys * cos(rad) + xs * sin(rad));
+				int   x3 = (int)(xs * cos(rad) - ys * sin(rad));
+				int   y3 = (int)(ys * cos(rad) + xs * sin(rad));
+				int   x4 = (int)(-xs * cos(rad) - ys * sin(rad));
+				int   y4 = (int)(ys * cos(rad) + -xs * sin(rad));
+				m_MouseOver = HitPointToSquare(
+					mx, my,
+					xp + x1, yp + y1,
+					xp + x2, yp + y2,
+					xp + x3, yp + y3,
+					xp + x4, yp + y4
+					);
+				m_MousePress = m_MouseOver && Pad->GetMouseClick().press();
+				printfDx("[]\n");
+			}
+				break;
+			default:
+				m_MouseOver = false;
+				break;
+			}
+		}
+		else {
+			m_MouseOver = false;
+		}
+	}
+	void UISystem::UI_CommonParts::Draw() noexcept {
+		if (this->m_FrameInfo.m_Alpha == 0.f) { return; }
+		if (1.f > this->m_FrameInfo.m_Alpha) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
+		}
+		auto* LocalizeParts = LocalizePool::Instance();
+
+		float rad = this->m_ZRotate + this->m_FrameInfo.m_ZRotOfs;
+
+		switch (this->m_EnumUIPartsType) {
+		case EnumUIPartsType::Box:
+		{
+			int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
+			int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
+			float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
+			float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
+
+			int   x1 = (int)(-xs * cos(rad) - -ys * sin(rad));
+			int   y1 = (int)(-ys * cos(rad) + -xs * sin(rad));
+			int   x2 = (int)(xs * cos(rad) - -ys * sin(rad));
+			int   y2 = (int)(-ys * cos(rad) + xs * sin(rad));
+			int   x3 = (int)(xs * cos(rad) - ys * sin(rad));
+			int   y3 = (int)(ys * cos(rad) + xs * sin(rad));
+			int   x4 = (int)(-xs * cos(rad) - ys * sin(rad));
+			int   y4 = (int)(ys * cos(rad) + -xs * sin(rad));
+			DrawQuadrangle(
+				xp + x1, yp + y1,
+				xp + x2, yp + y2,
+				xp + x3, yp + y3,
+				xp + x4, yp + y4,
+				m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, TRUE);
+			}
+			break;
+		case EnumUIPartsType::Msg:
+		{
+			int Width = GetDrawFormatStringWidth(
+				LocalizeParts->Get(this->m_TextID),
+				m_TextEX0.at(0).c_str(),
+				m_TextEX0.at(1).c_str(),
+				m_TextEX0.at(2).c_str()
+			);
+			int Size = GetFontSize();
+			double XCenter = 0.5;
+			double YCenter = 0.5;
+			switch (this->m_UIXCenter) {
+			case UIXCenter::LEFT:
+				this->m_DrawXCenter = this->m_XPos;
+				XCenter = 0.0;
+				break;
+			case UIXCenter::MIDDLE:
+				this->m_DrawXCenter = this->m_XPos + Width / 2;
+				XCenter = 0.5;
+				break;
+			case UIXCenter::RIGHT:
+				this->m_DrawXCenter = this->m_XPos + Width;
+				XCenter = 1.0;
+				break;
+			default:
+				break;
+			}
+			switch (this->m_UIYCenter) {
+			case UIYCenter::TOP:
+				this->m_DrawYCenter = this->m_YPos;
+				YCenter = 0.0;
+				break;
+			case UIYCenter::MIDDLE:
+				this->m_DrawYCenter = this->m_YPos + Size / 2;
+				YCenter = 0.5;
+				break;
+			case UIYCenter::BOTTOM:
+				this->m_DrawYCenter = this->m_YPos + Size;
+				YCenter = 1.0;
+				break;
+			default:
+				break;
+			}
+			int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
+			int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
+
+			DrawRotaFormatString(
+				xp, yp,
+				1.0, 1.0,
+				XCenter, YCenter,
+				(double)rad,
+				m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
+				FALSE,
+				LocalizeParts->Get(this->m_TextID),
+				m_TextEX0.at(0).c_str(),
+				m_TextEX0.at(1).c_str(),
+				m_TextEX0.at(2).c_str()
+			);
+			/*
+			GetDrawFormatStringWidthToHandle(
+				int FontHandle,
+				LocalizeParts->Get(this->m_TextID),
+				m_TextEX0.at(0).c_str(),
+				m_TextEX0.at(1).c_str(),
+				m_TextEX0.at(2).c_str()
+			);
+			GetFontSizeToHandle(int FontHandle);
+			DrawRotaFormatStringToHandle(
+				xp, yp,
+				1.0, 1.0,
+				XCenter, YCenter,
+				(double)rad,
+				m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
+				int FontHandle,
+				this->m_EdgeColor,
+				FALSE,
+				LocalizeParts->Get(this->m_TextID),
+				m_TextEX0.at(0).c_str(),
+				m_TextEX0.at(1).c_str(),
+				m_TextEX0.at(2).c_str()
+				);
+				//*/
+		}
+			break;
+		default:
+			break;
+		}
+		if (1.f > this->m_FrameInfo.m_Alpha) {
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		}
+	}
+	//
+	void UISystem::UI_CommonAnimes::SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept {
+		//
+		m_TargetID.clear();
+		for (auto& n : pJson["Target"]) {
+			for (auto& p : Parts) {
+				if (p->GetName() == n) {
+					m_TargetID.emplace_back(p->GetUniqueID());
+					break;
+				}
+			}
+		}
+		//
+		m_AnimeFrame.clear();
+		for (auto& n : pJson["Anime"]) {
+			FrameInfo tmp;
+			tmp.m_framepoint = n["Frame"];
+			tmp.m_Alpha = n["Alpha"];
+			tmp.m_XScale = n["XScale"];
+			tmp.m_YScale = n["YScale"];
+			tmp.m_XOfs = n["XOffset"];
+			tmp.m_YOfs = n["YOffset"];
+			tmp.m_ZRotOfs = n["ZRotOfs"];
+			std::string Lerptype = n["LerpType"];
+			for (int i = 0; i < (int)LerpType::Max; i++) {
+				if (Lerptype == g_LerpTypeStr[i]) {
+					tmp.m_LerpType = (LerpType)i;
+					break;
+				}
+			}
+			m_AnimeFrame.emplace_back(tmp);
+		}
+		//
+	}
+	void UISystem::UI_CommonAnimes::Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept {
+		if (m_AnimeFrame.size() == 0) { return; }
+		if (m_Frame < 0) { return; }
+		float FramePer = 0.f;
+		//現在のアニメ番号を取得
+		m_NowAnim = -1;
+		int tmpFrame = m_Frame;
+		for (auto& a : m_AnimeFrame) {
+			if (tmpFrame < a.m_framepoint) {
+				m_NowAnim = (int)(&a - &m_AnimeFrame.front());
+				FramePer = (float)tmpFrame / a.m_framepoint;
+				switch (a.m_LerpType) {
+					case LerpType::linear:
+						FramePer = FramePer;
+						break;
+					case LerpType::pow2:
+						FramePer = FramePer * FramePer;
+						break;
+					default:
+						break;
+				}
+				break;
+			}
+			tmpFrame -= a.m_framepoint;
+		}
+		if (m_NowAnim == -1) {
+			m_NowAnim = (int)(m_AnimeFrame.size()) - 1;
+			FramePer = 1.f;
+		}
+		//反映
+		for (auto& t : m_TargetID) {
+			for (auto& p : *Parts) {
+				if (p->GetUniqueID() == t) {
+					auto& Prev = m_AnimeFrame.at(std::max(m_NowAnim - 1, 0));
+					auto& Now = m_AnimeFrame.at(m_NowAnim);
+					FrameInfo tmp;
+					tmp.m_Alpha = Lerp(Prev.m_Alpha, Now.m_Alpha, FramePer);
+					tmp.m_XScale = Lerp(Prev.m_XScale, Now.m_XScale, FramePer);
+					tmp.m_YScale = Lerp(Prev.m_YScale, Now.m_YScale, FramePer);
+					tmp.m_XOfs = Lerp(Prev.m_XOfs, Now.m_XOfs, FramePer);
+					tmp.m_YOfs = Lerp(Prev.m_YOfs, Now.m_YOfs, FramePer);
+					tmp.m_ZRotOfs = Lerp(Prev.m_ZRotOfs, Now.m_ZRotOfs, FramePer);
+					p->SetFrameInfo(tmp);
+				}
+			}
+		}
+	}
+	//1レイヤー分
+	void UISystem::UI_OneLayer::Load(const char* path) noexcept {
+		m_IsEnd = false;
+
+		UniqueIDNum = 0;
+
+		int mdata = FileRead_open(path);
+		LONGLONG size = FileRead_size_handle(mdata);
+		std::string JsonStr;JsonStr.resize(size, '\0');
+		FileRead_read((void*)JsonStr.c_str(), (int)size, mdata);
+		FileRead_close(mdata);
+
+		nlohmann::json pJson = nlohmann::json::parse(JsonStr);
+		for (auto& j : pJson["Parts"]) {
+			m_CommonParts.emplace_back(std::make_unique<UI_CommonParts>());
+			m_CommonParts.back()->SetUniqueID(UniqueIDNum);
+			m_CommonParts.back()->SetParts(j);
+			UniqueIDNum++;
+		}
+		for (auto& j : pJson["TotalAnim"]) {
+			m_CommonAnimes.emplace_back(std::make_unique<UI_CommonAnimes>());
+			m_CommonAnimes.back()->SetParts(j, m_CommonParts);
+		}
+		std::sort(m_CommonParts.begin(), m_CommonParts.end(), [&](const std::unique_ptr<UI_CommonParts>& A, const std::unique_ptr<UI_CommonParts>& B) {
+			return (A->GetLayer() != B->GetLayer()) ? (A->GetLayer() < B->GetLayer()) : (A->GetUniqueID() < B->GetUniqueID());
+		});
+		if (UniqueIDNum == 0) { UniqueIDNum = -1; }
+	}
+	void UISystem::UI_OneLayer::Update() noexcept {
+		for (auto& p : m_CommonAnimes) {
+			p->Update(&m_CommonParts);
+		}
+		for (auto& p : m_CommonParts) {
+			p->Update();
+		}
+	}
+	void UISystem::UI_OneLayer::Draw() noexcept {
+		for (auto& p : m_CommonParts) {
+			p->Draw();
+		}
+	}
+	void UISystem::UI_OneLayer::Dispose() noexcept {
+		for (auto& p : m_CommonAnimes) {
+			p.reset();
+		}
+		m_CommonAnimes.clear();
+		for (auto& p : m_CommonParts) {
+			p.reset();
+		}
+		m_CommonParts.clear();
+		UniqueIDNum = -1;
+	}
+	//全体
+	int UISystem::AddUI(const char* path) noexcept {
+		for (auto& l : m_Layer) {
+			if (!l.IsActive()) {
+				l.Load(path);
+				return (int)(&l - &m_Layer.front());
+			}
+		}
+		return -1;
+	}
+	void UISystem::DelUI(int layer) noexcept {
+		auto& l = m_Layer.at(layer);
+		if (l.IsActive()) {
+			l.Dispose();
+		}
+	}
+	void UISystem::Update() noexcept {
+		for (auto& l : m_Layer) {
+			if (l.IsActive()) {
+				l.Update();
+			}
+		}
+	}
+	void UISystem::Draw() noexcept {
+		for (auto& l : m_Layer) {
+			if (l.IsActive()) {
+				l.Draw();
+			}
+		}
+	}
+	void UISystem::DisposeAll() noexcept {
+		for (auto& l : m_Layer) {
+			if (l.IsActive()) {
+				l.Dispose();
+			}
+		}
+	}
+	//
 };

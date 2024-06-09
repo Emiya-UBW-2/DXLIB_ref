@@ -589,8 +589,8 @@ namespace DXLibRef {
 				GuideImg.Dispose();
 				GuideString = "";
 			}
-			int GetDrawSize(float scale) const noexcept;
-			int Draw(int x, int y, float scale) const noexcept;
+			int GetDrawSize() const noexcept;
+			int Draw(int x, int y) const noexcept;
 		};
 
 		class PadsInfo {
@@ -782,7 +782,7 @@ namespace DXLibRef {
 		}
 	public:
 		void Execute(void) noexcept;
-		void Draw(float scale) const noexcept;
+		void Draw() const noexcept;
 		void Dispose(void) noexcept;
 	};
 

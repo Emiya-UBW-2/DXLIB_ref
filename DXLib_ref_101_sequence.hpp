@@ -38,8 +38,8 @@ namespace DXLibRef {
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
 		void MainDraw(void) noexcept { MainDraw_Sub(); }
 		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
-		void DrawUI_Base(float scale) noexcept { DrawUI_Base_Sub(scale); }
-		void DrawUI_In(float scale) noexcept { DrawUI_In_Sub(scale); }
+		void DrawUI_Base() noexcept { DrawUI_Base_Sub(); }
+		void DrawUI_In() noexcept { DrawUI_In_Sub(); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 
@@ -59,8 +59,8 @@ namespace DXLibRef {
 		virtual void BG_Draw_Sub(void) noexcept;
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
-		virtual void DrawUI_Base_Sub(float) noexcept {}
-		virtual void DrawUI_In_Sub(float) noexcept {}
+		virtual void DrawUI_Base_Sub(void) noexcept {}
+		virtual void DrawUI_In_Sub(void) noexcept {}
 		virtual void ShadowDraw_Far_Sub(void) noexcept {}
 		virtual void ShadowDraw_Sub(void) noexcept {}
 

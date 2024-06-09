@@ -5,8 +5,12 @@
 #define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSizeMax() / DXDraw::Instance()->GetDispXSizeMin())
 #define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSizeMax() / DXDraw::Instance()->GetDispYSizeMin())
 
-#define EdgeSize	y_r(2)
-#define LineHeight	y_r(18)
+#define x_UI(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / basex)
+#define y_UI(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / basey)
+
+
+#define EdgeSize	y_UI(2)
+#define LineHeight	y_UI(18)
 
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
@@ -79,8 +83,18 @@ namespace DXLibRef {
 	}
 	//矩形と点との2D判定
 	static bool HitPointToRectangle(int xp, int  yp, int x1, int  y1, int  x2, int  y2) { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
+
+	static bool HitPointToSquare(int xp, int  yp, int x1, int  y1, int  x2, int  y2, int  x3, int  y3, int  x4, int  y4)
+	{
+		if (0 > Vector3DX::Cross(VGet((float)(x2 - x1), (float)(y2 - y1), 0.f), VGet((float)(xp - x1), (float)(yp - y1), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet((float)(x3 - x2), (float)(y3 - y2), 0.f), VGet((float)(xp - x2), (float)(yp - y2), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet((float)(x4 - x3), (float)(y4 - y3), 0.f), VGet((float)(xp - x3), (float)(yp - y3), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet((float)(x1 - x4), (float)(y1 - y4), 0.f), VGet((float)(xp - x4), (float)(yp - y4), 0.f)).z) { return false; }
+		return true;
+	}
+
 	//マウスと矩形の判定
-	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2, float scale);
+	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2);
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -327,64 +341,64 @@ namespace DXLibRef {
 
 	namespace WindowSystem {
 		//箱
-		extern void SetBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet);
-		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int colorSet);
+		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
+		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet);
 		//文字
 		template <typename... Args>
-		extern const int GetMsgLen(int size, float scale, std::string_view String, Args&&... args) {
+		extern const int GetMsgLen(int size, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size*scale)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(8.f*scale);//エッジ分:
+			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8.f);//エッジ分:
 		}
 
-		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, float scale, int size, int xSize, FontHandle::FontXCenter FontX);
+		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX);
 
 		template <typename... Args>
-		extern const int SetMsg(int xp1, int yp1, int xp2, int yp2, float scale, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+		extern const int SetMsg(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
 			if (String == "") { return 0; }
 			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLen(size, scale, String, args...);
-			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, scale, size, xSize, FontX)) {
+			int xSize = GetMsgLen(size, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString((int)(size*scale), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString((int)(size), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
 		template <typename... Args>
-		extern const int GetMsgLenWW(int size, float scale, std::string_view String, Args&&... args) {
+		extern const int GetMsgLenWW(int size, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size*scale)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_r(8.f*scale);//エッジ分:
+			return Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8.f);//エッジ分:
 		}
 
 		template <typename... Args>
-		extern const int SetMsgWW(int xp1, int yp1, int xp2, int yp2, float scale, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
+		extern const int SetMsgWW(int xp1, int yp1, int xp2, int yp2, int size, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) {
 			if (String == "") { return 0; }
 			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLenWW(size, scale, String, args...);
-			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, scale, size, xSize, FontX)) {
+			int xSize = GetMsgLenWW(size, String, args...);
+			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString((int)(size*scale), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString((int)(size), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
 		template <typename... Args>
-		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			bool ret = SetClickBox(xp1, yp1, xp2, yp2, scale, defaultcolor);
-			SetMsgWW(xp1, yp1, xp2, yp2, scale, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
+			SetMsgWW(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
 		template <typename... Args>
-		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, float scale, unsigned int defaultcolor, std::string_view String, Args&&... args) {
-			SetBox(xp1, yp1, xp2, yp2, scale, defaultcolor);
-			SetMsg(xp1, yp1, xp2, yp2, scale, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) {
+			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
+			SetMsg(xp1, yp1, xp2, yp2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 		};
 
-		extern bool CheckBox(int xp1, int yp1, bool switchturn, float scale);
+		extern bool CheckBox(int xp1, int yp1, bool switchturn);
 
-		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax, float scale);
+		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax);
 
-		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax, float scale);
+		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax);
 		//
 		/*
 		class ScrollBoxClass {
@@ -409,7 +423,7 @@ namespace DXLibRef {
 							m_NowScrollYPer = std::clamp(m_NowScrollYPer + (float)(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
-					if (IntoMouse(xp2 - y_r(24), yp1, xp2, yp2)) {
+					if (IntoMouse(xp2 - y_UI(24), yp1, xp2, yp2)) {
 						if (Pad->GetINTERACTKey().trigger()) {
 							m_IsChangeScrollY = true;
 						}
@@ -442,8 +456,8 @@ namespace DXLibRef {
 						}
 					}
 				}
-				SetBox(xp2 - y_r(24), yp1, xp2, yp2, Gray50);
-				SetBox(xp2 - y_r(24) + y_r(1), Yp_s, xp2 - y_r(1), Yp_e, color);
+				SetBox(xp2 - y_UI(24), yp1, xp2, yp2, Gray50);
+				SetBox(xp2 - y_UI(24) + y_UI(1), Yp_s, xp2 - y_UI(1), Yp_e, color);
 			};
 		};
 		//*/
@@ -861,7 +875,6 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) {
-			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			for (int i = 0; i < 6; i++) {		// 映りこむ環境を描画する面の数だけ繰り返し
 				for (int j = 0; j < MIPLEVEL; j++) {			// ミップマップの数だけ繰り返し
 					SetRenderTargetToShader(0, dynamicCubeTex.get(), i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
@@ -1005,7 +1018,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void Draw(float scale) noexcept;
+		void Draw() noexcept;
 	};
 
 	//--------------------------------------------------------------------------------------------------
@@ -1025,7 +1038,7 @@ namespace DXLibRef {
 			int WinSizeX{ 720 };
 			int WinSizeY{ 720 };
 
-			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> m_Doing;
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing;
 			std::function<void()> m_ExitDoing;
 			std::function<void()> m_GuideDoing;
 		public:
@@ -1033,7 +1046,7 @@ namespace DXLibRef {
 			~PopUpDrawClass() {}
 		public:
 			void			Set(const char* WindowName, int sizex, int sizey,
-				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
+				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing
 			) noexcept {
@@ -1047,7 +1060,7 @@ namespace DXLibRef {
 			void			Start() noexcept;
 			void			End() noexcept;
 			void			Update() noexcept;
-			void			Draw(int xcenter,int ycenter, float scale) noexcept;
+			void			Draw(int xcenter,int ycenter) noexcept;
 		public:
 			const auto IsEnd() const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
@@ -1060,20 +1073,20 @@ namespace DXLibRef {
 		const auto IsActivePop() const noexcept { return (NowSel != LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
-					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch, float scale)> doing,
+					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 					std::function<void()> ExitDoing,
 					std::function<void()> GuideDoing,
 					bool IsInsert = false) noexcept;
 		void EndAll() noexcept;
 		void Update() noexcept;
-		void Draw(int xcenter, int ycenter, float scale) noexcept {
+		void Draw(int xcenter, int ycenter) noexcept {
 			if (!IsActivePop()) { return; }
-			que.at(NowSel).Draw(xcenter, ycenter, scale);
+			que.at(NowSel).Draw(xcenter, ycenter);
 		}
 	};
 
 	//--------------------------------------------------------------------------------------------------
-	// ポップアップ
+	// PCの情報を走査
 	//--------------------------------------------------------------------------------------------------
 	class CheckPCSpec {
 		struct MatchScore {
@@ -1230,5 +1243,186 @@ namespace DXLibRef {
 			std::thread newThead(&CheckPCSpec::FindCPU, this);
 			m_thread.swap(newThead);
 		}
+	};
+
+	//--------------------------------------------------------------------------------------------------
+	// 統一UI
+	//--------------------------------------------------------------------------------------------------
+	enum class EnumUIPartsType :int {
+		Zero = 0,
+		Box = Zero,
+		Msg,
+		Max,
+	};
+	static const char* g_UIPartsString[(int)EnumUIPartsType::Max] = {
+		"Box",
+		"Msg",
+	};
+	enum class LerpType {
+		linear,
+		pow2,
+		Max
+	};
+	static const char* g_LerpTypeStr[(int)LerpType::Max] = {
+		"linear",
+		"pow2",
+	};
+
+	static const int g_UIColorPalletNum = 13;
+	static const unsigned int g_UIColorPallet[g_UIColorPalletNum] = {
+		Red,
+		Green,
+		DarkGreen,
+		Blue,
+		Yellow,
+		WhiteSel,
+		White,
+		Gray15,
+		Gray25,
+		Gray50,
+		Gray65,
+		Gray75,
+		Black,
+	};
+	static const char* g_UIColorPalletString[g_UIColorPalletNum] = {
+		"Red",
+		"Green",
+		"DarkGreen",
+		"Blue",
+		"Yellow",
+		"WhiteSel",
+		"White",
+		"Gray15",
+		"Gray25",
+		"Gray50",
+		"Gray65",
+		"Gray75",
+		"Black",
+	};
+	enum class UIXCenter : int {
+		LEFT,
+		MIDDLE,
+		RIGHT,
+	};
+	static const char* g_UIXCenterString[] = {
+		"Left",
+		"Middle",
+		"Right",
+	};
+	enum class UIYCenter : int {
+		TOP,
+		MIDDLE,
+		BOTTOM,
+	};
+	static const char* g_UIYCenterString[] = {
+		"Top",
+		"Middle",
+		"Bottom",
+	};
+
+	class UISystem : public SingletonBase<UISystem> {
+	private:
+		friend class SingletonBase<UISystem>;
+	private:
+		struct FrameInfo {
+			int			m_framepoint{ 0 };	//前回～現在のフレーム数
+			float		m_Alpha{ 1.f };		//上記のフレーム数の段階でのXXX
+			float		m_XScale{ 1.f };
+			float		m_YScale{ 1.f };
+			float		m_XOfs{ 0.f };
+			float		m_YOfs{ 0.f };
+			float		m_ZRotOfs{ 0.f };
+			LerpType	m_LerpType{ LerpType::linear };//前フレームとのつなぎ方
+		};
+		class UI_CommonParts {
+		private://固定のパラメーター類
+			int				m_UniqueID{ 0 };
+			std::string		m_Name{};
+
+			EnumUIPartsType	m_EnumUIPartsType{ EnumUIPartsType::Zero };
+			int				m_Layer{ 0 };
+			//
+			bool			m_IsMouseClickActive{ false };
+			//
+			int				m_XPos{ 0 };
+			int				m_YPos{ 0 };
+			int				m_XSize{ 0 };
+			int				m_YSize{ 0 };
+			float			m_ZRotate{ 0.f };
+			UIXCenter		m_UIXCenter{ UIXCenter::LEFT };
+			UIYCenter		m_UIYCenter{ UIYCenter::TOP };
+			//
+			unsigned int	m_PressColor{ Gray25 };
+			unsigned int	m_IntoColor{ White };
+			unsigned int	m_BaseColor{ Black };
+			unsigned int	m_EdgeColor{ Gray75 };
+			//
+			int				m_TextID{ 0 };
+		private://変動する値
+			bool			m_MouseOver{ false };
+			bool			m_MousePress{ false };
+			int				m_DrawXCenter{ 0 };
+			int				m_DrawYCenter{ 0 };
+		public://外からいじられるもの
+			FrameInfo					m_FrameInfo{};
+			std::array<std::string,3>	m_TextEX0{};
+		public:
+			const auto& GetUniqueID() const noexcept { return m_UniqueID; }
+			const auto& GetName() const noexcept { return m_Name; }
+			const auto& GetLayer() const noexcept { return m_Layer; }
+
+			const auto& GetMousePress() const noexcept { return m_MousePress; }
+		public:
+			void SetUniqueID(int value) noexcept { m_UniqueID = value; }
+			void SetFrameInfo(const FrameInfo& value) noexcept { m_FrameInfo = value; }
+		public:
+			void SetParts(const nlohmann::json& pJson) noexcept;
+			void Update() noexcept;
+			void Draw() noexcept;
+		};
+		class UI_CommonAnimes {
+		private://固定のパラメーター類
+			std::vector<int> m_TargetID{};//対照のパーツ
+			std::vector<FrameInfo> m_AnimeFrame{};
+		private://変動する値
+			int m_NowAnim{ 0 };
+		public://外からいじられるもの
+			int m_Frame{ 0 };
+		public:
+		public:
+			void SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept;
+			void Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept;
+		};
+
+		class UI_OneLayer {
+		private://パーツ
+			std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
+			int UniqueIDNum{ -1 };
+		private://アニメーション
+			std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
+		private:
+			bool m_IsEnd{ false };//アニメーション側からの終了命令
+		public:
+			const auto IsActive() const noexcept { return UniqueIDNum != -1; }
+		public:
+			void Load(const char* path) noexcept;
+			void Update() noexcept;
+			void Draw() noexcept;
+			void Dispose() noexcept;
+		};
+	private:
+		std::array<UI_OneLayer, 5> m_Layer;
+	public:
+		UISystem() noexcept {
+		}
+		~UISystem() noexcept {
+		}
+	public:
+		int AddUI(const char* path) noexcept;
+		void DelUI(int layer) noexcept;
+
+		void Update() noexcept;
+		void Draw() noexcept;
+		void DisposeAll() noexcept;
 	};
 };

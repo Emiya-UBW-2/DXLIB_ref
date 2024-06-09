@@ -22,7 +22,7 @@ namespace DXLibRef {
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;
 		void SetEndPoint() noexcept;
-		void DebugWindow(int xpos, int ypos, float scale) noexcept;
+		void DebugWindow(int xpos, int ypos) noexcept;
 	};
 #endif // DEBUG
 };

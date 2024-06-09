@@ -54,6 +54,7 @@ namespace DXLibRef {
 		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos();Pos.y *= -1.f;
 		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
 		Pad->Execute();
+		UISystem::Instance()->Update();
 		auto SelEnd = !GetNowScene()->Update();		//XV
 		OptionWindowClass::Instance()->Execute();
 		DrawParts->Execute();
@@ -71,16 +72,16 @@ namespace DXLibRef {
 			[&]() { GetNowScene()->BG_Draw(); },
 			[&]() { GetNowScene()->MainDraw(); },
 			[&]() { GetNowScene()->MainDrawFront(); },
-			[&](float scale) { GetNowScene()->DrawUI_Base(scale); },
-			[&](float scale) {
-				GetNowScene()->DrawUI_In(scale);
+			[&]() { GetNowScene()->DrawUI_Base(); },
+			[&]() {
+				GetNowScene()->DrawUI_In();
 				//’Ç‰Á‚Ì•`‰æ•¨
 				auto* ItemLogParts = SideLog::Instance();
 				auto* PopUpParts = PopUp::Instance();
 				auto* Fonts = FontPool::Instance();
 				auto* OptionParts = OPTION::Instance();
-				ItemLogParts->Draw(scale);
-				PopUpParts->Draw(y_r(960), y_r(540), scale);
+				ItemLogParts->Draw();
+				PopUpParts->Draw(y_UI(960), y_UI(540));
 				{
 					FPSAvgs.at(m_FPSAvg) = GetFPS();
 					auto color = White;
@@ -104,11 +105,11 @@ namespace DXLibRef {
 					}
 					Avg = Avg / ((float)FPSAvgs.size());
 
-					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_r(18.f*scale), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-						y_r((1920 - 8)*scale), y_r(8.f*scale), White, Black, "%5.2f FPS", Avg);
+					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18.f), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																		  y_UI((1920 - 8)), y_UI(8.f), White, Black, "%5.2f FPS", Avg);
 				}
 #ifdef DEBUG
-				DebugParts->DebugWindow(y_r(1920 - 350), y_r(150), scale);
+				DebugParts->DebugWindow(y_UI(1920 - 350), y_UI(150));
 #endif // DEBUG
 			}
 		);
