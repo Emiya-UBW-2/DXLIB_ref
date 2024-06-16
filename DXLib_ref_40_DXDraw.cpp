@@ -6,7 +6,6 @@ namespace DXLibRef {
 	//
 	//--------------------------------------------------------------------------------------------------
 #ifdef _USE_OPENVR_
-	//AI用
 	class DXDraw::VRControl {
 		class VRDeviceClass {
 		private:
@@ -260,7 +259,8 @@ namespace DXLibRef {
 		void SubmitDraw(char eye_type, const GraphHandle& MainDrawScreen, const GraphHandle& UIScreen, std::function<void()> doingUI2) noexcept {
 			Camera3DInfo tmp_cam = GetCamPos(eye_type);
 			//目線用に合成
-			m_OutScreen.SetDraw_Screen(tmp_cam);
+			m_OutScreen.SetDraw_Screen();
+			tmp_cam.FlipCamInfo();
 			{
 				MainDrawScreen.DrawGraph(0, 0, true);
 				{
@@ -299,7 +299,6 @@ namespace DXLibRef {
 		}
 	};
 #else
-	//AI用
 	class DXDraw::VRControl {
 		class VRDeviceClass {
 		public:
@@ -343,23 +342,11 @@ namespace DXLibRef {
 	//
 	//--------------------------------------------------------------------------------------------------
 	void DXDraw::ShadowDraw::Init(int ShadowMapSize, int dispsizex, int dispsizey) {
-		//
 		BaseShadowHandle = GraphHandle::Make(dispsizex, dispsizey, TRUE);
-		{
-			int size = 2 << ShadowMapSize;
-			DepthBaseScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
-			SetDrawValidFloatTypeGraphCreateFlag(TRUE);
-			SetCreateDrawValidGraphChannelNum(2);
-			SetCreateGraphChannelBitDepth(32);
-			DepthScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
-			DepthFarScreenHandle = GraphHandle::Make(size, size, FALSE);				// 法線バッファの作成
-
-			// 設定を元に戻す
-			SetDrawValidFloatTypeGraphCreateFlag(FALSE);
-			SetCreateDrawValidGraphChannelNum(4);
-			SetCreateGraphColorBitDepth(32);
-		}
-		// 深度記録画像を使ったディレクショナルライト一つの描画用頂点シェーダーを読み込む
+		int size = 2 << ShadowMapSize;
+		DepthBaseScreenHandle = GraphHandle::Make(size, size, FALSE);			// 深度バッファ用の作成
+		DepthScreenHandle = GraphHandle::MakeDepth(size, size);					// 深度バッファの作成
+		DepthFarScreenHandle = GraphHandle::MakeDepth(size, size);				// 深度バッファの作成
 		m_Shader.Init("shader/VS_SoftShadow.vso", "shader/PS_SoftShadow.pso");
 	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
@@ -369,7 +356,7 @@ namespace DXLibRef {
 		SetCameraNearFar(0.05f * scale * Scale_Rate, 60.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
 		// カメラの位置と注視点はステージ全体が見渡せる位置
 		auto Vec = m_ShadowVec;
-		if (Vec.x == 0.f && m_ShadowVec.z == 0.f) {
+		if (m_ShadowVec.x == 0.f && m_ShadowVec.z == 0.f) {
 			Vec.z = (0.1f);
 		}
 		SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f * scale * Scale_Rate)).get(), Center.get());
@@ -383,10 +370,6 @@ namespace DXLibRef {
 			SetupCam(Center, 1.f);
 			m_CamViewMatrix[0] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
-			Shadowdoing();
-			// 設定したカメラのビュー行列と射影行列を取得しておく
-			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
-
 			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, -1);
@@ -403,8 +386,6 @@ namespace DXLibRef {
 			m_CamViewMatrix[1] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
-			// 設定したカメラのビュー行列と射影行列を取得しておく
-			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 		}
 		SetRenderTargetToShader(0, -1);
 		SetRenderTargetToShader(1, -1);
@@ -416,30 +397,25 @@ namespace DXLibRef {
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
 		float Scale_Rate = 12.5f;
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f* Scale_Rate, 100.f* Scale_Rate);
-		BaseShadowHandle.SetDraw_Screen(tmp_cam);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f * Scale_Rate, 100.f * Scale_Rate);
+		BaseShadowHandle.SetDraw_Screen();
+		tmp_cam.FlipCamInfo();
 		{
 			m_Shader.SetPixelParam(3, (float)OptionParts->GetParamInt(EnumSaveParam::shadow), 0.f, 0.f, 0.f);
+			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
+			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 			m_Shader.Draw_lamda(doing);
 		}
 		SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
 		SetUseTextureToShader(2, -1);				// 使用テクスチャの設定を解除
 		//後処理
-		//*
-		//GraphFilter(BaseShadowHandle.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 		GraphBlend(BaseShadowHandle.get(), DepthBaseScreenHandle.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-				   DX_RGBA_SELECT_SRC_G,    // 出力結果の赤成分は AlphaHandle の緑成分
-				   DX_RGBA_SELECT_SRC_G,    // 出力結果の緑成分は AlphaHandle の赤成分
-				   DX_RGBA_SELECT_SRC_G,    // 出力結果の青成分は AlphaHandle の青成分
-				   DX_RGBA_SELECT_SRC_R    // 出力結果のアルファ成分は BlendHandle の赤成分
-		);
-		//*/
+			DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_R);
 	}
 	void DXDraw::ShadowDraw::Draw() {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 		BaseShadowHandle.DrawGraph(0, 0, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		//DepthBaseScreenHandle.DrawExtendGraph(0, 0, 960, 960, false);
 	}
 	void DXDraw::ShadowDraw::Dispose() {
 		BaseShadowHandle.Dispose();
@@ -447,6 +423,26 @@ namespace DXLibRef {
 		DepthScreenHandle.Dispose();
 		DepthFarScreenHandle.Dispose();
 		m_Shader.Dispose();
+	}
+	void DXDraw::ShadowDraw::SetActive() {
+		auto* OptionParts = OPTION::Instance();
+		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
+		Init(11, y_r(1920), y_r(1080));
+	}
+	bool DXDraw::ShadowDraw::UpdateActive() {
+		auto* OptionParts = OPTION::Instance();
+		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
+		if (m_PrevShadow != shadow) {
+			m_PrevShadow = shadow;
+			if (shadow) {
+				Init(11, y_r(1920), y_r(1080));
+				return true;
+			}
+			else {
+				Dispose();
+			}
+		}
+		return false;
 	}
 	//--------------------------------------------------------------------------------------------------
 	//
@@ -459,9 +455,8 @@ namespace DXLibRef {
 		auto* OptionParts = OPTION::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		//ロード
-		m_IsFirstBoot = false;
-		if (!SaveDataParts->Load()) {
-			m_IsFirstBoot = true;
+		m_IsFirstBoot = !SaveDataParts->Load();
+		if (m_IsFirstBoot) {
 			//初回データ作成
 			SaveDataParts->Save();
 		}
@@ -508,12 +503,7 @@ namespace DXLibRef {
 		this->GetVRControl()->SetupBuffer(this->m_DispXSize, this->m_DispYSize);
 		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
 		SetOutApplicationLogValidFlag(TRUE);						//log
-		if (m_IsFirstBoot) {
-			SetMainWindowText("FirstBoot Option");						//タイトル
-		}
-		else {
-			SetMainWindowText("Loading...");							//タイトル
-		}
+		SetMainWindowText("Loading...");							//タイトル
 		ChangeWindowMode(TRUE);										//窓表示
 		SetUseDirect3DVersion(DXVer);								//directX ver
 		SetUseDirectInputFlag(TRUE);								//
@@ -574,34 +564,19 @@ namespace DXLibRef {
 		SE->Add((int)SoundEnumCommon::UI_OK, 1, "data/Sound/UI/ok.wav", false);
 		SE->Add((int)SoundEnumCommon::UI_NG, 1, "data/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
-		if (!m_IsFirstBoot) {
-			//影生成
-			m_PrevShadow = false;
-			m_ShadowDraw.Init(12, this->GetDispXSize(), this->GetDispYSize());
-			//Init
-			m_PauseActive.Set(false);
-			//
-			this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());								// 頂点データの準備
-			this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");																//レンズ
-			this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");						//レンズ
-
-			m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
-			LightPool::Create();
-		}
 	}
 	DXDraw::~DXDraw(void) noexcept {
-		if (m_VRControl) {
-			this->GetVRControl()->Dispose();
-			delete m_VRControl;
-		}
 		if (!m_IsFirstBoot) {
+			if (m_VRControl) {
+				this->GetVRControl()->Dispose();
+				delete m_VRControl;
+			}
 			m_ShadowDraw.Dispose();
 			if (m_IsCubeMap) {
 				m_RealTimeCubeMap.Dispose();
 			}
-			Effkseer_End();
-
 			m_PBR_Shader.Dispose();
+			Effkseer_End();
 		}
 		DxLib_End();
 	}
@@ -623,205 +598,31 @@ namespace DXLibRef {
 	}
 	//
 	void			DXDraw::Init(void) noexcept {
-		auto* OptionWindowParts = OptionWindowClass::Instance();
-		auto* Pad = PadControl::Instance();
-		auto* PopUpParts = PopUp::Instance();
-		auto* Fonts = FontPool::Instance();
-		auto* LocalizeParts = LocalizePool::Instance();
 		auto* OptionParts = OPTION::Instance();
-
+		auto* OptionWindowParts = OptionWindowClass::Instance();
 		OptionWindowParts->Init();
-		Update_effect_was = GetNowHiPerformanceCount();
-
-		if (m_IsFirstBoot) {
-			//this->GetDispXSize(), this->GetDispYSize()
-			m_CheckPCSpec.Set();
-
-			int xsize = y_r(1366);
-			int ysize = y_r(768);
-
-			UI_Screen = GraphHandle::Make(xsize, ysize, false);	//UI
-			//初期設定画面
-			OptionWindowParts->SetActive();
-			while (ProcessMessage() == 0) {
-				int xopt = xsize * this->GetDispXSize() / y_r(1920);
-				int yopt = ysize * this->GetDispYSize() / y_r(1080);
-				SetWindowPosition((deskx - xopt) / 2, (desky - yopt) / 2);
-				SetWindowSize(xopt, yopt);
-
-				Pad->Execute();
-				OptionWindowParts->Execute();
-				PopUpParts->Update();
-				if (!PopUpParts->IsActivePop()) {
-					break;
-				}
-				//
-				UI_Screen.SetDraw_Screen();
-				{
-					PopUpParts->Draw(y_r(720 / 2 + 16), y_r(720 / 2 + 16));
-					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_r(32), y_r(720 + 16) + y_r(32 / 2), Green, Black, LocalizeParts->Get(109));
-
-					int xp = y_r(720 + 16 + 16);
-					int yp = y_r(16);
-					if (WindowSystem::SetMsgClickBox(xp, yp, xp + y_r(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
-						m_CheckPCSpec.StartSearch();
-					}
-					yp += y_r(24);
-					if (m_CheckPCSpec.GetCPUDatas()) {
-						int MouseOverID = -1;
-						//CPU
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001));yp += LineHeight;
-						for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
-							int TextID = 0;
-							unsigned int Color = White;
-							if (c.m_Score >= 17276) {//
-								Color = Green;
-								TextID = 2002;
-							}
-							else if (c.m_Score >= 6600) {//
-								Color = Yellow;
-								TextID = 2003;
-							}
-							else {//
-								Color = Red;
-								TextID = 2004;
-							}
-							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
-								switch (TextID) {
-									case 2002:
-										MouseOverID = 2040;
-										break;
-									case 2003:
-										MouseOverID = 2041;
-										break;
-									case 2004:
-										MouseOverID = 2042;
-										break;
-									default:
-										break;
-								}
-							}
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score);yp += LineHeight;
-							yp += LineHeight;
-						}
-						if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
-							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005));yp += LineHeight;
-						}
-						//Mem
-						{
-							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011));yp += LineHeight;
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
-							int TextID = 0;
-							unsigned int Color = White;
-							if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
-								Color = Green;
-								TextID = 2012;
-							}
-							else {//
-								Color = Yellow;
-								TextID = 2013;
-							}
-							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 1)) {
-								switch (TextID) {
-									case 2012:
-										MouseOverID = 2043;
-										break;
-									case 2013:
-										MouseOverID = 2044;
-										break;
-									default:
-										break;
-								}
-							}
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
-							yp += LineHeight;
-						}
-						//GPU
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021));yp += LineHeight;
-						for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
-							int TextID = 0;
-							unsigned int Color = White;
-							if (c.m_Score >= 14649) {//
-								Color = Green;
-								TextID = 2022;
-							}
-							else if (c.m_Score >= 5003) {//
-								Color = Yellow;
-								TextID = 2023;
-							}
-							else {//
-								Color = Red;
-								TextID = 2024;
-							}
-							if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
-								switch (TextID) {
-									case 2022:
-										MouseOverID = 2045;
-										break;
-									case 2023:
-										MouseOverID = 2046;
-										break;
-									case 2024:
-										MouseOverID = 2047;
-										break;
-									default:
-										break;
-								}
-							}
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID));yp += LineHeight;
-							WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score);yp += LineHeight;
-							yp += LineHeight;
-						}
-						if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
-							WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025));yp += LineHeight;
-						}
-						//DirectX
-						int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
-						for (int loop = 0;loop < 2;loop++) {
-							if (GetUseDirect3DVersion() == DirectXVerID[loop]) {
-								NowSet = loop;
-							}
-						}
-						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
-							MouseOverID = 2048;
-						}
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]);yp += LineHeight;
-						if (MouseOverID > 0) {
-							xp = Pad->GetMS_X();
-							yp = Pad->GetMS_Y();
-							WindowSystem::SetMsg(xp, yp - LineHeight, xp, yp, LineHeight, FontHandle::FontXCenter::RIGHT, Green, DarkGreen, LocalizeParts->Get(MouseOverID));
-						}
-					}
-
-					xp = y_r(720 + 16 + 32);
-					yp = y_r(720);
-					if (WindowSystem::SetMsgClickBox(xp, yp, xsize-y_r(32), yp + y_r(32), Green, "Start Game!")) {
-						PopUpParts->EndAll();
-					}
-				}
-				GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
-				{
-					UI_Screen.DrawExtendGraph(0, 0, xopt, yopt, false);
-				}
-				Screen_Flip();
-			}
-			OptionParts->Save();
-			StartMe();
+		//Init
+		m_PauseActive.Set(false);
+		//シェーダー
+		this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());// 頂点データの準備
+		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");//レンズ
+		this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");//ブラックアウト
+		m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
+		//
+		LightPool::Create();
+		//シェーダー
+		PostPassEffect::Create();
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			UI_Screen = GraphHandle::Make(y_r(1920), y_r(1080), true);	//UI
 		}
-		else {
-			PostPassEffect::Create();						//シェーダー
-			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-				UI_Screen = GraphHandle::Make(y_r(1920), y_r(1080), true);	//UI
-			}
-		}
+		//影生成
+		m_ShadowDraw.SetActive();
+		//キューブマップ
 		m_IsCubeMap = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0);
 		if (m_IsCubeMap) {
 			m_RealTimeCubeMap.Init();
 		}
+		Update_effect_was = GetNowHiPerformanceCount();
 	}
 	bool			DXDraw::FirstExecute(void) noexcept {
 		auto* Pad = PadControl::Instance();
@@ -956,15 +757,8 @@ namespace DXLibRef {
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				m_ShadowDraw.SetDraw(doing, camInfo);
 			}
-			UI_Screen.SetDraw_Screen(camInfo, false);
-			{
-				SetCameraNearFar(camInfo.GetCamNear(), camInfo.GetCamFar());
-				SetupCamera_Perspective(camInfo.GetCamFov());
-				SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
-
-				m_CamViewMatrix = GetCameraViewMatrix();
-				m_CamProjectionMatrix = GetCameraProjectionMatrix();
-			}
+			m_CamViewMatrix = camInfo.GetViewMatrix();
+			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
 			PostPassParts->DrawDoF(sky_doing, [&]() { m_PBR_Shader.Draw_lamda(doing); }, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
@@ -1078,19 +872,7 @@ namespace DXLibRef {
 	void					DXDraw::VR_Haptic(char id_, unsigned short times) noexcept { this->GetVRControl()->Haptic(id_, times); }
 	//
 	bool					DXDraw::UpdateShadowActive() noexcept {
-		auto* OptionParts = OPTION::Instance();
-		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
-		if (m_PrevShadow != shadow) {
-			m_PrevShadow = shadow;
-			if (shadow) {
-				m_ShadowDraw.Init(11, y_r(1920), y_r(1080));
-				return true;
-			}
-			else {
-				m_ShadowDraw.Dispose();
-			}
-		}
-		return false;
+		return m_ShadowDraw.UpdateActive();
 	}
 
 	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept {
@@ -1130,5 +912,193 @@ namespace DXLibRef {
 				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
 			}
 		}
+	}
+	//
+	void			DXDraw::FirstBootSetting() {
+		SetMainWindowText("FirstBoot Option");						//タイトル
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* Pad = PadControl::Instance();
+		auto* PopUpParts = PopUp::Instance();
+		auto* Fonts = FontPool::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
+		auto* OptionParts = OPTION::Instance();
+
+		OptionWindowParts->Init();
+
+		m_CheckPCSpec.Set();
+
+		int xsize = y_r(1366);
+		int ysize = y_r(768);
+
+		UI_Screen = GraphHandle::Make(xsize, ysize, false);	//UI
+		//初期設定画面
+		OptionWindowParts->SetActive();
+		while (ProcessMessage() == 0) {
+			int xopt = xsize * this->GetDispXSize() / y_r(1920);
+			int yopt = ysize * this->GetDispYSize() / y_r(1080);
+			SetWindowPosition((deskx - xopt) / 2, (desky - yopt) / 2);
+			SetWindowSize(xopt, yopt);
+
+			Pad->Execute();
+			OptionWindowParts->Execute();
+			PopUpParts->Update();
+			if (!PopUpParts->IsActivePop()) {
+				break;
+			}
+			//
+			UI_Screen.SetDraw_Screen();
+			{
+				PopUpParts->Draw(y_r(720 / 2 + 16), y_r(720 / 2 + 16));
+				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_r(32), y_r(720 + 16) + y_r(32 / 2), Green, Black, LocalizeParts->Get(109));
+
+				int xp = y_r(720 + 16 + 16);
+				int yp = y_r(16);
+				if (WindowSystem::SetMsgClickBox(xp, yp, xp + y_r(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
+					m_CheckPCSpec.StartSearch();
+				}
+				yp += y_r(24);
+				if (m_CheckPCSpec.GetCPUDatas()) {
+					int MouseOverID = -1;
+					//CPU
+					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
+					for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
+						int TextID = 0;
+						unsigned int Color = White;
+						if (c.m_Score >= 17276) {//
+							Color = Green;
+							TextID = 2002;
+						}
+						else if (c.m_Score >= 6600) {//
+							Color = Yellow;
+							TextID = 2003;
+						}
+						else {//
+							Color = Red;
+							TextID = 2004;
+						}
+						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+							switch (TextID) {
+							case 2002:
+								MouseOverID = 2040;
+								break;
+							case 2003:
+								MouseOverID = 2041;
+								break;
+							case 2004:
+								MouseOverID = 2042;
+								break;
+							default:
+								break;
+							}
+						}
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						yp += LineHeight;
+					}
+					if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
+					}
+					//Mem
+					{
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
+						int TextID = 0;
+						unsigned int Color = White;
+						if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
+							Color = Green;
+							TextID = 2012;
+						}
+						else {//
+							Color = Yellow;
+							TextID = 2013;
+						}
+						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 1)) {
+							switch (TextID) {
+							case 2012:
+								MouseOverID = 2043;
+								break;
+							case 2013:
+								MouseOverID = 2044;
+								break;
+							default:
+								break;
+							}
+						}
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						yp += LineHeight;
+					}
+					//GPU
+					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021)); yp += LineHeight;
+					for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
+						int TextID = 0;
+						unsigned int Color = White;
+						if (c.m_Score >= 14649) {//
+							Color = Green;
+							TextID = 2022;
+						}
+						else if (c.m_Score >= 5003) {//
+							Color = Yellow;
+							TextID = 2023;
+						}
+						else {//
+							Color = Red;
+							TextID = 2024;
+						}
+						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+							switch (TextID) {
+							case 2022:
+								MouseOverID = 2045;
+								break;
+							case 2023:
+								MouseOverID = 2046;
+								break;
+							case 2024:
+								MouseOverID = 2047;
+								break;
+							default:
+								break;
+							}
+						}
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						yp += LineHeight;
+					}
+					if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
+						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
+					}
+					//DirectX
+					int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
+					for (int loop = 0; loop < 2; loop++) {
+						if (GetUseDirect3DVersion() == DirectXVerID[loop]) {
+							NowSet = loop;
+						}
+					}
+					if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+						MouseOverID = 2048;
+					}
+					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
+					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
+					if (MouseOverID > 0) {
+						xp = Pad->GetMS_X();
+						yp = Pad->GetMS_Y();
+						WindowSystem::SetMsg(xp, yp - LineHeight, xp, yp, LineHeight, FontHandle::FontXCenter::RIGHT, Green, DarkGreen, LocalizeParts->Get(MouseOverID));
+					}
+				}
+
+				xp = y_r(720 + 16 + 32);
+				yp = y_r(720);
+				if (WindowSystem::SetMsgClickBox(xp, yp, xsize - y_r(32), yp + y_r(32), Green, "Start Game!")) {
+					PopUpParts->EndAll();
+				}
+			}
+			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
+			{
+				UI_Screen.DrawExtendGraph(0, 0, xopt, yopt, false);
+			}
+			Screen_Flip();
+		}
+		OptionParts->Save();
 	}
 };

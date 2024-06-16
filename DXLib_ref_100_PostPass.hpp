@@ -2,8 +2,6 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-	//
-	static const int EXTEND = 4;
 	//ÉxÅ[ÉX
 	class PostPassBase {
 	protected:
@@ -19,9 +17,8 @@ namespace DXLibRef {
 	public:
 		bool IsActive() noexcept { return IsActive_Sub(); }
 		void Init()noexcept {
-			bool active = IsActive_Sub();
-			m_PrevActive = active;
-			if (active) {
+			m_PrevActive = IsActive_Sub();
+			if (m_PrevActive) {
 				Load_Sub();
 			}
 		}

@@ -50,6 +50,7 @@ namespace DXLibRef {
 			}
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
+			if (ysize == 0) { ysize == 1; }
 			xsize = xsize * y_UI(21) / ysize;
 			ysize = ysize * y_UI(21) / ysize;
 		}

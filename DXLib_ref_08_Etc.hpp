@@ -310,6 +310,116 @@ namespace DXLibRef {
 		// ポリゴンを2個描画
 		DrawPolygon2D(Vertex, 2, DX_NONE_GRAPH, FALSE);
 	}
+	//	x1,y1 Angleが0の場合の左上座標
+	//	x2,y2 Angleが0の場合の右下座標
+	//	xminp,yminp 左上角からの固定長さ
+	//	xmaxp,ymaxp 右下角からの固定長さ
+	//	XCenter,YCenter　　: 画像を回転描画する画像上の中心座標(左上を(0.0f,0.0f)、右下を(1.0f,1.0f)とした割合)
+	//	Angle　　　: 描画角度（ラジアン指定）
+	//	GrHandle　 : 描画するグラフィックの識別番号（グラフィックハンドル）
+	//	TransFlag　: 画像の透明度を有効にするかどうか( TRUE：有効にする　FALSE：無効にする )
+	//	TilingFlag : 角以外の部分をタイリングするか拡縮させるか( TRUE：タイリング　FALSE：拡縮 )
+	static void Draw9SliceGraph(
+		int x1, int y1, int x2, int y2,
+		int xminp, int yminp, int xmaxp, int ymaxp,
+		float XCenter, float YCenter, float Angle,
+		int GrHandle, bool TransFlag, bool TilingFlag) noexcept {
+		//最低限のサイズを指定
+		if (x2 < x1 + xminp + xmaxp) { x2 = x1 + xminp + xmaxp; }
+		if (y2 < y1 + yminp + ymaxp) { y2 = y1 + yminp + ymaxp; }
+		//用意する頂点情報
+		std::vector<VERTEX2D> Vertex;
+		std::vector<unsigned short> Index;
+
+		float xs = (float)(x2 - x1);
+		float ys = (float)(y2 - y1);
+
+		float CenterX = (float)x1 + xs * XCenter;
+		float CenterY = (float)y1 + ys * YCenter;
+
+		auto SetPoint = [&](float xper, float yper, int xc, int yc) {
+			Vertex.resize(Vertex.size() + 1);
+			Vertex.back().pos = VGet(
+				(float)x1 + xs * xper - CenterX,
+				(float)y1 + ys * yper - CenterY,
+				0.f);
+
+			Vertex.back().pos = VGet(
+				CenterX + Vertex.back().pos.x*std::cos(Angle) - Vertex.back().pos.y*std::sin(Angle),
+				CenterY + Vertex.back().pos.x*std::sin(Angle) + Vertex.back().pos.y*std::cos(Angle),
+				0.f);
+
+			Vertex.back().rhw = 1.0f;
+			Vertex.back().dif = GetColorU8(255, 255, 255, 255);
+			Vertex.back().u = (float)xc / 3.f;
+			Vertex.back().v = (float)yc / 3.f;
+			return (unsigned short)(Vertex.size() - 1);
+		};
+		auto SetBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
+			Index.emplace_back(SetPoint(xmin, ymin, xc, yc));// 左上の頂点の情報をセット
+			auto RU = SetPoint(xmax, ymin, xc + 1, yc);
+			auto LD = SetPoint(xmin, ymax, xc, yc + 1);
+			Index.emplace_back(RU);// 右上の頂点の情報をセット
+			Index.emplace_back(LD);// 左下の頂点の情報をセット
+			Index.emplace_back(SetPoint(xmax, ymax, xc + 1, yc + 1));// 右下の頂点の情報をセット
+			Index.emplace_back(LD);// 左下の頂点の情報をセット
+			Index.emplace_back(RU);// 右上の頂点の情報をセット
+		};
+
+		float xminpt = (float)xminp / xs;
+		float xmaxpt = (float)xmaxp / xs;
+		float xmaxt = 1.f - xmaxpt;
+		float xmidt = xmaxt - xminpt;
+
+		float yminpt = (float)yminp / ys;
+		float ymaxpt = (float)ymaxp / ys;
+		float ymaxt = 1.f - ymaxpt;
+		float ymidt = ymaxt - yminpt;
+
+		int xtile = 1;
+		int ytile = 1;
+		//タイリング
+		if (TilingFlag) {
+			xtile = (int)(xmidt / ((xminpt + xmaxpt) / 2.f)) + 1;
+			if (xtile <= 0) { xtile = 1; }
+			ytile = (int)(ymidt / ((yminpt + ymaxpt) / 2.f)) + 1;
+			if (ytile <= 0) { ytile = 1; }
+		}
+
+		Vertex.reserve((size_t)(3 * 2 * ((xtile + 2) * (ytile + 2))));
+		float xmin = 0.f;
+		float xmax = xminpt;
+		int xc = 0;
+		for (int x = 0;x < xtile + 2;x++) {
+			float ymin = 0.f;
+			float ymax = yminpt;
+			int yc = 0;
+			for (int y = 0;y < ytile + 2;y++) {
+				SetBox(xmin, ymin, xmax, ymax, xc, yc);
+				//次
+				ymin = ymax;
+				ymax = TilingFlag ? (ymin + ymidt / ytile) : ymaxt;
+				if (y == 0) {
+					yc = 1;
+				}
+				if (y == ytile) {
+					ymax = 1.f;
+					yc = 2;
+				}
+			}
+			//次
+			xmin = xmax;
+			xmax = TilingFlag ? (xmin + xmidt / xtile) : xmaxt;
+			if (x == 0) {
+				xc = 1;
+			}
+			if (x == xtile) {
+				xmax = 1.f;
+				xc = 2;
+			}
+		}
+		DrawPolygonIndexed2D(Vertex.data(), (int)Vertex.size(), Index.data(), (int)Index.size() / 3, GrHandle, TransFlag ? TRUE : FALSE);
+	}
 	//カプセル描画
 	static bool DrawCapsule_3D(const Vector3DX& p1, const Vector3DX& p2, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawCapsule3D(p1.get(), p2.get(), range, 8, color, speccolor, TRUE) == TRUE;

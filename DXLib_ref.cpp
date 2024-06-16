@@ -6,14 +6,20 @@ namespace DXLibRef {
 	DXLib_ref::DXLib_ref() noexcept {
 		DXDraw::Create();						//汎用
 		auto* DrawParts = DXDraw::Instance();
-		DrawParts->Init();
+		if (!DrawParts->IsFirstBoot()) {
+			DrawParts->Init();
+		}
 	}
 	DXLib_ref::~DXLib_ref() noexcept {
 
 	}
 	bool DXLib_ref::StartLogic() noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		if (DrawParts->IsFirstBoot()) { return false; }
+		if (DrawParts->IsFirstBoot()) {
+			DrawParts->FirstBootSetting();
+			StartMe();
+			return false;
+		}
 		SceneControl::Create();
 		return true;
 	}

@@ -25,8 +25,6 @@ namespace DXLibRef {
 		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
-		int ScrX = y_r(basex);
-		int ScrY = y_r(basey);
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
 		VECTOR vec_from = campos.get();		// カメラの位置
@@ -37,8 +35,8 @@ namespace DXLibRef {
 		SetupCamera_Perspective(fov);
 		MATRIX proj = GetCameraProjectionMatrix();
 		// ビューポート行列（スクリーン行列）の作成
-		float w = (float)ScrX / 2.0f;
-		float h = (float)ScrY / 2.0f;
+		float w = (float)y_r(basex) / 2.0f;
+		float h = (float)y_r(basey) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,

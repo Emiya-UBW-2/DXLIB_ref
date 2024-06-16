@@ -9,8 +9,7 @@ namespace DXLibRef {
 	const LocalizePool* SingletonBase<LocalizePool>::m_Singleton = nullptr;
 
 	LocalizePool::LocalizePool() {
-		auto* OptionParts = OPTION::Instance();
-		Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
+		Load(LanguageStr[OPTION::Instance()->GetParamInt(EnumSaveParam::Language)]);
 	}
 
 	void LocalizePool::Load(const char* Lang) {

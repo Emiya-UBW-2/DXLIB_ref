@@ -37,6 +37,30 @@ namespace DXLibRef {
 			m_near = cam_near_;
 			m_far = cam_far_;
 		}
+		void FlipCamInfo() const noexcept {
+			SetUpCamInfo(this->m_pos, this->m_vec, this->m_up, this->m_fov, this->m_near, this->m_far);
+		}
+
+		const MATRIX GetViewMatrix() const noexcept {
+			MATRIX mat_view;					// ビュー行列
+			VECTOR vec_from = m_pos.get();		// カメラの位置
+			VECTOR vec_lookat = m_vec.get();   // カメラの注視点
+			VECTOR vec_up = m_up.get();        // カメラの上方向
+			CreateLookAtMatrix(&mat_view, &vec_from, &vec_lookat, &vec_up);
+			return mat_view;
+		}
+
+		const MATRIX GetProjectionMatrix() const noexcept {
+			MATRIX mat_view;					// プロジェクション行列
+			CreatePerspectiveFovMatrix(&mat_view, m_fov, m_near, m_far);
+			return mat_view;
+		}
+
+		static void SetUpCamInfo(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_) {
+			SetCameraNearFar(near_, far_);
+			SetupCamera_Perspective(fov);
+			SetCameraPositionAndTargetAndUpVec(campos.get(), camvec.get(), camup.get());
+		}
 	};
 	class GraphHandle {
 	private:
@@ -82,6 +106,21 @@ namespace DXLibRef {
 			return { DxLib::MakeScreen(SizeX, SizeY, (trns ? TRUE : FALSE)) };
 		}
 
+		static GraphHandle MakeDepth(int SizeX, int SizeY) noexcept {
+			// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
+			auto prevMip = GetCreateDrawValidGraphChannelNum();
+			auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
+			auto prevBit = GetCreateGraphChannelBitDepth();
+			SetCreateDrawValidGraphChannelNum(2);
+			SetDrawValidFloatTypeGraphCreateFlag(TRUE);
+			SetCreateGraphChannelBitDepth(32);
+			auto ret = DxLib::MakeScreen(SizeX, SizeY, FALSE);
+			SetCreateDrawValidGraphChannelNum(prevMip);
+			SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
+			SetCreateGraphChannelBitDepth(prevBit);
+			return ret;
+		}
+
 		void DrawGraph(int posx, int posy, bool trns) const noexcept {
 			if (IsActive()) {
 				DxLib::DrawGraph(posx, posy, this->handle_, (trns ? TRUE : FALSE));
@@ -120,38 +159,12 @@ namespace DXLibRef {
 				ClearDrawScreen();
 			}
 		}
-		void SetDraw_Screen(const Camera3DInfo& camInfo, const bool& Clear = true) {
-			SetDraw_Screen(Clear);
-			SetCameraNearFar(camInfo.GetCamNear(), camInfo.GetCamFar());
-			SetupCamera_Perspective(camInfo.GetCamFov());
-			SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
-		}
-		void SetDraw_Screen(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_, const bool& Clear = true) {
-			SetDraw_Screen(Clear);
-			SetCameraNearFar(near_, far_);
-			SetupCamera_Perspective(fov);
-			SetCameraPositionAndTargetAndUpVec(campos.get(), camvec.get(), camup.get());
-		}
 		//
 		static void SetDraw_Screen(int handle, const bool& Clear = true) {
 			SetDrawScreen(handle);
 			if (Clear) {
 				ClearDrawScreen();
 			}
-		}
-
-		static void SetDraw_Screen(int handle, const Camera3DInfo& camInfo, const bool& Clear = true) {
-			SetDraw_Screen(handle, Clear);
-			SetCameraNearFar(camInfo.GetCamNear(), camInfo.GetCamFar());
-			SetupCamera_Perspective(camInfo.GetCamFov());
-			SetCameraPositionAndTargetAndUpVec(camInfo.GetCamPos().get(), camInfo.GetCamVec().get(), camInfo.GetCamUp().get());
-		}
-
-		static void SetDraw_Screen(int handle, const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_, const bool& Clear = true) {
-			SetDraw_Screen(handle, Clear);
-			SetCameraNearFar(near_, far_);
-			SetupCamera_Perspective(fov);
-			SetCameraPositionAndTargetAndUpVec(campos.get(), camvec.get(), camup.get());
 		}
 
 		auto getp(void) noexcept { return &handle_; }

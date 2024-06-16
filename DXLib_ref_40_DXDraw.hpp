@@ -34,6 +34,11 @@ namespace DXLibRef {
 			void Dispose();
 		private:
 			void SetupCam(Vector3DX Center, float scale) const noexcept;
+		private:
+			bool						m_PrevShadow{ false };
+		public:
+			void SetActive();
+			bool UpdateActive();
 		};
 	private:
 		int							m_DispXSize{deskx};
@@ -53,8 +58,6 @@ namespace DXLibRef {
 		switchs						m_PauseActive;
 		LONGLONG					m_StartTime{0};
 		bool						m_IsEnd{false};
-
-		bool						m_PrevShadow{false};
 
 		ShadowDraw					m_ShadowDraw;
 
@@ -149,6 +152,7 @@ namespace DXLibRef {
 
 		void			SetWindowOrBorderless() noexcept;
 	public:
+		void			FirstBootSetting();
 		void			Init(void) noexcept;
 		bool			FirstExecute(void) noexcept;
 		bool			UpdateShadowActive() noexcept;
@@ -178,6 +182,5 @@ namespace DXLibRef {
 		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
 		Vector3DX			Get_VR_Hand2TouchPadPoint() const noexcept;
 		void				VR_Haptic(char id_, unsigned short times) noexcept;	//VRコントローラー振動
-	private:
 	};
 };
