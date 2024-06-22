@@ -608,6 +608,7 @@ namespace DXLibRef {
 		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");//レンズ
 		this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");//ブラックアウト
 		m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
+		m_PBR_Shader.AddGeometryShader("shader/GS_PBR3D.pso");
 		//
 		LightPool::Create();
 		//シェーダー
@@ -759,7 +760,13 @@ namespace DXLibRef {
 			}
 			m_CamViewMatrix = camInfo.GetViewMatrix();
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
-			PostPassParts->DrawDoF(sky_doing, [&]() { m_PBR_Shader.Draw_lamda(doing); }, doingFront, camInfo);
+			PostPassParts->DrawDoF(sky_doing, [&]() {
+				MATRIX view, projection;
+				GetTransformToViewMatrix(&view);
+				GetTransformToProjectionMatrix(&projection);
+				m_PBR_Shader.SetGeometryCONSTBUFFER(1, &view, &projection);
+				m_PBR_Shader.Draw_lamda(doing);
+								   }, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });

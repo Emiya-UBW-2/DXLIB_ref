@@ -815,12 +815,21 @@ namespace DXLibRef {
 			MATRIX ProjectionMatrix;
 		};
 	private:
+		//DXLIBから引っ張ってきたシェーダー用の定義
+		typedef float DX_D3D11_SHADER_FLOAT4[4];
+		struct DX_D3D11_GS_CONST_BUFFER_BASE {
+			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4];											// ビュー　→　プロジェクション行列
+			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3];												// ワールド　→　ビュー行列
+		};
+	private:
 		//シェーダーハンドル
 		int m_VertexShaderhandle{-1};
+		int m_GeometryShaderhandle{-1};
 		int m_PixelShaderhandle{-1};
 		//シェーダーに渡す追加パラメーターを配するハンドル
 		std::array<int, 4> LightCameraMatrixConstantBufferHandle{-1};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
 		std::array<int, 4> m_VertexShadercbhandle{-1};
+		int m_GeometryShaderMatcbhandle{-1};
 		int m_PixelShaderSendDispSizeHandle{-1};
 		std::array<int, 4> m_PixelShadercbhandle{-1};
 
@@ -828,9 +837,11 @@ namespace DXLibRef {
 		ShaderUseClass() {
 			//シェーダーハンドル
 			m_VertexShaderhandle = -1;
+			m_GeometryShaderhandle = -1;
 			m_PixelShaderhandle = -1;
 			//シェーダーに渡す追加パラメーターを配するハンドル
 			for (auto& h : m_VertexShadercbhandle) { h = -1; }
+			m_GeometryShaderMatcbhandle = -1;
 			m_PixelShaderSendDispSizeHandle = -1;
 			for (auto& h : m_PixelShadercbhandle) { h = -1; }
 		}
@@ -857,6 +868,11 @@ namespace DXLibRef {
 			}
 			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);			// ピクセルシェーダーバイナリコードの読み込み
 		}
+		void			AddGeometryShader(const char* GeometryShader) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			this->m_GeometryShaderMatcbhandle = CreateShaderConstantBuffer(sizeof(DX_D3D11_GS_CONST_BUFFER_BASE));
+			this->m_GeometryShaderhandle = LoadGeometryShader(GeometryShader);
+		}
 		//後始末
 		void			Dispose() noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
@@ -868,6 +884,9 @@ namespace DXLibRef {
 				DeleteShaderConstantBuffer(h);
 			}
 			DeleteShader(this->m_VertexShaderhandle);
+			//
+			DeleteShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
+			DeleteShader(this->m_GeometryShaderhandle);
 			//ピクセルシェーダ―周り
 			DeleteShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);
 			for (auto& h : m_PixelShadercbhandle) {
@@ -898,7 +917,47 @@ namespace DXLibRef {
 			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle[0]);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
-		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		//シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (this->m_GeometryShaderhandle == -1) { return; }
+			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
+
+			// ビュー変換用行列をセットする
+			LightCameraMatrixConst->ViewMatrix[0][0] = ViewMatrix->m[0][0];
+			LightCameraMatrixConst->ViewMatrix[0][1] = ViewMatrix->m[1][0];
+			LightCameraMatrixConst->ViewMatrix[0][2] = ViewMatrix->m[2][0];
+			LightCameraMatrixConst->ViewMatrix[0][3] = ViewMatrix->m[3][0];
+			LightCameraMatrixConst->ViewMatrix[1][0] = ViewMatrix->m[0][1];
+			LightCameraMatrixConst->ViewMatrix[1][1] = ViewMatrix->m[1][1];
+			LightCameraMatrixConst->ViewMatrix[1][2] = ViewMatrix->m[2][1];
+			LightCameraMatrixConst->ViewMatrix[1][3] = ViewMatrix->m[3][1];
+			LightCameraMatrixConst->ViewMatrix[2][0] = ViewMatrix->m[0][2];
+			LightCameraMatrixConst->ViewMatrix[2][1] = ViewMatrix->m[1][2];
+			LightCameraMatrixConst->ViewMatrix[2][2] = ViewMatrix->m[2][2];
+			LightCameraMatrixConst->ViewMatrix[2][3] = ViewMatrix->m[3][2];
+			// 投影変換用行列をセットする
+			LightCameraMatrixConst->ProjectionMatrix[0][0] = ProjectionMatrix->m[0][0];
+			LightCameraMatrixConst->ProjectionMatrix[0][1] = ProjectionMatrix->m[1][0];
+			LightCameraMatrixConst->ProjectionMatrix[0][2] = ProjectionMatrix->m[2][0];
+			LightCameraMatrixConst->ProjectionMatrix[0][3] = ProjectionMatrix->m[3][0];
+			LightCameraMatrixConst->ProjectionMatrix[1][0] = ProjectionMatrix->m[0][1];
+			LightCameraMatrixConst->ProjectionMatrix[1][1] = ProjectionMatrix->m[1][1];
+			LightCameraMatrixConst->ProjectionMatrix[1][2] = ProjectionMatrix->m[2][1];
+			LightCameraMatrixConst->ProjectionMatrix[1][3] = ProjectionMatrix->m[3][1];
+			LightCameraMatrixConst->ProjectionMatrix[2][0] = ProjectionMatrix->m[0][2];
+			LightCameraMatrixConst->ProjectionMatrix[2][1] = ProjectionMatrix->m[1][2];
+			LightCameraMatrixConst->ProjectionMatrix[2][2] = ProjectionMatrix->m[2][2];
+			LightCameraMatrixConst->ProjectionMatrix[2][3] = ProjectionMatrix->m[3][2];
+			LightCameraMatrixConst->ProjectionMatrix[3][0] = ProjectionMatrix->m[0][3];
+			LightCameraMatrixConst->ProjectionMatrix[3][1] = ProjectionMatrix->m[1][3];
+			LightCameraMatrixConst->ProjectionMatrix[3][2] = ProjectionMatrix->m[2][3];
+			LightCameraMatrixConst->ProjectionMatrix[3][3] = ProjectionMatrix->m[3][3];
+
+			UpdateShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
+			SetShaderConstantBuffer(this->m_GeometryShaderMatcbhandle, DX_SHADERTYPE_GEOMETRY, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
+		}
+		//ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 設定したカメラのビュー行列と射影行列を取得しておく
@@ -937,11 +996,13 @@ namespace DXLibRef {
 			}
 			SetUseVertexShader(this->m_VertexShaderhandle);											// 使用する頂点シェーダーをセット
 			SetUsePixelShader(this->m_PixelShaderhandle);											// 使用するピクセルシェーダーをセット
+			SetUseGeometryShader(this->m_GeometryShaderhandle);										// 使用するジオメトリシェーダーをセット
 			MV1SetUseOrigShader(TRUE);
 			doing();
 			MV1SetUseOrigShader(FALSE);
 			SetUseVertexShader(-1);
 			SetUsePixelShader(-1);
+			SetUseGeometryShader(-1);
 		}
 		//2D画像に適用する場合の関数
 		void			Draw(ScreenVertex& Screenvertex) noexcept {
