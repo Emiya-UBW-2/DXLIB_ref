@@ -123,10 +123,10 @@ namespace DXLibRef {
 	}
 	void SceneControl::NextScene(void) noexcept {
 		auto* Pad = PadControl::Instance();
+		GetNowScene()->Dispose();							//‰ð•ú
 		if (this->m_NowScenesPtr != GetNowScene()->Get_Next()) {
 			GetNowScene()->Dispose_Load();
 		}
-		GetNowScene()->Dispose();							//‰ð•ú
 		this->m_NowScenesPtr = GetNowScene()->Get_Next();		//‘JˆÚ
 		Pad->Dispose();
 		GetNowScene()->Load();

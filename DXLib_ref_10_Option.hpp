@@ -28,6 +28,8 @@ namespace DXLibRef {
 		Language,
 		AA,
 		DrawScale,
+		GodRay,
+		PBR,
 		Max,
 	};
 	static const char* OptionStr[(int)EnumSaveParam::Max] = {
@@ -56,6 +58,8 @@ namespace DXLibRef {
 		"Language",
 		"AA",
 		"DrawScale",
+		"GodRay",
+		"PBR",
 	};
 
 	enum class EnumParamType {

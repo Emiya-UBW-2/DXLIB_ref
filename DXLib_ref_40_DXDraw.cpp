@@ -604,7 +604,7 @@ namespace DXLibRef {
 		//Init
 		m_PauseActive.Set(false);
 		//シェーダー
-		this->m_ScreenVertex.SetScreenVertex(this->GetDispXSize(), this->GetDispYSize());// 頂点データの準備
+		this->m_ScreenVertex.SetScreenVertex(y_r(1920), y_r(1080));// 頂点データの準備
 		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");//レンズ
 		this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");//ブラックアウト
 		m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
@@ -761,11 +761,16 @@ namespace DXLibRef {
 			m_CamViewMatrix = camInfo.GetViewMatrix();
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
 			PostPassParts->DrawDoF(sky_doing, [&]() {
-				MATRIX view, projection;
-				GetTransformToViewMatrix(&view);
-				GetTransformToProjectionMatrix(&projection);
-				m_PBR_Shader.SetGeometryCONSTBUFFER(1, &view, &projection);
-				m_PBR_Shader.Draw_lamda(doing);
+				if (OPTION::Instance()->GetParamBoolean(EnumSaveParam::PBR)) {
+					MATRIX view, projection;
+					GetTransformToViewMatrix(&view);
+					GetTransformToProjectionMatrix(&projection);
+					m_PBR_Shader.SetGeometryCONSTBUFFER(1, &view, &projection);
+					m_PBR_Shader.Draw_lamda(doing);
+				}
+				else {
+					doing();
+				}
 								   }, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
@@ -778,7 +783,7 @@ namespace DXLibRef {
 				PostPassParts->Plus_Draw([&]() {
 					this->m_Shader2D[0].SetPixelDispSize(y_r(1920), y_r(1080));
 					this->m_Shader2D[0].SetPixelParam(3, this->m_ShaderParam[0].param[0], this->m_ShaderParam[0].param[1], this->m_ShaderParam[0].param[2], this->m_ShaderParam[0].param[3]);
-					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
+					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[0].Draw(this->m_ScreenVertex);
 					SetUseTextureToShader(0, -1);
 					});
@@ -788,7 +793,7 @@ namespace DXLibRef {
 				PostPassParts->Plus_Draw([&]() {
 					this->m_Shader2D[1].SetPixelDispSize(y_r(1920), y_r(1080));
 					this->m_Shader2D[1].SetPixelParam(3, this->m_ShaderParam[1].param[0], 0, 0, 0);
-					SetUseTextureToShader(0, PostPassParts->Get_MAIN_Screen().get());	//使用するテクスチャをセット
+					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[1].Draw(this->m_ScreenVertex);
 					SetUseTextureToShader(0, -1);
 					});

@@ -623,7 +623,7 @@ namespace DXLibRef {
 			SSRDepthScreen.Dispose();
 			m_Shader.Dispose();
 		}
-		bool IsActive_Sub() noexcept override { return OPTION::Instance()->GetParamInt(EnumSaveParam::shadow) > 0; }
+		bool IsActive_Sub() noexcept override { return (OPTION::Instance()->GetParamInt(EnumSaveParam::shadow) > 0) && OPTION::Instance()->GetParamBoolean(EnumSaveParam::GodRay); }
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* , GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
@@ -677,6 +677,7 @@ namespace DXLibRef {
 	PostPassEffect::PostPassEffect(void) {
 
 		BufferScreen = GraphHandle::Make(y_r(1920), y_r(1080), true);
+		ColorScreen = GraphHandle::Make(y_r(1920), y_r(1080), false);
 		//ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
@@ -801,12 +802,10 @@ namespace DXLibRef {
 		}
 	}
 	void PostPassEffect::LoadGBuffer() noexcept {
-		ColorScreen = GraphHandle::Make(y_r(1920), y_r(1080), false);
 		NormalScreen = GraphHandle::Make(y_r(1920), y_r(1080), false);
 		DepthScreen = GraphHandle::MakeDepth(y_r(1920), y_r(1080));
 	}
 	void PostPassEffect::DisposeGBuffer() noexcept {
-		ColorScreen.Dispose();
 		NormalScreen.Dispose();
 		DepthScreen.Dispose();
 	}
