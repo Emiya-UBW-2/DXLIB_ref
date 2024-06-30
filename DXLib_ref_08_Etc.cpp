@@ -7,10 +7,12 @@ namespace DXLibRef {
 	const UISystem* SingletonBase<UISystem>::m_Singleton = nullptr;
 	
 	int y_UI(int p1) {
+		return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
+	}
+	int y_UIMs(int p1) {
 		auto* OptionParts = OPTION::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
-			//return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
-			return (int(p1) * DXDraw::Instance()->GetDispYSizeMax() / basey);
+			return (int(p1) * DXDraw::Instance()->GetDispYSizeBorder() / basey);
 		}
 		else {
 			return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
@@ -230,12 +232,12 @@ namespace DXLibRef {
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
-				int yp = yp1 - y_UI(24.f * d.GetFlip());
+				int yp = yp1 - y_UI((int)(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
 					xp1 - y_UI(6), yp + y_UI(18),
 					xp1 - y_UI(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18), d.GetMsg()), y_UI(200))*d.ActivePer()), yp + y_UI(18) + y_UI(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18.f), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
 																	  (int)(xp1), (int)(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}

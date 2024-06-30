@@ -539,8 +539,8 @@ namespace DXLibRef {
 			this->m_DispXSize_Border = this->m_DispXSize;
 			this->m_DispYSize_Border = this->m_DispYSize;
 		}
-		m_DispXSize_Max = std::min(m_DispXSize_Border, (int)(std::min(basex, this->m_DispXSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 10.f)));
-		m_DispYSize_Max = std::min(m_DispYSize_Border, (int)(std::min(basey, this->m_DispYSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 10.f)));
+		m_DispXSize_Max = std::min(m_DispXSize_Border, (int)(std::min(basex, this->m_DispXSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		m_DispYSize_Max = std::min(m_DispYSize_Border, (int)(std::min(basey, this->m_DispYSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
 		SetWindowOrBorderless();
 		//
 #ifdef DEBUG
@@ -803,11 +803,11 @@ namespace DXLibRef {
 			if (IsPause()) {
 				//
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * 0.5f), 0, 255));
-				DrawBox_2D(0, 0, y_UI(1920.f), y_UI(1080.f), Black, TRUE);
+				DrawBox_2D(0, 0, y_UI(1920), y_UI(1080), Black, TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//
 				if (m_PauseFlashCount > 0.5f) {
-					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_UI(36.f), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_UI(16.f), y_UI(16.f), Green, Black, "Pause");
+					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_UI(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_UI(16), y_UI(16), Green, Black, "Pause");
 				}
 			}
 			};

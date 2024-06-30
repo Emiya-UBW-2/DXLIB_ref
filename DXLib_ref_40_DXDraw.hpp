@@ -103,6 +103,8 @@ namespace DXLibRef {
 		const auto&		GetDispXSizeMax(void) const noexcept { return m_DispXSize_Max; }
 		const auto&		GetDispYSizeMax(void) const noexcept { return m_DispYSize_Max; }
 
+		const auto&		GetDispYSizeBorder(void) const noexcept { return m_DispYSize_Border; }
+
 		const auto&		GetFps(void) const noexcept { return m_FPS; }
 
 		const auto&		is_lens(void) const noexcept { return m_ShaderParam[0].use; }

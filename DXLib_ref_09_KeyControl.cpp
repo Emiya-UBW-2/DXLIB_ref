@@ -65,10 +65,10 @@ namespace DXLibRef {
 
 		int ofs = 0;
 		if (xsize > 0) {
-			ofs += (int)(xsize) + y_UI(3.f);
+			ofs += (int)(xsize) + y_UI(3);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18.f), GuideString) + y_UI(12.f);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18), GuideString) + y_UI(12);
 		}
 		return ofs;
 	}
@@ -79,7 +79,7 @@ namespace DXLibRef {
 		int ofs = 0;
 		if (xsize > 0) {
 			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize), y + (int)(ysize), true);
-			ofs += (int)(xsize) + y_UI(3.f);
+			ofs += (int)(xsize) + y_UI(3);
 		}
 		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_UI(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
@@ -360,8 +360,8 @@ namespace DXLibRef {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = y_UI(mx);
-						MouseY = y_UI(my);
+						MouseX = y_UIMs(mx);
+						MouseY = y_UIMs(my);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.ThumbRX;
@@ -418,8 +418,8 @@ namespace DXLibRef {
 					{
 						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 						GetMousePoint(&mx, &my);
-						MouseX = y_UI(mx);
-						MouseY = y_UI(my);
+						MouseX = y_UIMs(mx);
+						MouseY = y_UIMs(my);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.Z;
@@ -440,8 +440,8 @@ namespace DXLibRef {
 				{
 					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
 					GetMousePoint(&mx, &my);
-					MouseX = y_UI(mx);
-					MouseY = y_UI(my);
+					MouseX = y_UIMs(mx);
+					MouseY = y_UIMs(my);
 					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 					if (m_MouseMoveEnable) {

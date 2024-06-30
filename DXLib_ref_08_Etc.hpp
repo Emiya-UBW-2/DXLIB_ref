@@ -10,6 +10,7 @@
 
 namespace DXLibRef {
 	extern int y_UI(int p1);
+	extern int y_UIMs(int p1);
 	//--------------------------------------------------------------------------------------------------
 	// 補完
 	//--------------------------------------------------------------------------------------------------
@@ -454,7 +455,7 @@ namespace DXLibRef {
 		template <typename... Args>
 		extern const int GetMsgLen(int size, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8.f);//エッジ分:
+			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8);//エッジ分:
 		}
 
 		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX);
@@ -474,7 +475,7 @@ namespace DXLibRef {
 		template <typename... Args>
 		extern const int GetMsgLenWW(int size, std::string_view String, Args&&... args) {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8.f);//エッジ分:
+			return Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size)).GetStringWidth(-1, ((std::string)String).c_str(), args...) + y_UI(8);//エッジ分:
 		}
 
 		template <typename... Args>
