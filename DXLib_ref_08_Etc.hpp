@@ -5,14 +5,11 @@
 #define x_r(p1) (int(p1) * DXDraw::Instance()->GetDispXSizeMax() / DXDraw::Instance()->GetDispXSizeMin())
 #define y_r(p1) (int(p1) * DXDraw::Instance()->GetDispYSizeMax() / DXDraw::Instance()->GetDispYSizeMin())
 
-#define x_UI(p1) (int(p1) * DXDraw::Instance()->GetDispXSize() / basex)
-#define y_UI(p1) (int(p1) * DXDraw::Instance()->GetDispYSize() / basey)
-
-
 #define EdgeSize	y_UI(2)
 #define LineHeight	y_UI(18)
 
 namespace DXLibRef {
+	extern int y_UI(int p1);
 	//--------------------------------------------------------------------------------------------------
 	// •âŠ®
 	//--------------------------------------------------------------------------------------------------

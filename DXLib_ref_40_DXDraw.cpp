@@ -939,17 +939,13 @@ namespace DXLibRef {
 
 		m_CheckPCSpec.Set();
 
-		int xsize = y_r(1366);
-		int ysize = y_r(768);
-
-		UI_Screen = GraphHandle::Make(xsize, ysize, false);	//UI
 		//初期設定画面
 		OptionWindowParts->SetActive();
 		while (ProcessMessage() == 0) {
-			int xopt = xsize * this->GetDispXSize() / y_r(1920);
-			int yopt = ysize * this->GetDispYSize() / y_r(1080);
-			SetWindowPosition((deskx - xopt) / 2, (desky - yopt) / 2);
-			SetWindowSize(xopt, yopt);
+			int xBase = y_UI(1366);
+			int yBase = y_UI(768);
+			SetWindowPosition((deskx - xBase) / 2, (desky - yBase) / 2);
+			SetWindowSize(xBase, yBase);
 
 			Pad->Execute();
 			OptionWindowParts->Execute();
@@ -958,21 +954,21 @@ namespace DXLibRef {
 				break;
 			}
 			//
-			UI_Screen.SetDraw_Screen();
+			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
 			{
-				PopUpParts->Draw(y_r(720 / 2 + 16), y_r(720 / 2 + 16));
-				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_r(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_r(32), y_r(720 + 16) + y_r(32 / 2), Green, Black, LocalizeParts->Get(109));
+				PopUpParts->Draw(y_UI(720 / 2 + 16), y_UI(720 / 2 + 16));
+				Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_UI(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, y_UI(32), y_UI(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
 
-				int xp = y_r(720 + 16 + 16);
-				int yp = y_r(16);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xp + y_r(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
+				int xp = y_UI(720 + 16 + 16);
+				int yp = y_UI(16);
+				if (WindowSystem::SetMsgClickBox(xp, yp, xp + y_UI(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
 					m_CheckPCSpec.StartSearch();
 				}
-				yp += y_r(24);
+				yp += y_UI(24);
 				if (m_CheckPCSpec.GetCPUDatas()) {
 					int MouseOverID = -1;
 					//CPU
-					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
+					WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
 					for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
 						int TextID = 0;
 						unsigned int Color = White;
@@ -988,33 +984,33 @@ namespace DXLibRef {
 							Color = Red;
 							TextID = 2004;
 						}
-						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+						if (IntoMouse(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight * 2)) {
 							switch (TextID) {
-							case 2002:
-								MouseOverID = 2040;
-								break;
-							case 2003:
-								MouseOverID = 2041;
-								break;
-							case 2004:
-								MouseOverID = 2042;
-								break;
-							default:
-								break;
+								case 2002:
+									MouseOverID = 2040;
+									break;
+								case 2003:
+									MouseOverID = 2041;
+									break;
+								case 2004:
+									MouseOverID = 2042;
+									break;
+								default:
+									break;
 							}
 						}
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 						yp += LineHeight;
 					}
 					if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
+						WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
 					}
 					//Mem
 					{
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
+						WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
 						int TextID = 0;
 						unsigned int Color = White;
 						if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
@@ -1025,23 +1021,23 @@ namespace DXLibRef {
 							Color = Yellow;
 							TextID = 2013;
 						}
-						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 1)) {
+						if (IntoMouse(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight * 1)) {
 							switch (TextID) {
-							case 2012:
-								MouseOverID = 2043;
-								break;
-							case 2013:
-								MouseOverID = 2044;
-								break;
-							default:
-								break;
+								case 2012:
+									MouseOverID = 2043;
+									break;
+								case 2013:
+									MouseOverID = 2044;
+									break;
+								default:
+									break;
 							}
 						}
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
 						yp += LineHeight;
 					}
 					//GPU
-					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021)); yp += LineHeight;
+					WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021)); yp += LineHeight;
 					for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
 						int TextID = 0;
 						unsigned int Color = White;
@@ -1057,28 +1053,28 @@ namespace DXLibRef {
 							Color = Red;
 							TextID = 2024;
 						}
-						if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+						if (IntoMouse(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight * 2)) {
 							switch (TextID) {
-							case 2022:
-								MouseOverID = 2045;
-								break;
-							case 2023:
-								MouseOverID = 2046;
-								break;
-							case 2024:
-								MouseOverID = 2047;
-								break;
-							default:
-								break;
+								case 2022:
+									MouseOverID = 2045;
+									break;
+								case 2023:
+									MouseOverID = 2046;
+									break;
+								case 2024:
+									MouseOverID = 2047;
+									break;
+								default:
+									break;
 							}
 						}
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-						WindowSystem::SetMsg(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 						yp += LineHeight;
 					}
 					if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
-						WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
+						WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
 					}
 					//DirectX
 					int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
@@ -1087,11 +1083,11 @@ namespace DXLibRef {
 							NowSet = loop;
 						}
 					}
-					if (IntoMouse(xp + y_r(16), yp, xsize - y_r(16), yp + LineHeight * 2)) {
+					if (IntoMouse(xp + y_UI(16), yp, xBase - y_UI(16), yp + LineHeight * 2)) {
 						MouseOverID = 2048;
 					}
-					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
-					WindowSystem::SetMsg(xp, yp, xsize - y_r(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
+					WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
+					WindowSystem::SetMsg(xp, yp, xBase - y_UI(16), yp + LineHeight, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
 					if (MouseOverID > 0) {
 						xp = Pad->GetMS_X();
 						yp = Pad->GetMS_Y();
@@ -1099,15 +1095,11 @@ namespace DXLibRef {
 					}
 				}
 
-				xp = y_r(720 + 16 + 32);
-				yp = y_r(720);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xsize - y_r(32), yp + y_r(32), Green, "Start Game!")) {
+				xp = y_UI(720 + 16 + 32);
+				yp = y_UI(720);
+				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - y_UI(32), yp + y_UI(32), Green, "Start Game!")) {
 					PopUpParts->EndAll();
 				}
-			}
-			GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
-			{
-				UI_Screen.DrawExtendGraph(0, 0, xopt, yopt, false);
 			}
 			Screen_Flip();
 		}

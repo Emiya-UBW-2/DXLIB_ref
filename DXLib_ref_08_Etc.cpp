@@ -6,6 +6,16 @@ namespace DXLibRef {
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
 	const UISystem* SingletonBase<UISystem>::m_Singleton = nullptr;
 	
+	int y_UI(int p1) {
+		auto* OptionParts = OPTION::Instance();
+		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
+			//return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
+			return (int(p1) * DXDraw::Instance()->GetDispYSizeMax() / basey);
+		}
+		else {
+			return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
+		}
+	}
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -284,10 +294,10 @@ namespace DXLibRef {
 		int xp2, yp2;
 
 		if (m_ActivePer > 1.f / 255.f) {
-			xm1 = xcenter - WinSizeX / 2;
-			ym1 = ycenter - WinSizeY / 2;
-			xm2 = xcenter + WinSizeX / 2;
-			ym2 = ycenter + WinSizeY / 2;
+			xm1 = xcenter - y_UI(WinSizeX) / 2;
+			ym1 = ycenter - y_UI(WinSizeY) / 2;
+			xm2 = xcenter + y_UI(WinSizeX) / 2;
+			ym2 = ycenter + y_UI(WinSizeY) / 2;
 
 			//îwåi
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);

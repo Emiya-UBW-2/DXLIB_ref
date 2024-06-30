@@ -7,12 +7,16 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	class TEMPSCENE {
 	private:
-		std::shared_ptr<TEMPSCENE> Next_ptr{nullptr};
 		bool			m_IsFirstLoop{true};			//初回チェック
 		bool			m_IsLoading{false};
+
+		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{nullptr};
+		int							Next_Select{0};
+	public:
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(index) = Next_scenes_ptr_t; }
+		auto&		Get_Next(void) noexcept { return Next_ptr.at(Next_Select); }
+		void		SetNextSelect(int value) noexcept { Next_Select = value; }
 	public://ゲッター
-		void			Set_Next(const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr = Next_scenes_ptr_t; }
-		auto&			Get_Next(void) noexcept { return Next_ptr; }
 		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
@@ -25,6 +29,7 @@ namespace DXLibRef {
 			}
 		}
 		void Set(void) noexcept {
+			Next_Select = 0;
 			Set_Sub();
 			m_IsFirstLoop = true;
 		}
