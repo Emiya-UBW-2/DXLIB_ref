@@ -559,7 +559,9 @@ namespace DXLibRef {
 		void Dispose_Sub() noexcept override {
 			BufScreen.Dispose();
 		}
-		bool IsActive_Sub() noexcept override { return OPTION::Instance()->GetParamBoolean(EnumSaveParam::ScreenEffect); }
+		bool IsActive_Sub() noexcept override {
+			return OPTION::Instance()->GetParamBoolean(EnumSaveParam::ScreenEffect) && OPTION::Instance()->GetParamBoolean(EnumSaveParam::Distortion);
+		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			BufScreen.SetDraw_Screen();
 			{
@@ -768,6 +770,22 @@ namespace DXLibRef {
 			DrawEffekseer3D();
 			doingFront();
 			}, camInfo);
+		BufferScreen.SetDraw_Screen(false);
+	}
+	void PostPassEffect::Draw2D(std::function<void()> doing) {
+		//全ての画面を初期化
+		if (m_IsActiveGBuffer) {
+			//リセット替わり
+			ColorScreen.SetDraw_Screen();
+			NormalScreen.SetDraw_Screen();
+				DrawBox_2D(0, 0, y_r(1920), y_r(1080), GetColor(128,128,255), TRUE);
+			DepthScreen.SetDraw_Screen();
+				DrawBox_2D(0, 0, y_r(1920), y_r(1080), Red, TRUE);
+		}
+		BufferScreen.SetDraw_Screen();
+		{
+			doing();
+		}
 		BufferScreen.SetDraw_Screen(false);
 	}
 	void PostPassEffect::Draw() {

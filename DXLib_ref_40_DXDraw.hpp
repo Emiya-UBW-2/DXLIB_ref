@@ -166,6 +166,11 @@ namespace DXLibRef {
 			std::function<void()> doingUI,
 			std::function<void()> doingUI2
 		) noexcept;
+		void			Draw2D(
+			std::function<void()> doing,
+			std::function<void()> doingUI,
+			std::function<void()> doingUI2
+		) noexcept;
 		bool			Screen_Flip(void) noexcept;
 
 		//VR

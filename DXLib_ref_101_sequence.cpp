@@ -68,51 +68,99 @@ namespace DXLibRef {
 		//影をセット
 		DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
 		//画面に反映
-		DrawParts->Draw(
-			[&]() { GetNowScene()->BG_Draw(); },
-			[&]() { GetNowScene()->MainDraw(); },
-			[&]() { GetNowScene()->MainDrawFront(); },
-			[&]() { GetNowScene()->DrawUI_Base(); },
-			[&]() {
-				GetNowScene()->DrawUI_In();
-				//追加の描画物
-				auto* ItemLogParts = SideLog::Instance();
-				auto* PopUpParts = PopUp::Instance();
-				auto* Fonts = FontPool::Instance();
-				auto* OptionParts = OPTION::Instance();
-				ItemLogParts->Draw();
-				PopUpParts->Draw(y_UI(960), y_UI(540));
-				{
-					FPSAvgs.at(m_FPSAvg) = GetFPS();
-					auto color = White;
-					//危険
-					if (FPSAvgs.at(m_FPSAvg) < 45.f) {
-						color = Red;
-					}
-					else if (FPSAvgs.at(m_FPSAvg) < 58.f) {
-						color = Yellow;
-					}
-					//十分！
-					if (FPSAvgs.at(m_FPSAvg) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
-						color = Green;
-					}
+		if (GetNowScene()->Get3DActive()) {
+			DrawParts->Draw(
+				[&]() { GetNowScene()->BG_Draw(); },
+				[&]() { GetNowScene()->MainDraw(); },
+				[&]() { GetNowScene()->MainDrawFront(); },
+				[&]() { GetNowScene()->DrawUI_Base(); },
+				[&]() {
+					GetNowScene()->DrawUI_In();
+					//追加の描画物
+					auto* ItemLogParts = SideLog::Instance();
+					auto* PopUpParts = PopUp::Instance();
+					auto* Fonts = FontPool::Instance();
+					auto* OptionParts = OPTION::Instance();
+					ItemLogParts->Draw();
+					PopUpParts->Draw(y_UI(960), y_UI(540));
+					{
+						FPSAvgs.at(m_FPSAvg) = GetFPS();
+						auto color = White;
+						//危険
+						if (FPSAvgs.at(m_FPSAvg) < 45.f) {
+							color = Red;
+						}
+						else if (FPSAvgs.at(m_FPSAvg) < 58.f) {
+							color = Yellow;
+						}
+						//十分！
+						if (FPSAvgs.at(m_FPSAvg) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+							color = Green;
+						}
 
-					++m_FPSAvg %= ((int)FPSAvgs.size());
+						++m_FPSAvg %= ((int)FPSAvgs.size());
 
-					float Avg = 0.f;
-					for (auto& f : FPSAvgs) {
-						Avg += f;
+						float Avg = 0.f;
+						for (auto& f : FPSAvgs) {
+							Avg += f;
+						}
+						Avg = Avg / ((float)FPSAvgs.size());
+
+						Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																			  y_UI((1920 - 8)), y_UI(8), White, Black, "%5.2f FPS", Avg);
 					}
-					Avg = Avg / ((float)FPSAvgs.size());
-
-					Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																		  y_UI((1920 - 8)), y_UI(8), White, Black, "%5.2f FPS", Avg);
-				}
 #ifdef DEBUG
-				DebugParts->DebugWindow(y_UI(1920 - 350), y_UI(150));
+					DebugParts->DebugWindow(y_UI(1920 - 350), y_UI(150));
 #endif // DEBUG
-			}
-		);
+				}
+			);
+		}
+		else {
+			PostPassEffect::Instance()->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);
+			DrawParts->Draw2D(
+				[&]() { GetNowScene()->MainDraw(); },
+				[&]() { GetNowScene()->DrawUI_Base(); },
+				[&]() {
+					GetNowScene()->DrawUI_In();
+					//追加の描画物
+					auto* ItemLogParts = SideLog::Instance();
+					auto* PopUpParts = PopUp::Instance();
+					auto* Fonts = FontPool::Instance();
+					auto* OptionParts = OPTION::Instance();
+					ItemLogParts->Draw();
+					PopUpParts->Draw(y_UI(960), y_UI(540));
+					{
+						FPSAvgs.at(m_FPSAvg) = GetFPS();
+						auto color = White;
+						//危険
+						if (FPSAvgs.at(m_FPSAvg) < 45.f) {
+							color = Red;
+						}
+						else if (FPSAvgs.at(m_FPSAvg) < 58.f) {
+							color = Yellow;
+						}
+						//十分！
+						if (FPSAvgs.at(m_FPSAvg) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+							color = Green;
+						}
+
+						++m_FPSAvg %= ((int)FPSAvgs.size());
+
+						float Avg = 0.f;
+						for (auto& f : FPSAvgs) {
+							Avg += f;
+						}
+						Avg = Avg / ((float)FPSAvgs.size());
+
+						Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																			  y_UI((1920 - 8)), y_UI(8), White, Black, "%5.2f FPS", Avg);
+					}
+#ifdef DEBUG
+					DebugParts->DebugWindow(y_UI(1920 - 350), y_UI(150));
+#endif // DEBUG
+				}
+			);
+		}
 
 		//デバッグ
 #ifdef DEBUG

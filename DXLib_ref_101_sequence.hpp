@@ -12,12 +12,16 @@ namespace DXLibRef {
 
 		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{nullptr};
 		int							Next_Select{0};
+
+		bool			m_Is3DActive{true};
 	public:
 		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(index) = Next_scenes_ptr_t; }
 		auto&		Get_Next(void) noexcept { return Next_ptr.at(Next_Select); }
 		void		SetNextSelect(int value) noexcept { Next_Select = value; }
+		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
 	public://ゲッター
 		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
+		const auto&		Get3DActive(void) const noexcept { return m_Is3DActive; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		~TEMPSCENE(void) noexcept {}

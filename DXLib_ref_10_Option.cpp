@@ -37,6 +37,8 @@ namespace DXLibRef {
 		m_SaveParams.at((int)EnumSaveParam::DrawScale).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at((int)EnumSaveParam::GodRay).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at((int)EnumSaveParam::PBR).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at((int)EnumSaveParam::Distortion).SetEnumParamType(EnumParamType::Boolean);
+		
 		//SetOutApplicationLogValidFlag(FALSE);
 		int mdata = -1;
 		bool NewData = true;
@@ -83,6 +85,7 @@ namespace DXLibRef {
 				SetParamFloat(EnumSaveParam::DrawScale, 1.f);
 				SetParamBoolean(EnumSaveParam::GodRay, true);
 				SetParamBoolean(EnumSaveParam::PBR, true);
+				SetParamBoolean(EnumSaveParam::Distortion, true);
 				return;
 			}
 		}

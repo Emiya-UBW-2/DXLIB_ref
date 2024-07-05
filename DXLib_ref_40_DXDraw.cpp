@@ -854,6 +854,51 @@ namespace DXLibRef {
 			}
 		}
 	}
+	void			DXDraw::Draw2D(
+		std::function<void()> doing,
+		std::function<void()> doingUI,
+		std::function<void()> doingUI2
+	) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
+		auto* Fonts = FontPool::Instance();
+		auto* Pad = PadControl::Instance();
+		//描画
+		auto PauseDraw = [&]() {
+			if (IsPause()) {
+				//
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * 0.5f), 0, 255));
+				DrawBox_2D(0, 0, y_UI(1920), y_UI(1080), Black, TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				//
+				if (m_PauseFlashCount > 0.5f) {
+					Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString(y_UI(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, y_UI(16), y_UI(16), Green, Black, "Pause");
+				}
+			}
+		};
+		//
+		PostPassParts->Draw2D(doing);
+		//ソフトシャドウ重ね
+		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
+			PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });
+		}
+		PostPassParts->Draw();
+		//ディスプレイ描画
+		GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);
+		{
+			auto Prev = GetDrawMode();
+			//SetDrawMode(DX_DRAWMODE_NEAREST);
+			SetDrawMode(DX_DRAWMODE_BILINEAR);
+			PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->GetDispXSize(), this->GetDispYSize(), false);
+
+			doingUI();
+			PauseDraw();
+			doingUI2();										//UI2
+			UISystem::Instance()->Draw();
+			Pad->Draw();
+			SetDrawMode(Prev);
+		}
+	}
 	bool					DXDraw::Screen_Flip(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		ScreenFlip();

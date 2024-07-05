@@ -30,6 +30,7 @@ namespace DXLibRef {
 		DrawScale,
 		GodRay,
 		PBR,
+		Distortion,
 		Max,
 	};
 	static const char* OptionStr[(int)EnumSaveParam::Max] = {
@@ -59,6 +60,7 @@ namespace DXLibRef {
 		"AA",
 		"DrawScale",
 		"GodRay",
+		"Distortion",
 		"PBR",
 	};
 

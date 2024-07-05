@@ -94,6 +94,7 @@ namespace DXLibRef {
 	public:
 		void Update() noexcept;
 		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
+		void Draw2D(std::function<void()> doing);
 		void Draw();
 		void Plus_Draw(std::function<void()> doing) noexcept {
 			GraphFilterBlt(BufferScreen.get(), ColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, 1);
