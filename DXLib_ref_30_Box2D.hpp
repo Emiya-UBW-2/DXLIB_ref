@@ -1,6 +1,8 @@
 #pragma once
 #include "DXLib_ref.h"
 
+#ifdef _USE_BOX2D_
+
 //Box2DŠg’£
 namespace std {
 	template <>
@@ -62,3 +64,5 @@ namespace DXLibRef {
 		}
 	};
 };
+
+#endif // _USE_BOX2D_

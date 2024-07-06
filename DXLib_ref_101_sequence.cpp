@@ -48,8 +48,10 @@ namespace DXLibRef {
 #ifdef DEBUG
 		DebugParts->SetStartPoint();
 #endif // DEBUG
-		if (DrawParts->UpdateShadowActive() || GetNowScene()->GetIsFirstLoop()) {
-			DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
+		if (GetNowScene()->Get3DActive()) {
+			if (DrawParts->UpdateShadowActive() || GetNowScene()->GetIsFirstLoop()) {
+				DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
+			}
 		}
 		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos();Pos.y *= -1.f;
 		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
@@ -65,10 +67,11 @@ namespace DXLibRef {
 #ifdef DEBUG
 		DebugParts->SetPoint("-----DrawStart-----");
 #endif // DEBUG
-		//‰e‚ðƒZƒbƒg
-		DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
 		//‰æ–Ê‚É”½‰f
 		if (GetNowScene()->Get3DActive()) {
+			//‰e‚ðƒZƒbƒg
+			DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
+			//‰æ–Ê‚É”½‰f
 			DrawParts->Draw(
 				[&]() { GetNowScene()->BG_Draw(); },
 				[&]() { GetNowScene()->MainDraw(); },
@@ -116,6 +119,7 @@ namespace DXLibRef {
 			);
 		}
 		else {
+			//‰æ–Ê‚É”½‰f
 			PostPassEffect::Instance()->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);
 			DrawParts->Draw2D(
 				[&]() { GetNowScene()->MainDraw(); },

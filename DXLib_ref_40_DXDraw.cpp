@@ -304,7 +304,7 @@ namespace DXLibRef {
 		public:
 			const bool		PadPress(VR_PAD) const noexcept { return false; }
 			const bool		PadTouch(VR_PAD) const noexcept { return false; }
-			const auto&		GetTouchPadPoint(void) const noexcept { return Vector3DX::zero(); }
+			const auto		GetTouchPadPoint(void) const noexcept { return Vector3DX::zero(); }
 		};
 	public:
 		VRControl(void) noexcept {}
@@ -878,10 +878,7 @@ namespace DXLibRef {
 		};
 		//
 		PostPassParts->Draw2D(doing);
-		//ソフトシャドウ重ね
-		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-			PostPassParts->Plus_Draw([&]() { m_ShadowDraw.Draw(); });
-		}
+		//
 		PostPassParts->Draw();
 		//ディスプレイ描画
 		GraphHandle::SetDraw_Screen((int)DX_SCREEN_BACK, true);

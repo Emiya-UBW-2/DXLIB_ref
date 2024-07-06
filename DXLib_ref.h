@@ -5,20 +5,28 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 #define DEBUG
 //#define _USE_OPENVR_
+//#define _USE_BOX2D_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*pragma																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 #ifdef _USE_OPENVR_
+
 #pragma comment(lib,"..\\..\\..\\openvr\\openvr_api.lib")
+
 #endif // _USE_OPENVR_
+
+#ifdef _USE_BOX2D_
 
 #ifdef _DEBUG
 #pragma comment(lib,"..\\..\\..\\Box2D\\Debug\\Box2D.lib")
 #else
 #pragma comment(lib,"..\\..\\..\\Box2D\\Release\\Box2D.lib")
 #endif // _DEBUG
+
+#endif // _USE_BOX2D_
+
 //ÉGÉâÅ[,åxçêéÊÇË
 #define NOMINMAX
 #pragma warning(disable:4505)
@@ -30,6 +38,11 @@
 #ifdef _USE_OPENVR_
 #include <openvr.h>
 #endif // _USE_OPENVR_
+//Box2D
+#ifdef _USE_BOX2D_
+#include "Box2D/Box2D.h"
+#endif // _USE_BOX2D_
+
 //ã§í 
 #include <stdint.h>
 #include <array>
@@ -52,7 +65,6 @@
 
 #pragma comment(lib, "shlwapi.lib")
 //í«â¡ï®
-#include "Box2D/Box2D.h"
 #include "json.hpp"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/

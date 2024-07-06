@@ -65,7 +65,7 @@ namespace DXLibRef {
 				//次の行に行く前に描画、itが指す文字は含まない
 				const std::size_t str_len_byte = current_string_byte_pos - line_front_string_byte_pos;
 				//it->DrawXは前の文字の右端に等しい
-				const float line_width = it->DrawX - line_front_it->DrawX;
+				//const float line_width = it->DrawX - line_front_it->DrawX;
 				const float padding = 0.f;//(area_width - line_width) / 2.0f;
 				const auto line_string = string.substr(line_front_string_byte_pos / sizeof(TCHAR), (str_len_byte / sizeof(TCHAR)));
 				DxLib::DrawStringFToHandle(draw_area_x_left + padding, draw_area_y_top + current_y_relative, line_string.c_str(), color, font_handle, edge_color, false);
@@ -77,7 +77,7 @@ namespace DXLibRef {
 			}
 		}
 		//最終行の描画
-		const auto last_line_width = info.back().DrawX + info.back().SizeX - line_front_it->DrawX;
+		//const auto last_line_width = info.back().DrawX + info.back().SizeX - line_front_it->DrawX;
 		const float padding = 0.f;// (area_width - last_line_width) / 2.0f;
 		const auto line_string = string.substr(line_front_string_byte_pos / sizeof(TCHAR));
 		DxLib::DrawStringFToHandle(draw_area_x_left + padding, draw_area_y_top + current_y_relative, line_string.c_str(), color, font_handle, edge_color, false);

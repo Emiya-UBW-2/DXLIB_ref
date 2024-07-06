@@ -133,6 +133,12 @@ namespace DXLibRef {
 			}
 		}
 
+		void DrawRotaGraphF(float posx, float posy, float Exrate, float rad, bool trns) const noexcept {
+			if (IsActive()) {
+				DxLib::DrawRotaGraphF(posx, posy, double(Exrate), double(rad), this->handle_, (trns ? TRUE : FALSE));
+			}
+		}
+
 		void DrawRotaGraph3(int posx, int posy,
 			int cx, int cy,
 			float ExtRateX, float ExtRateY, float rad, bool trns) const noexcept {
