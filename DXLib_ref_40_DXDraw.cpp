@@ -859,7 +859,6 @@ namespace DXLibRef {
 		std::function<void()> doingUI,
 		std::function<void()> doingUI2
 	) noexcept {
-		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		auto* Fonts = FontPool::Instance();
 		auto* Pad = PadControl::Instance();
