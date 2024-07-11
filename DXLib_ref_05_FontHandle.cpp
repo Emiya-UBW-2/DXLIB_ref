@@ -24,9 +24,21 @@ namespace DXLibRef {
 			if (ALL == "") { continue; }
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
-			this->havehandle.resize(this->havehandle.size() + 1);
-			this->havehandle.back().m_ID = (LocalizeID)(std::stoi(LEFT));
-			sprintfDx(this->havehandle.back().m_Str, RIGHT.c_str());
+			LocalizeID ID = (LocalizeID)(std::stoi(LEFT));
+			bool IsHit = false;
+			for (auto& h : this->havehandle) {
+				if (h.m_ID == ID) {
+					std::string Before = h.m_Str;
+					sprintfDx(h.m_Str, "%s\n%s", Before.c_str(), RIGHT.c_str());//改行して同じテキストとする
+					IsHit = true;
+					break;
+				}
+			}
+			if (!IsHit) {
+				this->havehandle.resize(this->havehandle.size() + 1);
+				this->havehandle.back().m_ID = (LocalizeID)(std::stoi(LEFT));
+				sprintfDx(this->havehandle.back().m_Str, RIGHT.c_str());
+			}
 		}
 		FileRead_close(mdata);
 	}

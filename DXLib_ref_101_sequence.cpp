@@ -109,7 +109,7 @@ namespace DXLibRef {
 						}
 						Avg = Avg / ((float)FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+						Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 																			  y_UI((1920 - 8)), y_UI(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
@@ -156,7 +156,7 @@ namespace DXLibRef {
 						}
 						Avg = Avg / ((float)FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+						Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 																			  y_UI((1920 - 8)), y_UI(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG

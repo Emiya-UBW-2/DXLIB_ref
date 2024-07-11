@@ -218,7 +218,7 @@ namespace DXLibRef {
 	private:
 		struct LocalizeStr {
 			LocalizeID m_ID{0};
-			char m_Str[256]{};
+			char m_Str[512]{};
 		};
 
 		std::vector<LocalizeStr> havehandle;

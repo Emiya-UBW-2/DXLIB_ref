@@ -235,9 +235,9 @@ namespace DXLibRef {
 				int yp = yp1 - y_UI((int)(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
 					xp1 - y_UI(6), yp + y_UI(18),
-					xp1 - y_UI(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18), d.GetMsg()), y_UI(200))*d.ActivePer()), yp + y_UI(18) + y_UI(5),
+					xp1 - y_UI(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).GetStringWidth(-1, d.GetMsg()), y_UI(200))*d.ActivePer()), yp + y_UI(18) + y_UI(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+				Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
 																	  (int)(xp1), (int)(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
@@ -255,7 +255,9 @@ namespace DXLibRef {
 				auto* KeyGuide = PadControl::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
 				KeyGuide->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
-				m_GuideDoing();
+				if (m_GuideDoing) {
+					m_GuideDoing();
+				}
 			}
 		);
 		SE->Get((int)SoundEnumCommon::UI_OK).Play(0, DX_PLAYTYPE_BACK, TRUE);
@@ -272,7 +274,9 @@ namespace DXLibRef {
 		m_Active = false;
 		m_ActiveSwitch = true;
 		Pad->SetGuideUpdate();
-		m_ExitDoing();
+		if (m_ExitDoing) {
+			m_ExitDoing();
+		}
 	}
 	void PopUp::PopUpDrawClass::Update() noexcept {
 		auto* Pad = PadControl::Instance();
@@ -332,7 +336,9 @@ namespace DXLibRef {
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 			//
-			m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
+			if (m_Doing) {
+				m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
+			}
 			//
 		}
 	}

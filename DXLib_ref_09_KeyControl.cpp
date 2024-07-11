@@ -68,7 +68,7 @@ namespace DXLibRef {
 			ofs += (int)(xsize) + y_UI(3);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge).GetStringWidth(y_UI(18), GuideString) + y_UI(12);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).GetStringWidth(-1, GuideString) + y_UI(12);
 		}
 		return ofs;
 	}
@@ -81,7 +81,7 @@ namespace DXLibRef {
 			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize), y + (int)(ysize), true);
 			ofs += (int)(xsize) + y_UI(3);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge).DrawString(y_UI(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_UI(24) / 2, White, Black, GuideString);
+		Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_UI(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
 	}
 

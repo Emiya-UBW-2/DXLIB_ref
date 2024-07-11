@@ -481,7 +481,7 @@ namespace DXLibRef {
 			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL).DrawString((int)(size), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::Nomal_EdgeL, (int)(size)).DrawString(-1, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
@@ -499,7 +499,7 @@ namespace DXLibRef {
 			if (!GetMsgPos(&xp1, &yp1, xp2, yp2, size, xSize, FontX)) {
 				return 0;
 			}
-			Fonts->Get(FontPool::FontType::WW_Gothic).DrawString((int)(size), FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::WW_Gothic, (int)(size)).DrawString(-1, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 			return xSize;//エッジ分
 		};
 		//
@@ -1220,9 +1220,9 @@ namespace DXLibRef {
 			int WinSizeX{ 720 };
 			int WinSizeY{ 720 };
 
-			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing;
-			std::function<void()> m_ExitDoing;
-			std::function<void()> m_GuideDoing;
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing{ nullptr };
+			std::function<void()> m_ExitDoing{ nullptr };
+			std::function<void()> m_GuideDoing{ nullptr };
 		public:
 			PopUpDrawClass() {}
 			~PopUpDrawClass() {}
