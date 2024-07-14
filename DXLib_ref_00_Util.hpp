@@ -134,18 +134,18 @@ namespace DXLibRef {
 	//角度からラジアンに
 	extern void* enabler;// ダミー変数
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	inline static float deg2rad(T p1) {
+	constexpr float deg2rad(T p1) {
 		std::is_arithmetic<T>::value;
 		return float(p1) * DX_PI_F / 180.f;
 	}
 	//ラジアンから角度に
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	inline static float rad2deg(T p1) {
+	constexpr float rad2deg(T p1) {
 		return float(p1) * 180.f / DX_PI_F;
 	}
 
 	//余弦定理
-	static float GetCosFormula(float a, float b, float c) {
+	constexpr float GetCosFormula(float a, float b, float c) {
 		if (b + c > a && c + a > b && a + b > c) {
 			return std::clamp((b * b + c * c - a * a) / (2.f * b*c), -1.f, 1.f);
 		}

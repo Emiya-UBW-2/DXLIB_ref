@@ -54,7 +54,9 @@ namespace DXLibRef {
 			}
 		}
 		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos();Pos.y *= -1.f;
-		DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
+		if (GetNowScene()->Get3DActive()) {
+			DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
+		}
 		Pad->Execute();
 		UISystem::Instance()->Update();
 		auto SelEnd = !GetNowScene()->Update();		//XV
