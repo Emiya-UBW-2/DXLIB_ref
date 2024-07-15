@@ -17,7 +17,7 @@ namespace DXLibRef {
 		SE,
 		VOICE,
 		BGM,
-		AllWaysFront,
+		WindowMode,
 		ScreenEffect,
 		Reflection,
 		MotionBlur,
@@ -33,7 +33,7 @@ namespace DXLibRef {
 		Distortion,
 		Max,
 	};
-	static const char* OptionStr[(int)EnumSaveParam::Max] = {
+	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
 		"GraphicsPreset",
 		"DirectXVer",
 		"usevr",
@@ -94,18 +94,18 @@ namespace DXLibRef {
 		EnumParamType m_EnumParamType{};
 		int valueint{0};
 	public:
-		void SetEnumParamType(EnumParamType value) { m_EnumParamType = value; }
-		const auto GetEnumParamType() const { return m_EnumParamType; }
+		void SetEnumParamType(EnumParamType value) noexcept { m_EnumParamType = value; }
+		const auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
 
-		void SetBoolean(bool use) { valueint = use ? 1 : 0; }
+		void SetBoolean(bool use) noexcept { valueint = use ? 1 : 0; }
 		const auto GetBoolean() const { return (valueint != 0); }
-		void ChangeBoolean() { SetBoolean(GetBoolean() ^ 1); }
+		void ChangeBoolean(void) noexcept { SetBoolean(GetBoolean() ^ 1); }
 
-		void SetInt(int use) { valueint = use; }
-		const auto GetInt() const { return valueint; }
+		void SetInt(int use) noexcept { valueint = use; }
+		const auto GetInt(void) const noexcept { return valueint; }
 
-		void SetFloat(float use) { valueint = (int)(use*1000.f); }
-		const auto GetFloat() const { return (float)(valueint) / 1000.f; }
+		void SetFloat(float use) noexcept { valueint = static_cast<int>(use*1000.f); }
+		const auto GetFloat(void) const noexcept { return static_cast<float>(valueint) / 1000.f; }
 
 	};
 
@@ -113,18 +113,23 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<OPTION>;
 	private:
-		OPTION() {
+		OPTION(void) noexcept {
 			Load();
 		}
-		~OPTION() {}
+		OPTION(const OPTION&) = delete;
+		OPTION(OPTION&& o) = delete;
+		OPTION& operator=(const OPTION&) = delete;
+		OPTION& operator=(OPTION&& o) = delete;
+
+		~OPTION(void) noexcept {}
 	private:
-		std::array<SaveParams, (int)EnumSaveParam::Max> m_SaveParams;
+		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
 	public:
-		const auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetBoolean(); }
-		const auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetInt(); }
-		const auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at((int)id).GetFloat(); }
+		const auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
+		const auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
+		const auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetFloat(); }
 	public:
-		void			SetParamBoolean(EnumSaveParam id, bool use) {
+		void			SetParamBoolean(EnumSaveParam id, bool use) noexcept {
 			switch (id) {
 				case EnumSaveParam::SSAO:
 				case EnumSaveParam::AA:
@@ -144,14 +149,37 @@ namespace DXLibRef {
 				case EnumSaveParam::ScreenEffect:
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
 					break;
+				case EnumSaveParam::GraphicsPreset:
+				case EnumSaveParam::DirectXVer:
+				case EnumSaveParam::ObjLevel:
+				case EnumSaveParam::shadow:
+				case EnumSaveParam::fov:
+				case EnumSaveParam::vsync:
+				case EnumSaveParam::FpsLimit:
+				case EnumSaveParam::SE:
+				case EnumSaveParam::VOICE:
+				case EnumSaveParam::BGM:
+				case EnumSaveParam::WindowMode:
+				case EnumSaveParam::Reflection:
+				case EnumSaveParam::MotionBlur:
+				case EnumSaveParam::Xsensing:
+				case EnumSaveParam::Ysensing:
+				case EnumSaveParam::HeadBobbing:
+				case EnumSaveParam::ControlType:
+				case EnumSaveParam::Language:
+				case EnumSaveParam::DrawScale:
+				case EnumSaveParam::GodRay:
+				case EnumSaveParam::PBR:
+				case EnumSaveParam::Distortion:
+				case EnumSaveParam::Max:
 				default:
 					break;
 			}
-			m_SaveParams.at((int)id).SetBoolean(use);
+			m_SaveParams.at(static_cast<size_t>(id)).SetBoolean(use);
 		}
-		void			ChangeParamBoolean(EnumSaveParam id) { m_SaveParams.at((int)id).ChangeBoolean(); }
+		void			ChangeParamBoolean(EnumSaveParam id) noexcept { m_SaveParams.at(static_cast<size_t>(id)).ChangeBoolean(); }
 
-		void			SetParamInt(EnumSaveParam id, int use) {
+		void			SetParamInt(EnumSaveParam id, int use) noexcept {
 			switch (id) {
 				case EnumSaveParam::Reflection:
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
@@ -160,12 +188,39 @@ namespace DXLibRef {
 				case EnumSaveParam::shadow:
 					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = 0; }
 					break;
+				case EnumSaveParam::GraphicsPreset:
+				case EnumSaveParam::DirectXVer:
+				case EnumSaveParam::usevr:
+				case EnumSaveParam::ObjLevel:
+				case EnumSaveParam::DoF:
+				case EnumSaveParam::bloom:
+				case EnumSaveParam::SSAO:
+				case EnumSaveParam::fov:
+				case EnumSaveParam::vsync:
+				case EnumSaveParam::FpsLimit:
+				case EnumSaveParam::SE:
+				case EnumSaveParam::VOICE:
+				case EnumSaveParam::BGM:
+				case EnumSaveParam::WindowMode:
+				case EnumSaveParam::ScreenEffect:
+				case EnumSaveParam::MotionBlur:
+				case EnumSaveParam::Xsensing:
+				case EnumSaveParam::Ysensing:
+				case EnumSaveParam::HeadBobbing:
+				case EnumSaveParam::ControlType:
+				case EnumSaveParam::Language:
+				case EnumSaveParam::AA:
+				case EnumSaveParam::DrawScale:
+				case EnumSaveParam::GodRay:
+				case EnumSaveParam::PBR:
+				case EnumSaveParam::Distortion:
+				case EnumSaveParam::Max:
 				default:
 					break;
 			}
-			m_SaveParams.at((int)id).SetInt(use);
+			m_SaveParams.at(static_cast<size_t>(id)).SetInt(use);
 		}
-		void			SetParamFloat(EnumSaveParam id, float use) { m_SaveParams.at((int)id).SetFloat(use); }
+		void			SetParamFloat(EnumSaveParam id, float use) noexcept { m_SaveParams.at(static_cast<size_t>(id)).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) noexcept;
@@ -187,17 +242,17 @@ namespace DXLibRef {
 		public:
 			float selanim{0.f};
 		public:
-			const auto& GetName() const noexcept { return m_Name; }
-			const auto& GetInfoTextID() const noexcept { return m_Info; }
+			const auto& GetName(void) const noexcept { return m_Name; }
+			const auto& GetInfoTextID(void) const noexcept { return m_Info; }
 
-			void GetLeftPush() const noexcept { m_LeftPush(); }
-			void GetRightPush() const noexcept { m_RightPush(); }
-			void GetOKPush() const noexcept { m_OKPush(); }
-			void GetAnyDoing() const noexcept { m_AnyDoing(); }
+			void GetLeftPush(void) const noexcept { m_LeftPush(); }
+			void GetRightPush(void) const noexcept { m_RightPush(); }
+			void GetOKPush(void) const noexcept { m_OKPush(); }
+			void GetAnyDoing(void) const noexcept { m_AnyDoing(); }
 		public:
 			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
 					  std::function<void()> AnyDoing,
-					  std::function<void(int xpos, int ypos, bool isMine)> draw) {
+					  std::function<void(int xpos, int ypos, bool isMine)> draw) noexcept {
 				selanim = 0;
 
 				m_Name = name;
@@ -217,9 +272,12 @@ namespace DXLibRef {
 			std::string m_name;
 			std::vector<OptionElementsInfo> m_Elements;
 		protected:
-			virtual void Init_Sub() noexcept {}
+			virtual void Init_Sub(void) noexcept {}
 		public:
-			const auto& GetID() const noexcept { return m_id; }
+			const auto& GetID(void) const noexcept { return m_id; }
+		public:
+			OptionTabsInfo(void) noexcept {}
+			virtual ~OptionTabsInfo(void) noexcept {}
 		public:
 			void Init(int ID, const char* name) noexcept {
 				m_id = ID;
@@ -233,8 +291,11 @@ namespace DXLibRef {
 		};
 
 		class SoundTabsInfo :public OptionTabsInfo {
+		public:
+			SoundTabsInfo(void) noexcept {}
+			virtual ~SoundTabsInfo(void) noexcept {}
 		protected:
-			void Init_Sub() noexcept override;
+			void Init_Sub(void) noexcept override;
 		};
 		class GraphicTabsInfo :public OptionTabsInfo {
 			static const int	FrameLimitsNum = 10;
@@ -252,18 +313,32 @@ namespace DXLibRef {
 			};
 		private:
 			int RefreshRate{FrameLimits[1]};
+		public:
+			GraphicTabsInfo(void) noexcept {}
+			GraphicTabsInfo(const GraphicTabsInfo&) = delete;
+			GraphicTabsInfo(GraphicTabsInfo&& o) = delete;
+			GraphicTabsInfo& operator=(const GraphicTabsInfo&) = delete;
+			GraphicTabsInfo& operator=(GraphicTabsInfo&& o) = delete;
+
+			virtual ~GraphicTabsInfo(void) noexcept {}
 		protected:
-			void Init_Sub() noexcept override;
+			void Init_Sub(void) noexcept override;
 		};
 		class ControlTabsInfo :public OptionTabsInfo {
+		public:
+			ControlTabsInfo(void) noexcept {}
+			virtual ~ControlTabsInfo(void) noexcept {}
 		protected:
-			void Init_Sub() noexcept override;
+			void Init_Sub(void) noexcept override;
 		private:
 			void KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept;
 		};
 		class ElseTabsInfo :public OptionTabsInfo {
+		public:
+			ElseTabsInfo(void) noexcept {}
+			virtual ~ElseTabsInfo(void) noexcept {}
 		protected:
-			void Init_Sub() noexcept override;
+			void Init_Sub(void) noexcept override;
 		};
 	private:
 		int m_tabsel{0};
@@ -273,18 +348,26 @@ namespace DXLibRef {
 		bool						m_ActiveSwitch{false};
 		bool						m_RestartSwitch{false};
 	public:
-		void SetRestart() noexcept { m_RestartSwitch = true; }
-		void SetActive() noexcept { m_ActiveSwitch = true; }
-		const auto IsRestartSwitch() noexcept {
+		void SetRestart(void) noexcept { m_RestartSwitch = true; }
+		void SetActive(void) noexcept { m_ActiveSwitch = true; }
+		const auto IsRestartSwitch(void) noexcept {
 			if (!m_Active && m_RestartSwitch) {
 				m_RestartSwitch = false;
 				return true;
 			}
 			return false;
 		}
-		const auto& IsActive() const noexcept { return m_Active; }
+		const auto& IsActive(void) const noexcept { return m_Active; }
+	private:
+		OptionWindowClass(void) noexcept {}
+		OptionWindowClass(const OptionWindowClass&) = delete;
+		OptionWindowClass(OptionWindowClass&& o) = delete;
+		OptionWindowClass& operator=(const OptionWindowClass&) = delete;
+		OptionWindowClass& operator=(OptionWindowClass&& o) = delete;
+
+		~OptionWindowClass(void) noexcept {}
 	public:
-		void Init() noexcept;
+		void Init(void) noexcept;
 		void Execute(void)noexcept;
 	};
 }

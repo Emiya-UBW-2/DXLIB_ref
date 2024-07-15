@@ -12,15 +12,15 @@ namespace DXLibRef {
 		static std::vector<DRAWCHARINFO> get_draw_string_char_info(const std::basic_string<TCHAR>& string, int font_handle) {
 			std::vector<DRAWCHARINFO> info;
 			info.resize(string.size());
-			auto char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), (int)(string.length() * sizeof(TCHAR)), font_handle, false);
+			auto char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), static_cast<int>(string.length() * sizeof(TCHAR)), font_handle, false);
 			if (char_info_num < 0) throw std::runtime_error("fail in function DxLib::GetDrawStringCharInfoToHandle");
 			if (info.size() < static_cast<std::size_t>(char_info_num)) {
-				info.resize(char_info_num + 1);
+				info.resize(static_cast<std::size_t>(char_info_num) + 1);
 				//再取得
-				char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), (int)(string.length() * sizeof(TCHAR)), font_handle, false);
-				if (char_info_num < 0 || info.size() < static_cast<std::size_t>(char_info_num)) throw std::runtime_error("fail to detect draw info.");
+				char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), static_cast<int>(string.length() * sizeof(TCHAR)), font_handle, false);
+				if (char_info_num < 0 || static_cast<int>(info.size()) < char_info_num) throw std::runtime_error("fail to detect draw info.");
 			}
-			info.resize(char_info_num);
+			info.resize(static_cast<std::size_t>(char_info_num));
 			return info;
 		}
 	}
@@ -173,10 +173,10 @@ namespace DXLibRef {
 			case FontYCenter::TOP:
 				break;
 			case FontYCenter::MIDDLE:
-				y -= (int)((float)(GetFontSizeToHandle(this->handle_) / 2)*ysiz);
+				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(this->handle_) / 2)*ysiz);
 				break;
 			case FontYCenter::BOTTOM:
-				y -= (int)((float)(GetFontSizeToHandle(this->handle_))*ysiz);
+				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(this->handle_))*ysiz);
 				break;
 			default:
 				break;
@@ -223,8 +223,13 @@ namespace DXLibRef {
 
 		std::vector<LocalizeStr> havehandle;
 	private:
-		LocalizePool();
-		~LocalizePool() {
+		LocalizePool(void) noexcept;
+		LocalizePool(const LocalizePool&) = delete;
+		LocalizePool(LocalizePool&& o) = delete;
+		LocalizePool& operator=(const LocalizePool&) = delete;
+		LocalizePool& operator=(LocalizePool&& o) = delete;
+
+		~LocalizePool(void) noexcept {
 			Dispose();
 		}
 	public:
@@ -267,6 +272,14 @@ namespace DXLibRef {
 			int				m_size{ 0 };
 
 			FontHandle		m_Handle;
+		public:
+			Fonthave(void) noexcept {}
+			Fonthave(const Fonthave&) = delete;
+			Fonthave(Fonthave&& o) = delete;
+			Fonthave& operator=(const Fonthave&) = delete;
+			Fonthave& operator=(Fonthave&& o) = delete;
+
+			~Fonthave(void) noexcept {}
 		public:
 			const auto&		Get_type(void)const noexcept { return this->m_Type; }
 			const auto&		Get_fontsize(void)const noexcept { return this->m_fontsize; }
@@ -373,18 +386,26 @@ namespace DXLibRef {
 			}
 		};
 	private:
-		std::vector<Fonthave> havehandle;
+		std::vector<std::unique_ptr<Fonthave>> havehandle;
 		size_t Add(FontType type, int fontSize = -1) noexcept {
 			for (auto& h : this->havehandle) {
-				if (h.Get_type() == type && h.Get_fontsize() == fontSize) {
-					return &h - &this->havehandle.front();
+				if (h->Get_type() == type && h->Get_fontsize() == fontSize) {
+					return static_cast<size_t>(&h - &this->havehandle.front());
 				}
 			}
-			this->havehandle.resize(this->havehandle.size() + 1);
-			this->havehandle.back().Set(type, fontSize);
+			this->havehandle.emplace_back(std::make_unique<Fonthave>());
+			this->havehandle.back()->Set(type, fontSize);
 			return this->havehandle.size() - 1;
 		}
+	private:
+		FontPool(void) noexcept {}
+		FontPool(const FontPool&) = delete;
+		FontPool(FontPool&& o) = delete;
+		FontPool& operator=(const FontPool&) = delete;
+		FontPool& operator=(FontPool&& o) = delete;
+
+		~FontPool(void) noexcept {}
 	public:
-		Fonthave& Get(FontType type, int fontSize = -1) noexcept { return this->havehandle[Add(type, fontSize)]; }
+		std::unique_ptr<Fonthave>& Get(FontType type, int fontSize = -1) noexcept { return this->havehandle[Add(type, fontSize)]; }
 	};
 };

@@ -16,12 +16,17 @@ namespace DXLibRef {
 		size_t																	m_PointSel{ 0 };
 		switchs																	m_Switch;
 	private:
-		DebugClass();
-		~DebugClass();
+		DebugClass(void) noexcept;
+		DebugClass(const DebugClass&) = delete;
+		DebugClass(DebugClass&& o) = delete;
+		DebugClass& operator=(const DebugClass&) = delete;
+		DebugClass& operator=(DebugClass&& o) = delete;
+
+		~DebugClass(void) noexcept {}
 	public:
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;
-		void SetEndPoint() noexcept;
+		void SetEndPoint(void) noexcept;
 		void DebugWindow(int xpos, int ypos) noexcept;
 	};
 #endif // DEBUG

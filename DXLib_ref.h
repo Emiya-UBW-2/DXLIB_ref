@@ -30,6 +30,7 @@
 //エラー,警告取り
 #define NOMINMAX
 #pragma warning(disable:4505)
+#pragma warning(disable:4820)
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include																																	*/
@@ -120,13 +121,16 @@ namespace DXLibRef {
 	class DXLib_ref : public SingletonBase<DXLib_ref> {
 	private:
 		friend class SingletonBase<DXLib_ref>;
-	private:
-	public://ゲッター
 	private://コンストラクタ
 		DXLib_ref(void) noexcept;
-		~DXLib_ref(void) noexcept;
+		DXLib_ref(const DXLib_ref&) = delete;
+		DXLib_ref(DXLib_ref&& o) = delete;
+		DXLib_ref& operator=(const DXLib_ref&) = delete;
+		DXLib_ref& operator=(DXLib_ref&& o) = delete;
+
+		~DXLib_ref(void) noexcept {}
 	public:
-		bool StartLogic() noexcept;
-		bool MainLogic() noexcept;
+		bool StartLogic(void) noexcept;
+		bool MainLogic(void) noexcept;
 	};
 };

@@ -20,11 +20,19 @@ namespace DXLibRef {
 		std::string									m_ObjFileName;
 		std::string									m_ColFileName;
 	public:
+		ModelBaseClass(void) noexcept {}
+		ModelBaseClass(const ModelBaseClass&) = delete;
+		ModelBaseClass(ModelBaseClass&& o) = delete;
+		ModelBaseClass& operator=(const ModelBaseClass&) = delete;
+		ModelBaseClass& operator=(ModelBaseClass&& o) = delete;
+
+		virtual ~ModelBaseClass(void) noexcept {}
+	public:
 		const auto		GetPathCompare(const char* filepath, const char* objfilename, const char* colfilename) const noexcept {
 			return ((this->m_FilePath == filepath) && (this->m_ObjFileName == objfilename) && (this->m_ColFileName == colfilename));
 		}
 	public:
-		void			SetShapePer(int pShape, float Per) noexcept { this->m_Shapes[(int)pShape].second = Per; }
+		void			SetShapePer(int pShape, float Per) noexcept { this->m_Shapes[static_cast<size_t>(pShape)].second = Per; }
 	public:
 		void			LoadModel(
 			const std::shared_ptr<ObjectBaseClass>& pBase,
@@ -57,13 +65,13 @@ namespace DXLibRef {
 		//const auto		GetMatrix(void) const noexcept { return GetObj().GetMatrix(); }
 		const auto		GetFrameLocalMat(int frame) const noexcept { return this->m_obj.GetFrameLocalMatrix(frame); }
 		const auto		GetFrameWorldMat(int frame) const noexcept { return this->m_obj.GetFrameLocalWorldMatrix(frame); }
-		const auto		GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameWorldMat((int)this->m_obj.frame_parent(frame)); }
-		const auto		GetChildFrameNum(int frame) const noexcept { return (int)this->m_obj.frame_child_num(frame); }
-		const auto		GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameWorldMat((int)this->m_obj.frame_child(frame, ID)); }
+		const auto		GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.frame_parent(frame))); }
+		const auto		GetChildFrameNum(int frame) const noexcept { return static_cast<int>(this->m_obj.frame_child_num(frame)); }
+		const auto		GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.frame_child(frame, ID))); }
 
-		const bool		HaveFrame(int frame) const noexcept { return this->m_Frames[frame].first != -1; }
-		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[frame].first; }
-		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[frame].second; }
+		const bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != -1; }
+		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
+		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
 
 		void			SetAnimOnce(int ID, float speed) noexcept;
@@ -77,14 +85,14 @@ namespace DXLibRef {
 		const auto&		GetIsDelete(void) const noexcept { return this->m_IsDelete; }
 	public:
 		void			SetActive(bool value) noexcept { this->m_IsActive = value; }
-		void			SetDelete() noexcept { this->m_IsDelete = true; }
-		void			SetResetP(bool value) { this->m_IsResetPhysics = value; }
-		void			SetScreenPosition(const Vector3DX& value, float size) {
+		void			SetDelete(void) noexcept { this->m_IsDelete = true; }
+		void			SetResetP(bool value) noexcept { this->m_IsResetPhysics = value; }
+		void			SetScreenPosition(const Vector3DX& value, float size) noexcept {
 			this->m_ScreenPosition = value;
 			this->m_CameraSize = size;
 		}
 		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
-		void			SetShaderTexHandle(int id, int value) noexcept { this->m_ShaderTex[id] = value; }
+		void			SetShaderTexHandle(int id, int value) noexcept { this->m_ShaderTex[static_cast<size_t>(id)] = value; }
 		void			ResetMove(const Matrix4x4DX& mat, const Vector3DX& pos) noexcept {
 			this->m_move.vec.Set(0, 0, 0);
 			SetMove(mat, pos);
@@ -99,7 +107,7 @@ namespace DXLibRef {
 			this->m_move.posbuf = pos;
 			UpdateMove();
 		}
-		void			SetMove(const Matrix4x4DX& mat, const Vector3DX& pos, const Vector3DX& vec) {
+		void			SetMove(const Matrix4x4DX& mat, const Vector3DX& pos, const Vector3DX& vec) noexcept {
 			this->m_move.mat = mat;
 			this->m_move.pos = pos;
 			this->m_move.posbuf = pos;
@@ -117,7 +125,7 @@ namespace DXLibRef {
 		//”»’è‹N“®
 		void			SetupCol(void) noexcept {
 			if (this->m_col.IsActive()) {
-				for (int i = 0; i < this->m_col.mesh_num(); ++i) { this->m_col.SetupCollInfo(8, 8, 8, -1, i); }
+				for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); ++i) { this->m_col.SetupCollInfo(8, 8, 8, -1, i); }
 			}
 		}
 		const auto		RefreshCol(const Vector3DX& StartPos, const Vector3DX& EndPos, float pRange) noexcept {
@@ -125,7 +133,7 @@ namespace DXLibRef {
 			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.pos) <= pRange) {
 				//”»’è‹N“®
 				this->m_ColActive = true;
-				for (int i = 0; i < this->m_col.mesh_num(); i++) { this->m_col.RefreshCollInfo(-1, i); }
+				for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); i++) { this->m_col.RefreshCollInfo(-1, i); }
 				return true;
 			}
 			return false;
@@ -135,7 +143,7 @@ namespace DXLibRef {
 		const auto		GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, -1, sel); }
 		void			GetColNearestInAllMesh(const Vector3DX& StartPos, Vector3DX* EndPos) const noexcept {
 			MV1_COLL_RESULT_POLY colres;
-			for (int i = 0; i < this->m_col.mesh_num(); ++i) {
+			for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); ++i) {
 				colres = GetColLine(StartPos, *EndPos, i);
 				if (colres.HitFlag == TRUE) {
 					*EndPos = colres.HitPosition;
@@ -143,11 +151,19 @@ namespace DXLibRef {
 			}
 		}
 	public:
-		virtual int	GetFrameNum() noexcept { return 0; }
+		virtual int	GetFrameNum(void) noexcept { return 0; }
 		virtual const char*	GetFrameStr(int) noexcept { return nullptr; }
 
-		virtual int	GetShapeNum() noexcept { return 0; }
+		virtual int	GetShapeNum(void) noexcept { return 0; }
 		virtual const char*	GetShapeStr(int) noexcept { return nullptr; }
+	public:
+		ObjectBaseClass(void) noexcept {}
+		ObjectBaseClass(const ObjectBaseClass&) = delete;
+		ObjectBaseClass(ObjectBaseClass&& o) = delete;
+		ObjectBaseClass& operator=(const ObjectBaseClass&) = delete;
+		ObjectBaseClass& operator=(ObjectBaseClass&& o) = delete;
+
+		virtual ~ObjectBaseClass(void) noexcept {}
 	public:
 		void			Init(void) noexcept;
 		virtual void	FirstExecute(void) noexcept {}

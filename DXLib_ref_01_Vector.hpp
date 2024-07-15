@@ -8,7 +8,7 @@ namespace DXLibRef {
 		float y{0};
 		float z{0};
 	public:
-		Vector3DX() noexcept : x(0), y(0), z(0) {}
+		Vector3DX(void) noexcept : x(0), y(0), z(0) {}
 		Vector3DX(VECTOR value) noexcept { this->Set(value.x, value.y, value.z); }
 		VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					//•ÏŠ·
 		static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	//“ü—Í
@@ -79,11 +79,11 @@ namespace DXLibRef {
 	class Matrix4x4DX {
 		MATRIX value;
 	public:
-		Matrix4x4DX() noexcept : value(DxLib::MGetIdent()) {}
+		Matrix4x4DX(void) noexcept : value(DxLib::MGetIdent()) {}
 		Matrix4x4DX(MATRIX value) noexcept { this->value = value; }
 		MATRIX get(void) const noexcept { return this->value; }		//•ÏŠ·
 		//
-		static const Matrix4x4DX identity() noexcept { return DxLib::MGetIdent(); }
+		static const Matrix4x4DX identity(void) noexcept { return DxLib::MGetIdent(); }
 
 		static Matrix4x4DX Axis1(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis1(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }
 		static Matrix4x4DX Axis2(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis2(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }

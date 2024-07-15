@@ -30,7 +30,7 @@ namespace DXLibRef {
 	public:
 		Vector3DX					pos;//仮
 	public:
-		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) {
+		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) noexcept {
 			fixtureDef.shape = dynamicBox;								//
 			fixtureDef.density = 1.0f;									//ボックス密度をゼロ以外に設定すると、動的になる
 			fixtureDef.friction = 0.3f;									//デフォルトの摩擦をオーバーライド
@@ -38,11 +38,11 @@ namespace DXLibRef {
 			this->playerfix = this->body->CreateFixture(&fixtureDef);	//シェイプをボディに追加
 		}
 
-		void		SetLinearVelocity(const b2Vec2& position) {
+		void		SetLinearVelocity(const b2Vec2& position) noexcept {
 			this->body->SetLinearVelocity(position);
 		}
 
-		void		Execute(const Vector3DX& add, float yradadd) {
+		void		Execute(const Vector3DX& add, float yradadd) noexcept {
 			this->body->SetLinearVelocity(b2Vec2(add.x, add.z));
 			this->body->SetAngularVelocity(yradadd);
 		}
@@ -59,7 +59,7 @@ namespace DXLibRef {
 		const auto	Pos(void) noexcept { return body->GetPosition(); }
 		const auto	Rad(void) noexcept { return body->GetAngle(); }
 		const auto	Speed(void) noexcept { return std::hypot(this->body->GetLinearVelocity().x, this->body->GetLinearVelocity().y); }
-		void		SetTransform(const b2Vec2& position, float32 angle) {
+		void		SetTransform(const b2Vec2& position, float32 angle) noexcept {
 			body->SetTransform(position, angle);
 		}
 	};

@@ -5,23 +5,12 @@ namespace DXLibRef {
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
 	const UISystem* SingletonBase<UISystem>::m_Singleton = nullptr;
-	
-	int y_UI(int p1) {
-		return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
-	}
-	int y_UIMs(int p1) {
-		auto* OptionParts = OPTION::Instance();
-		if (OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
-			return (int(p1) * DXDraw::Instance()->GetDispYSizeBorder() / basey);
-		}
-		else {
-			return (int(p1) * DXDraw::Instance()->GetDispYSize() / basey);
-		}
-	}
+	const CameraShake* SingletonBase<CameraShake>::m_Singleton = nullptr;
+
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
-	float GetEasingRatio(EasingType EasingType, float ratio) {
+	float GetEasingRatio(EasingType EasingType, float ratio) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
 			case EasingType::OutExpo:
@@ -30,13 +19,14 @@ namespace DXLibRef {
 				return 1.f;
 		}
 	}
-	bool IntoMouse(int x1, int  y1, int  x2, int  y2) {
+	bool IntoMouse(int x1, int  y1, int  x2, int  y2) noexcept {
 		auto* Pad = PadControl::Instance();
 		int mx =Pad->GetMS_X();
 		int my = Pad->GetMS_Y();
 		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
 		VECTOR vec_from = campos.get();		// カメラの位置
@@ -47,8 +37,8 @@ namespace DXLibRef {
 		SetupCamera_Perspective(fov);
 		MATRIX proj = GetCameraProjectionMatrix();
 		// ビューポート行列（スクリーン行列）の作成
-		float w = (float)y_r(basex) / 2.0f;
-		float h = (float)y_r(basey) / 2.0f;
+		float w = (float)DrawParts->GetScreenY(1920) / 2.0f;
+		float h = (float)DrawParts->GetScreenY(1080) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,
@@ -72,41 +62,40 @@ namespace DXLibRef {
 	//
 	namespace WindowSystem {
 		//箱
-		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
-			DrawBox_2D((int)(xp1), (int)(yp1), (int)(xp2), (int)(yp2), colorSet, true);
+		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
+			DrawBox_2D(static_cast<int>(xp1), static_cast<int>(yp1), static_cast<int>(xp2), static_cast<int>(yp2), colorSet, true);
 		}
-		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) {
+		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
 			auto* Pad = PadControl::Instance();
 			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2);
 			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && Pad->GetMouseClick().trigger());
 		};
 		//文字
-		const bool GetMsgPos(int* xp1, int *yp1, int xp2, int yp2, int size, int xSize, FontHandle::FontXCenter FontX) {
-			*yp1 = *yp1 + (yp2 - *yp1) / 2;
-			if ((*yp1 - size / 2) > y_UI(1080) || (*yp1 + size / 2) < 0) { return false; }				//画面外は表示しない
+		const bool GetMsgPosOn(int* xp1, int *yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
+			auto* DrawParts = DXDraw::Instance();
 			switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
-					*xp1 = *xp1 + y_UI(6);
-					if ((*xp1) > y_UI(1920) || (*xp1 + xSize) < 0) { return false; }						//画面外は表示しない
-					break;
+					*xp1 = *xp1 + DrawParts->GetUIY(6);
+					return HitRectangleToRectangle(
+						(*xp1), (*yp1 - ySize / 2), (*xp1 + xSize), (*yp1 + ySize / 2),
+						0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
 				case FontHandle::FontXCenter::MIDDLE:
-					*xp1 = *xp1 + (xp2 - *xp1) / 2;
-					if ((*xp1 - xSize / 2) > y_UI(1920) || (*xp1 + xSize / 2) < 0) { return false; }		//画面外は表示しない
-					break;
+					return HitRectangleToRectangle(
+						(*xp1 - xSize / 2), (*yp1 - ySize / 2), (*xp1 + xSize / 2), (*yp1 + ySize),
+						0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
 				case FontHandle::FontXCenter::RIGHT:
-					*xp1 = xp2 - y_UI(6);
-					if ((*xp1 - xSize) > y_UI(1920) || (*xp1) < 0) { return false; }						//画面外は表示しない
-					break;
+					*xp1 = *xp1 - DrawParts->GetUIY(6);
+					return HitRectangleToRectangle(
+						(*xp1 - xSize), (*yp1 - ySize / 2), (*xp1), (*yp1 + ySize / 2),
+						0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
 				default:
-					break;
+					return false;
 			}
-			*xp1 = (int)(*xp1);
-			*yp1 = (int)(*yp1);
-			return true;
 		};
 		//
-		bool CheckBox(int xp1, int yp1, bool switchturn) {
+		bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
+			auto* DrawParts = DXDraw::Instance();
 			int xp3 = xp1 + EdgeSize;
 			int yp3 = yp1 + EdgeSize;
 			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
@@ -117,19 +106,19 @@ namespace DXLibRef {
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				switchturn ^= 1;
 				auto* SE = SoundPool::Instance();
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			SetBox(xp3 + y_UI(5), yp3 + y_UI(5), xp4 - y_UI(5), yp4 - y_UI(5), Black);
+			SetBox(xp3 + DrawParts->GetUIY(5), yp3 + DrawParts->GetUIY(5), xp4 - DrawParts->GetUIY(5), yp4 - DrawParts->GetUIY(5), Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + y_UI(5), yp3 + y_UI(5), xp4 + y_UI(5), yp4 - y_UI(5), Gray50);
+			SetBox(xp3 + DrawParts->GetUIY(5), yp3 + DrawParts->GetUIY(5), xp4 + DrawParts->GetUIY(5), yp4 - DrawParts->GetUIY(5), Gray50);
 			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
 			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
 			SetBox(xp3, yp3, xp4, yp4, color);
 			return switchturn;
 		}
 		//
-		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) {
+		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept {
 			int xp = 0;
 			{
 				int xpmin = xmin + 1;
@@ -139,7 +128,7 @@ namespace DXLibRef {
 				bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
 				if (MouseOver && Pad->GetMouseClick().trigger()) {
 					auto* SE = SoundPool::Instance();
-					SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+					SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 				}
 				if (MouseOver && Pad->GetMouseClick().press()) {
 					value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
@@ -150,12 +139,12 @@ namespace DXLibRef {
 					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
-			SetMsgWW(xp, yp, xp, yp + LineHeight, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+			SetMsgWW(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
 			return value;
 		}
 
-		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) {
+		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) noexcept {
 			{
 				int width = LineHeight;
 				int r = LineHeight / 3;
@@ -165,7 +154,7 @@ namespace DXLibRef {
 					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
 					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
 						value = loop;
 					}
@@ -175,9 +164,9 @@ namespace DXLibRef {
 		}
 	};
 	//
-	void			moves::Update_Physics(float speed_randam, float rate) {
+	void			moves::Update_Physics(float speed_randam, float rate) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		this->pos += this->vec*((float)((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
+		this->pos += this->vec*(static_cast<float>((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
 		this->vec.y += M_GR / powf((DrawParts->GetFps() / rate), 2.f);
 
 		//this->gun_m.pos += this->gun_m.vec;
@@ -206,13 +195,13 @@ namespace DXLibRef {
 			m_on ^= 1;
 		}
 	}
-	void			Pendulum2D::Update() {
+	void			Pendulum2D::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / DrawParts->GetFps();
 		m_rad += this->m_vel / DrawParts->GetFps();
 	}
 	//
-	void SideLog::SideLogData::UpdateActive() noexcept {
+	void SideLog::SideLogData::UpdateActive(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (m_Time > 0.f) {
 			m_Time -= 1.f / DrawParts->GetFps();
@@ -222,29 +211,30 @@ namespace DXLibRef {
 		}
 		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
 	}
-	void SideLog::Draw() noexcept {
+	void SideLog::Draw(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* Fonts = FontPool::Instance();
 
 		int xp1, yp1;
-		xp1 = y_UI(64);
-		yp1 = y_UI(256);
+		xp1 = DrawParts->GetUIY(64);
+		yp1 = DrawParts->GetUIY(256);
 
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*d.ActivePer()), 0, 255));
-				int yp = yp1 - y_UI((int)(24.f * d.GetFlip()));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f*d.ActivePer()), 0, 255));
+				int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
-					xp1 - y_UI(6), yp + y_UI(18),
-					xp1 - y_UI(6) + (int)(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).GetStringWidth(-1, d.GetMsg()), y_UI(200))*d.ActivePer()), yp + y_UI(18) + y_UI(5),
+					xp1 - DrawParts->GetUIY(6), yp + DrawParts->GetUIY(18),
+					xp1 - DrawParts->GetUIY(6) + static_cast<int>(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(-1, d.GetMsg()), DrawParts->GetUIY(200))*d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-																	  (int)(xp1), (int)(yp), d.GetMsgColor(), Black, d.GetMsg());
+				Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+																	  static_cast<int>(xp1), static_cast<int>(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	//
-	void PopUp::PopUpDrawClass::Start() noexcept
+	void PopUp::PopUpDrawClass::Start(void) noexcept
 	{
 		auto* SE = SoundPool::Instance();
 		auto* Pad = PadControl::Instance();
@@ -260,17 +250,17 @@ namespace DXLibRef {
 				}
 			}
 		);
-		SE->Get((int)SoundEnumCommon::UI_OK).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		SE->Get(static_cast<int>(SoundEnumCommon::UI_OK)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
 		m_Active = true;
 		m_ActiveSwitch = true;
 	}
-	void PopUp::PopUpDrawClass::End() noexcept
+	void PopUp::PopUpDrawClass::End(void) noexcept
 	{
 		auto* SE = SoundPool::Instance();
 		auto* Pad = PadControl::Instance();
 
-		SE->Get((int)SoundEnumCommon::UI_CANCEL).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		SE->Get(static_cast<int>(SoundEnumCommon::UI_CANCEL)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 		m_Active = false;
 		m_ActiveSwitch = true;
 		Pad->SetGuideUpdate();
@@ -278,7 +268,7 @@ namespace DXLibRef {
 			m_ExitDoing();
 		}
 	}
-	void PopUp::PopUpDrawClass::Update() noexcept {
+	void PopUp::PopUpDrawClass::Update(void) noexcept {
 		auto* Pad = PadControl::Instance();
 		m_ActiveSwitch = false;
 		Easing(&m_ActivePer, m_Active ? 1.f : 0.f, m_Active ? 0.7f : 0.3f, EasingType::OutExpo);
@@ -291,6 +281,7 @@ namespace DXLibRef {
 		}
 	}
 	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 
 		int xm1, ym1;
@@ -300,38 +291,38 @@ namespace DXLibRef {
 		int xp2, yp2;
 
 		if (m_ActivePer > 1.f / 255.f) {
-			xm1 = xcenter - y_UI(WinSizeX) / 2;
-			ym1 = ycenter - y_UI(WinSizeY) / 2;
-			xm2 = xcenter + y_UI(WinSizeX) / 2;
-			ym2 = ycenter + y_UI(WinSizeY) / 2;
+			xm1 = xcenter - DrawParts->GetUIY(WinSizeX) / 2;
+			ym1 = ycenter - DrawParts->GetUIY(WinSizeY) / 2;
+			xm2 = xcenter + DrawParts->GetUIY(WinSizeX) / 2;
+			ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
 
 			//背景
 			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*per), 0, 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f*per), 0, 255));
 			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 			//タイトル
 			{
-				xp1 = xm1 + y_UI(32);
+				xp1 = xm1 + DrawParts->GetUIY(32);
 				yp1 = ym1 + LineHeight / 4;
-				WindowSystem::SetMsg(xp1,yp1,xp1,yp1+ LineHeight * 2, LineHeight * 2,FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+				WindowSystem::SetMsg(xp1, yp1 + LineHeight, LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 			}
 			//
 			if (m_Active) {
-				xp1 = xm2 - y_UI(140);
+				xp1 = xm2 - DrawParts->GetUIY(140);
 				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_UI(5), xp1 + y_UI(108), yp1 + LineHeight * 2 - y_UI(5), Red, LocalizeParts->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
-			xp1 = xm1 + y_UI(24);
+			xp1 = xm1 + DrawParts->GetUIY(24);
 			yp1 = ym1 + LineHeight * 3;
-			xp2 = xm2 - y_UI(24);
+			xp2 = xm2 - DrawParts->GetUIY(24);
 			yp2 = ym2 - LineHeight;
 			//背景
 			{
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f*0.3), 0, 255));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f*0.3f), 0, 255));
 				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
@@ -348,9 +339,10 @@ namespace DXLibRef {
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing,
 				bool IsInsert) noexcept {
-		que.at(LastSel).Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
+		auto& Last = que.at(LastSel);
+			Last.Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
 		if (!IsActivePop()) {
-			que.at(LastSel).Start();
+			Last.Start();
 			auto* DrawParts = DXDraw::Instance();
 			PrevPause = DrawParts->IsPause();
 			DrawParts->SetPause(true);
@@ -358,20 +350,20 @@ namespace DXLibRef {
 		else if (IsInsert) {
 			que.at(NowSel).End();
 			NowSel = LastSel;
-			que.at(LastSel).Start();
+			Last.Start();
 		}
-		++LastSel %= ((int)que.size());
+		++LastSel %= que.size();
 	}
-	void PopUp::EndAll() noexcept {
+	void PopUp::EndAll(void) noexcept {
 		if (!IsActivePop()) { return; }
 		que.at(NowSel).End();
 		NowSel = LastSel;
 	}
-	void PopUp::Update() noexcept {
+	void PopUp::Update(void) noexcept {
 		if (!IsActivePop()) { return; }
 		que.at(NowSel).Update();
 		if (que.at(NowSel).IsEnd()) {
-			++NowSel %= ((int)que.size());
+			++NowSel %= que.size();
 			if (IsActivePop()) {
 				que.at(NowSel).Start();
 			}
@@ -388,7 +380,7 @@ namespace DXLibRef {
 		this->m_Name = pJson["Name"];
 		//
 		std::string Type = pJson["Type"];
-		for (int i = 0; i < (int)EnumUIPartsType::Max; i++) {
+		for (size_t i = 0; i < static_cast<size_t>(EnumUIPartsType::Max); i++) {
 			if (Type == g_UIPartsString[i]) {
 				this->m_EnumUIPartsType = (EnumUIPartsType)i;
 				break;
@@ -406,14 +398,14 @@ namespace DXLibRef {
 		this->m_ZRotate = pJson["ZRotate"];
 		//
 		std::string XCenter = pJson["XCenter"];
-		for (int i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; i++) {
 			if (XCenter == g_UIXCenterString[i]) {
 				this->m_UIXCenter = (UIXCenter)i;
 				break;
 			}
 		}
 		std::string YCenter = pJson["YCenter"];
-		for (int i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; i++) {
 			if (YCenter == g_UIYCenterString[i]) {
 				this->m_UIYCenter = (UIYCenter)i;
 				break;
@@ -421,7 +413,7 @@ namespace DXLibRef {
 		}
 		//色関係
 		auto GetColorByPallet = [&](const std::string& ColorStr) {
-			for (int i = 0; i < g_UIColorPalletNum; i++) {
+			for (size_t i = 0; i < g_UIColorPalletNum; i++) {
 				if (ColorStr == g_UIColorPalletString[i]) {
 					return g_UIColorPallet[i];
 					break;
@@ -463,54 +455,55 @@ namespace DXLibRef {
 			break;
 		}
 	}
-	void UISystem::UI_CommonParts::Update() noexcept {
+	void UISystem::UI_CommonParts::Update(void) noexcept {
 		if (this->m_IsMouseClickActive) {
 			auto* Pad = PadControl::Instance();
 			int mx = Pad->GetMS_X();
 			int my = Pad->GetMS_Y();
 
 			float rad = this->m_ZRotate + this->m_FrameInfo.m_ZRotOfs;
-
 			switch (this->m_EnumUIPartsType) {
-			case EnumUIPartsType::Box:
-			{
-				int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
-				int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
-				float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
-				float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
+				case EnumUIPartsType::Box:
+					{
+						int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
+						int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
+						float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
+						float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
 
-				int   x1 = (int)(-xs * cos(rad) - -ys * sin(rad));
-				int   y1 = (int)(-ys * cos(rad) + -xs * sin(rad));
-				int   x2 = (int)(xs * cos(rad) - -ys * sin(rad));
-				int   y2 = (int)(-ys * cos(rad) + xs * sin(rad));
-				int   x3 = (int)(xs * cos(rad) - ys * sin(rad));
-				int   y3 = (int)(ys * cos(rad) + xs * sin(rad));
-				int   x4 = (int)(-xs * cos(rad) - ys * sin(rad));
-				int   y4 = (int)(ys * cos(rad) + -xs * sin(rad));
-				m_MouseOver = HitPointToSquare(
-					mx, my,
-					xp + x1, yp + y1,
-					xp + x2, yp + y2,
-					xp + x3, yp + y3,
-					xp + x4, yp + y4
-					);
-				m_MousePress = m_MouseOver && Pad->GetMouseClick().press();
-				printfDx("[]\n");
-			}
-				break;
-			default:
-				m_MouseOver = false;
-				break;
+						int   x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
+						int   y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
+						int   x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
+						int   y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
+						int   x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
+						int   y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
+						int   x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
+						int   y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
+						m_MouseOver = HitPointToSquare(
+							mx, my,
+							xp + x1, yp + y1,
+							xp + x2, yp + y2,
+							xp + x3, yp + y3,
+							xp + x4, yp + y4
+						);
+						m_MousePress = m_MouseOver && Pad->GetMouseClick().press();
+						printfDx("[]\n");
+					}
+					break;
+				case EnumUIPartsType::Msg:
+				case EnumUIPartsType::Max:
+				default:
+					m_MouseOver = false;
+					break;
 			}
 		}
 		else {
 			m_MouseOver = false;
 		}
 	}
-	void UISystem::UI_CommonParts::Draw() noexcept {
+	void UISystem::UI_CommonParts::Draw(void) noexcept {
 		if (this->m_FrameInfo.m_Alpha == 0.f) { return; }
 		if (1.f > this->m_FrameInfo.m_Alpha) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp((int)(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
 		}
 		auto* LocalizeParts = LocalizePool::Instance();
 
@@ -519,19 +512,19 @@ namespace DXLibRef {
 		switch (this->m_EnumUIPartsType) {
 		case EnumUIPartsType::Box:
 		{
-			int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
-			int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
+			int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
+			int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
 			float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
 			float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
 
-			int   x1 = (int)(-xs * cos(rad) - -ys * sin(rad));
-			int   y1 = (int)(-ys * cos(rad) + -xs * sin(rad));
-			int   x2 = (int)(xs * cos(rad) - -ys * sin(rad));
-			int   y2 = (int)(-ys * cos(rad) + xs * sin(rad));
-			int   x3 = (int)(xs * cos(rad) - ys * sin(rad));
-			int   y3 = (int)(ys * cos(rad) + xs * sin(rad));
-			int   x4 = (int)(-xs * cos(rad) - ys * sin(rad));
-			int   y4 = (int)(ys * cos(rad) + -xs * sin(rad));
+			int   x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
+			int   y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
+			int   x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
+			int   y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
+			int   x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
+			int   y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
+			int   x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
+			int   y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
 			DrawQuadrangle(
 				xp + x1, yp + y1,
 				xp + x2, yp + y2,
@@ -583,8 +576,8 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			int xp = this->m_DrawXCenter + (int)this->m_FrameInfo.m_XOfs;
-			int yp = this->m_DrawYCenter + (int)this->m_FrameInfo.m_YOfs;
+			int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
+			int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
 
 			DrawRotaFormatString(
 				xp, yp,
@@ -624,6 +617,7 @@ namespace DXLibRef {
 				//*/
 		}
 			break;
+		case EnumUIPartsType::Max:
 		default:
 			break;
 		}
@@ -655,7 +649,7 @@ namespace DXLibRef {
 			tmp.m_YOfs = n["YOffset"];
 			tmp.m_ZRotOfs = n["ZRotOfs"];
 			std::string Lerptype = n["LerpType"];
-			for (int i = 0; i < (int)LerpType::Max; i++) {
+			for (size_t i = 0; i < static_cast<size_t>(LerpType::Max); i++) {
 				if (Lerptype == g_LerpTypeStr[i]) {
 					tmp.m_LerpType = (LerpType)i;
 					break;
@@ -674,7 +668,7 @@ namespace DXLibRef {
 		int tmpFrame = m_Frame;
 		for (auto& a : m_AnimeFrame) {
 			if (tmpFrame < a.m_framepoint) {
-				m_NowAnim = (int)(&a - &m_AnimeFrame.front());
+				m_NowAnim = static_cast<int>(&a - &m_AnimeFrame.front());
 				FramePer = (float)tmpFrame / a.m_framepoint;
 				switch (a.m_LerpType) {
 					case LerpType::linear:
@@ -682,6 +676,8 @@ namespace DXLibRef {
 						break;
 					case LerpType::pow2:
 						FramePer = FramePer * FramePer;
+						break;
+					case LerpType::Max:
 						break;
 					default:
 						break;
@@ -691,15 +687,15 @@ namespace DXLibRef {
 			tmpFrame -= a.m_framepoint;
 		}
 		if (m_NowAnim == -1) {
-			m_NowAnim = (int)(m_AnimeFrame.size()) - 1;
+			m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
 			FramePer = 1.f;
 		}
 		//反映
 		for (auto& t : m_TargetID) {
 			for (auto& p : *Parts) {
 				if (p->GetUniqueID() == t) {
-					auto& Prev = m_AnimeFrame.at(std::max(m_NowAnim - 1, 0));
-					auto& Now = m_AnimeFrame.at(m_NowAnim);
+					auto& Prev = m_AnimeFrame.at(static_cast<size_t>(std::max(m_NowAnim - 1, 0)));
+					auto& Now = m_AnimeFrame.at(static_cast<size_t>(m_NowAnim));
 					FrameInfo tmp;
 					tmp.m_Alpha = Lerp(Prev.m_Alpha, Now.m_Alpha, FramePer);
 					tmp.m_XScale = Lerp(Prev.m_XScale, Now.m_XScale, FramePer);
@@ -719,9 +715,9 @@ namespace DXLibRef {
 		UniqueIDNum = 0;
 
 		int mdata = FileRead_open(path);
-		LONGLONG size = FileRead_size_handle(mdata);
+		size_t size = static_cast<size_t>(FileRead_size_handle(mdata));
 		std::string JsonStr;JsonStr.resize(size, '\0');
-		FileRead_read((void*)JsonStr.c_str(), (int)size, mdata);
+		FileRead_read((void*)JsonStr.c_str(), static_cast<int>(size), mdata);
 		FileRead_close(mdata);
 
 		nlohmann::json pJson = nlohmann::json::parse(JsonStr);
@@ -740,7 +736,7 @@ namespace DXLibRef {
 		});
 		if (UniqueIDNum == 0) { UniqueIDNum = -1; }
 	}
-	void UISystem::UI_OneLayer::Update() noexcept {
+	void UISystem::UI_OneLayer::Update(void) noexcept {
 		for (auto& p : m_CommonAnimes) {
 			p->Update(&m_CommonParts);
 		}
@@ -748,12 +744,12 @@ namespace DXLibRef {
 			p->Update();
 		}
 	}
-	void UISystem::UI_OneLayer::Draw() noexcept {
+	void UISystem::UI_OneLayer::Draw(void) noexcept {
 		for (auto& p : m_CommonParts) {
 			p->Draw();
 		}
 	}
-	void UISystem::UI_OneLayer::Dispose() noexcept {
+	void UISystem::UI_OneLayer::Dispose(void) noexcept {
 		for (auto& p : m_CommonAnimes) {
 			p.reset();
 		}
@@ -769,36 +765,49 @@ namespace DXLibRef {
 		for (auto& l : m_Layer) {
 			if (!l.IsActive()) {
 				l.Load(path);
-				return (int)(&l - &m_Layer.front());
+				return static_cast<int>(&l - &m_Layer.front());
 			}
 		}
 		return -1;
 	}
 	void UISystem::DelUI(int layer) noexcept {
-		auto& l = m_Layer.at(layer);
+		auto& l = m_Layer.at(static_cast<size_t>(layer));
 		if (l.IsActive()) {
 			l.Dispose();
 		}
 	}
-	void UISystem::Update() noexcept {
+	void UISystem::Update(void) noexcept {
 		for (auto& l : m_Layer) {
 			if (l.IsActive()) {
 				l.Update();
 			}
 		}
 	}
-	void UISystem::Draw() noexcept {
+	void UISystem::Draw(void) noexcept {
 		for (auto& l : m_Layer) {
 			if (l.IsActive()) {
 				l.Draw();
 			}
 		}
 	}
-	void UISystem::DisposeAll() noexcept {
+	void UISystem::DisposeAll(void) noexcept {
 		for (auto& l : m_Layer) {
 			if (l.IsActive()) {
 				l.Dispose();
 			}
+		}
+	}
+	void CameraShake::Update(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		if (m_SendCamShakeTime > 0.f) {
+			if (m_SendCamShake) {
+				m_SendCamShake = false;
+				this->m_CamShake = m_SendCamShakeTime;
+			}
+			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
+			Easing(&this->m_CamShake1, Vector3DX::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
+			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
+			this->m_CamShake = std::max(this->m_CamShake - 1.f / DrawParts->GetFps(), 0.f);
 		}
 	}
 	//

@@ -7,14 +7,15 @@ namespace DXLibRef {
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
 
 	void PadControl::KeyGuideGraphs::AddGuideXBox(int ID, std::string_view GuideStr) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < XBoxNum) {
 			std::string Path = "data/key/key_glay/";
 			Path += XBoxGuidePath[ID];
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			xsize = xsize * y_UI(24) / ysize;
-			ysize = ysize * y_UI(24) / ysize;
+			xsize = xsize * DrawParts->GetUIY(24) / ysize;
+			ysize = ysize * DrawParts->GetUIY(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -23,14 +24,15 @@ namespace DXLibRef {
 		GuideString = GuideStr;
 	}
 	void PadControl::KeyGuideGraphs::AddGuideDS4(int ID, std::string_view GuideStr) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < DS4Num) {
 			std::string Path = "data/key/key_glay/";
 			Path += DS4GuidePath[ID];
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			xsize = xsize * y_UI(24) / ysize;
-			ysize = ysize * y_UI(24) / ysize;
+			xsize = xsize * DrawParts->GetUIY(24) / ysize;
+			ysize = ysize * DrawParts->GetUIY(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -39,6 +41,7 @@ namespace DXLibRef {
 		GuideString = GuideStr;
 	}
 	void PadControl::KeyGuideGraphs::AddGuidePC(int ID, std::string_view GuideStr) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < KeyNum) {
 			std::string Path = "data/key/key_glay/";
 			Path += KeyGuidePath[ID];
@@ -51,8 +54,8 @@ namespace DXLibRef {
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
 			if (ysize == 0) { ysize = 1; }
-			xsize = xsize * y_UI(21) / ysize;
-			ysize = ysize * y_UI(21) / ysize;
+			xsize = xsize * DrawParts->GetUIY(21) / ysize;
+			ysize = ysize * DrawParts->GetUIY(21) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -60,28 +63,30 @@ namespace DXLibRef {
 		}
 		GuideString = GuideStr;
 	}
-	int PadControl::KeyGuideGraphs::GetDrawSize() const noexcept {
+	int PadControl::KeyGuideGraphs::GetDrawSize(void) const noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			ofs += (int)(xsize) + y_UI(3);
+			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).GetStringWidth(-1, GuideString) + y_UI(12);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(-1, GuideString) + DrawParts->GetUIY(12);
 		}
 		return ofs;
 	}
 
 	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + (int)(xsize), y + (int)(ysize), true);
-			ofs += (int)(xsize) + y_UI(3);
+			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
+			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge, y_UI(18)).DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + y_UI(24) / 2, White, Black, GuideString);
+		Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
 	}
 
@@ -114,7 +119,7 @@ namespace DXLibRef {
 					//ボタン
 					if (ID >= 0xF010) {
 						//十字キー
-						float deg = (float)(input.POV[0]) / 100.f;
+						float deg = static_cast<float>(input.POV[0]) / 100.f;
 						bool w_key = false;
 						bool s_key = false;
 						bool a_key = false;
@@ -163,7 +168,7 @@ namespace DXLibRef {
 	const bool PadControl::GetPushAnySwitchLocal(PADS select, int ID) {
 		auto* SE = SoundPool::Instance();
 		if (GetButtonPress(ID)) {
-			auto& P = m_PadsInfo[(int)select];
+			auto& P = m_PadsInfo.at(static_cast<size_t>(select));
 			if (P.m_assign != ID) {
 			}
 			else if (P.m_Key.trigger()) {
@@ -174,8 +179,8 @@ namespace DXLibRef {
 			}
 
 			//既にアサイン済のものがあった場合そいつを無効化
-			for (int p = 0; p < (int)PADS::MAX; p++) {
-				auto& P2 = m_PadsInfo[p];
+			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
 					P2.m_reserve = -1;
 					break;
@@ -183,7 +188,7 @@ namespace DXLibRef {
 			}
 			if (P.m_reserve != ID) {
 				P.m_reserve = ID;
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			return true;
 		}
@@ -191,37 +196,37 @@ namespace DXLibRef {
 	}
 
 	void PadControl::GetPushAnySwitch(PADS select) {
-		for (int p = 0; p < (int)PADS::MAX; p++) {
-			if (p == (int)select) { continue; }
-			auto& P = m_PadsInfo[p];
+		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+			if (p == static_cast<size_t>(select)) { continue; }
+			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_reserve)) {
 				break;
 			}
 		}
-		for (int p = 0; p < (int)PADS::MAX; p++) {
-			if (p == (int)select) { continue; }
-			auto& P = m_PadsInfo[p];
+		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+			if (p == static_cast<size_t>(select)) { continue; }
+			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_assign)) {
 				break;
 			}
 		}
 		switch (m_ControlType) {
 			case ControlType::XBox:
-				for (int i = 0; i < XBoxNum; i++) {
+				for (size_t i = 0; i < XBoxNum; i++) {
 					if (GetPushAnySwitchLocal(select, XBoxID[i])) {
 						break;
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (int i = 0; i < DS4Num; i++) {
+				for (size_t i = 0; i < DS4Num; i++) {
 					if (GetPushAnySwitchLocal(select, DS4ID[i])) {
 						break;
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (int i = 0; i < KeyNum; i++) {
+				for (size_t i = 0; i < KeyNum; i++) {
 					if (GetPushAnySwitchLocal(select, KeyID[i])) {
 						break;
 					}
@@ -247,10 +252,10 @@ namespace DXLibRef {
 			if (ALL == "") { continue; }
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
-			for (int i = 0; i < (int)PADS::MAX; i++) {
+			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
 				if (LEFT == PADSStr[i]) {
-					this->m_PadsInfo[i].m_assign = GetStrtoID(RIGHT.c_str());
-					this->m_PadsInfo[i].m_reserve = this->m_PadsInfo[i].m_assign;
+					this->m_PadsInfo.at(i).m_assign = GetStrtoID(RIGHT.c_str());
+					this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
 					break;
 				}
 			}
@@ -259,20 +264,20 @@ namespace DXLibRef {
 	}
 	void PadControl::Save(void) noexcept {
 		std::ofstream outputfile(GetSavePath());
-		for (int i = 0; i < (int)PADS::MAX; i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
 			outputfile << (std::string)PADSStr[i] + "=" + GetIDtoStr(this->m_PadsInfo[i].m_assign) + "\n";
 		}
 		outputfile.close();
 	}
 
 	void PadControl::ResetAssign(void) noexcept {
-		for (int i = 0; i < (int)PADS::MAX; i++) {
-			this->m_PadsInfo[i].m_reserve = this->m_PadsInfo[i].m_assign;
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+			this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
 		}
 	}
 	void PadControl::FlipAssign(void) noexcept {
-		for (int i = 0; i < (int)PADS::MAX; i++) {
-			this->m_PadsInfo[i].m_assign = this->m_PadsInfo[i].m_reserve;
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+			this->m_PadsInfo.at(i).m_assign = this->m_PadsInfo.at(i).m_reserve;
 		}
 	}
 
@@ -286,9 +291,9 @@ namespace DXLibRef {
 			Key.resize(Key.size() + 1);
 			//
 			Key.back() = std::make_unique<KeyGuideGraphs>();
-			for (int i = 0; i < KeyNum; i++) {
+			for (size_t i = 0; i < KeyNum; i++) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
-					Key.back()->AddGuidePC(i, LocalizeParts->Get(9990));
+					Key.back()->AddGuidePC(static_cast<int>(i), LocalizeParts->Get(9990));
 					break;
 				}
 			}
@@ -330,7 +335,7 @@ namespace DXLibRef {
 					{
 						int LS_X = input.ThumbLX;
 						int LS_Y = -input.ThumbLY;
-						if (this->m_PadsInfo[(int)PADS::MOVE_STICK].m_assign == 0xF002) {
+						if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
 							LS_X = input.ThumbRX;
 							LS_Y = -input.ThumbRY;
 						}
@@ -351,22 +356,19 @@ namespace DXLibRef {
 							s_key = (130.f <= deg || deg <= -130.f);
 							d_key = (40.f <= deg && deg <= 140.f);
 						}
-						this->m_PadsInfo[(int)PADS::MOVE_W].m_Key.Execute(w_key);
-						this->m_PadsInfo[(int)PADS::MOVE_S].m_Key.Execute(s_key);
-						this->m_PadsInfo[(int)PADS::MOVE_A].m_Key.Execute(a_key);
-						this->m_PadsInfo[(int)PADS::MOVE_D].m_Key.Execute(d_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
 					}
 					//右スティック
 					{
-						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
-						GetMousePoint(&mx, &my);
-						MouseX = y_UIMs(mx);
-						MouseY = y_UIMs(my);
+						DrawParts->GetMousePosition(&MouseX, &MouseY);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.ThumbRX;
 						int RS_Y = -input.ThumbRY;
-						if (this->m_PadsInfo[(int)PADS::DIR_STICK].m_assign == 0xF001) {
+						if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
 							RS_X = input.ThumbLX;
 							RS_Y = -input.ThumbLY;
 						}
@@ -393,7 +395,7 @@ namespace DXLibRef {
 					{
 						int LS_X = input.X;
 						int LS_Y = input.Y;
-						if (this->m_PadsInfo[(int)PADS::MOVE_STICK].m_assign == 0xF002) {
+						if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
 							LS_X = input.Z;
 							LS_Y = input.Rz;
 						}
@@ -409,22 +411,19 @@ namespace DXLibRef {
 							s_key = (130.f <= deg || deg <= -130.f);
 							d_key = (40.f <= deg && deg <= 140.f);
 						}
-						this->m_PadsInfo[(int)PADS::MOVE_W].m_Key.Execute(w_key);
-						this->m_PadsInfo[(int)PADS::MOVE_S].m_Key.Execute(s_key);
-						this->m_PadsInfo[(int)PADS::MOVE_A].m_Key.Execute(a_key);
-						this->m_PadsInfo[(int)PADS::MOVE_D].m_Key.Execute(d_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
+						this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
 					}
 					//右スティック
 					{
-						int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
-						GetMousePoint(&mx, &my);
-						MouseX = y_UIMs(mx);
-						MouseY = y_UIMs(my);
+						DrawParts->GetMousePosition(&MouseX, &MouseY);
 						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 						SetMouseDispFlag(TRUE);
 						int RS_X = input.Z;
 						int RS_Y = input.Rz;
-						if (this->m_PadsInfo[(int)PADS::DIR_STICK].m_assign == 0xF001) {
+						if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
 							RS_X = input.X;
 							RS_Y = input.Y;
 						}
@@ -438,10 +437,7 @@ namespace DXLibRef {
 			case ControlType::PC:
 				//右スティック
 				{
-					int mx = DrawParts->GetDispXSize() / 2, my = DrawParts->GetDispYSize() / 2;
-					GetMousePoint(&mx, &my);
-					MouseX = y_UIMs(mx);
-					MouseY = y_UIMs(my);
+					DrawParts->GetMousePosition(&MouseX, &MouseY);
 					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 					if (m_MouseMoveEnable) {
@@ -450,7 +446,7 @@ namespace DXLibRef {
 						}
 						else {
 							if (!DrawParts->IsPause()) {
-								SetMousePoint(DrawParts->GetDispXSize() / 2, DrawParts->GetDispYSize() / 2);
+								SetMousePoint(DrawParts->GetUIY(1920 / 2), DrawParts->GetUIY(1080 / 2));
 								SetMouseDispFlag(FALSE);
 							}
 							else {
@@ -462,15 +458,15 @@ namespace DXLibRef {
 						SetMouseDispFlag(TRUE);
 					}
 					auto* OptionParts = OPTION::Instance();
-					Look_XradAdd = (float)(mx - DrawParts->GetDispXSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					Look_YradAdd = -(float)(my - DrawParts->GetDispYSize() / 2)*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					Look_XradAdd = static_cast<float>(MouseX - DrawParts->GetUIY(1920 / 2))*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					Look_YradAdd = -static_cast<float>(MouseY - DrawParts->GetUIY(1080 / 2))*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				break;
 			default:
 				break;
 		}
 		//ボタン
-		for (int i = 0; i < (int)PADS::MAX; i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
 			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
 					case PADS::MOVE_W:
@@ -479,23 +475,47 @@ namespace DXLibRef {
 					case PADS::MOVE_D:
 						continue;
 						break;
+					case PADS::MOVE_STICK:
+					case PADS::DIR_UP:
+					case PADS::DIR_DOWN:
+					case PADS::DIR_LEFT:
+					case PADS::DIR_RIGHT:
+					case PADS::DIR_STICK:
+					case PADS::LEAN_L:
+					case PADS::LEAN_R:
+					case PADS::RELOAD:
+					case PADS::INTERACT:
+					case PADS::THROW:
+					case PADS::MELEE:
+					case PADS::JUMP:
+					case PADS::INVENTORY:
+					case PADS::RUN:
+					case PADS::WALK:
+					case PADS::SHOT:
+					case PADS::AIM:
+					case PADS::ULT:
+					case PADS::SQUAT:
+					case PADS::PRONE:
+					case PADS::CHECK:
+					case PADS::MAX:
 					default:
 						break;
 				}
 			}
-			this->m_PadsInfo[i].m_Key.Execute(GetButtonPress(this->m_PadsInfo[i].m_assign));
+			this->m_PadsInfo.at(i).m_Key.Execute(GetButtonPress(this->m_PadsInfo.at(i).m_assign));
 		}
 		//
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 	}
-	void PadControl::Draw() const noexcept {
+	void PadControl::Draw(void) const noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		int xp = 0;
-		int y = y_UI((1080 - 21 - 16));
+		int y = DrawParts->GetUIY((1080 - 21 - 16));
 		for (const auto& k : Key) {
-			xp += k->Draw(y_UI(32) + xp, y);
-			if (xp > y_UI(960)) {
+			xp += k->Draw(DrawParts->GetUIY(32) + xp, y);
+			if (xp > DrawParts->GetUIY(960)) {
 				xp = 0;
-				y -= y_UI(28);
+				y -= DrawParts->GetUIY(28);
 			}
 		}
 	}

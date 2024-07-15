@@ -67,42 +67,45 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<LightPool>;
 	private:
-		class Lights {
-		public:
-			LightHandle handle;
-			//LONGLONG time{ 0 };
-		};
-		std::array<Lights, 5> handles;
+		std::array<LightHandle, 5> handles;
 		int now = 0;
+	private:
+		LightPool(void) noexcept {}
+		LightPool(const LightPool&) = delete;
+		LightPool(LightPool&& o) = delete;
+		LightPool& operator=(const LightPool&) = delete;
+		LightPool& operator=(LightPool&& o) = delete;
+
+		~LightPool(void) noexcept {}
 	public:
 		const LightHandle&			Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			auto prev = now;
-			if (handles[now].handle.get() != -1) {
-				handles[now].handle.Dispose();
+			if (handles[static_cast<size_t>(now)].get() != -1) {
+				handles[static_cast<size_t>(now)].Dispose();
 			}
-			//handles[now].time = GetNowHiPerformanceCount();
+			//handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
 			switch (Lighttype) {
 				case LightType::POINT:
-					handles[now].handle = LightHandle::CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
+					handles[static_cast<size_t>(now)] = LightHandle::CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
 					break;
 				case LightType::SPOT:
-					handles[now].handle = LightHandle::CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
+					handles[static_cast<size_t>(now)] = LightHandle::CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
 					break;
 				case LightType::DIRECTIONAL:
-					handles[now].handle = LightHandle::CreateDir(pos);
+					handles[static_cast<size_t>(now)] = LightHandle::CreateDir(pos);
 					break;
 				default:
 					break;
 			}
 			++now %= handles.size();
-			return handles[prev].handle;
+			return handles[static_cast<size_t>(prev)];
 		}
-		void			Update() noexcept {
+		void			Update(void) noexcept {
 			/*
 			for (auto& h : handles) {
-				if (h.handle.get() != -1) {
+				if (h.get() != -1) {
 					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30) {
-						h.handle.Dispose();
+						h.Dispose();
 					}
 				}
 			}

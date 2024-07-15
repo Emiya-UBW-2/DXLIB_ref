@@ -17,10 +17,15 @@ namespace DXLibRef {
 		std::vector<SharedObj>		m_Object;
 		switchs						m_ResetP;
 	private:
-		ObjectManager() {
+		ObjectManager(void) noexcept {
 			m_Object.reserve(256);
 		}
-		~ObjectManager() {
+		ObjectManager(const ObjectManager&) = delete;
+		ObjectManager(ObjectManager&& o) = delete;
+		ObjectManager& operator=(const ObjectManager&) = delete;
+		ObjectManager& operator=(ObjectManager&& o) = delete;
+
+		~ObjectManager(void) noexcept {
 			DeleteAll();
 			m_Object.shrink_to_fit();
 		}
@@ -35,7 +40,7 @@ namespace DXLibRef {
 		void			LateExecuteObject(void) noexcept;
 
 		void			Draw_Depth(void) noexcept;
-		void			Draw() noexcept;
+		void			Draw(void) noexcept;
 		void			Draw_Shadow(void) noexcept;
 
 		void			DeleteAll(void) noexcept;

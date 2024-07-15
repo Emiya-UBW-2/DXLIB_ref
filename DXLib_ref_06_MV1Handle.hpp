@@ -93,15 +93,15 @@ namespace DXLibRef {
 		Vector3DX frame(int p1) const noexcept { return MV1GetFramePosition(this->handle_, p1); }
 		size_t frame_num(void) const noexcept {
 			if (IsActive()) {
-				return MV1GetFrameNum(this->handle_);
+				return static_cast<size_t>(MV1GetFrameNum(this->handle_));
 			}
 			else {
 				return 0;
 			}
 		}
 		int frame_parent(int p1) const noexcept { return MV1GetFrameParent(this->handle_, p1); }
-		size_t frame_child(int p1, int p2) const noexcept { return MV1GetFrameChild(this->handle_, p1, p2); }
-		size_t frame_child_num(int p1) const noexcept { return MV1GetFrameChildNum(this->handle_, p1); }
+		size_t frame_child(int p1, int p2) const noexcept { return static_cast<size_t>(MV1GetFrameChild(this->handle_, p1, p2)); }
+		size_t frame_child_num(int p1) const noexcept { return static_cast<size_t>(MV1GetFrameChildNum(this->handle_, p1)); }
 		bool SetFrameLocalMatrix(int id, Matrix4x4DX mat) const noexcept { return MV1SetFrameUserLocalMatrix(this->handle_, id, mat.get()) == TRUE; }
 
 		Matrix4x4DX GetFrameLocalMatrix(int id) const noexcept { return MV1GetFrameLocalMatrix(this->handle_, id); }
@@ -113,7 +113,7 @@ namespace DXLibRef {
 
 		void frame_Reset(int p1) const noexcept { MV1ResetFrameUserLocalMatrix(this->handle_, p1); }
 		/*マテリアル*/
-		size_t material_num(void) const noexcept { return MV1GetMaterialNum(this->handle_); }
+		size_t material_num(void) const noexcept { return static_cast<size_t>(MV1GetMaterialNum(this->handle_)); }
 		void material_AlphaTestAll(bool Enable, int mode, int param) const noexcept {
 			MV1SetMaterialDrawAlphaTestAll(this->handle_, Enable ? TRUE : FALSE, mode, param);
 		}
@@ -121,7 +121,7 @@ namespace DXLibRef {
 		/*メッシュ*/
 		size_t mesh_num(void) const noexcept {
 			if (IsActive()) {
-				return MV1GetMeshNum(this->handle_);
+				return static_cast<size_t>(MV1GetMeshNum(this->handle_));
 			}
 			else {
 				return 0;
@@ -215,15 +215,15 @@ namespace DXLibRef {
 				printfDx("error");
 				WaitKey();
 			}
-			_ModelHandle->anime.resize(MV1GetAnimNum(_Have_Anim.get()));
+			_ModelHandle->anime.resize(static_cast<size_t>(MV1GetAnimNum(_Have_Anim.get())));
 			if (_ModelHandle->anime.size() > 0) {
 				for (int i = 0; i < int(_ModelHandle->anime.size()); i++) {
-					_ModelHandle->anime[i].set(_ModelHandle, i, &_Have_Anim);
+					_ModelHandle->anime.at(static_cast<size_t>(i)).set(_ModelHandle, i, &_Have_Anim);
 				}
 			}
 			return;
 		}
-		static void LoadonAnime() noexcept {
+		static void LoadonAnime(void) noexcept {
 			//これに切り替え
 			//MV1::Load(model[Max].Path, &(model[Max].obj));
 			//model[Max].obj.SetAnime(&(model[Max].obj), model[Max].obj);
@@ -232,9 +232,9 @@ namespace DXLibRef {
 
 		MV1 Duplicate(void) const noexcept { return DxLib::MV1DuplicateModel(this->handle_); }
 
-		void DuplicateonAnime() const noexcept {
+		void DuplicateonAnime(void) const noexcept {
 			//これに切り替え
-			//model[Max].obj = model[i].obj.Duplicate();
+			//model[Max].obj = model.at(static_cast<size_t>(i)).obj.Duplicate();
 			//model[Max].obj.SetAnime(&(model[Max].obj), model[Max].obj);
 			return;
 		}

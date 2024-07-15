@@ -37,11 +37,11 @@ namespace DXLibRef {
 			m_near = cam_near_;
 			m_far = cam_far_;
 		}
-		void FlipCamInfo() const noexcept {
+		void FlipCamInfo(void) const noexcept {
 			SetUpCamInfo(this->m_pos, this->m_vec, this->m_up, this->m_fov, this->m_near, this->m_far);
 		}
 
-		const MATRIX GetViewMatrix() const noexcept {
+		const MATRIX GetViewMatrix(void) const noexcept {
 			MATRIX mat_view;					// ビュー行列
 			VECTOR vec_from = m_pos.get();		// カメラの位置
 			VECTOR vec_lookat = m_vec.get();   // カメラの注視点
@@ -50,7 +50,7 @@ namespace DXLibRef {
 			return mat_view;
 		}
 
-		const MATRIX GetProjectionMatrix() const noexcept {
+		const MATRIX GetProjectionMatrix(void) const noexcept {
 			MATRIX mat_view;					// プロジェクション行列
 			CreatePerspectiveFovMatrix(&mat_view, m_fov, m_near, m_far);
 			return mat_view;
@@ -175,13 +175,13 @@ namespace DXLibRef {
 
 		auto getp(void) noexcept { return &handle_; }
 		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int   XSize, int   YSize, std::vector<GraphHandle> *Handles, bool NotUse3DFlag = false) noexcept {
-			int* HandleArray = new int[AllNum];
+			int* HandleArray = new int[static_cast<size_t>(AllNum)];
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
 
 			Handles->clear();
 			for (int i = 0; i < AllNum; i++) {
 				Handles->resize(Handles->size() + 1);
-				Handles->back() = HandleArray[i];
+				Handles->back() = HandleArray[static_cast<size_t>(i)];
 			}
 			delete[] HandleArray;
 

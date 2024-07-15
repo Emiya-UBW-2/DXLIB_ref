@@ -7,22 +7,22 @@ namespace DXLibRef {
 	protected:
 		bool m_PrevActive{false};
 	public:
-		PostPassBase(void) {}
-		virtual ~PostPassBase(void) {}
+		PostPassBase(void) noexcept {}
+		virtual ~PostPassBase(void) noexcept {}
 	protected:
-		virtual void Load_Sub() noexcept {}
-		virtual void Dispose_Sub() noexcept {}
-		virtual bool IsActive_Sub() noexcept { return true; }
+		virtual void Load_Sub(void) noexcept {}
+		virtual void Dispose_Sub(void) noexcept {}
+		virtual bool IsActive_Sub(void) noexcept { return true; }
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*, GraphHandle*, GraphHandle*) noexcept {}
 	public:
-		bool IsActive() noexcept { return IsActive_Sub(); }
+		bool IsActive(void) noexcept { return IsActive_Sub(); }
 		void Init()noexcept {
 			m_PrevActive = IsActive_Sub();
 			if (m_PrevActive) {
 				Load_Sub();
 			}
 		}
-		void UpdateActive() noexcept {
+		void UpdateActive(void) noexcept {
 			bool active = IsActive_Sub();
 			if (m_PrevActive != active) {
 				m_PrevActive = active;
@@ -34,7 +34,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void Dispose() noexcept {
+		void Dispose(void) noexcept {
 			if (IsActive_Sub()) {
 				Dispose_Sub();
 			}
@@ -77,22 +77,27 @@ namespace DXLibRef {
 		auto& Get_far_DoFMin(void) noexcept { return far_DoFMin; }
 	public:
 		//ボケ始める場所を指定(完全にボケるのはニアファーの限度)
-		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) {
+		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
 			near_DoF = near_d;
 			far_DoF = far_d;
 			near_DoFMax = near_m;
 			far_DoFMin = far_m;
 		}
-		void SetLevelFilter(int inMin, int inMax, float gamma) {
+		void SetLevelFilter(int inMin, int inMax, float gamma) noexcept {
 			InColorPerMin = std::clamp(inMin, 0, 255);
 			InColorPerMax = std::clamp(inMax, 0, 255);
 			InColorGamma = std::max(1.f, gamma);
 		}
 	private:
 		PostPassEffect(void);
+		PostPassEffect(const PostPassEffect&) = delete;
+		PostPassEffect(PostPassEffect&& o) = delete;
+		PostPassEffect& operator=(const PostPassEffect&) = delete;
+		PostPassEffect& operator=(PostPassEffect&& o) = delete;
+
 		~PostPassEffect(void) noexcept;
 	public:
-		void Update() noexcept;
+		void Update(void) noexcept;
 		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
 		void Draw2D(std::function<void()> doing);
 		void Draw();
@@ -105,7 +110,7 @@ namespace DXLibRef {
 		}
 	private:
 		void DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams);
-		void LoadGBuffer() noexcept;
-		void DisposeGBuffer() noexcept;
+		void LoadGBuffer(void) noexcept;
+		void DisposeGBuffer(void) noexcept;
 	};
 };

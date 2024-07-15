@@ -134,15 +134,10 @@ namespace DXLibRef {
 	//角度からラジアンに
 	extern void* enabler;// ダミー変数
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float deg2rad(T p1) {
-		std::is_arithmetic<T>::value;
-		return float(p1) * DX_PI_F / 180.f;
-	}
+	constexpr float deg2rad(T p1) { return float(p1) * DX_PI_F / 180.f; }
 	//ラジアンから角度に
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float rad2deg(T p1) {
-		return float(p1) * 180.f / DX_PI_F;
-	}
+	constexpr float rad2deg(T p1) { return float(p1) * 180.f / DX_PI_F; }
 
 	//余弦定理
 	constexpr float GetCosFormula(float a, float b, float c) {
@@ -160,7 +155,7 @@ namespace DXLibRef {
 		// wstring → SJIS
 		int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), int(oWString.size() + 1), nullptr, 0, NULL, NULL);
 		// バッファの取得
-		CHAR* cpMultiByte = new CHAR[iBufferSize];
+		CHAR* cpMultiByte = new CHAR[static_cast<size_t>(iBufferSize)];
 		// wstring → SJIS
 		WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), int(oWString.size() + 1), cpMultiByte, iBufferSize, NULL, NULL);
 		// stringの生成
@@ -175,7 +170,7 @@ namespace DXLibRef {
 		// SJIS → wstring
 		int iBufferSize = MultiByteToWideChar(CP_ACP, 0, oString.data(), int(oString.size() + 1), nullptr, 0);
 		// バッファの取得
-		wchar_t* cpUCS2 = new wchar_t[iBufferSize];
+		wchar_t* cpUCS2 = new wchar_t[static_cast<size_t>(iBufferSize)];
 		// SJIS → wstring
 		MultiByteToWideChar(CP_ACP, 0, oString.data(), int(oString.size() + 1), cpUCS2, iBufferSize);
 		// stringの生成

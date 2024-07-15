@@ -51,24 +51,24 @@ namespace DXLibRef {
 
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		//オブジェクトが増えた場合に備えて範囲forは使わない
-		for (int i = 0; i < this->m_Object.size(); i++) {
-			auto& o = this->m_Object[i];
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				o->FirstExecute();
 			}
 		}
 		//物理アップデート
 		this->m_ResetP.Execute(CheckHitKeyWithCheck(KEY_INPUT_P) != 0);
-		for (int i = 0; i < this->m_Object.size(); i++) {
-			auto& o = this->m_Object[i];
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				if (this->m_ResetP.trigger()) { o->SetResetP(true); }
 				o->ExecuteCommon();
 			}
 		}
 		//オブジェクトの排除チェック
-		for (int i = 0; i < this->m_Object.size(); i++) {
-			auto& o = this->m_Object[i];
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (o->GetIsDelete()) {
 				//順番の維持のためここはerase
 				o->Dispose();
@@ -90,7 +90,7 @@ namespace DXLibRef {
 			o->Depth_Draw();
 		}
 	}
-	void			ObjectManager::Draw() noexcept {
+	void			ObjectManager::Draw(void) noexcept {
 		for (auto& o : this->m_Object) {
 			o->CheckDraw();
 			o->Draw(false);

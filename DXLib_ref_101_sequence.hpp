@@ -11,20 +11,25 @@ namespace DXLibRef {
 		bool			m_IsLoading{false};
 
 		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{nullptr};
-		int							Next_Select{0};
+		size_t			m_Next_Select{0};
 
 		bool			m_Is3DActive{true};
 	public:
-		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(index) = Next_scenes_ptr_t; }
-		auto&		Get_Next(void) noexcept { return Next_ptr.at(Next_Select); }
-		void		SetNextSelect(int value) noexcept { Next_Select = value; }
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
+		auto&		Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
+		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
 	public://ゲッター
 		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 		const auto&		Get3DActive(void) const noexcept { return m_Is3DActive; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
-		~TEMPSCENE(void) noexcept {}
+		TEMPSCENE(const TEMPSCENE&) = delete;
+		TEMPSCENE(TEMPSCENE&& o) = delete;
+		TEMPSCENE& operator=(const TEMPSCENE&) = delete;
+		TEMPSCENE& operator=(TEMPSCENE&& o) = delete;
+
+		virtual ~TEMPSCENE(void) noexcept {}
 	public://メイン更新
 		void Load(void) noexcept {
 			if (!m_IsLoading) {
@@ -33,11 +38,11 @@ namespace DXLibRef {
 			}
 		}
 		void Set(void) noexcept {
-			Next_Select = 0;
+			this->m_Next_Select = 0;
 			Set_Sub();
 			m_IsFirstLoop = true;
 		}
-		bool Update() noexcept {
+		bool Update(void) noexcept {
 			auto ans = Update_Sub();
 			m_IsFirstLoop = false;
 			return ans;
@@ -47,8 +52,8 @@ namespace DXLibRef {
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
 		void MainDraw(void) noexcept { MainDraw_Sub(); }
 		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
-		void DrawUI_Base() noexcept { DrawUI_Base_Sub(); }
-		void DrawUI_In() noexcept { DrawUI_In_Sub(); }
+		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
+		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 
@@ -88,8 +93,13 @@ namespace DXLibRef {
 		std::shared_ptr<TEMPSCENE> m_NowScenesPtr;
 		std::array<float, 60> FPSAvgs{};
 		int m_FPSAvg = 0;
-	public:
-		SceneControl() noexcept {}
+	private:
+		SceneControl(void) noexcept {}
+		SceneControl(const SceneControl&) = delete;
+		SceneControl(SceneControl&& o) = delete;
+		SceneControl& operator=(const SceneControl&) = delete;
+		SceneControl& operator=(SceneControl&& o) = delete;
+
 		~SceneControl(void) noexcept {
 			for (auto& s : this->m_ScenesPtr) {
 				s->Dispose();

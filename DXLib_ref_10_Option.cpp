@@ -10,34 +10,34 @@ namespace DXLibRef {
 	const OPTION* SingletonBase<OPTION>::m_Singleton = nullptr;
 
 	void			OPTION::Load(void) noexcept {
-		m_SaveParams.at((int)EnumSaveParam::GraphicsPreset).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::DirectXVer).SetEnumParamType(EnumParamType::Else);//DirectXVer
-		m_SaveParams.at((int)EnumSaveParam::usevr).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::ObjLevel).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::DoF).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::bloom).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::shadow).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::SSAO).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::fov).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::vsync).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::FpsLimit).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::SE).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::VOICE).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::BGM).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::AllWaysFront).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::ScreenEffect).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::Reflection).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at((int)EnumSaveParam::MotionBlur).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::Xsensing).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::Ysensing).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::HeadBobbing).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::ControlType).SetEnumParamType(EnumParamType::Else);//ControlType
-		m_SaveParams.at((int)EnumSaveParam::Language).SetEnumParamType(EnumParamType::Else);//Language
-		m_SaveParams.at((int)EnumSaveParam::AA).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::DrawScale).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at((int)EnumSaveParam::GodRay).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::PBR).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at((int)EnumSaveParam::Distortion).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GraphicsPreset)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);//DirectXVer
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::usevr)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ObjLevel)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DoF)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::bloom)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::shadow)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SSAO)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::fov)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::vsync)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::FpsLimit)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SE)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::VOICE)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::BGM)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::WindowMode)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ScreenEffect)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Reflection)).SetEnumParamType(EnumParamType::Int);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::MotionBlur)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Xsensing)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Ysensing)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::HeadBobbing)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ControlType)).SetEnumParamType(EnumParamType::Else);//ControlType
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);//Language
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
 		
 		//SetOutApplicationLogValidFlag(FALSE);
 		int mdata = -1;
@@ -73,7 +73,7 @@ namespace DXLibRef {
 				SetParamFloat(EnumSaveParam::SE, 0.5f);
 				SetParamFloat(EnumSaveParam::VOICE, 0.5f);
 				SetParamFloat(EnumSaveParam::BGM, 0.5f);
-				SetParamBoolean(EnumSaveParam::AllWaysFront, true);
+				SetParamBoolean(EnumSaveParam::WindowMode, true);
 				SetParamBoolean(EnumSaveParam::ScreenEffect, true);
 				SetParamInt(EnumSaveParam::Reflection, 2);
 				SetParamBoolean(EnumSaveParam::MotionBlur, false);
@@ -95,7 +95,7 @@ namespace DXLibRef {
 			if (ALL == "") { continue; }
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
-			for (int loop = 0;loop < (int)EnumSaveParam::Max;loop++) {
+			for (size_t loop = 0;loop < static_cast<size_t>(EnumSaveParam::Max);loop++) {
 				if (LEFT != OptionStr[loop]) { continue; }
 				switch (m_SaveParams.at(loop).GetEnumParamType()) {
 					case EnumParamType::Boolean:
@@ -108,26 +108,26 @@ namespace DXLibRef {
 						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));
 						break;
 					case EnumParamType::Else:
-						if (loop == (int)EnumSaveParam::DirectXVer) {
-							for (int i = 0;i < 2;i++) {
+						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
+							for (size_t i = 0;i < 2;i++) {
 								if (RIGHT == DirectXVerStr[i]) {
-									SetParamInt((EnumSaveParam)loop, i);
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
 								}
 							}
 						}
-						else if (loop == (int)EnumSaveParam::ControlType) {
-							for (int i = 1;i < 3;i++) {
+						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
+							for (size_t i = 1;i < 3;i++) {
 								if (RIGHT == ControlTypeStr[i]) {
-									SetParamInt((EnumSaveParam)loop, i);
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
 								}
 							}
 						}
-						else if (loop == (int)EnumSaveParam::Language && !NewData) {
-							for (int i = 0;i < 2;i++) {
+						else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
+							for (size_t i = 0;i < 2;i++) {
 								if (RIGHT == LanguageStr[i]) {
-									SetParamInt((EnumSaveParam)loop, i);
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
 								}
 							}
@@ -146,8 +146,8 @@ namespace DXLibRef {
 	void			OPTION::Save(void) noexcept {
 		std::ofstream outputfile("Save/Setting.txt");
 
-		for (int loop = 0;loop < (int)EnumSaveParam::Max;loop++) {
-			switch (m_SaveParams.at(loop).GetEnumParamType()) {
+		for (int loop = 0;loop < static_cast<int>(EnumSaveParam::Max);loop++) {
+			switch (m_SaveParams.at(static_cast<size_t>(loop)).GetEnumParamType()) {
 				case EnumParamType::Boolean:
 					outputfile << std::string(OptionStr[loop]) + "=" + std::string(GetParamBoolean((EnumSaveParam)loop) ? "true" : "false") + "\n";
 					break;
@@ -158,13 +158,13 @@ namespace DXLibRef {
 					outputfile << std::string(OptionStr[loop]) + "=" + std::to_string(GetParamFloat((EnumSaveParam)loop)) + "\n";
 					break;
 				case EnumParamType::Else:
-					if (loop == (int)EnumSaveParam::DirectXVer) {
+					if (loop == static_cast<int>(EnumSaveParam::DirectXVer)) {
 						outputfile << std::string(OptionStr[loop]) + "=" + std::string(DirectXVerStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
 					}
-					else if (loop == (int)EnumSaveParam::ControlType) {
+					else if (loop == static_cast<int>(EnumSaveParam::ControlType)) {
 						outputfile << std::string(OptionStr[loop]) + "=" + std::string(ControlTypeStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
 					}
-					else if (loop == (int)EnumSaveParam::Language) {
+					else if (loop == static_cast<int>(EnumSaveParam::Language)) {
 						outputfile << std::string(OptionStr[loop]) + "=" + std::string(LanguageStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
 					}
 					break;
@@ -182,38 +182,38 @@ namespace DXLibRef {
 	const OptionWindowClass* SingletonBase<OptionWindowClass>::m_Singleton = nullptr;
 	//
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
-		ypos += y_UI((int)selanim);
-		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight, 
-							   LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
-		m_Draw(xpos + y_UI(720 - 324), ypos, isMine);
+		auto* DrawParts = DXDraw::Instance();
+		ypos += DrawParts->GetUIY(static_cast<int>(selanim));
+		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
+		m_Draw(xpos + DrawParts->GetUIY(720 - 324), ypos, isMine);
 	}
 	//
 	void OptionWindowClass::OptionTabsInfo::Execute(int *select, bool CanPress) noexcept {
 		if ((*select) < 0) { return; }
 		auto* SE = SoundPool::Instance();
 		auto* Pad = PadControl::Instance();
-		m_Elements.at((*select)).GetAnyDoing();
+		m_Elements.at(static_cast<size_t>(*select)).GetAnyDoing();
 		if (CanPress) {
 			if (Pad->GetKey(PADS::MOVE_W).trigger()) {
 				--(*select);
-				if ((*select) < 0) { (*select) = (int)m_Elements.size() - 1; }
-				m_Elements.at((*select)).selanim = 3.f;
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				if ((*select) < 0) { (*select) = static_cast<int>(m_Elements.size()) - 1; }
+				m_Elements.at(static_cast<size_t>(*select)).selanim = 3.f;
+				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetKey(PADS::MOVE_S).trigger()) {
 				++(*select);
-				if ((*select) > (int)m_Elements.size() - 1) { (*select) = 0; }
-				m_Elements.at((*select)).selanim = -3.f;
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				if ((*select) > static_cast<int>(m_Elements.size()) - 1) { (*select) = 0; }
+				m_Elements.at(static_cast<size_t>(*select)).selanim = -3.f;
+				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetKey(PADS::MOVE_A).repeat()) {
-				m_Elements.at((*select)).GetLeftPush();
+				m_Elements.at(static_cast<size_t>(*select)).GetLeftPush();
 			}
 			if (Pad->GetKey(PADS::MOVE_D).repeat()) {
-				m_Elements.at((*select)).GetRightPush();
+				m_Elements.at(static_cast<size_t>(*select)).GetRightPush();
 			}
 			if (Pad->GetKey(PADS::INTERACT).trigger() || Pad->GetMouseClick().trigger()) {
-				m_Elements.at((*select)).GetOKPush();
+				m_Elements.at(static_cast<size_t>(*select)).GetOKPush();
 			}
 		}
 		for (auto& e : m_Elements) {
@@ -221,56 +221,58 @@ namespace DXLibRef {
 		}
 	}
 	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		int xp1, yp1;
 		//タブ
 		{
-			xp1 = xpos + (y_UI(140) + y_UI(12)) * m_id;
+			xp1 = xpos + (DrawParts->GetUIY(140) + DrawParts->GetUIY(12)) * m_id;
 			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + y_UI(5), xp1 + y_UI(140), yp1 + LineHeight * 2 - y_UI(5),  (isActive ? Gray25 : Gray75), m_name)) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5),  (isActive ? Gray25 : Gray75), m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
-				SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 		}
 		//内容
 		if (isActive) {
 			xp1 = xpos;
 			yp1 = ypos + LineHeight * 2;
-			for (int i = 0; i < (int)m_Elements.size(); i++) {
-				yp1 += (LineHeight + y_UI(6));
-				if (IntoMouse(xp1, yp1, xp1 + y_UI(500), yp1 + (LineHeight + y_UI(6)))) {
+			for (int i = 0; i < static_cast<int>(m_Elements.size()); i++) {
+				yp1 += (LineHeight + DrawParts->GetUIY(6));
+				if (IntoMouse(xp1, yp1, xp1 + DrawParts->GetUIY(500), yp1 + (LineHeight + DrawParts->GetUIY(6)))) {
 					*select = i;
 				}
-				m_Elements.at(i).Draw(xp1, yp1, (*select == i));
+				m_Elements.at(static_cast<size_t>(i)).Draw(xp1, yp1, (*select == i));
 			}
 		}
 	}
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos, xpos, ypos + LineHeight,  LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(select).GetInfoTextID()));
+		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2,  LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
 	}
 	//
-	void OptionWindowClass::SoundTabsInfo::Init_Sub() noexcept {
+	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("BGM", 1110,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) - 0.1f, 0.f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) + 0.1f, 0.f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, (float)value / 100.f);
 										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 }
@@ -281,28 +283,29 @@ namespace DXLibRef {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) - 0.1f, 0.f, 1.f));
-										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 									 },
 									 [&]() {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) + 0.1f, 0.f, 1.f));
-										 SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::SE)*100.f + 0.5f), 0, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE)*100.f + 0.5f), 0, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::SE, (float)value / 100.f);
 										 SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 									 }
 									 );
 	}
-	void OptionWindowClass::GraphicTabsInfo::Init_Sub() noexcept {
+	void OptionWindowClass::GraphicTabsInfo::Init_Sub(void) noexcept {
 		HDC hdc;
 		hdc = GetDC(GetMainWindowHandle());	// デバイスコンテキストの取得
 		RefreshRate = GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
@@ -313,7 +316,7 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 case 0:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -370,7 +373,7 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) + 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 case 0:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -427,9 +430,10 @@ namespace DXLibRef {
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset);
-										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + y_UI(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 												 case 0:
@@ -489,32 +493,34 @@ namespace DXLibRef {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Window Mode", 1121,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AllWaysFront);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::WindowMode);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 auto* DrawParts = DXDraw::Instance();
 										 DrawParts->SetWindowOrBorderless();
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AllWaysFront);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::WindowMode);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 auto* DrawParts = DXDraw::Instance();
 										 DrawParts->SetWindowOrBorderless();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
-				auto* LocalizeParts = LocalizePool::Instance();
-				auto* OptionParts = OPTION::Instance();
-										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront);
+										 auto* LocalizeParts = LocalizePool::Instance();
+										 auto* OptionParts = OPTION::Instance();
+										 auto* DrawParts = DXDraw::Instance();
+										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::WindowMode);
 
-										 OptionParts->SetParamBoolean(EnumSaveParam::AllWaysFront, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)));
-										 if (prev != OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront)) {
-											 auto* DrawParts = DXDraw::Instance();
+										 OptionParts->SetParamBoolean(EnumSaveParam::WindowMode, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)));
+										 if (prev != OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
 											 DrawParts->SetWindowOrBorderless();
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + y_UI(100), ypos, xpos + y_UI(100), ypos + LineHeight, 
-																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::AllWaysFront) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
+										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
+																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::WindowMode) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -525,7 +531,7 @@ namespace DXLibRef {
 										 if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 											 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
@@ -533,7 +539,7 @@ namespace DXLibRef {
 										 if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 											 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -559,10 +565,10 @@ namespace DXLibRef {
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
 										 for (int i = 0;i < FrameLimitsNum;i++) {
-											 if (FrameLimits[i] == value) {
+											 if (FrameLimits[static_cast<size_t>(i)] == value) {
 												 i--;
 												 if (i < 0) { i = FrameLimitsNum - 1; }
-												 value = FrameLimits[i];
+												 value = FrameLimits[static_cast<size_t>(i)];
 												 isHit = true;
 												 break;
 											 }
@@ -572,17 +578,17 @@ namespace DXLibRef {
 										 }
 
 										 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
 										 for (int i = 0;i < FrameLimitsNum;i++) {
-											 if (FrameLimits[i] == value) {
+											 if (FrameLimits[static_cast<size_t>(i)] == value) {
 												 i++;
 												 if (i > FrameLimitsNum - 1) { i = 0; }
-												 value = FrameLimits[i];
+												 value = FrameLimits[static_cast<size_t>(i)];
 												 isHit = true;
 												 break;
 											 }
@@ -591,25 +597,26 @@ namespace DXLibRef {
 											 value = FrameLimits[1];
 										 }
 										 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 											[&](int xpos, int ypos, bool) {
 												auto* OptionParts = OPTION::Instance();
+												auto* DrawParts = DXDraw::Instance();
 												int ret = 0;
 												//結果から一番近いやつに指定
 												int diff = 10000;
 												for (int i = 0; i < FrameLimitsNum; i++) {
-													int tmp = std::abs(FrameLimits[i] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
+													int tmp = std::abs(FrameLimits[static_cast<size_t>(i)] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 													if (diff > tmp) {
 														diff = tmp;
 														ret = i;
 													}
 												}
-												int value = WindowSystem::UpDownBox(xpos, xpos + y_UI(200), ypos, ret, FrameLimitsNum);
+												int value = WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, ret, FrameLimitsNum);
 												OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
-												WindowSystem::SetMsgWW(xpos + y_UI(250), ypos, xpos + y_UI(250), ypos + LineHeight, 
+												WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(250), ypos + LineHeight/2, 
 													LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 											}
 									 );
@@ -618,37 +625,40 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1)) ? 1 : 0);
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
 											 OptionWindowClass::Instance()->SetRestart();
 										 }
-										 WindowSystem::SetMsgWW(xpos + y_UI(100), ypos, xpos + y_UI(100), ypos + LineHeight, 
+										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("AntiAlias", 1126,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AA);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::AA);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -661,12 +671,14 @@ namespace DXLibRef {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("SSAO", 1127,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::SSAO);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::SSAO);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -680,18 +692,19 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) - 1, 0, 3));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) + 1, 0, 3));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + y_UI(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
+										 auto* DrawParts = DXDraw::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
 									 }
 									 );
 
@@ -700,18 +713,19 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) - 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) + 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + y_UI(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -719,29 +733,32 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) + 1, 0, 4));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + y_UI(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
+										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Bloom Effect", 1131,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::bloom);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::bloom);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -753,12 +770,14 @@ namespace DXLibRef {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Screen Effect", 1132,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -770,12 +789,14 @@ namespace DXLibRef {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("DoF", 1133,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::DoF);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::DoF);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -787,12 +808,14 @@ namespace DXLibRef {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("MotionBlur", 1134,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -806,18 +829,19 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
+										 OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -825,21 +849,22 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) - 0.1f, 0.25f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int prev = (int)(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f);
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f), 25, 100);
+										 int prev = static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f), 25, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, (float)value / 100.f);
 										 if (prev != value) {
 											 OptionWindowClass::Instance()->SetRestart();
@@ -847,22 +872,22 @@ namespace DXLibRef {
 									 }
 									 );
 	}
-	void OptionWindowClass::ElseTabsInfo::Init_Sub() noexcept {
+	void OptionWindowClass::ElseTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Language", 1145,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 											 case  LanguageType::Eng:
-												 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Jpn);
+												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 												 break;
 											 case  LanguageType::Jpn:
-												 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Eng);
+												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 												 break;
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 
 										 auto* LocalizeParts = LocalizePool::Instance();
@@ -873,15 +898,15 @@ namespace DXLibRef {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 											 case  LanguageType::Eng:
-												 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Jpn);
+												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 												 break;
 											 case  LanguageType::Jpn:
-												 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Eng);
+												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 												 break;
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 OptionWindowClass::Instance()->SetRestart();
 
 										 auto* LocalizeParts = LocalizePool::Instance();
@@ -891,13 +916,14 @@ namespace DXLibRef {
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::Language);
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == (int)LanguageType::Eng))) {
-											 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Eng);
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == static_cast<int>(LanguageType::Eng)))) {
+											 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 										 }
 										 else {
-											 OptionParts->SetParamInt(EnumSaveParam::Language, (int)LanguageType::Jpn);
+											 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 										 }
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::Language)) {
 											 OptionWindowClass::Instance()->SetRestart();
@@ -906,7 +932,7 @@ namespace DXLibRef {
 											 LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + y_UI(125), ypos, xpos + y_UI(125), ypos + LineHeight, 
+										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight/2, 
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 									 }
 									 );
@@ -915,18 +941,19 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) - 0.01f, 0.01f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) + 0.01f, 0.01f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Xsensing)*100.f + 0.5f), 10, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Xsensing)*100.f + 0.5f), 10, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, (float)value / 100.f);
 									 }
 									 );
@@ -935,30 +962,33 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) - 0.01f, 0.f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) + 0.01f, 0.f, 1.f));
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 int value = WindowSystem::UpDownBar(xpos, xpos + y_UI(200), ypos, (int)(OptionParts->GetParamFloat(EnumSaveParam::Ysensing)*100.f + 0.5f), 10, 100);
+										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Ysensing)*100.f + 0.5f), 10, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, (float)value / 100.f);
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("HeadBobbing", 1142,
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
-										 OPTION::Instance()->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* OptionParts = OPTION::Instance();
+										 OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -973,47 +1003,50 @@ namespace DXLibRef {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
 											 case  ControlType::PS4:
-												 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::XBox);
+												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
 												 break;
 											 case  ControlType::XBox:
-												 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::PS4);
+												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 												 break;
+											 case  ControlType::PC:
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
 											 case  ControlType::PS4:
-												 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::XBox);
+												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
 												 break;
 											 case  ControlType::XBox:
-												 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::PS4);
+												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 												 break;
+											 case  ControlType::PC:
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
+										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
-										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == (int)ControlType::PS4))) {
-											 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::PS4);
+										 if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::PS4)))) {
+											 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 										 }
 										 else {
-											 OptionParts->SetParamInt(EnumSaveParam::ControlType, (int)ControlType::XBox);
+											 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
 										 }
 										 ypos -= LineHeight * 1 / 6;
-										 if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == (int)ControlType::XBox) {
-											 WindowSystem::SetMsgWW(xpos + y_UI(125), ypos, xpos + y_UI(125), ypos + LineHeight * 2 / 3, 
+										 if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
+											 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
 										 }
 										 else {
-											 WindowSystem::SetMsgWW(xpos + y_UI(125), ypos, xpos + y_UI(125), ypos + LineHeight * 2 / 3, 
+											 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
 										 }
 
@@ -1026,12 +1059,12 @@ namespace DXLibRef {
 												 case DX_PADTYPE_SWITCH_JOY_CON_R:
 												 case DX_PADTYPE_SWITCH_PRO_CTRL:
 												 case DX_PADTYPE_SWITCH_HORI_PAD:
-													 WindowSystem::SetMsgWW(xpos + y_UI(125), ypos + LineHeight * 2 / 3, xpos + y_UI(125), ypos + LineHeight * 4 / 3, 
+													 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:DirectInput");
 													 break;
 												 case DX_PADTYPE_XBOX_360:
 												 case DX_PADTYPE_XBOX_ONE:
-													 WindowSystem::SetMsgWW(xpos + y_UI(125), ypos + LineHeight * 2 / 3, xpos + y_UI(125), ypos + LineHeight * 4 / 3, 
+													 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:XInput");
 													 break;
 												 default:
@@ -1043,14 +1076,15 @@ namespace DXLibRef {
 	}
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos, xpos + y_UI(200), ypos + LineHeight, 
+		auto* DrawParts = DXDraw::Instance();
+		WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight/2,
 							   LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
 							   "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
 	}
 
 
-	void OptionWindowClass::ControlTabsInfo::Init_Sub() noexcept {
+	void OptionWindowClass::ControlTabsInfo::Init_Sub(void) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
 		const int KeyInfo = 1151;
 
@@ -1061,10 +1095,11 @@ namespace DXLibRef {
 									 [&]() {},
 									 [&]() {},
 									 [&](int xpos, int ypos, bool isMine) {
+										 auto* DrawParts = DXDraw::Instance();
 										 if (isMine && PadControl::Instance()->GetMouseClick().trigger()) {
 											 PadControl::Instance()->ResetAssign();
 										 }
-										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_UI(200), ypos + LineHeight,  LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1227,16 +1262,17 @@ namespace DXLibRef {
 									 [&]() {},
 									 [&](int xpos, int ypos, bool isMine) {
 										 auto* Pad = PadControl::Instance();
+										 auto* DrawParts = DXDraw::Instance();
 										 if (isMine && Pad->GetMouseClick().trigger()) {
 											 Pad->FlipAssign();
 											 Pad->Save();
 										 }
-										 WindowSystem::SetMsgWW(xpos, ypos, xpos + y_UI(200), ypos + LineHeight,  LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 	}
 	//
-	void OptionWindowClass::Init() noexcept {
+	void OptionWindowClass::Init(void) noexcept {
 		//
 		m_Tabs.at(0) = std::make_unique<SoundTabsInfo>();
 		m_Tabs.at(0)->Init(0, "Sound");
@@ -1255,40 +1291,42 @@ namespace DXLibRef {
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", 720, 720,
 							   [&](int xmin, int ymin, int, int ymax, bool EndSwitch) {
-								   auto* Pad = PadControl::Instance();
+								auto* DrawParts = DXDraw::Instance();
+								auto* OptionParts = OPTION::Instance();
+									auto* Pad = PadControl::Instance();
 								   auto* SE = SoundPool::Instance();
 								   int xp1, yp1;
 
 
-								   xp1 = xmin + y_UI(24);
+								   xp1 = xmin + DrawParts->GetUIY(24);
 								   yp1 = ymin;
 								   for (auto& t : m_Tabs) {
 									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
 								   }
 								   //ガイド
-								   xp1 = xmin + y_UI(24);
+								   xp1 = xmin + DrawParts->GetUIY(24);
 								   yp1 = ymax - LineHeight * 3 / 2;
-								   m_Tabs.at(m_tabsel)->DrawInfo(xp1, yp1, m_select);
+								   m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
 
 								   //
 								   if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
 									   --m_tabsel;
-									   if (m_tabsel < 0) { m_tabsel = (int)m_Tabs.size() - 1; }
+									   if (m_tabsel < 0) { m_tabsel = static_cast<int>(m_Tabs.size()) - 1; }
 									   m_select = 0;
-									   SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									   SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 								   }
 								   if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
 									   ++m_tabsel;
-									   if (m_tabsel > (int)m_Tabs.size() - 1) { m_tabsel = 0; }
+									   if (m_tabsel > static_cast<int>(m_Tabs.size()) - 1) { m_tabsel = 0; }
 									   m_select = 0;
-									   SE->Get((int)SoundEnumCommon::UI_Select).Play(0, DX_PLAYTYPE_BACK, TRUE);
+									   SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 								   }
 
-								   m_Tabs.at(m_tabsel)->Execute(&m_select, (m_tabsel != 3));
+								   m_Tabs.at(static_cast<size_t>(m_tabsel))->Execute(&m_select, (m_tabsel != 3));
 								   //
 								   if (EndSwitch) {
 									   Pad->SetGuideUpdate();
-									   OPTION::Instance()->Save();
+									   OptionParts->Save();
 									   Pad->Save();
 									   m_tabsel = 0;
 									   m_select = 0;

@@ -38,25 +38,25 @@ namespace DXLibRef {
 		{
 			this->m_Frames.clear();
 			if (pBase->GetFrameNum() > 0) {
-				this->m_Frames.resize(pBase->GetFrameNum());
+				this->m_Frames.resize(static_cast<std::size_t>(pBase->GetFrameNum()));
 			}
 			for (auto& f : this->m_Frames) {
 				f.first = -1;
 			}
 			if (this->m_Frames.size() > 0) {
 				int count = 0;
-				for (int frameNum = 0; frameNum < this->m_obj.frame_num(); frameNum++) {
-					if (this->m_obj.frame_name(frameNum) == pBase->GetFrameStr(count)) {
+				for (int frameNum = 0; frameNum < static_cast<int>(this->m_obj.frame_num()); frameNum++) {
+					if (this->m_obj.frame_name(static_cast<size_t>(frameNum)) == pBase->GetFrameStr(count)) {
 						//そのフレームを登録
-						this->m_Frames[count].first = frameNum;
-						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[count].first).pos());
+						this->m_Frames[static_cast<size_t>(count)].first = frameNum;
+						this->m_Frames[static_cast<size_t>(count)].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[static_cast<size_t>(count)].first).pos());
 					}
-					else if (frameNum < this->m_obj.frame_num() - 1) {
+					else if (frameNum < static_cast<int>(this->m_obj.frame_num()) - 1) {
 						continue;//飛ばす
 					}
 					count++;
 					frameNum = 0;
-					if (count >= (int)this->m_Frames.size()) {
+					if (count >= static_cast<int>(this->m_Frames.size())) {
 						break;
 					}
 				}
@@ -66,17 +66,17 @@ namespace DXLibRef {
 		{
 			this->m_Shapes.clear();
 			if (pBase->GetShapeNum() > 0) {
-				this->m_Shapes.resize(pBase->GetShapeNum());
+				this->m_Shapes.resize(static_cast<size_t>(pBase->GetShapeNum()));
 			}
-			for (int j = 0; j < (int)this->m_Shapes.size(); j++) {
+			for (int j = 0; j < static_cast<int>(this->m_Shapes.size()); j++) {
 				auto s = MV1SearchShape(this->m_obj.get(), pBase->GetShapeStr(j));
 				if (s >= 0) {
-					this->m_Shapes[j].first = s;
-					this->m_Shapes[j].second = 0.f;
+					this->m_Shapes[static_cast<size_t>(j)].first = s;
+					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
 				}
 				else {
-					this->m_Shapes[j].first = -1;
-					this->m_Shapes[j].second = 0.f;
+					this->m_Shapes[static_cast<size_t>(j)].first = -1;
+					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
 				}
 			}
 		}
@@ -138,7 +138,7 @@ namespace DXLibRef {
 		//フレーム
 		this->m_Frames.resize(pBase->m_Frames.size());
 		for (auto& f : this->m_Frames) {
-			auto index = &f - &this->m_Frames.front();
+			auto index = static_cast<std::size_t>(&f - &this->m_Frames.front());
 			f.first = pBase->m_Frames.at(index).first;
 			if (f.first != -1) {
 				f.second = pBase->m_Frames.at(index).second;
@@ -147,7 +147,7 @@ namespace DXLibRef {
 		//シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());
 		for (auto& f : this->m_Shapes) {
-			auto index = &f - &this->m_Shapes.front();
+			auto index = static_cast<std::size_t>(&f - &this->m_Shapes.front());
 			f.first = pBase->m_Shapes.at(index).first;
 			if (f.first != -1) {
 				f.second = pBase->m_Shapes.at(index).second;
@@ -157,13 +157,13 @@ namespace DXLibRef {
 	//
 	void			ObjectBaseClass::SetAnimOnce(int ID, float speed) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
-		if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoEnd(); }
+		this->GetObj().get_anime(static_cast<size_t>(ID)).time += 30.f / DrawParts->GetFps() * speed;
+		if (this->GetObj().get_anime(static_cast<size_t>(ID)).TimeEnd()) { this->GetObj().get_anime(static_cast<size_t>(ID)).GoEnd(); }
 	}
 	void			ObjectBaseClass::SetAnimLoop(int ID, float speed) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		this->GetObj().get_anime(ID).time += 30.f / DrawParts->GetFps() * speed;
-		if (this->GetObj().get_anime(ID).TimeEnd()) { this->GetObj().get_anime(ID).GoStart(); }
+		this->GetObj().get_anime(static_cast<size_t>(ID)).time += 30.f / DrawParts->GetFps() * speed;
+		if (this->GetObj().get_anime(static_cast<size_t>(ID)).TimeEnd()) { this->GetObj().get_anime(static_cast<size_t>(ID)).GoStart(); }
 	}
 	//
 	void			ObjectBaseClass::Init(void) noexcept {
@@ -197,7 +197,7 @@ namespace DXLibRef {
 					Max = 1;
 				}
 				for (int i = 0; i < Max; i++) {
-					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, (float)(i + 1) / (float)Max));
+					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / (float)Max));
 					this->GetObj().PhysicsCalculation(1000.0f *60.f / DrawParts->GetFps() / Max);
 				}
 			}
@@ -234,7 +234,7 @@ namespace DXLibRef {
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f*12.5f, -0.f*12.5f, -1.f*12.5f)).get(),
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f*12.5f, 1.f*12.5f, 1.f*12.5f)).get()) == FALSE
 				) {
-				for (int i = 0; i < this->GetObj().mesh_num(); i++) {
+				for (int i = 0; i < static_cast<int>(this->GetObj().mesh_num()); i++) {
 					if ((MV1GetMeshSemiTransState(this->GetObj().get(), i) == TRUE) == isDrawSemiTrans) {
 						this->GetObj().DrawMesh(i);
 					}

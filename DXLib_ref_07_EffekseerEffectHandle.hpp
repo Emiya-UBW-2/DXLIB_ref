@@ -17,7 +17,7 @@ namespace DXLibRef {
 		static constexpr int invalid_handle = -1;
 
 	public:
-		constexpr Effekseer2DPlayingHandle() noexcept : handle_(invalid_handle) {}
+		constexpr Effekseer2DPlayingHandle(void) noexcept : handle_(invalid_handle) {}
 		Effekseer2DPlayingHandle(const Effekseer2DPlayingHandle&) = delete;
 		Effekseer2DPlayingHandle(Effekseer2DPlayingHandle&& o) noexcept : handle_(o.handle_) {
 			o.handle_ = invalid_handle;
@@ -302,6 +302,11 @@ namespace DXLibRef {
 			effsorce.resize(effsorce.size() + 1);
 			effsorce.back() = EffekseerEffectHandle::load("data/effect/gndsmk.efk");								//戦車用エフェクト
 		}
+		EffectResource(const EffectResource&) = delete;
+		EffectResource(EffectResource&& o) = delete;
+		EffectResource& operator=(const EffectResource&) = delete;
+		EffectResource& operator=(EffectResource&& o) = delete;
+
 		~EffectResource() {
 			for (auto& e : effsorce) {
 				e.Dispose();
@@ -320,6 +325,14 @@ namespace DXLibRef {
 			Vector3DX					m_Normal;						//
 			float						m_scale{ 1.f };					//
 			Effekseer3DPlayingHandle	m_handle;						//
+		public:
+			EffectS(void) noexcept {}
+			EffectS(const EffectS&) = delete;
+			EffectS(EffectS&& o) = delete;
+			EffectS& operator=(const EffectS&) = delete;
+			EffectS& operator=(EffectS&& o) = delete;
+
+			~EffectS(void) noexcept {}
 		public:
 			const auto		GetIsPlaying(void) const noexcept { return this->m_handle.IsPlaying(); }
 			const auto&		GetIsFirst(void) const noexcept { return this->m_IsFirst; }
@@ -402,57 +415,70 @@ namespace DXLibRef {
 		};
 	private:
 		static const int EffectNum = 16;
-		std::array<std::pair<int, std::array<EffectS, EffectNum + 1>>, (int)EffectResource::Effect::effects> m_effect;//エフェクト
+		std::array<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>, static_cast<int>(EffectResource::Effect::effects)> m_effect;//エフェクト
 	public:
 		//複数エフェクトの再生
 		void		SetOnce_Any(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
-			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
-			this->m_effect[(int)ID].second[this->m_effect[(int)ID].first].SetEffectSpeed(speed);
-			++this->m_effect[(int)ID].first %= EffectNum;
+			this->m_effect.at(static_cast<size_t>(ID)).second[static_cast<size_t>(this->m_effect.at(static_cast<size_t>(ID)).first)]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
+			this->m_effect.at(static_cast<size_t>(ID)).second[static_cast<size_t>(this->m_effect.at(static_cast<size_t>(ID)).first)]->SetEffectSpeed(speed);
+			++this->m_effect.at(static_cast<size_t>(ID)).first %= EffectNum;
 		}
 		const auto	CheckEffectCount(void) const noexcept {
 			int cnt = 0;
 			for (int i = 0; i < EffectNum; i++) {
-				for (auto& t : this->m_effect[i].second) {
-					if (t.GetIsPlaying()) { cnt++; }
+				for (auto& t : this->m_effect.at(static_cast<size_t>(i)).second) {
+					if (t->GetIsPlaying()) { cnt++; }
 				}
 			}
 			return cnt;
 		}
 		//単体で制御したいエフェクトの制御
 		const auto	CheckPlayEffect(EffectResource::Effect ID) const noexcept {
-			return this->m_effect[(int)ID].second[EffectNum].GetIsPlaying();
+			return this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->GetIsPlaying();
 		}
 		void		SetLoop(EffectResource::Effect ID, const Vector3DX& pos_t) noexcept {
-			this->m_effect[(int)ID].second[EffectNum].SetLoop(EffectResource::Instance()->effsorce.at((int)ID), pos_t);
+			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetLoop(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t);
 		}
 		void		Update_LoopEffect(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect[(int)ID].second[EffectNum].SetParam(pos_t, nomal_t, scale);
+			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
 		}
 		void		SetOnce(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect[(int)ID].second[EffectNum].SetOnce(EffectResource::Instance()->effsorce.at((int)ID), pos_t, nomal_t, scale);
+			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
 		}
-		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect[(int)ID].second[EffectNum].StopEffect(); }
-		void		SetEffectSpeed(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectSpeed(value); }
-		void		SetEffectScale(EffectResource::Effect ID, float value) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectScale(value); }
-		void		SetEffectColor(EffectResource::Effect ID, int r, int g, int b, int a) noexcept { this->m_effect[(int)ID].second[EffectNum].SetEffectColor(r, g, b, a); }
+		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->StopEffect(); }
+		void		SetEffectSpeed(EffectResource::Effect ID, float value) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectSpeed(value); }
+		void		SetEffectScale(EffectResource::Effect ID, float value) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectScale(value); }
+		void		SetEffectColor(EffectResource::Effect ID, int r, int g, int b, int a) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectColor(r, g, b, a); }
+	public:
+		EffectControl(void) noexcept {}
+		EffectControl(const EffectControl&) = delete;
+		EffectControl(EffectControl&& o) = delete;
+		EffectControl& operator=(const EffectControl&) = delete;
+		EffectControl& operator=(EffectControl&& o) = delete;
+
+		~EffectControl(void) noexcept {}
+	public:
 		//全体の更新
 		void		Init(void) noexcept {
 			for (auto& ef : this->m_effect) {
 				ef.first = 0;
+				for (auto& t : ef.second) {
+					t = std::make_unique<EffectS>();
+				}
 			}
 		}
 		void		Execute(void) noexcept {
 			for (auto& ef : this->m_effect) {
 				for (auto& t : ef.second) {
-					t.Execute();
+					t->Execute();
 				}
 			}
 		}
 		void		Dispose(void) noexcept {
 			for (auto& ef : this->m_effect) {
 				for (auto& t : ef.second) {
-					t.Dispose();
+					t->Dispose();
+					t.reset();
 				}
 			}
 		}

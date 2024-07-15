@@ -3,27 +3,21 @@
 namespace DXLibRef {
 	const DXLib_ref* SingletonBase<DXLib_ref>::m_Singleton = nullptr;
 
-	DXLib_ref::DXLib_ref() noexcept {
+	DXLib_ref::DXLib_ref(void) noexcept {
 		DXDraw::Create();						//汎用
 		auto* DrawParts = DXDraw::Instance();
-		if (!DrawParts->IsFirstBoot()) {
-			DrawParts->Init();
-		}
+		DrawParts->Init();
 	}
-	DXLib_ref::~DXLib_ref() noexcept {
-
-	}
-	bool DXLib_ref::StartLogic() noexcept {
+	bool DXLib_ref::StartLogic(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (DrawParts->IsFirstBoot()) {
-			DrawParts->FirstBootSetting();
 			StartMe();
 			return false;
 		}
 		SceneControl::Create();
 		return true;
 	}
-	bool DXLib_ref::MainLogic() noexcept {
+	bool DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
 		//最初の読み込み
 		SceneParts->GetNowScene()->Load();
