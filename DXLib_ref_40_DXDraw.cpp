@@ -21,8 +21,8 @@ namespace DXLibRef {
 			moves						m_move;
 		public:
 			const auto&		GetID(void) const noexcept { return m_ID; }
-			const auto		IsActive(void) const noexcept { return m_isInitialized && m_isActive; }
-			const bool		PadPress(VR_PAD ID) const noexcept {
+			auto			IsActive(void) const noexcept { return m_isInitialized && m_isActive; }
+			bool			PadPress(VR_PAD ID) const noexcept {
 				switch (ID) {
 					case VR_PAD::TRIGGER:
 						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
@@ -38,7 +38,7 @@ namespace DXLibRef {
 						return false;
 				}
 			}
-			const bool		PadTouch(VR_PAD ID) const noexcept {
+			bool			PadTouch(VR_PAD ID) const noexcept {
 				switch (ID) {
 					case VR_PAD::TRIGGER:
 						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
@@ -113,9 +113,9 @@ namespace DXLibRef {
 		vr::IVRSystem*				m_VR_SystemPtr{nullptr};
 		vr::EVRInitError			m_VR_ErrorHandle{vr::VRInitError_None};
 		std::vector<VRDeviceClass>	m_VR_DeviceInfo;
-		char						m_VR_HMDID{-1};
-		char						m_VR_Hand1ID{-1};
-		char						m_VR_Hand2ID{-1};
+		char						m_VR_HMDID{ INVALID_ID };
+		char						m_VR_Hand1ID{ INVALID_ID };
+		char						m_VR_Hand2ID{ INVALID_ID };
 		std::vector<char>			m_VR_TrackerID;
 		bool						m_VR_PrevHMDIsActive{false};
 		bool						m_VR_HMD_StartFlag{true};
@@ -126,7 +126,7 @@ namespace DXLibRef {
 		VRControl(void) noexcept {}
 		~VRControl(void) noexcept {}
 	public:
-		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return  (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
+		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
 		const VRDeviceClass*	Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
 		const VRDeviceClass*	GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
 		void			ResetHMD(void) noexcept {
@@ -161,11 +161,11 @@ namespace DXLibRef {
 		}
 		void			Haptic(char id_, unsigned short times) noexcept {
 			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && (id_ != -1) && m_VR_SystemPtr) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && (id_ != INVALID_ID) && m_VR_SystemPtr) {
 				m_VR_SystemPtr->TriggerHapticPulse(m_VR_DeviceInfo[id_].GetID(), 2, times);
 			}
 		}
-		const auto		GetEyePosition(char eye_type) noexcept {
+		auto			GetEyePosition(char eye_type) noexcept {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
@@ -175,7 +175,7 @@ namespace DXLibRef {
 			return Vector3DX::zero();
 		}
 		const GraphHandle* GetOutBuffer(void) const noexcept { return &m_OutScreen; }
-		const auto		GetCamPos(char eye_type) noexcept {
+		auto			GetCamPos(char eye_type) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
 			tmp_cam.SetCamPos(
@@ -308,23 +308,23 @@ namespace DXLibRef {
 	class DXDraw::VRControl {
 		class VRDeviceClass {
 		public:
-			const bool		PadPress(VR_PAD) const noexcept { return false; }
-			const bool		PadTouch(VR_PAD) const noexcept { return false; }
-			const auto		GetTouchPadPoint(void) const noexcept { return Vector3DX::zero(); }
+			bool			PadPress(VR_PAD) const noexcept { return false; }
+			bool			PadTouch(VR_PAD) const noexcept { return false; }
+			auto			GetTouchPadPoint(void) const noexcept { return Vector3DX::zero(); }
 		};
 	public:
 		VRControl(void) noexcept {}
 		~VRControl(void) noexcept {}
 	public:
-		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return  nullptr; }
+		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return nullptr; }
 		const VRDeviceClass*	Get_VR_Hand2Device(void) const noexcept { return nullptr; }
 		const VRDeviceClass*	GetTrackerDevice(int) const noexcept { return nullptr; }
 		void			ResetHMD(void) noexcept {}
 		void			GetHMDPosition(Vector3DX*, Matrix4x4DX*) noexcept {}
 		void			Haptic(char, unsigned short) noexcept {}
-		const auto		GetEyePosition(char) noexcept { return Vector3DX::zero(); }
+		auto			GetEyePosition(char) noexcept { return Vector3DX::zero(); }
 		const GraphHandle* GetOutBuffer(void) const noexcept { return nullptr; }
-		const auto		GetCamPos(char eye_type) noexcept {
+		auto			GetCamPos(char eye_type) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			Camera3DInfo tmp_cam = DrawParts->GetMainCamera();
 			tmp_cam.SetCamPos(
@@ -370,7 +370,7 @@ namespace DXLibRef {
 	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) noexcept {
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
-		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
 			SetupCam(Center, 1.f);
@@ -378,14 +378,14 @@ namespace DXLibRef {
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
-		SetRenderTargetToShader(0, -1);
-		SetRenderTargetToShader(1, -1);
-		SetRenderTargetToShader(2, -1);
+		SetRenderTargetToShader(0, INVALID_ID);
+		SetRenderTargetToShader(1, INVALID_ID);
+		SetRenderTargetToShader(2, INVALID_ID);
 	}
 	void DXDraw::ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center) noexcept {
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
-		SetRenderTargetToShader(1, -1);
+		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
 			SetupCam(Center, 2.f);
@@ -393,9 +393,9 @@ namespace DXLibRef {
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
-		SetRenderTargetToShader(0, -1);
-		SetRenderTargetToShader(1, -1);
-		SetRenderTargetToShader(2, -1);
+		SetRenderTargetToShader(0, INVALID_ID);
+		SetRenderTargetToShader(1, INVALID_ID);
+		SetRenderTargetToShader(2, INVALID_ID);
 	}
 	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam) noexcept {
 		auto* OptionParts = OPTION::Instance();
@@ -407,13 +407,13 @@ namespace DXLibRef {
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
-			m_Shader.SetPixelParam(3, (float)OptionParts->GetParamInt(EnumSaveParam::shadow), 0.f, 0.f, 0.f);
+			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), 0.f, 0.f, 0.f);
 			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
 			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 			m_Shader.Draw_lamda(doing);
 		}
-		SetUseTextureToShader(1, -1);				// 使用テクスチャの設定を解除
-		SetUseTextureToShader(2, -1);				// 使用テクスチャの設定を解除
+		SetUseTextureToShader(1, INVALID_ID);				// 使用テクスチャの設定を解除
+		SetUseTextureToShader(2, INVALID_ID);				// 使用テクスチャの設定を解除
 		//後処理
 		GraphBlend(BaseShadowHandle.get(), DepthBaseScreenHandle.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 			DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_R);
@@ -501,7 +501,7 @@ namespace DXLibRef {
 			int DPI = 96;
 			//GetMonitorDpi(NULL,&DPI);
 			if (SetProcessDPIAware() != 0) {
-				auto hdc = GetDC(nullptr);                 // カレントのスクリーン全体のデバイスコンテキスト取得.
+				auto hdc = GetDC(nullptr);         // カレントのスクリーン全体のデバイスコンテキスト取得.
 				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
 			}
 			this->m_DispXSize = this->m_DispXSize * DPI / 96;
@@ -547,8 +547,8 @@ namespace DXLibRef {
 			this->m_DispXSize_Border = this->m_DispXSize;
 			this->m_DispYSize_Border = this->m_DispYSize;
 		}
-		m_DispXSize_Max = std::min(m_DispXSize_Border, static_cast<int>(std::min(basex, this->m_DispXSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		m_DispYSize_Max = std::min(m_DispYSize_Border, static_cast<int>(std::min(basey, this->m_DispYSize)*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		m_DispXSize_Max = std::min(m_DispXSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basex, this->m_DispXSize))*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		m_DispYSize_Max = std::min(m_DispYSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basey, this->m_DispYSize))*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
 		SetWindowOrBorderless();
 		//
 #ifdef DEBUG
@@ -668,12 +668,12 @@ namespace DXLibRef {
 
 				int xp = GetUIY(720 + 16 + 16);
 				int yp = GetUIY(16);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, Gray50, LocalizeParts->Get(2000))) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, LocalizeParts->Get(2000))) {
 					m_CheckPCSpec.StartSearch();
 				}
 				yp += GetUIY(24);
 				if (m_CheckPCSpec.GetCPUDatas()) {
-					int MouseOverID = -1;
+					int MouseOverID = INVALID_ID;
 					//CPU
 					WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
 					for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
@@ -795,7 +795,7 @@ namespace DXLibRef {
 					}
 					WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
 					WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
-					if (MouseOverID > 0) {
+					if (MouseOverID != INVALID_ID) {
 						xp = Pad->GetMS_X();
 						yp = Pad->GetMS_Y();
 						WindowSystem::SetMsg(xp, yp - LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, Green, DarkGreen, LocalizeParts->Get(MouseOverID));
@@ -804,7 +804,7 @@ namespace DXLibRef {
 
 				xp = GetUIY(720 + 16 + 32);
 				yp = GetUIY(720);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), Green, "Start Game!")) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, "Start Game!")) {
 					PopUpParts->EndAll();
 				}
 			}
@@ -902,7 +902,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 						}
@@ -932,7 +932,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, Gray15, LocalizeParts->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(2102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 							StartMe();
@@ -1011,7 +1011,7 @@ namespace DXLibRef {
 				else {
 					doing();
 				}
-								   }, doingFront, camInfo);
+								  }, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw->Draw(); });
@@ -1025,7 +1025,7 @@ namespace DXLibRef {
 					this->m_Shader2D[0].SetPixelParam(3, this->m_ShaderParam[0].param[0], this->m_ShaderParam[0].param[1], this->m_ShaderParam[0].param[2], this->m_ShaderParam[0].param[3]);
 					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[0].Draw(this->m_ScreenVertex);
-					SetUseTextureToShader(0, -1);
+					SetUseTextureToShader(0, INVALID_ID);
 					});
 			}
 			if (this->m_ShaderParam[1].use) {
@@ -1035,7 +1035,7 @@ namespace DXLibRef {
 					this->m_Shader2D[1].SetPixelParam(3, this->m_ShaderParam[1].param[0], 0, 0, 0);
 					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[1].Draw(this->m_ScreenVertex);
-					SetUseTextureToShader(0, -1);
+					SetUseTextureToShader(0, INVALID_ID);
 					});
 			}
 			};

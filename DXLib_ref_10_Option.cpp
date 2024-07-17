@@ -40,7 +40,7 @@ namespace DXLibRef {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
 		
 		//SetOutApplicationLogValidFlag(FALSE);
-		int mdata = -1;
+		int mdata = INVALID_ID;
 		bool NewData = true;
 		if (std::filesystem::is_regular_file("Save/Setting.txt")) {
 			mdata = FileRead_open("Save/Setting.txt", FALSE);
@@ -227,7 +227,7 @@ namespace DXLibRef {
 		{
 			xp1 = xpos + (DrawParts->GetUIY(140) + DrawParts->GetUIY(12)) * m_id;
 			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5),  (isActive ? Gray25 : Gray75), m_name)) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, (isActive ? Gray25 : Gray75), m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
@@ -249,7 +249,7 @@ namespace DXLibRef {
 	}
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2,  LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
+		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
 	}
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
@@ -273,7 +273,7 @@ namespace DXLibRef {
 										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100);
-										 OptionParts->SetParamFloat(EnumSaveParam::BGM, (float)value / 100.f);
+										 OptionParts->SetParamFloat(EnumSaveParam::BGM, static_cast<float>(value) / 100.f);
 										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 }
 									 );
@@ -300,7 +300,7 @@ namespace DXLibRef {
 										 auto* SE = SoundPool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE)*100.f + 0.5f), 0, 100);
-										 OptionParts->SetParamFloat(EnumSaveParam::SE, (float)value / 100.f);
+										 OptionParts->SetParamFloat(EnumSaveParam::SE, static_cast<float>(value) / 100.f);
 										 SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 									 }
 									 );
@@ -865,7 +865,7 @@ namespace DXLibRef {
 										 auto* OptionParts = OPTION::Instance();
 										 int prev = static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f);
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f), 25, 100);
-										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, (float)value / 100.f);
+										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, static_cast<float>(value) / 100.f);
 										 if (prev != value) {
 											 OptionWindowClass::Instance()->SetRestart();
 										 }
@@ -878,10 +878,10 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
-											 case  LanguageType::Eng:
+											 case LanguageType::Eng:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 												 break;
-											 case  LanguageType::Jpn:
+											 case LanguageType::Jpn:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 												 break;
 											 default:
@@ -897,10 +897,10 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
-											 case  LanguageType::Eng:
+											 case LanguageType::Eng:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 												 break;
-											 case  LanguageType::Jpn:
+											 case LanguageType::Jpn:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 												 break;
 											 default:
@@ -954,7 +954,7 @@ namespace DXLibRef {
 										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Xsensing)*100.f + 0.5f), 10, 100);
-										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, (float)value / 100.f);
+										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, static_cast<float>(value) / 100.f);
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -975,7 +975,7 @@ namespace DXLibRef {
 										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Ysensing)*100.f + 0.5f), 10, 100);
-										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, (float)value / 100.f);
+										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, static_cast<float>(value) / 100.f);
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1002,13 +1002,13 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
-											 case  ControlType::PS4:
+											 case ControlType::PS4:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
 												 break;
-											 case  ControlType::XBox:
+											 case ControlType::XBox:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 												 break;
-											 case  ControlType::PC:
+											 case ControlType::PC:
 											 default:
 												 break;
 										 }
@@ -1017,13 +1017,13 @@ namespace DXLibRef {
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
-											 case  ControlType::PS4:
+											 case ControlType::PS4:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
 												 break;
-											 case  ControlType::XBox:
+											 case ControlType::XBox:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 												 break;
-											 case  ControlType::PC:
+											 case ControlType::PC:
 											 default:
 												 break;
 										 }
@@ -1078,8 +1078,8 @@ namespace DXLibRef {
 		auto* Pad = PadControl::Instance();
 		auto* DrawParts = DXDraw::Instance();
 		WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight/2,
-							   LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
-							   "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
+							  LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
+							  "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
 	}
 
@@ -1290,65 +1290,65 @@ namespace DXLibRef {
 			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", 720, 720,
-							   [&](int xmin, int ymin, int, int ymax, bool EndSwitch) {
+							  [&](int xmin, int ymin, int, int ymax, bool EndSwitch) {
 								auto* DrawParts = DXDraw::Instance();
 								auto* OptionParts = OPTION::Instance();
 									auto* Pad = PadControl::Instance();
-								   auto* SE = SoundPool::Instance();
-								   int xp1, yp1;
+								  auto* SE = SoundPool::Instance();
+								  int xp1, yp1;
 
 
-								   xp1 = xmin + DrawParts->GetUIY(24);
-								   yp1 = ymin;
-								   for (auto& t : m_Tabs) {
-									   t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
-								   }
-								   //ƒKƒCƒh
-								   xp1 = xmin + DrawParts->GetUIY(24);
-								   yp1 = ymax - LineHeight * 3 / 2;
-								   m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
+								  xp1 = xmin + DrawParts->GetUIY(24);
+								  yp1 = ymin;
+								  for (auto& t : m_Tabs) {
+									  t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
+								  }
+								  //ƒKƒCƒh
+								  xp1 = xmin + DrawParts->GetUIY(24);
+								  yp1 = ymax - LineHeight * 3 / 2;
+								  m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
 
-								   //
-								   if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
-									   --m_tabsel;
-									   if (m_tabsel < 0) { m_tabsel = static_cast<int>(m_Tabs.size()) - 1; }
-									   m_select = 0;
-									   SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-								   }
-								   if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
-									   ++m_tabsel;
-									   if (m_tabsel > static_cast<int>(m_Tabs.size()) - 1) { m_tabsel = 0; }
-									   m_select = 0;
-									   SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-								   }
+								  //
+								  if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
+									  --m_tabsel;
+									  if (m_tabsel < 0) { m_tabsel = static_cast<int>(m_Tabs.size()) - 1; }
+									  m_select = 0;
+									  SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+								  }
+								  if (Pad->GetKey(PADS::LEAN_R).trigger() && (m_tabsel != 3)) {
+									  ++m_tabsel;
+									  if (m_tabsel > static_cast<int>(m_Tabs.size()) - 1) { m_tabsel = 0; }
+									  m_select = 0;
+									  SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+								  }
 
-								   m_Tabs.at(static_cast<size_t>(m_tabsel))->Execute(&m_select, (m_tabsel != 3));
-								   //
-								   if (EndSwitch) {
-									   Pad->SetGuideUpdate();
-									   OptionParts->Save();
-									   Pad->Save();
-									   m_tabsel = 0;
-									   m_select = 0;
-								   }
-							   },
-							   [&]() {m_Active = false;},
-								   [&]() {
-								   auto* KeyGuide = PadControl::Instance();
-								   auto* LocalizeParts = LocalizePool::Instance();
+								  m_Tabs.at(static_cast<size_t>(m_tabsel))->Execute(&m_select, (m_tabsel != 3));
+								  //
+								  if (EndSwitch) {
+									  Pad->SetGuideUpdate();
+									  OptionParts->Save();
+									  Pad->Save();
+									  m_tabsel = 0;
+									  m_select = 0;
+								  }
+							  },
+							  [&]() {m_Active = false;},
+								  [&]() {
+								  auto* KeyGuide = PadControl::Instance();
+								  auto* LocalizeParts = LocalizePool::Instance();
 
-								   KeyGuide->AddGuide(PADS::INTERACT, LocalizeParts->Get(9992));
+								  KeyGuide->AddGuide(PADS::INTERACT, LocalizeParts->Get(9992));
 
-								   KeyGuide->AddGuide(PADS::LEAN_L, "");
-								   KeyGuide->AddGuide(PADS::LEAN_R, LocalizeParts->Get(9994));
-								   KeyGuide->AddGuide(PADS::MOVE_W, "");
-								   KeyGuide->AddGuide(PADS::MOVE_A, "");
-								   KeyGuide->AddGuide(PADS::MOVE_S, "");
-								   KeyGuide->AddGuide(PADS::MOVE_D, "");
-								   KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizeParts->Get(9993));
-							   },
-								   true
-								   );
+								  KeyGuide->AddGuide(PADS::LEAN_L, "");
+								  KeyGuide->AddGuide(PADS::LEAN_R, LocalizeParts->Get(9994));
+								  KeyGuide->AddGuide(PADS::MOVE_W, "");
+								  KeyGuide->AddGuide(PADS::MOVE_A, "");
+								  KeyGuide->AddGuide(PADS::MOVE_S, "");
+								  KeyGuide->AddGuide(PADS::MOVE_D, "");
+								  KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizeParts->Get(9993));
+							  },
+								  true
+								  );
 		}
 	}
 };

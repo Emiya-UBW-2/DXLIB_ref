@@ -1,7 +1,7 @@
 ﻿/*=============================================================================
-  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
-  Distributed under the Boost Software License, Version 1.0.
-  (See https://www.boost.org/LICENSE_1_0.txt)
+ Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
+ Distributed under the Boost Software License, Version 1.0.
+ (See https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #pragma once
 #include "DXLib_ref.h"
@@ -20,7 +20,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr SoundHandle(int h) : handle_(h) {}
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 	public:
 		constexpr SoundHandle() : handle_(invalid_handle) {}
 		SoundHandle(const SoundHandle&) = delete;
@@ -46,7 +46,7 @@ namespace DXLibRef {
 		}
 		int get(void) const noexcept { return handle_; }
 		SoundHandle Duplicate(void) const noexcept { return DxLib::DuplicateSoundMem(this->handle_); }
-		bool check()  const noexcept { return (DxLib::CheckSoundMem(handle_) == TRUE); }
+		bool check() const noexcept { return (DxLib::CheckSoundMem(handle_) == TRUE); }
 		bool play(int type, int flag = 1) const noexcept { return (PlaySoundMem(handle_, type, flag) == 0); }
 		bool stop(void) const noexcept {
 			if (invalid_handle != this->handle_) {
@@ -57,7 +57,7 @@ namespace DXLibRef {
 			}
 		}
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
-		const auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
+		auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
 		bool SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
 		bool Radius(float radius) const noexcept { return (Set3DRadiusSoundMem(radius, handle_) == 0); }
 		void play_3D(const Vector3DX& pos, float radius, int type_t = DX_PLAYTYPE_BACK)const {
@@ -134,12 +134,12 @@ namespace DXLibRef {
 					h.stop();
 				}
 			}
-			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = -1, int panpal = -256) {
+			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = INVALID_ID, int panpal = -256) {
 				auto ans = now;
 				shandle.at(static_cast<size_t>(Sel_t))->handle[now].play(type_t, Flag_t);
-				if (vol_t != -1) {
+				if (vol_t != INVALID_ID) {
 					Set_vol = vol_t;
-					shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * Set_vol));
+					shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 				}
 				if (panpal != -256) {
 					ChangePanSoundMem(panpal, shandle.at(static_cast<size_t>(Sel_t))->handle[now].get());
@@ -147,7 +147,7 @@ namespace DXLibRef {
 				++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
 				return static_cast<int>(ans);
 			}
-			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = -1, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = INVALID_ID, int type_t = DX_PLAYTYPE_BACK) noexcept {
 				bool isplay = true;
 				{
 					//距離内にいない場合鳴らさない
@@ -157,17 +157,17 @@ namespace DXLibRef {
 				if (isplay) {
 					auto ans = now;
 					shandle.at(static_cast<size_t>(Sel_t))->handle[now].play_3D(pos_t, radius, type_t);
-					if (vol_t != -1) {
+					if (vol_t != INVALID_ID) {
 						Set_vol = vol_t;
-						shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * Set_vol));
+						shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 					}
 					++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
 					return static_cast<int>(ans);
 				}
-				return -1;
+				return INVALID_ID;
 			}
 			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) {
-				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].vol(static_cast<int>(vol_rate * std::clamp(vol, 0, 255)));
+				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].vol(static_cast<int>(vol_rate * static_cast<float>(std::clamp(vol, 0, 255))));
 			}
 			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) {
 				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].SetPosition(pos_t);
@@ -176,7 +176,7 @@ namespace DXLibRef {
 				Set_vol = std::clamp(vol, 0, 255);
 				for (auto& sh : this->shandle) {
 					for (auto& h : sh->handle) {
-						h.vol(static_cast<int>(vol_rate * Set_vol));
+						h.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 					}
 				}
 			}
@@ -184,7 +184,7 @@ namespace DXLibRef {
 				vol_rate = std::clamp(vol, 0.f, 1.f);
 				for (auto& sh : this->shandle) {
 					for (auto& h : sh->handle) {
-						h.vol(static_cast<int>(vol_rate * Set_vol));
+						h.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 					}
 				}
 			}
@@ -217,8 +217,8 @@ namespace DXLibRef {
 			this->havehandle.back().Set(ID_t, buffersize, path_t, is3Dsound);
 			return this->havehandle.size() - 1;
 		}
-		Soundhave&		Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
-		void			Delete(int ID_t) {
+		Soundhave& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
+		void			Delete(int ID_t) noexcept {
 			for (int i = 0; i < static_cast<int>(this->havehandle.size()); i++) {
 				auto& h = this->havehandle.at(static_cast<size_t>(i));
 				if (h.Get_ID() == ID_t) {
@@ -286,11 +286,11 @@ namespace DXLibRef {
 			}
 			void			SetVol_Local(int vol) {
 				Set_vol = std::clamp(vol, 0, 255);
-				this->handle.vol(static_cast<int>(vol_rate * Set_vol));
+				this->handle.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 			}
 			void			SetVol(float vol) {
 				vol_rate = std::clamp(vol, 0.f, 1.f);
-				this->handle.vol(static_cast<int>(vol_rate * Set_vol));
+				this->handle.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 			}
 		};
 	private:

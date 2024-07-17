@@ -28,7 +28,7 @@ namespace DXLibRef {
 
 		virtual ~ModelBaseClass(void) noexcept {}
 	public:
-		const auto		GetPathCompare(const char* filepath, const char* objfilename, const char* colfilename) const noexcept {
+		auto		GetPathCompare(const char* filepath, const char* objfilename, const char* colfilename) const noexcept {
 			return ((this->m_FilePath == filepath) && (this->m_ObjFileName == objfilename) && (this->m_ColFileName == colfilename));
 		}
 	public:
@@ -45,6 +45,7 @@ namespace DXLibRef {
 
 	class ObjectBaseClass : public ModelBaseClass {
 	protected:
+		int											m_ObjectID{ INVALID_ID };
 		bool										m_ColActive{false};
 		moves										m_move;
 		Matrix4x4DX									m_PrevMat;//物理更新のため
@@ -58,18 +59,17 @@ namespace DXLibRef {
 		Vector3DX									m_ScreenPosition;
 		float										m_CameraSize{0.f};
 		ShaderUseClass*								m_UseShader{nullptr};
-		std::array<int, 2>							m_ShaderTex{-1 , -1};
 	public:
 		auto& GetObj(void) noexcept { return this->m_obj; }
 		const auto& GetObj_const(void) const noexcept { return this->m_obj; }
-		//const auto		GetMatrix(void) const noexcept { return GetObj().GetMatrix(); }
-		const auto		GetFrameLocalMat(int frame) const noexcept { return this->m_obj.GetFrameLocalMatrix(frame); }
-		const auto		GetFrameWorldMat(int frame) const noexcept { return this->m_obj.GetFrameLocalWorldMatrix(frame); }
-		const auto		GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.frame_parent(frame))); }
-		const auto		GetChildFrameNum(int frame) const noexcept { return static_cast<int>(this->m_obj.frame_child_num(frame)); }
-		const auto		GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.frame_child(frame, ID))); }
+		//auto		GetMatrix(void) const noexcept { return GetObj().GetMatrix(); }
+		auto		GetFrameLocalMat(int frame) const noexcept { return this->m_obj.GetFrameLocalMatrix(frame); }
+		auto		GetFrameWorldMat(int frame) const noexcept { return this->m_obj.GetFrameLocalWorldMatrix(frame); }
+		auto		GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.GetFrameParent(frame))); }
+		auto		GetChildFrameNum(int frame) const noexcept { return static_cast<int>(this->m_obj.GetFrameChildNum(frame)); }
+		auto		GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.GetFrameChild(frame, ID))); }
 
-		const bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != -1; }
+		bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
 		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
@@ -77,6 +77,7 @@ namespace DXLibRef {
 		void			SetAnimOnce(int ID, float speed) noexcept;
 		void			SetAnimLoop(int ID, float speed) noexcept;
 	public:
+		const auto&		GetObjectID(void) const noexcept { return this->m_ObjectID; }
 		const auto&		GetobjType(void) const noexcept { return this->m_objType; }
 		const auto&		GetScreenPosition(void) const noexcept { return this->m_ScreenPosition; }
 		const auto&		GetCameraSize(void) const noexcept { return this->m_CameraSize; }
@@ -84,6 +85,7 @@ namespace DXLibRef {
 		const auto&		IsActive(void) const noexcept { return this->m_IsActive; }
 		const auto&		GetIsDelete(void) const noexcept { return this->m_IsDelete; }
 	public:
+		void			SetObjectID(int value) noexcept { this->m_ObjectID = value; }
 		void			SetActive(bool value) noexcept { this->m_IsActive = value; }
 		void			SetDelete(void) noexcept { this->m_IsDelete = true; }
 		void			SetResetP(bool value) noexcept { this->m_IsResetPhysics = value; }
@@ -92,7 +94,6 @@ namespace DXLibRef {
 			this->m_CameraSize = size;
 		}
 		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
-		void			SetShaderTexHandle(int id, int value) noexcept { this->m_ShaderTex[static_cast<size_t>(id)] = value; }
 		void			ResetMove(const Matrix4x4DX& mat, const Vector3DX& pos) noexcept {
 			this->m_move.vec.Set(0, 0, 0);
 			SetMove(mat, pos);
@@ -125,25 +126,25 @@ namespace DXLibRef {
 		//判定起動
 		void			SetupCol(void) noexcept {
 			if (this->m_col.IsActive()) {
-				for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); ++i) { this->m_col.SetupCollInfo(8, 8, 8, -1, i); }
+				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) { this->m_col.SetupCollInfo(8, 8, 8, INVALID_ID, i); }
 			}
 		}
-		const auto		RefreshCol(const Vector3DX& StartPos, const Vector3DX& EndPos, float pRange) noexcept {
+		auto			RefreshCol(const Vector3DX& StartPos, const Vector3DX& EndPos, float pRange) noexcept {
 			if (this->m_ColActive) { return true; }				//すでに起動しているなら無視
 			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.pos) <= pRange) {
 				//判定起動
 				this->m_ColActive = true;
-				for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); i++) { this->m_col.RefreshCollInfo(-1, i); }
+				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); i++) { this->m_col.RefreshCollInfo(INVALID_ID, i); }
 				return true;
 			}
 			return false;
 		}
 		//判定取得
-		const auto		GetColCapsule(const Vector3DX& StartPos, const Vector3DX& EndPos, float range, const int sel = 0) const noexcept { return this->m_col.CollCheck_Capsule(StartPos, EndPos, range, -1, sel); }
-		const auto		GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, -1, sel); }
+		auto			GetColCapsule(const Vector3DX& StartPos, const Vector3DX& EndPos, float range, const int sel = 0) const noexcept { return this->m_col.CollCheck_Capsule(StartPos, EndPos, range, INVALID_ID, sel); }
+		auto			GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, INVALID_ID, sel); }
 		void			GetColNearestInAllMesh(const Vector3DX& StartPos, Vector3DX* EndPos) const noexcept {
 			MV1_COLL_RESULT_POLY colres;
-			for (int i = 0; i < static_cast<int>(this->m_col.mesh_num()); ++i) {
+			for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) {
 				colres = GetColLine(StartPos, *EndPos, i);
 				if (colres.HitFlag == TRUE) {
 					*EndPos = colres.HitPosition;
@@ -169,7 +170,6 @@ namespace DXLibRef {
 		virtual void	FirstExecute(void) noexcept {}
 		void			ExecuteCommon(void) noexcept;
 		virtual void	LateExecute(void) noexcept {}
-		virtual void	Depth_Draw(void) noexcept {}
 		virtual void	DrawShadow(void) noexcept;
 		virtual void	CheckDraw(void) noexcept;
 		virtual void	Draw(bool isDrawSemiTrans) noexcept;

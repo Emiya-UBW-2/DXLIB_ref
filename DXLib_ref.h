@@ -31,6 +31,8 @@
 #define NOMINMAX
 #pragma warning(disable:4505)
 #pragma warning(disable:4820)
+#pragma warning(disable:5045)
+#pragma warning(disable:5259)
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include																																	*/
@@ -72,15 +74,16 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 constexpr float M_GR{-122.5f};				/*重力加速度*/
 //constexpr float M_GR{ -9.8f };				/*重力加速度*/
+constexpr int INVALID_ID = -1;
 
 //DPIを反映するデスクトップサイズ
-//const int32_t deskx{ (int32_t)(950) / 1 };
-//const int32_t desky{ (int32_t)(950 * 9 / 16) / 1 };
-const int32_t deskx{(int32_t)(GetSystemMetrics(SM_CXSCREEN)) / 1};
-const int32_t desky{(int32_t)(GetSystemMetrics(SM_CYSCREEN)) / 1};
+//const int deskx{ static_cast<int>(640) / 1 };
+//const int desky{ static_cast<int>(640 * 9 / 16) / 1 };
+const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) / 1};
+const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) / 1};
 
-const int32_t basex{1920 / 1};
-const int32_t basey{1080 / 1};
+const int basex{1920 / 1};
+const int basey{1080 / 1};
 
 enum class VR_PAD {
 	TRIGGER,

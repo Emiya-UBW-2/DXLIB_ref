@@ -13,10 +13,10 @@ namespace DXLibRef {
 	private:
 		static const T* m_Singleton;
 	public:
-		static void Create(void) {
+		static void Create(void) noexcept {
 			m_Singleton = new T();
 		}
-		static T* Instance(void) {
+		static T* Instance(void) noexcept {
 			if (m_Singleton == nullptr) {
 				MessageBox(NULL, "Failed Instance Create", "", MB_OK);
 				exit(-1);
@@ -25,8 +25,8 @@ namespace DXLibRef {
 			return (T*)m_Singleton;
 		}
 	protected:
-		SingletonBase() {}
-		virtual ~SingletonBase() {}
+		SingletonBase() noexcept {}
+		virtual ~SingletonBase() noexcept {}
 	private:
 		SingletonBase(const SingletonBase &) = delete;
 		SingletonBase& operator=(const SingletonBase &) = delete;
@@ -109,7 +109,7 @@ namespace DXLibRef {
 	// 起動
 	//--------------------------------------------------------------------------------------------------
 	//起動
-	static void CreateOurProcess(char* szCmd, DWORD flag, bool fWait) {
+	static void CreateOurProcess(char* szCmd, DWORD flag, bool fWait) noexcept {
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 		memset(&si, 0, sizeof(STARTUPINFO));
@@ -121,7 +121,7 @@ namespace DXLibRef {
 		CloseHandle(pi.hThread);
 	}
 	//自身を多重起動
-	static void StartMe(void) {
+	static void StartMe(void) noexcept {
 		char Path[MAX_PATH];
 		// EXEのあるフォルダのパスを取得
 		::GetModuleFileName(NULL, Path, MAX_PATH);
@@ -134,13 +134,13 @@ namespace DXLibRef {
 	//角度からラジアンに
 	extern void* enabler;// ダミー変数
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float deg2rad(T p1) { return float(p1) * DX_PI_F / 180.f; }
+	constexpr float deg2rad(T p1) noexcept { return float(p1) * DX_PI_F / 180.f; }
 	//ラジアンから角度に
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float rad2deg(T p1) { return float(p1) * 180.f / DX_PI_F; }
+	constexpr float rad2deg(T p1) noexcept { return float(p1) * 180.f / DX_PI_F; }
 
 	//余弦定理
-	constexpr float GetCosFormula(float a, float b, float c) {
+	constexpr float GetCosFormula(float a, float b, float c) noexcept {
 		if (b + c > a && c + a > b && a + b > c) {
 			return std::clamp((b * b + c * c - a * a) / (2.f * b*c), -1.f, 1.f);
 		}
@@ -151,7 +151,7 @@ namespace DXLibRef {
 	// 文字変換
 	//--------------------------------------------------------------------------------------------------
 	/*wstringをstringへ変換*/
-	static std::string WStringToString(std::wstring_view oWString) {
+	static std::string WStringToString(std::wstring_view oWString) noexcept {
 		// wstring → SJIS
 		int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), int(oWString.size() + 1), nullptr, 0, NULL, NULL);
 		// バッファの取得
@@ -166,7 +166,7 @@ namespace DXLibRef {
 		return oRet;
 	}
 	/*stringをwstringへ変換する*/
-	static std::wstring StringToWString(std::string_view oString) {
+	static std::wstring StringToWString(std::string_view oString) noexcept {
 		// SJIS → wstring
 		int iBufferSize = MultiByteToWideChar(CP_ACP, 0, oString.data(), int(oString.size() + 1), nullptr, 0);
 		// バッファの取得
@@ -184,17 +184,16 @@ namespace DXLibRef {
 	// フォントファイル管理
 	//--------------------------------------------------------------------------------------------------
 	class FontInstallClass {
-		DESIGNVECTOR	m_Font;
 		std::string		m_Path;
 	public:
-		void Install(LPCSTR font_path) {
+		void Install(LPCSTR font_path) noexcept {
 			m_Path = font_path;
-			if (AddFontResourceEx(m_Path.c_str(), FR_PRIVATE, &m_Font) == 0) {
+			if (AddFontResourceEx(m_Path.c_str(), FR_PRIVATE, NULL) == 0) {
 				MessageBox(NULL, "フォント読込失敗", "", MB_OK);
 			}
 		}
-		void Remove() {
-			if (RemoveFontResourceEx(m_Path.c_str(), FR_PRIVATE, &m_Font) == 0) {
+		void Remove() noexcept {
+			if (RemoveFontResourceEx(m_Path.c_str(), FR_PRIVATE, NULL) == 0) {
 				MessageBox(NULL, "フォント読込削除", "", MB_OK);
 			}
 		}

@@ -654,7 +654,7 @@ namespace DXLibRef {
 			return "NONE";
 		};
 	private:
-		const int			GetStrtoID(const char* Str) const noexcept {
+		int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
 				case ControlType::XBox:
 					for (size_t i = 0; i < XBoxNum; i++) {
@@ -680,7 +680,7 @@ namespace DXLibRef {
 				default:
 					break;
 			}
-			return -1;
+			return INVALID_ID;
 		}
 		const char*			GetSavePath(void) const noexcept {
 			switch (m_ControlType) {
@@ -738,16 +738,16 @@ namespace DXLibRef {
 
 		auto& GetKey(PADS select) noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
 		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
-		const auto GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
-		const auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
+		auto GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
+		auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
 
-		const auto GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
+		auto GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
 		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_reserve = assign; }
 
-		const bool GetButtonPress(int ID);
+		bool GetButtonPress(int ID);
 		void GetPushAnySwitch(PADS select);
 
-		const bool GetPushAnySwitchLocal(PADS select, int ID);
+		bool GetPushAnySwitchLocal(PADS select, int ID);
 	public:
 		void SetMouseMoveEnable(bool value) noexcept { m_MouseMoveEnable = value; }
 		void SetGuideUpdate(void) noexcept { m_IsUpdate = true; }
@@ -791,7 +791,7 @@ namespace DXLibRef {
 				default:
 					break;
 			}
-			Key.back()->AddGuidePC(-1, GuideStr);
+			Key.back()->AddGuidePC(INVALID_ID, GuideStr);
 		}
 	public:
 		void Execute(void) noexcept;
@@ -805,6 +805,14 @@ namespace DXLibRef {
 		float			m_AddxRad{0.f};
 		float			m_AddyRad{0.f};
 		unsigned long long	m_Flags{0};
+	public:
+		InputControl(void) noexcept {}
+		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
+		InputControl(InputControl&& tgt) noexcept { *this = tgt; }
+		//InputControl& operator=(const InputControl&) = delete;
+		//InputControl& operator=(InputControl&& o) = delete;
+
+		virtual ~InputControl(void) noexcept {}
 	public:
 		void			ResetKeyInput(void) noexcept {
 			this->m_Flags = 0;
@@ -830,23 +838,23 @@ namespace DXLibRef {
 		const auto&		GetAddxRad(void) const noexcept { return this->m_AddxRad; }
 		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
 
-		const auto	GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
+		auto		GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
 
-		const auto operator+(const InputControl& o) const noexcept {
+		auto operator+(const InputControl& o) const noexcept {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad + o.m_AddxRad;
 			tmp.m_AddyRad = this->m_AddyRad + o.m_AddyRad;
 			tmp.m_Flags = this->m_Flags;
 			return tmp;
 		}
-		const auto operator-(const InputControl& o) const noexcept {
+		auto operator-(const InputControl& o) const noexcept {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad - o.m_AddxRad;
 			tmp.m_AddyRad = this->m_AddyRad - o.m_AddyRad;
 			tmp.m_Flags = this->m_Flags;
 			return tmp;
 		}
-		const auto operator*(float per) const noexcept {
+		auto operator*(float per) const noexcept {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad *per;
 			tmp.m_AddyRad = this->m_AddyRad *per;

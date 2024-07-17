@@ -19,7 +19,7 @@ namespace DXLibRef {
 				return 1.f;
 		}
 	}
-	bool IntoMouse(int x1, int  y1, int  x2, int  y2) noexcept {
+	bool IntoMouse(int x1, int y1, int x2, int y2) noexcept {
 		auto* Pad = PadControl::Instance();
 		int mx =Pad->GetMS_X();
 		int my = Pad->GetMS_Y();
@@ -30,15 +30,15 @@ namespace DXLibRef {
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
 		VECTOR vec_from = campos.get();		// カメラの位置
-		VECTOR vec_lookat = camvec.get();   // カメラの注視点
-		VECTOR vec_up = camup.get();        // カメラの上方向
+		VECTOR vec_lookat = camvec.get();  // カメラの注視点
+		VECTOR vec_up = camup.get();    // カメラの上方向
 		CreateLookAtMatrix(&mat_view, &vec_from, &vec_lookat, &vec_up);
 		SetCameraNearFar(near_t, far_t);
 		SetupCamera_Perspective(fov);
 		MATRIX proj = GetCameraProjectionMatrix();
 		// ビューポート行列（スクリーン行列）の作成
-		float w = (float)DrawParts->GetScreenY(1920) / 2.0f;
-		float h = (float)DrawParts->GetScreenY(1080) / 2.0f;
+		float w = static_cast<float>(DrawParts->GetScreenY(1920)) / 2.0f;
+		float h = static_cast<float>(DrawParts->GetScreenY(1080)) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,
@@ -72,7 +72,7 @@ namespace DXLibRef {
 			return (MouseOver && Pad->GetMouseClick().trigger());
 		};
 		//文字
-		const bool GetMsgPosOn(int* xp1, int *yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
+		bool GetMsgPosOn(int* xp1, int *yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
@@ -136,7 +136,7 @@ namespace DXLibRef {
 
 				SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
 				SetBox(xpmin, yp, xpmin + (xpmax - xpmin)*std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
-					   MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
+					  MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
 			SetMsgWW(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
@@ -225,10 +225,10 @@ namespace DXLibRef {
 				int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
 					xp1 - DrawParts->GetUIY(6), yp + DrawParts->GetUIY(18),
-					xp1 - DrawParts->GetUIY(6) + static_cast<int>(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(-1, d.GetMsg()), DrawParts->GetUIY(200))*d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
+					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(INVALID_ID, d.GetMsg()), DrawParts->GetUIY(200)))*d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-																	  static_cast<int>(xp1), static_cast<int>(yp), d.GetMsgColor(), Black, d.GetMsg());
+				Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+																	 static_cast<int>(xp1), static_cast<int>(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -312,7 +312,7 @@ namespace DXLibRef {
 			if (m_Active) {
 				xp1 = xm2 - DrawParts->GetUIY(140);
 				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), Red, LocalizeParts->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
@@ -467,17 +467,17 @@ namespace DXLibRef {
 					{
 						int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
 						int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
-						float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
-						float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
+						float xs = static_cast<float>(this->m_XSize) * this->m_FrameInfo.m_XScale / 2.f;
+						float ys = static_cast<float>(this->m_YSize) * this->m_FrameInfo.m_YScale / 2.f;
 
-						int   x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
-						int   y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
-						int   x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
-						int   y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
-						int   x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
-						int   y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
-						int   x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
-						int   y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
+						int  x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
+						int  y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
+						int  x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
+						int  y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
+						int  x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
+						int  y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
+						int  x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
+						int  y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
 						m_MouseOver = HitPointToSquare(
 							mx, my,
 							xp + x1, yp + y1,
@@ -514,17 +514,17 @@ namespace DXLibRef {
 		{
 			int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
 			int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
-			float xs = this->m_XSize * this->m_FrameInfo.m_XScale / 2.f;
-			float ys = this->m_YSize * this->m_FrameInfo.m_YScale / 2.f;
+			float xs = static_cast<float>(this->m_XSize) * this->m_FrameInfo.m_XScale / 2.f;
+			float ys = static_cast<float>(this->m_YSize) * this->m_FrameInfo.m_YScale / 2.f;
 
-			int   x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
-			int   y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
-			int   x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
-			int   y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
-			int   x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
-			int   y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
-			int   x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
-			int   y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
+			int  x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
+			int  y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
+			int  x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
+			int  y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
+			int  x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
+			int  y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
+			int  x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
+			int  y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
 			DrawQuadrangle(
 				xp + x1, yp + y1,
 				xp + x2, yp + y2,
@@ -583,7 +583,7 @@ namespace DXLibRef {
 				xp, yp,
 				1.0, 1.0,
 				XCenter, YCenter,
-				(double)rad,
+				static_cast<double>(rad),
 				m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
 				FALSE,
 				LocalizeParts->Get(this->m_TextID),
@@ -604,7 +604,7 @@ namespace DXLibRef {
 				xp, yp,
 				1.0, 1.0,
 				XCenter, YCenter,
-				(double)rad,
+				static_cast<double>(rad),
 				m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
 				int FontHandle,
 				this->m_EdgeColor,
@@ -664,12 +664,12 @@ namespace DXLibRef {
 		if (m_Frame < 0) { return; }
 		float FramePer = 0.f;
 		//現在のアニメ番号を取得
-		m_NowAnim = -1;
+		m_NowAnim = INVALID_ID;
 		int tmpFrame = m_Frame;
 		for (auto& a : m_AnimeFrame) {
 			if (tmpFrame < a.m_framepoint) {
 				m_NowAnim = static_cast<int>(&a - &m_AnimeFrame.front());
-				FramePer = (float)tmpFrame / a.m_framepoint;
+				FramePer = static_cast<float>(tmpFrame) / static_cast<float>(a.m_framepoint);
 				switch (a.m_LerpType) {
 					case LerpType::linear:
 						FramePer = FramePer;
@@ -686,7 +686,7 @@ namespace DXLibRef {
 			}
 			tmpFrame -= a.m_framepoint;
 		}
-		if (m_NowAnim == -1) {
+		if (m_NowAnim == INVALID_ID) {
 			m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
 			FramePer = 1.f;
 		}
@@ -734,7 +734,7 @@ namespace DXLibRef {
 		std::sort(m_CommonParts.begin(), m_CommonParts.end(), [&](const std::unique_ptr<UI_CommonParts>& A, const std::unique_ptr<UI_CommonParts>& B) {
 			return (A->GetLayer() != B->GetLayer()) ? (A->GetLayer() < B->GetLayer()) : (A->GetUniqueID() < B->GetUniqueID());
 		});
-		if (UniqueIDNum == 0) { UniqueIDNum = -1; }
+		if (UniqueIDNum == 0) { UniqueIDNum = INVALID_ID; }
 	}
 	void UISystem::UI_OneLayer::Update(void) noexcept {
 		for (auto& p : m_CommonAnimes) {
@@ -758,7 +758,7 @@ namespace DXLibRef {
 			p.reset();
 		}
 		m_CommonParts.clear();
-		UniqueIDNum = -1;
+		UniqueIDNum = INVALID_ID;
 	}
 	//全体
 	int UISystem::AddUI(const char* path) noexcept {
@@ -768,7 +768,7 @@ namespace DXLibRef {
 				return static_cast<int>(&l - &m_Layer.front());
 			}
 		}
-		return -1;
+		return INVALID_ID;
 	}
 	void UISystem::DelUI(int layer) noexcept {
 		auto& l = m_Layer.at(static_cast<size_t>(layer));

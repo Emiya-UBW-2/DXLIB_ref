@@ -72,7 +72,7 @@ namespace DXLibRef {
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(-1, GuideString) + DrawParts->GetUIY(12);
+			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(INVALID_ID, GuideString) + DrawParts->GetUIY(12);
 		}
 		return ofs;
 	}
@@ -86,11 +86,11 @@ namespace DXLibRef {
 			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
+		Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
 	}
 
-	const bool PadControl::GetButtonPress(int ID) {
+	bool PadControl::GetButtonPress(int ID) {
 		switch (m_ControlType) {
 			case ControlType::XBox:
 				{
@@ -165,14 +165,14 @@ namespace DXLibRef {
 		return false;
 	}
 
-	const bool PadControl::GetPushAnySwitchLocal(PADS select, int ID) {
+	bool PadControl::GetPushAnySwitchLocal(PADS select, int ID) {
 		auto* SE = SoundPool::Instance();
 		if (GetButtonPress(ID)) {
 			auto& P = m_PadsInfo.at(static_cast<size_t>(select));
 			if (P.m_assign != ID) {
 			}
 			else if (P.m_Key.trigger()) {
-				ID = (P.m_reserve == -1) ? P.m_assign : -1;
+				ID = (P.m_reserve == INVALID_ID) ? P.m_assign : INVALID_ID;
 			}
 			else {
 				return true;
@@ -182,7 +182,7 @@ namespace DXLibRef {
 			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
 				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
-					P2.m_reserve = -1;
+					P2.m_reserve = INVALID_ID;
 					break;
 				}
 			}
@@ -239,7 +239,7 @@ namespace DXLibRef {
 
 
 	void PadControl::Load(void) noexcept {
-		int mdata = -1;
+		int mdata = INVALID_ID;
 		if (std::filesystem::is_regular_file(GetSavePath())) {
 			mdata = FileRead_open(GetSavePath(), FALSE);
 		}
@@ -345,7 +345,7 @@ namespace DXLibRef {
 						if (abs(LS_X) < 10) { LS_X = 0; }
 						if (abs(LS_Y) < 10) { LS_Y = 0; }
 
-						float deg = rad2deg(atan2f((float)LS_X, -(float)LS_Y));
+						float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
 						bool w_key = false;
 						bool s_key = false;
 						bool a_key = false;
@@ -377,8 +377,8 @@ namespace DXLibRef {
 
 						if (!DrawParts->IsPause()) {
 							auto* OptionParts = OPTION::Instance();
-							Look_XradAdd = std::clamp((float)RS_X / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-							Look_YradAdd = std::clamp(-(float)RS_Y / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+							Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+							Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 						}
 						else {
 							Look_XradAdd = 0.f;
@@ -400,7 +400,7 @@ namespace DXLibRef {
 							LS_Y = input.Rz;
 						}
 
-						float deg = rad2deg(atan2f((float)LS_X, -(float)LS_Y));
+						float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
 						bool w_key = false;
 						bool s_key = false;
 						bool a_key = false;
@@ -429,8 +429,8 @@ namespace DXLibRef {
 						}
 
 						auto* OptionParts = OPTION::Instance();
-						Look_XradAdd = (float)RS_X / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-						Look_YradAdd = -(float)RS_Y / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+						Look_XradAdd = static_cast<float>(RS_X) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+						Look_YradAdd = -static_cast<float>(RS_Y) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					}
 				}
 				break;

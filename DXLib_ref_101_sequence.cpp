@@ -103,7 +103,7 @@ namespace DXLibRef {
 							color = Yellow;
 						}
 						//十分！
-						if (FPSAvgs.at(static_cast<size_t>(m_FPSAvg)) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+						if (FPSAvgs.at(static_cast<size_t>(m_FPSAvg)) > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
 							color = Green;
 						}
 
@@ -113,10 +113,10 @@ namespace DXLibRef {
 						for (auto& f : FPSAvgs) {
 							Avg += f;
 						}
-						Avg = Avg / ((float)FPSAvgs.size());
+						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																			  DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
+						Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																			 DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
 					DebugParts->DebugWindow(DrawParts->GetUIY(1920 - 350), DrawParts->GetUIY(150));
@@ -151,7 +151,7 @@ namespace DXLibRef {
 							color = Yellow;
 						}
 						//十分！
-						if (FPSAvgs.at(static_cast<size_t>(m_FPSAvg)) > (OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+						if (FPSAvgs.at(static_cast<size_t>(m_FPSAvg)) > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
 							color = Green;
 						}
 
@@ -161,10 +161,10 @@ namespace DXLibRef {
 						for (auto& f : FPSAvgs) {
 							Avg += f;
 						}
-						Avg = Avg / ((float)FPSAvgs.size());
+						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(-1, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																			  DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
+						Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+																			 DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
 					DebugParts->DebugWindow(DrawParts->GetUIY(1920 - 350), DrawParts->GetUIY(150));

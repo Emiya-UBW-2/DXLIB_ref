@@ -118,7 +118,7 @@ namespace DXLibRef {
 					DepthThreshold += 0.05f;
 				}
 
-				printfDx("RayInterval   :%d\n", RayInterval);
+				printfDx("RayInterval  :%d\n", RayInterval);
 				printfDx("DepthThreshold:%f\n", DepthThreshold);
 #endif // DEBUG
 				SetUseTextureToShader(0, SSRColorScreen.get());
@@ -126,17 +126,17 @@ namespace DXLibRef {
 				SetUseTextureToShader(2, SSRDepthScreen.get());
 				SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
 				SetUseTextureToShader(4, bkScreen2.get());
-				m_Shader.SetPixelParam(3, (float)RayInterval, 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
+				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
 				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
-				m_Shader.SetPixelParam(5, (float)OptionParts->GetParamInt(EnumSaveParam::Reflection),0.f,0.f, 0.f);
+				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)),0.f,0.f, 0.f);
 				{
 					m_Shader.Draw(m_SSRScreenVertex);
 				}
-				SetUseTextureToShader(0, -1);
-				SetUseTextureToShader(1, -1);
-				SetUseTextureToShader(2, -1);
-				SetUseTextureToShader(3, -1);
-				SetUseTextureToShader(4, -1);
+				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(1, INVALID_ID);
+				SetUseTextureToShader(2, INVALID_ID);
+				SetUseTextureToShader(3, INVALID_ID);
+				SetUseTextureToShader(4, INVALID_ID);
 			}
 			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 8, 200);
 			TargetGraph->SetDraw_Screen(false);
@@ -189,9 +189,9 @@ namespace DXLibRef {
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, -1);
-				SetUseTextureToShader(1, -1);
-				SetUseTextureToShader(2, -1);
+				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(1, INVALID_ID);
+				SetUseTextureToShader(2, INVALID_ID);
 			}
 		}
 	};
@@ -276,11 +276,11 @@ namespace DXLibRef {
 			BufScreen[2].SetDraw_Screen(true);
 				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
 			GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					   DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
+					  DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
+					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[2].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
+					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
 			TargetGraph->SetDraw_Screen(true);
 			{
 				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
@@ -438,7 +438,7 @@ namespace DXLibRef {
 			GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 			GraphBlendBlt(TargetGraph->get(), bkScreen2.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
+					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				AberrationScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
@@ -493,7 +493,7 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			GraphBlendBlt(TargetGraph->get(), bkScreen.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					   DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
+					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen();
 			{
 				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
@@ -552,14 +552,14 @@ namespace DXLibRef {
 			// 外周部分用の Sin, Cos テーブルを作成する
 			Angle = 0.0f;
 			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
-				AngleSinTable.at(static_cast<size_t>(i)) = (float)sin((double)Angle);
-				AngleCosTable.at(static_cast<size_t>(i)) = (float)cos((double)Angle);
+				AngleSinTable.at(static_cast<size_t>(i)) = std::sin(Angle);
+				AngleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
 			}
 
 			// 内側の盛り上がっているように見せる箇所で使用する Cos テーブルを作成する
 			Angle = 0.0f;
 			for (i = 0; i < CIRCLE_RADIUS_VERTEX_NUM; i++, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
-				InCircleCosTable.at(static_cast<size_t>(i)) = (float)cos((double)Angle);
+				InCircleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
 			}
 
 			// ポリゴン頂点インデックスの準備
@@ -599,20 +599,20 @@ namespace DXLibRef {
 					CenterDistance = Radius;
 
 					// 中心に引き込まれる距離を算出
-					AbsorptionDistance = Absorption * j / (CIRCLE_RADIUS_VERTEX_NUM - 1);
+					AbsorptionDistance = Absorption * static_cast<float>(j) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
 					// 中心に向かって移動する距離を算出
 					AbsorptionMoveX = Cos * AbsorptionDistance;
 					AbsorptionMoveY = Sin * AbsorptionDistance;
 
 					// スクリーン座標の決定
-					Vert->pos.x = Cos * CenterDistance + CenterX;
-					Vert->pos.y = Sin * CenterDistance + CenterY;
+					Vert->pos.x = Cos * CenterDistance + static_cast<float>(CenterX);
+					Vert->pos.y = Sin * CenterDistance + static_cast<float>(CenterY);
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Vert->pos.x + AbsorptionMoveX) / DrawParts->GetScreenY(1920);
-					Vert->v = (Vert->pos.y + AbsorptionMoveY) / DrawParts->GetScreenY(1080);
+					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(DrawParts->GetScreenY(1920));
+					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(DrawParts->GetScreenY(1080));
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -638,16 +638,16 @@ namespace DXLibRef {
 					CenterDistance = InCircleCosTable[static_cast<size_t>(j)] * Radius;
 
 					// 画像座標視点での円の中心までの距離を算出
-					GraphCenterDistance = ((CIRCLE_RADIUS_VERTEX_NUM - 1) - j) * (Absorption + Radius) / (CIRCLE_RADIUS_VERTEX_NUM - 1);
+					GraphCenterDistance = static_cast<float>((CIRCLE_RADIUS_VERTEX_NUM - 1) - j) * (Absorption + Radius) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
 					// スクリーン座標の決定
-					Vert->pos.x = Cos * CenterDistance + CenterX;
-					Vert->pos.y = Sin * CenterDistance + CenterY;
+					Vert->pos.x = Cos * CenterDistance + static_cast<float>(CenterX);
+					Vert->pos.y = Sin * CenterDistance + static_cast<float>(CenterY);
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Cos * GraphCenterDistance + CenterX) / DrawParts->GetScreenY(1920);
-					Vert->v = (Sin * GraphCenterDistance + CenterY) / DrawParts->GetScreenY(1080);
+					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(DrawParts->GetScreenY(1920));
+					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(DrawParts->GetScreenY(1080));
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -682,7 +682,7 @@ namespace DXLibRef {
 				// 画面を歪ませて描画
 				DrawCircleScreen(
 					DrawParts->GetScreenY(1920 / 2), DrawParts->GetScreenY(1080 / 2),
-					(float)DrawParts->GetScreenY(1920 * 2 / 3), 120.0f, BufScreen);
+					static_cast<float>(DrawParts->GetScreenY(1920 * 2 / 3)), 120.0f, BufScreen);
 			}
 		}
 	};
@@ -712,7 +712,7 @@ namespace DXLibRef {
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, -1);
+				SetUseTextureToShader(0, INVALID_ID);
 			}
 		}
 	};
@@ -783,9 +783,9 @@ namespace DXLibRef {
 					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, -1);
-				SetUseTextureToShader(1, -1);
-				SetUseTextureToShader(2, -1);
+				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(1, INVALID_ID);
+				SetUseTextureToShader(2, INVALID_ID);
 			}
 			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 300);
 			TargetGraph->SetDraw_Screen();
@@ -938,10 +938,10 @@ namespace DXLibRef {
 		{
 			done();
 		}
-		SetRenderTargetToShader(0, -1);
+		SetRenderTargetToShader(0, INVALID_ID);
 		if (m_IsActiveGBuffer) {
-			SetRenderTargetToShader(1, -1);
-			SetRenderTargetToShader(2, -1);
+			SetRenderTargetToShader(1, INVALID_ID);
+			SetRenderTargetToShader(2, INVALID_ID);
 		}
 	}
 	void PostPassEffect::LoadGBuffer(void) noexcept {

@@ -43,4 +43,79 @@ namespace DXLibRef {
 		}
 		FileRead_close(mdata);
 	}
+	void FontPool::Fonthave::Set(FontType type, int fontSize) noexcept {
+		auto* DrawParts = DXDraw::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
+		this->m_fontsize = fontSize;
+		this->m_Type = type;
+		switch (this->m_Type) {
+		case FontType::Nomal_Edge:
+			this->m_size = 32;
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, INVALID_ID, DrawParts->GetUIX(1));
+			}
+			else {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, INVALID_ID, DrawParts->GetUIX(1));
+			}
+			break;
+		case FontType::Nomal_EdgeL:
+			this->m_size = 32;
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, INVALID_ID, DrawParts->GetUIX(3));
+			}
+			else {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, INVALID_ID, DrawParts->GetUIX(3));
+			}
+			break;
+		case FontType::Nomal_AA:
+			this->m_size = 92;
+			this->m_scaleType = DX_DRAWMODE_NEAREST;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_NORMAL, INVALID_ID, INVALID_ID);
+			}
+			else {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING, INVALID_ID, INVALID_ID);
+			}
+			break;
+		case FontType::Nomal_ItalicAA:
+			this->m_size = 92;
+			this->m_scaleType = DX_DRAWMODE_NEAREST;
+			this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), (this->m_fontsize != INVALID_ID) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, INVALID_ID, INVALID_ID, true);
+			break;
+		case FontType::Gothic_Edge:
+			this->m_size = 32;
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_EDGE, INVALID_ID, DrawParts->GetUIX(1));
+			}
+			else {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, INVALID_ID, DrawParts->GetUIX(1));
+			}
+			break;
+		case FontType::Gothic_AA:
+			this->m_size = 32;
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_NORMAL, INVALID_ID, INVALID_ID);
+			}
+			else {
+				this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, INVALID_ID, INVALID_ID);
+			}
+			break;
+		case FontType::WW_Gothic:
+			this->m_size = 32;
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			if (this->m_fontsize != INVALID_ID) {
+				this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_fontsize, DX_FONTTYPE_EDGE, INVALID_ID, DrawParts->GetUIX(3));
+			}
+			else {
+				this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, INVALID_ID, DrawParts->GetUIX(3));
+			}
+			break;
+		default:
+			break;
+		}
+	}
 };

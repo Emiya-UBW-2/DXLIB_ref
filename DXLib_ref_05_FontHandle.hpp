@@ -1,7 +1,7 @@
 ﻿/*=============================================================================
-  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
-  Distributed under the Boost Software License, Version 1.0.
-  (See https://www.boost.org/LICENSE_1_0.txt)
+ Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
+ Distributed under the Boost Software License, Version 1.0.
+ (See https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #pragma once
 #include "DXLib_ref.h"
@@ -32,7 +32,7 @@ namespace DXLibRef {
 		unsigned int edge_color = 0
 	)
 	{
-		if (0 == string.length())  throw std::invalid_argument("empty string not allowed.");
+		if (0 == string.length()) throw std::invalid_argument("empty string not allowed.");
 		if (draw_area_x_right < draw_area_x_left || draw_area_y_bottom < draw_area_y_top) throw std::invalid_argument("");
 
 		//一文字ずつの描画幅情報を取得する
@@ -71,7 +71,7 @@ namespace DXLibRef {
 				DxLib::DrawStringFToHandle(draw_area_x_left + padding, draw_area_y_top + current_y_relative, line_string.c_str(), color, font_handle, edge_color, false);
 				//itが指す文字が先頭になる
 				line_front_string_byte_pos = current_string_byte_pos;
-				current_y_relative += line_space;
+				current_y_relative += static_cast<float>(line_space);
 				line_front_it = it;
 				if (area_height < current_y_relative) return current_y_relative;//描画可能領域(y)を超えたら終了
 			}
@@ -81,7 +81,7 @@ namespace DXLibRef {
 		const float padding = 0.f;// (area_width - last_line_width) / 2.0f;
 		const auto line_string = string.substr(line_front_string_byte_pos / sizeof(TCHAR));
 		DxLib::DrawStringFToHandle(draw_area_x_left + padding, draw_area_y_top + current_y_relative, line_string.c_str(), color, font_handle, edge_color, false);
-		return current_y_relative + line_space;
+		return current_y_relative + static_cast<float>(line_space);
 	}
 
 
@@ -100,7 +100,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr FontHandle(int h) : handle_(h) {}
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 	public:
 		constexpr FontHandle(void) : handle_(invalid_handle) {}
 		FontHandle(const FontHandle&) = delete;
@@ -132,11 +132,11 @@ namespace DXLibRef {
 			return DxLib::GetDrawFormatStringWidthToHandle(this->handle_, String.c_str(), args...);
 		}
 		int GetDrawExtendWidth(float siz, std::basic_string_view<TCHAR> String) const noexcept {
-			return DxLib::GetDrawExtendNStringWidthToHandle(double(siz), String.data(), String.size(), this->handle_, FALSE);
+			return DxLib::GetDrawExtendNStringWidthToHandle(static_cast<double>(siz), String.data(), String.size(), this->handle_, FALSE);
 		}
 		template <typename... Args>
 		int GetDrawExtendWidthFormat(float siz, const std::string& String, Args&&... args) const noexcept {
-			return DxLib::GetDrawExtendFormatStringWidthToHandle(double(siz), this->handle_, String.c_str(), args...);
+			return DxLib::GetDrawExtendFormatStringWidthToHandle(static_cast<double>(siz), this->handle_, String.c_str(), args...);
 		}
 		//文字描画
 		template <typename... Args>
@@ -183,13 +183,13 @@ namespace DXLibRef {
 			}
 			switch (FontX) {
 			case FontXCenter::LEFT:
-				DxLib::DrawExtendFormatString2ToHandle(x, y, (double)xsiz, (double)ysiz, Color, EdgeColor, this->handle_, String.c_str(), args...);
+				DxLib::DrawExtendFormatString2ToHandle(x, y, static_cast<double>(xsiz), static_cast<double>(ysiz), Color, EdgeColor, this->handle_, String.c_str(), args...);
 				break;
 			case FontXCenter::MIDDLE:
-				DxLib::DrawExtendFormatString2ToHandle(x - GetDrawExtendWidthFormat(xsiz, String.c_str(), args...) / 2, y, (double)xsiz, (double)ysiz, Color, EdgeColor, this->handle_, String.c_str(), args...);
+				DxLib::DrawExtendFormatString2ToHandle(x - GetDrawExtendWidthFormat(xsiz, String.c_str(), args...) / 2, y, static_cast<double>(xsiz), static_cast<double>(ysiz), Color, EdgeColor, this->handle_, String.c_str(), args...);
 				break;
 			case FontXCenter::RIGHT:
-				DxLib::DrawExtendFormatString2ToHandle(x - GetDrawExtendWidthFormat(xsiz, String.c_str(), args...), y, (double)xsiz, (double)ysiz, Color, EdgeColor, this->handle_, String.c_str(), args...);
+				DxLib::DrawExtendFormatString2ToHandle(x - GetDrawExtendWidthFormat(xsiz, String.c_str(), args...), y, static_cast<double>(xsiz), static_cast<double>(ysiz), Color, EdgeColor, this->handle_, String.c_str(), args...);
 				break;
 			default:
 				break;
@@ -197,14 +197,14 @@ namespace DXLibRef {
 		}
 
 		//文字描画
-		const auto DrawStringAutoFit(int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& String) const noexcept {
-			return draw_string_center((float)x1, (float)x2, (float)y1, (float)y2, String, Color, this->handle_, EdgeColor);
+		auto DrawStringAutoFit(int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& String) const noexcept {
+			return draw_string_center(static_cast<float>(x1), static_cast<float>(x2), static_cast<float>(y1), static_cast<float>(y2), String, Color, this->handle_, EdgeColor);
 		}
 		//ハンドル作成
-		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = -1, int CharSet = -1, int EdgeSize = -1, bool Italic = false) {
+		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) {
 			return { DxLib::CreateFontToHandleWithStrLen(FontName.data(), FontName.length(), Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
-		static FontHandle Create(int Size, int FontType = -1, int CharSet = -1, int EdgeSize = -1, bool Italic = false) {
+		static FontHandle Create(int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) {
 			return { DxLib::CreateFontToHandle(nullptr, Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
 	};
@@ -285,109 +285,37 @@ namespace DXLibRef {
 			const auto&		Get_fontsize(void)const noexcept { return this->m_fontsize; }
 			template <typename... Args>
 			void DrawString(int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& String, Args&&... args) const noexcept {
-				if (this->m_fontsize != -1) {
+				if (this->m_fontsize != INVALID_ID) {
 					this->m_Handle.DrawString(FontX, FontY, x, y, Color, EdgeColor, String, args...);
 				}
 				else {
 					auto prev = GetDrawMode();
 					SetDrawMode(this->m_scaleType);
-					this->m_Handle.DrawExtendString(FontX, FontY, x, y, (float)fontSize / (float)this->m_size, (float)fontSize / (float)this->m_size, Color, EdgeColor, String, args...);
+					this->m_Handle.DrawExtendString(FontX, FontY, x, y, static_cast<float>(fontSize) / static_cast<float>(this->m_size), static_cast<float>(fontSize) / static_cast<float>(this->m_size), Color, EdgeColor, String, args...);
 					SetDrawMode(prev);
 				}
 			}
 
-			const auto DrawStringAutoFit(int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& String) const noexcept {
+			auto DrawStringAutoFit(int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& String) const noexcept {
 				return this->m_Handle.DrawStringAutoFit(x1, y1, x2, y2, Color, EdgeColor, String);
 			}
 
 			template <typename... Args>
-			const auto GetStringWidth(int fontSize, const std::string& String, Args&&... args) const noexcept {
-				if (this->m_fontsize != -1) {
+			auto GetStringWidth(int fontSize, const std::string& String, Args&&... args) const noexcept {
+				//auto* DrawParts = DXDraw::Instance(); +DrawParts->GetUIY(8)//エッジ分:
+				if (this->m_fontsize != INVALID_ID) {
 					return this->m_Handle.GetDrawWidthFormat(String, args...);
 				}
 				else {
-					return this->m_Handle.GetDrawExtendWidthFormat((float)fontSize / (float)this->m_size, String, args...);
+					return this->m_Handle.GetDrawExtendWidthFormat(static_cast<float>(fontSize) / static_cast<float>(this->m_size), String, args...);
 				}
 			}
 
-			void			Set(FontType type, int fontSize = -1) noexcept {
-				auto* LocalizeParts = LocalizePool::Instance();
-				this->m_fontsize = fontSize;
-				this->m_Type = type;
-				switch (this->m_Type) {
-				case FontType::Nomal_Edge:
-					this->m_size = 32;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
-					}
-					else {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
-					}
-					break;
-				case FontType::Nomal_EdgeL:
-					this->m_size = 32;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
-					}
-					else {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
-					}
-					break;
-				case FontType::Nomal_AA:
-					this->m_size = 92;
-					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
-					}
-					else {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
-					}
-					break;
-				case FontType::Nomal_ItalicAA:
-					this->m_size = 92;
-					this->m_scaleType = DX_DRAWMODE_NEAREST;
-					this->m_Handle = FontHandle::Create(LocalizeParts->Get(0), (this->m_fontsize != -1) ? this->m_fontsize : this->m_size, DX_FONTTYPE_NORMAL, -1, -1, true);
-					break;
-				case FontType::Gothic_Edge:
-					this->m_size = 32;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_EDGE, -1, 1);
-					}
-					else {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 1);
-					}
-					break;
-				case FontType::Gothic_AA:
-					this->m_size = 32;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_fontsize, DX_FONTTYPE_NORMAL, -1, -1);
-					}
-					else {
-						this->m_Handle = FontHandle::Create(LocalizeParts->Get(1), this->m_size, DX_FONTTYPE_ANTIALIASING, -1, -1);
-					}
-					break;
-				case FontType::WW_Gothic:
-					this->m_size = 32;
-					this->m_scaleType = DX_DRAWMODE_BILINEAR;
-					if (this->m_fontsize != -1) {
-						this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_fontsize, DX_FONTTYPE_EDGE, -1, 3);
-					}
-					else {
-						this->m_Handle = FontHandle::Create("MS UI Gothic", this->m_size, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
-					}
-					break;
-				default:
-					break;
-				}
-			}
+			void			Set(FontType type, int fontSize = INVALID_ID) noexcept;
 		};
 	private:
 		std::vector<std::unique_ptr<Fonthave>> havehandle;
-		size_t Add(FontType type, int fontSize = -1) noexcept {
+		size_t Add(FontType type, int fontSize = INVALID_ID) noexcept {
 			for (auto& h : this->havehandle) {
 				if (h->Get_type() == type && h->Get_fontsize() == fontSize) {
 					return static_cast<size_t>(&h - &this->havehandle.front());
@@ -406,6 +334,6 @@ namespace DXLibRef {
 
 		~FontPool(void) noexcept {}
 	public:
-		std::unique_ptr<Fonthave>& Get(FontType type, int fontSize = -1) noexcept { return this->havehandle[Add(type, fontSize)]; }
+		std::unique_ptr<Fonthave>& Get(FontType type, int fontSize = INVALID_ID) noexcept { return this->havehandle[Add(type, fontSize)]; }
 	};
 };

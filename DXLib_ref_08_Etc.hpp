@@ -42,8 +42,8 @@ namespace DXLibRef {
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	//クリップボードに画像をコピー
-	static const auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
-		HWND   hwnd = GetMainWindowHandle();
+	static auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
+		HWND  hwnd = GetMainWindowHandle();
 
 		if (IsClipboardFormatAvailable(CF_BITMAP) == FALSE) { return false; }	// 指定した形式のデータがクリップボードにあるかを問い合わせる
 		if (OpenClipboard(hwnd) == FALSE) { return false; }						// オープン
@@ -51,10 +51,10 @@ namespace DXLibRef {
 		CloseClipboard();														// クローズ
 		if (hBitmap == NULL) { return false; }
 
-		BITMAP bitmap;
+		BITMAP bitmap{};
 		GetObject(hBitmap, sizeof(BITMAP), &bitmap);
 
-		BITMAPINFO bmpInfo;
+		BITMAPINFO bmpInfo{};
 		bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 		bmpInfo.bmiHeader.biWidth = bitmap.bmWidth;
 		bmpInfo.bmiHeader.biHeight = bitmap.bmHeight;
@@ -75,11 +75,11 @@ namespace DXLibRef {
 		return true;
 	}
 	//矩形と点との2D判定
-	static bool HitPointToRectangle(int xp, int  yp, int x1, int  y1, int  x2, int  y2) noexcept { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
+	static bool HitPointToRectangle(int xp, int yp, int x1, int y1, int x2, int y2) noexcept { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
 
-	static bool HitRectangleToRectangle(int xp1, int  yp1, int xp2, int  yp2, int x1, int  y1, int  x2, int  y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
+	static bool HitRectangleToRectangle(int xp1, int yp1, int xp2, int yp2, int x1, int y1, int x2, int y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
 
-	static bool HitPointToSquare(int xp, int  yp, int x1, int  y1, int  x2, int  y2, int  x3, int  y3, int  x4, int  y4) noexcept {
+	static bool HitPointToSquare(int xp, int yp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) noexcept {
 		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.f), VGet(static_cast<float>(xp - x1), static_cast<float>(yp - y1), 0.f)).z) { return false; }
 		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2), 0.f), VGet(static_cast<float>(xp - x2), static_cast<float>(yp - y2), 0.f)).z) { return false; }
 		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3), 0.f), VGet(static_cast<float>(xp - x3), static_cast<float>(yp - y3), 0.f)).z) { return false; }
@@ -88,7 +88,7 @@ namespace DXLibRef {
 	}
 
 	//マウスと矩形の判定
-	extern bool IntoMouse(int x1, int  y1, int  x2, int  y2) noexcept;
+	extern bool IntoMouse(int x1, int y1, int x2, int y2) noexcept;
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -211,10 +211,10 @@ namespace DXLibRef {
 	}
 	//グラデーションのある矩形を描画
 	static void DrawGradationBox_2D(int x1, int y1, int x2, int y2, COLOR_U8 color1, COLOR_U8 color2, const unsigned char UorL = 255) noexcept {
-		VERTEX2D Vertex[6];
+		VERTEX2D Vertex[6]{};
 		// 左上の頂点の情報をセット
-		Vertex[0].pos.x = (float)x1;
-		Vertex[0].pos.y = (float)y1;
+		Vertex[0].pos.x = static_cast<float>(x1);
+		Vertex[0].pos.y = static_cast<float>(y1);
 		Vertex[0].pos.z = 0.0f;
 		Vertex[0].rhw = 1.0f;
 		Vertex[0].dif = color1;
@@ -222,8 +222,8 @@ namespace DXLibRef {
 		Vertex[0].v = 0.0f;
 
 		// 右上の頂点の情報をセット
-		Vertex[1].pos.x = (float)x2;
-		Vertex[1].pos.y = (float)y1;
+		Vertex[1].pos.x = static_cast<float>(x2);
+		Vertex[1].pos.y = static_cast<float>(y1);
 		Vertex[1].pos.z = 0.0f;
 		Vertex[1].rhw = 1.0f;
 		Vertex[1].dif = color2;
@@ -233,8 +233,8 @@ namespace DXLibRef {
 		Vertex[5] = Vertex[1];
 
 		// 左下の頂点の情報をセット
-		Vertex[2].pos.x = (float)x1;
-		Vertex[2].pos.y = (float)y2;
+		Vertex[2].pos.x = static_cast<float>(x1);
+		Vertex[2].pos.y = static_cast<float>(y2);
 		Vertex[2].pos.z = 0.0f;
 		Vertex[2].rhw = 1.0f;
 		Vertex[2].dif = color1;
@@ -244,8 +244,8 @@ namespace DXLibRef {
 		Vertex[4] = Vertex[2];
 
 		// 右下の頂点の情報をセット
-		Vertex[3].pos.x = (float)x2;
-		Vertex[3].pos.y = (float)y2;
+		Vertex[3].pos.x = static_cast<float>(x2);
+		Vertex[3].pos.y = static_cast<float>(y2);
 		Vertex[3].pos.z = 0.0f;
 		Vertex[3].rhw = 1.0f;
 		Vertex[3].u = 0.0f;
@@ -341,14 +341,14 @@ namespace DXLibRef {
 		float xs = static_cast<float>(x2 - x1);
 		float ys = static_cast<float>(y2 - y1);
 
-		float CenterX = (float)x1 + xs * XCenter;
-		float CenterY = (float)y1 + ys * YCenter;
+		float CenterX = static_cast<float>(x1) + xs * XCenter;
+		float CenterY = static_cast<float>(y1) + ys * YCenter;
 
 		auto SetPoint = [&](float xper, float yper, int xc, int yc) {
 			Vertex.resize(Vertex.size() + 1);
 			Vertex.back().pos = VGet(
-				(float)x1 + xs * xper - CenterX,
-				(float)y1 + ys * yper - CenterY,
+				static_cast<float>(x1) + xs * xper - CenterX,
+					static_cast<float>(y1) + ys * yper - CenterY,
 				0.f);
 
 			Vertex.back().pos = VGet(
@@ -358,8 +358,8 @@ namespace DXLibRef {
 
 			Vertex.back().rhw = 1.0f;
 			Vertex.back().dif = GetColorU8(255, 255, 255, 255);
-			Vertex.back().u = (float)xc / 3.f;
-			Vertex.back().v = (float)yc / 3.f;
+			Vertex.back().u = static_cast<float>(xc) / 3.f;
+			Vertex.back().v = static_cast<float>(yc) / 3.f;
 			return (unsigned short)(Vertex.size() - 1);
 		};
 		auto SetBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
@@ -373,13 +373,13 @@ namespace DXLibRef {
 			Index.emplace_back(RU);// 右上の頂点の情報をセット
 		};
 
-		float xminpt = (float)xminp / xs;
-		float xmaxpt = (float)xmaxp / xs;
+		float xminpt = static_cast<float>(xminp) / xs;
+		float xmaxpt = static_cast<float>(xmaxp) / xs;
 		float xmaxt = 1.f - xmaxpt;
 		float xmidt = xmaxt - xminpt;
 
-		float yminpt = (float)yminp / ys;
-		float ymaxpt = (float)ymaxp / ys;
+		float yminpt = static_cast<float>(yminp) / ys;
+		float ymaxpt = static_cast<float>(ymaxp) / ys;
 		float ymaxt = 1.f - ymaxpt;
 		float ymidt = ymaxt - yminpt;
 
@@ -405,7 +405,7 @@ namespace DXLibRef {
 				SetBox(xmin, ymin, xmax, ymax, xc, yc);
 				//次
 				ymin = ymax;
-				ymax = TilingFlag ? (ymin + ymidt / ytile) : ymaxt;
+				ymax = TilingFlag ? (ymin + ymidt / static_cast<float>(ytile)) : ymaxt;
 				if (y == 0) {
 					yc = 1;
 				}
@@ -416,7 +416,7 @@ namespace DXLibRef {
 			}
 			//次
 			xmin = xmax;
-			xmax = TilingFlag ? (xmin + xmidt / xtile) : xmaxt;
+			xmax = TilingFlag ? (xmin + xmidt / static_cast<float>(xtile)) : xmaxt;
 			if (x == 0) {
 				xc = 1;
 			}
@@ -462,55 +462,55 @@ namespace DXLibRef {
 		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
 		//文字
 		template <typename... Args>
-		extern const int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
-			auto* DrawParts = DXDraw::Instance();
+		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->GetStringWidth(-1, ((std::string)String).c_str(), args...) + DrawParts->GetUIY(8);//エッジ分:
+			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
 		}
 
-		const bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
+		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
 
 		template <typename... Args>
-		extern const int SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
-			if (String == "") { return 0; }
-			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLen(ySize, String, args...);
-			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
-				return 0;
+		extern void SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
+			if (String == "") {
+				return;
 			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->DrawString(-1, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
-			return xSize;//エッジ分
+			auto* Fonts = FontPool::Instance();
+			int xSize = (FontX == FontHandle::FontXCenter::LEFT) ? 0 : GetMsgLen(ySize, String, args...);//左揃えでは計算の必要がない
+			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
+				return;
+			}
+			Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		};
 		//
 		template <typename... Args>
-		extern const int GetMsgLenWW(int ySize, std::string_view String, Args&&... args) noexcept {
-			auto* DrawParts = DXDraw::Instance();
+		extern int GetMsgLenWW(int ySize, std::string_view String, Args&&... args) noexcept {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->GetStringWidth(-1, ((std::string)String).c_str(), args...) + DrawParts->GetUIY(8);//エッジ分:
+			return Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
 		}
 
 		template <typename... Args>
-		extern const int SetMsgWW(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
-			if (String == "") { return 0; }
-			auto* Fonts = FontPool::Instance();
-			int xSize = GetMsgLenWW(ySize, String, args...);
-			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
-				return 0;
+		extern void SetMsgWW(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
+			if (String == "") {
+				return;
 			}
-			Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->DrawString(-1, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
-			return xSize;//エッジ分
+			auto* Fonts = FontPool::Instance();
+			int xSize = (FontX == FontHandle::FontXCenter::LEFT) ? 0 : GetMsgLenWW(ySize, String, args...);//左揃えでは計算の必要がない
+			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
+				return;
+			}
+			Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		};
 		//
 		template <typename... Args>
-		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
 			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsgWW((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+			SetMsgWW((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
 		template <typename... Args>
-		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
+		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
 			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(LineHeight, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 		};
 
 		extern bool CheckBox(int xp1, int yp1, bool switchturn) noexcept;
@@ -591,12 +591,12 @@ namespace DXLibRef {
 		static const int charLength = 512;
 	public:
 		//文字列から=より右の値取得
-		static const std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
+		static std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
 		//文字列から=より右の値取得
-		static const std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
+		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
 	public:
 		//左辺の情報もとる
-		static const std::string		getcmd(int p1, int *p2) noexcept {
+		static std::string		getcmd(int p1, int *p2) noexcept {
 			char mstr[charLength]; /*tank*/
 			FileRead_gets(mstr, charLength, p1);
 			*p2 = std::stoi(getright(mstr));
@@ -609,32 +609,32 @@ namespace DXLibRef {
 			return std::string(mstr);
 		}
 		//=より右の値取得
-		static const std::string		_str(int p1) noexcept {
+		static std::string		_str(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return getright(mstr);
 		}
-		static const long int			_int(int p1) noexcept {
+		static long int			_int(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return std::stoi(getright(mstr));
 		}
-		static const long int			_long(int p1) noexcept {
+		static long int			_long(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return std::stol(getright(mstr));
 		}
-		static const unsigned long int	_ulong(int p2) noexcept {
+		static unsigned long int	_ulong(int p2) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p2);
 			return std::stoul(getright(mstr));
 		}
-		static const float				_float(int p1) noexcept {
+		static float				_float(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return std::stof(getright(mstr));
 		}
-		static const bool				_bool(int p1) noexcept {
+		static bool				_bool(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return (getright(mstr).find("true") != std::string::npos);
@@ -642,7 +642,7 @@ namespace DXLibRef {
 	};
 	//モデルのフレーム情報保持
 	class frames {
-		int			m_FrameID{ -1 };
+		int			m_FrameID{ INVALID_ID };
 		Matrix4x4DX	m_WorldPos;
 		Matrix4x4DX	m_LocalPos;
 	public:
@@ -654,7 +654,7 @@ namespace DXLibRef {
 		void			Set(int i, const MV1& obj) noexcept {
 			m_FrameID = i;
 			m_WorldPos = obj.GetFrameLocalWorldMatrix(i);
-			if (obj.frame_parent(i) >= 0) {
+			if (obj.GetFrameParent(i) >= 0) {
 				m_LocalPos = obj.GetFrameLocalMatrix(i);
 			}
 			else {
@@ -675,8 +675,15 @@ namespace DXLibRef {
 		Vector3DX vec;		//加速
 		Matrix4x4DX mat;		//回転
 		Vector3DX rad;		//回転
-
-		const Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
+	public:
+		moves(void) noexcept {}
+		moves(const moves& tgt) noexcept { *this = tgt; }
+		moves(moves&& tgt) noexcept { *this = tgt; }
+		//moves& operator=(const moves&) = delete;
+		//moves& operator=(moves&& o) = delete;
+		~moves(void) noexcept {}
+	public:
+		Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
 
 		void			operator=(const moves&tgt) noexcept {
 			this->pos = tgt.pos;
@@ -685,7 +692,7 @@ namespace DXLibRef {
 			this->mat = tgt.mat;
 			this->rad = tgt.rad;
 		}
-		const auto operator+(const moves& o) const noexcept {
+		auto operator+(const moves& o) const noexcept {
 			//mat,reposに関しては必要に応じて1
 			moves tmp;
 			tmp.pos = this->pos + o.pos;
@@ -693,7 +700,7 @@ namespace DXLibRef {
 			tmp.rad = this->rad + o.rad;
 			return tmp;
 		}
-		const auto operator-(const moves& o) const noexcept {
+		auto operator-(const moves& o) const noexcept {
 			//mat,reposに関しては必要に応じて1
 			moves tmp;
 			tmp.pos = this->pos - o.pos;
@@ -702,7 +709,7 @@ namespace DXLibRef {
 
 			return tmp;
 		}
-		const auto operator*(float per) const noexcept {
+		auto operator*(float per) const noexcept {
 			//mat,reposに関しては必要に応じて1
 			moves tmp;
 			tmp.pos = this->pos*per;
@@ -751,17 +758,17 @@ namespace DXLibRef {
 		//更新
 		void			Execute(bool key) noexcept;
 		//オンオフの取得
-		const bool on(void) const noexcept { return m_on; }
+		bool on(void) const noexcept { return m_on; }
 		//押した瞬間
-		const bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
+		bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
 		//押している間
-		const bool press(void) const noexcept { return m_press; }
+		bool press(void) const noexcept { return m_press; }
 		//押している間
-		const bool repeat(void) const noexcept { return m_repeat; }
+		bool repeat(void) const noexcept { return m_repeat; }
 		//離した瞬間
-		const bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
+		bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
 		//離している間
-		const bool release(void) const noexcept { return !m_press; }
+		bool release(void) const noexcept { return !m_press; }
 	};
 	// 2次元振り子演算
 	class Pendulum2D {
@@ -780,7 +787,7 @@ namespace DXLibRef {
 		}
 		void Update(void) noexcept;
 	public:
-		const auto GetRad(void) const noexcept { return this->m_rad; }
+		auto GetRad(void) const noexcept { return this->m_rad; }
 		void AddRad(float value) noexcept { this->m_rad += value; }
 	};
 
@@ -802,10 +809,10 @@ namespace DXLibRef {
 				int yp1 = dispy;
 				int xp2 = dispx;
 				int yp2 = 0;
-				Screen_vertex[0].pos = VGet((float)xp1, (float)yp1, 0.0f);
-				Screen_vertex[1].pos = VGet((float)xp2, (float)yp1, 0.0f);
-				Screen_vertex[2].pos = VGet((float)xp1, (float)yp2, 0.0f);
-				Screen_vertex[3].pos = VGet((float)xp2, (float)yp2, 0.0f);
+				Screen_vertex[0].pos = VGet(static_cast<float>(xp1), static_cast<float>(yp1), 0.0f);
+				Screen_vertex[1].pos = VGet(static_cast<float>(xp2), static_cast<float>(yp1), 0.0f);
+				Screen_vertex[2].pos = VGet(static_cast<float>(xp1), static_cast<float>(yp2), 0.0f);
+				Screen_vertex[3].pos = VGet(static_cast<float>(xp2), static_cast<float>(yp2), 0.0f);
 				Screen_vertex[0].dif = GetColorU8(255, 255, 255, 255);
 				Screen_vertex[1].dif = GetColorU8(255, 255, 255, 255);
 				Screen_vertex[2].dif = GetColorU8(255, 255, 255, 255);
@@ -833,27 +840,27 @@ namespace DXLibRef {
 		};
 	private:
 		//シェーダーハンドル
-		int m_VertexShaderhandle{-1};
-		int m_GeometryShaderhandle{-1};
-		int m_PixelShaderhandle{-1};
+		int m_VertexShaderhandle{ INVALID_ID };
+		int m_GeometryShaderhandle{ INVALID_ID };
+		int m_PixelShaderhandle{ INVALID_ID };
 		//シェーダーに渡す追加パラメーターを配するハンドル
-		std::array<int, 4> LightCameraMatrixConstantBufferHandle{-1};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
-		std::array<int, 4> m_VertexShadercbhandle{-1};
-		int m_GeometryShaderMatcbhandle{-1};
-		int m_PixelShaderSendDispSizeHandle{-1};
-		std::array<int, 4> m_PixelShadercbhandle{-1};
+		std::array<int, 4> LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
+		std::array<int, 4> m_VertexShadercbhandle{};
+		int m_GeometryShaderMatcbhandle{ INVALID_ID };
+		int m_PixelShaderSendDispSizeHandle{ INVALID_ID };
+		std::array<int, 4> m_PixelShadercbhandle{};
 
 	public:
 		ShaderUseClass(void) noexcept {
 			//シェーダーハンドル
-			m_VertexShaderhandle = -1;
-			m_GeometryShaderhandle = -1;
-			m_PixelShaderhandle = -1;
+			m_VertexShaderhandle = INVALID_ID;
+			m_GeometryShaderhandle = INVALID_ID;
+			m_PixelShaderhandle = INVALID_ID;
 			//シェーダーに渡す追加パラメーターを配するハンドル
-			for (auto& h : m_VertexShadercbhandle) { h = -1; }
-			m_GeometryShaderMatcbhandle = -1;
-			m_PixelShaderSendDispSizeHandle = -1;
-			for (auto& h : m_PixelShadercbhandle) { h = -1; }
+			for (auto& h : m_VertexShadercbhandle) { h = INVALID_ID; }
+			m_GeometryShaderMatcbhandle = INVALID_ID;
+			m_PixelShaderSendDispSizeHandle = INVALID_ID;
+			for (auto& h : m_PixelShadercbhandle) { h = INVALID_ID; }
 		}
 		~ShaderUseClass(void) noexcept {
 			Dispose();
@@ -930,7 +937,7 @@ namespace DXLibRef {
 		//シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			if (this->m_GeometryShaderhandle == -1) { return; }
+			if (this->m_GeometryShaderhandle == INVALID_ID) { return; }
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
 
 			// ビュー変換用行列をセットする
@@ -982,8 +989,8 @@ namespace DXLibRef {
 		void			SetPixelDispSize(int dispx, int dispy) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
-			dispsize->u = (float)dispx;
-			dispsize->v = (float)dispy;
+			dispsize->u = static_cast<float>(dispx);
+			dispsize->v = static_cast<float>(dispy);
 			UpdateShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);									// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle, DX_SHADERTYPE_PIXEL, 2);				// ピクセルシェーダー用の定数バッファを定数バッファレジスタ2にセット
 		}
@@ -1010,9 +1017,9 @@ namespace DXLibRef {
 			MV1SetUseOrigShader(TRUE);
 			doing();
 			MV1SetUseOrigShader(FALSE);
-			SetUseVertexShader(-1);
-			SetUsePixelShader(-1);
-			SetUseGeometryShader(-1);
+			SetUseVertexShader(INVALID_ID);
+			SetUsePixelShader(INVALID_ID);
+			SetUseGeometryShader(INVALID_ID);
 		}
 		//2D画像に適用する場合の関数
 		void			Draw(ScreenVertex& Screenvertex) noexcept {
@@ -1129,7 +1136,7 @@ namespace DXLibRef {
 			if (Data) {
 				return Data->second;
 			}
-			return (int64_t)-1;
+			return (int64_t)INVALID_ID;
 		}
 	public:
 		void Save(void) noexcept {
@@ -1188,10 +1195,10 @@ namespace DXLibRef {
 			}
 			void UpdateActive(void) noexcept;
 		public:
-			const float GetFlip(void) noexcept { return m_Flip_Y; }
-			const float ActivePer(void) noexcept { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time)*5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
-			const char* GetMsg(void) noexcept { return m_Message; }
-			const unsigned int GetMsgColor(void) noexcept { return m_Color; }
+			float GetFlip(void) const noexcept { return m_Flip_Y; }
+			float ActivePer(void) const noexcept { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time)*5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
+			const char* GetMsg(void) const noexcept { return m_Message; }
+			unsigned int GetMsgColor(void) const noexcept { return m_Color; }
 		};
 	private:
 		std::array<SideLogData, 16> data;
@@ -1270,7 +1277,7 @@ namespace DXLibRef {
 			void			Update(void) noexcept;
 			void			Draw(int xcenter,int ycenter) noexcept;
 		public:
-			const auto IsEnd(void) const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
+			auto IsEnd(void) const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
 	private:
 		std::array<PopUpDrawClass, 24> que;
@@ -1286,7 +1293,7 @@ namespace DXLibRef {
 
 		~PopUp(void) noexcept {}
 	public:
-		const auto IsActivePop(void) const noexcept { return (NowSel != LastSel); }
+		auto IsActivePop(void) const noexcept { return (NowSel != LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
 					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
@@ -1617,10 +1624,10 @@ namespace DXLibRef {
 		private:
 			std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
 			std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
-			int UniqueIDNum{-1};
+			int UniqueIDNum{ INVALID_ID };
 			bool m_IsEnd{ false };//アニメーション側からの終了命令
 		public:
-			const auto IsActive(void) const noexcept { return UniqueIDNum != -1; }
+			auto IsActive(void) const noexcept { return UniqueIDNum != INVALID_ID; }
 		public:
 			void Load(const char* path) noexcept;
 			void Update(void) noexcept;
@@ -1675,4 +1682,10 @@ namespace DXLibRef {
 	public:
 		void Update(void) noexcept;
 	};
+
+	//ファイルが存在するか
+	static bool IsFileExist(const char* Path) noexcept {
+		FILEINFO FileInfo;
+		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)-1);
+	}
 };

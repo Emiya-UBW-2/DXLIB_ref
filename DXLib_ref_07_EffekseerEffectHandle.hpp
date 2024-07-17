@@ -1,7 +1,7 @@
 ﻿/*=============================================================================
-  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
-  Distributed under the Boost Software License, Version 1.0.
-  (See https://www.boost.org/LICENSE_1_0.txt)
+ Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
+ Distributed under the Boost Software License, Version 1.0.
+ (See https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #pragma once
 #include "DXLib_ref.h"
@@ -14,7 +14,7 @@ namespace DXLibRef {
 		int handle_;
 		constexpr Effekseer2DPlayingHandle(int h) noexcept : handle_(h) {}
 		friend EffekseerEffectHandle;
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 
 	public:
 		constexpr Effekseer2DPlayingHandle(void) noexcept : handle_(invalid_handle) {}
@@ -29,13 +29,13 @@ namespace DXLibRef {
 			return *this;
 		}
 		~Effekseer2DPlayingHandle(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				this->Stop();
 			}
 		}
-		//    @brief	2D表示のエフェクトが再生中か取得する。
-		//    @return	再生中かどうか?
-		//    @return	true:再生中、false:再生されていない、もしくは再生終了
+		//  @brief	2D表示のエフェクトが再生中か取得する。
+		//  @return	再生中かどうか?
+		//  @return	true:再生中、false:再生されていない、もしくは再生終了
 		bool IsPlaying(void) const noexcept {
 			return 0 == IsEffekseer2DEffectPlaying(this->handle_);
 		}
@@ -43,36 +43,36 @@ namespace DXLibRef {
 		void Stop(void) const noexcept {
 			StopEffekseer2DEffect(this->handle_);
 		}
-		//    @brief	再生中の2D表示のエフェクトの位置を設定する。
-		//    @param	x	X座標
-		//    @param	y	Y座標
+		//  @brief	再生中の2D表示のエフェクトの位置を設定する。
+		//  @param	x	X座標
+		//  @param	y	Y座標
 		void SetPos(Vector3DX pos) const noexcept {
 			SetPosPlayingEffekseer2DEffect(this->handle_, pos.x, pos.y, pos.z);
 		}
-		//    @brief	再生中の2D表示のエフェクトの角度を設定する。
-		//    @param	x	X軸角度(ラジアン)
-		//    @param	y	Y軸角度(ラジアン)
-		//    @param	z	Z軸角度(ラジアン)
-		//    @note
-		//    回転の方向は時計回りである。
-		//    回転の順番は Z軸回転 → X軸回転 → Y軸回転である。
+		//  @brief	再生中の2D表示のエフェクトの角度を設定する。
+		//  @param	x	X軸角度(ラジアン)
+		//  @param	y	Y軸角度(ラジアン)
+		//  @param	z	Z軸角度(ラジアン)
+		//  @note
+		//  回転の方向は時計回りである。
+		//  回転の順番は Z軸回転 → X軸回転 → Y軸回転である。
 		void SetRotation(float x, float y, float z) const noexcept {
 			SetRotationPlayingEffekseer2DEffect(this->handle_, x, y, z);
 		}
-		//    @brief	再生中の2D表示のエフェクトの拡大率を設定する。
-		//    @param	x	X方向拡大率
-		//    @param	y	Y方向拡大率
-		//    @param	z	Z方向拡大率
+		//  @brief	再生中の2D表示のエフェクトの拡大率を設定する。
+		//  @param	x	X方向拡大率
+		//  @param	y	Y方向拡大率
+		//  @param	z	Z方向拡大率
 		void SetScale(float x, float y, float z) const noexcept {
 			SetScalePlayingEffekseer2DEffect(this->handle_, x, y, z);
 		}
-		//    @brief	再生中の2D表示のエフェクトの再生速度を取得する。
-		//    @return	再生速度
+		//  @brief	再生中の2D表示のエフェクトの再生速度を取得する。
+		//  @return	再生速度
 		float GetSpeed(void) const noexcept {
 			return GetSpeedPlayingEffekseer2DEffect(this->handle_);
 		}
-		//    @brief	再生中の2D表示のエフェクトの再生速度を設定する。
-		//    @param	speed	再生速度
+		//  @brief	再生中の2D表示のエフェクトの再生速度を設定する。
+		//  @param	speed	再生速度
 		void SetSpeed(float speed) const noexcept {
 			SetSpeedPlayingEffekseer2DEffect(this->handle_, speed);
 		}
@@ -82,16 +82,16 @@ namespace DXLibRef {
 		}
 		// * @brief ハンドルを破棄する
 		void Dispose(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				this->Stop();
-				this->handle_ = -1;
+				this->handle_ = INVALID_ID;
 			}
 		}
-		//    @brief	指定されたEffekseerにより再生中の2Dエフェクトを描画する。
-		//    @note
-		//    特定のエフェクトのみを描画したい時に使用する。
-		//    特定のエフェクトを描画する。
-		//    DrawEffekseer2Dとは併用できない。
+		//  @brief	指定されたEffekseerにより再生中の2Dエフェクトを描画する。
+		//  @note
+		//  特定のエフェクトのみを描画したい時に使用する。
+		//  特定のエフェクトを描画する。
+		//  DrawEffekseer2Dとは併用できない。
 		void Draw(void) noexcept {
 			DrawEffekseer2D_Draw(this->handle_);
 		}
@@ -103,7 +103,7 @@ namespace DXLibRef {
 		int handle_;
 		constexpr Effekseer3DPlayingHandle(int h) noexcept : handle_(h) {}
 		friend EffekseerEffectHandle;
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 
 	public:
 		constexpr Effekseer3DPlayingHandle(void) noexcept : handle_(invalid_handle) {}
@@ -118,7 +118,7 @@ namespace DXLibRef {
 			return *this;
 		}
 		~Effekseer3DPlayingHandle(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				this->Stop();
 			}
 		}
@@ -189,9 +189,9 @@ namespace DXLibRef {
 		 * @brief ハンドルを破棄する
 		 */
 		void Dispose(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				this->Stop();
-				this->handle_ = -1;
+				this->handle_ = INVALID_ID;
 			}
 		}
 		/**
@@ -211,7 +211,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr EffekseerEffectHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 
 	public:
 		constexpr EffekseerEffectHandle(void) noexcept : handle_(invalid_handle) {}
@@ -226,19 +226,19 @@ namespace DXLibRef {
 			return *this;
 		}
 		~EffekseerEffectHandle(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				DeleteEffekseerEffect(this->handle_);
 			}
 		}
 		void Dispose(void) noexcept {
-			if (-1 != this->handle_) {
+			if (INVALID_ID != this->handle_) {
 				DeleteEffekseerEffect(this->handle_);
-				this->handle_ = -1;
+				this->handle_ = INVALID_ID;
 			}
 		}
 		/*
-		//    @brief	メモリ上のEffekseerのエフェクトリソースを2D表示で再生する。
-		//    @return	エフェクトのハンドル
+		//  @brief	メモリ上のEffekseerのエフェクトリソースを2D表示で再生する。
+		//  @return	エフェクトのハンドル
 		Effekseer2DPlayingHandle Play2D(void) const noexcept {
 			return { PlayEffekseer2DEffect(this->handle_) };
 		}
@@ -251,7 +251,7 @@ namespace DXLibRef {
 			return { PlayEffekseer3DEffect(this->handle_) };
 		}
 		[[deprecated]] int get(void) const noexcept { return this->handle_; }
-		constexpr explicit operator bool(void) noexcept { return -1 != this->handle_; }
+		constexpr explicit operator bool(void) noexcept { return INVALID_ID != this->handle_; }
 		// LoadEffekseerEffectはfileNameをstd::wstringに必ず格納する、オーバーロード必要
 		static EffekseerEffectHandle load(const char* fileName, float magnification = 1.0f) noexcept { return { LoadEffekseerEffect(fileName, magnification) }; }
 		static EffekseerEffectHandle load(const wchar_t* fileName, float magnification = 1.0f) noexcept { return { LoadEffekseerEffect(fileName, magnification) }; }
@@ -334,7 +334,7 @@ namespace DXLibRef {
 
 			~EffectS(void) noexcept {}
 		public:
-			const auto		GetIsPlaying(void) const noexcept { return this->m_handle.IsPlaying(); }
+			auto			GetIsPlaying(void) const noexcept { return this->m_handle.IsPlaying(); }
 			const auto&		GetIsFirst(void) const noexcept { return this->m_IsFirst; }
 		private:
 			void			Ef_Set(const EffekseerEffectHandle& handle_, const Vector3DX& pPos, const Vector3DX& pNormal, float pScale = 1.f) noexcept {
@@ -423,7 +423,7 @@ namespace DXLibRef {
 			this->m_effect.at(static_cast<size_t>(ID)).second[static_cast<size_t>(this->m_effect.at(static_cast<size_t>(ID)).first)]->SetEffectSpeed(speed);
 			++this->m_effect.at(static_cast<size_t>(ID)).first %= EffectNum;
 		}
-		const auto	CheckEffectCount(void) const noexcept {
+		auto		CheckEffectCount(void) const noexcept {
 			int cnt = 0;
 			for (int i = 0; i < EffectNum; i++) {
 				for (auto& t : this->m_effect.at(static_cast<size_t>(i)).second) {
@@ -433,7 +433,7 @@ namespace DXLibRef {
 			return cnt;
 		}
 		//単体で制御したいエフェクトの制御
-		const auto	CheckPlayEffect(EffectResource::Effect ID) const noexcept {
+		auto		CheckPlayEffect(EffectResource::Effect ID) const noexcept {
 			return this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->GetIsPlaying();
 		}
 		void		SetLoop(EffectResource::Effect ID, const Vector3DX& pos_t) noexcept {

@@ -4,8 +4,9 @@ namespace DXLibRef {
 	const ObjectManager* SingletonBase<ObjectManager>::m_Singleton = nullptr;
 
 	void			ObjectManager::AddObject(const SharedObj& NewObj) noexcept {
-		this->m_Object.resize(this->m_Object.size() + 1);
-		this->m_Object.back() = NewObj;
+		this->m_Object.emplace_back(NewObj);
+		this->m_Object.back()->SetObjectID(this->m_LastUniqueID);
+		this->m_LastUniqueID++;
 	}
 	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		const SharedModel* Ptr = nullptr;
@@ -48,7 +49,6 @@ namespace DXLibRef {
 			}
 		}
 	}
-
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		//オブジェクトが増えた場合に備えて範囲forは使わない
 		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
@@ -84,12 +84,6 @@ namespace DXLibRef {
 			o->SetScreenPosition(campos, -1.f);
 		}
 	}
-
-	void			ObjectManager::Draw_Depth(void) noexcept {
-		for (auto& o : this->m_Object) {
-			o->Depth_Draw();
-		}
-	}
 	void			ObjectManager::Draw(void) noexcept {
 		for (auto& o : this->m_Object) {
 			o->CheckDraw();
@@ -104,7 +98,6 @@ namespace DXLibRef {
 			o->DrawShadow();
 		}
 	}
-
 	void			ObjectManager::DeleteAll(void) noexcept {
 		for (auto& o : this->m_Object) {
 			if (o) {
@@ -118,5 +111,6 @@ namespace DXLibRef {
 			}
 		}
 		this->m_Model.clear();
+		this->m_LastUniqueID = 0;//一旦ユニークIDもリセット
 	}
 };

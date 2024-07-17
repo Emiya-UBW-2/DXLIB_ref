@@ -1,7 +1,7 @@
 ﻿/*=============================================================================
-  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
-  Distributed under the Boost Software License, Version 1.0.
-  (See https://www.boost.org/LICENSE_1_0.txt)
+ Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
+ Distributed under the Boost Software License, Version 1.0.
+ (See https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #pragma once
 #include "DXLib_ref.h"
@@ -44,8 +44,8 @@ namespace DXLibRef {
 		const MATRIX GetViewMatrix(void) const noexcept {
 			MATRIX mat_view;					// ビュー行列
 			VECTOR vec_from = m_pos.get();		// カメラの位置
-			VECTOR vec_lookat = m_vec.get();   // カメラの注視点
-			VECTOR vec_up = m_up.get();        // カメラの上方向
+			VECTOR vec_lookat = m_vec.get();  // カメラの注視点
+			VECTOR vec_up = m_up.get();    // カメラの上方向
 			CreateLookAtMatrix(&mat_view, &vec_from, &vec_lookat, &vec_up);
 			return mat_view;
 		}
@@ -66,7 +66,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr GraphHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = -1;
+		static constexpr int invalid_handle = INVALID_ID;
 
 	public:
 		constexpr GraphHandle(void) noexcept : handle_(invalid_handle) {}
@@ -99,7 +99,7 @@ namespace DXLibRef {
 			return { DxLib::LoadGraphWithStrLen(FileName.data(), FileName.length(), NotUse3DFlag) };
 		}
 		static GraphHandle LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int *HandleArray, bool NotUse3DFlag = false) noexcept {
-			return { DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum,   XSize, YSize, HandleArray, NotUse3DFlag) };
+			return { DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum,  XSize, YSize, HandleArray, NotUse3DFlag) };
 		}
 
 		static GraphHandle Make(int SizeX, int SizeY, bool trns = false) noexcept {
@@ -129,13 +129,13 @@ namespace DXLibRef {
 
 		void DrawRotaGraph(int posx, int posy, float Exrate, float rad, bool trns) const noexcept {
 			if (IsActive()) {
-				DxLib::DrawRotaGraph(posx, posy, double(Exrate), double(rad), this->handle_, (trns ? TRUE : FALSE));
+				DxLib::DrawRotaGraph(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
 			}
 		}
 
 		void DrawRotaGraphF(float posx, float posy, float Exrate, float rad, bool trns) const noexcept {
 			if (IsActive()) {
-				DxLib::DrawRotaGraphF(posx, posy, double(Exrate), double(rad), this->handle_, (trns ? TRUE : FALSE));
+				DxLib::DrawRotaGraphF(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace DXLibRef {
 			int cx, int cy,
 			float ExtRateX, float ExtRateY, float rad, bool trns) const noexcept {
 			if (IsActive()) {
-				DxLib::DrawRotaGraph3(posx, posy, cx, cy, double(ExtRateX), double(ExtRateY), double(rad), this->handle_, (trns ? TRUE : FALSE));
+				DxLib::DrawRotaGraph3(posx, posy, cx, cy, static_cast<double>(ExtRateX), static_cast<double>(ExtRateY), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace DXLibRef {
 		}
 
 		auto getp(void) noexcept { return &handle_; }
-		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int   XSize, int   YSize, std::vector<GraphHandle> *Handles, bool NotUse3DFlag = false) noexcept {
+		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int  XSize, int  YSize, std::vector<GraphHandle> *Handles, bool NotUse3DFlag = false) noexcept {
 			int* HandleArray = new int[static_cast<size_t>(AllNum)];
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
 

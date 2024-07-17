@@ -6,8 +6,8 @@ namespace DXLibRef {
 	class ModelBaseClass;
 	class ObjectBaseClass;
 
-	typedef std::shared_ptr<ModelBaseClass> SharedModel;
-	typedef std::shared_ptr<ObjectBaseClass> SharedObj;
+	using SharedModel = std::shared_ptr<ModelBaseClass>;
+	using SharedObj = std::shared_ptr<ObjectBaseClass>;
 
 	class ObjectManager : public SingletonBase<ObjectManager> {
 	private:
@@ -15,10 +15,11 @@ namespace DXLibRef {
 	private:
 		std::vector<SharedModel>	m_Model;
 		std::vector<SharedObj>		m_Object;
+		int							m_LastUniqueID{ 0 };
 		switchs						m_ResetP;
 	private:
 		ObjectManager(void) noexcept {
-			m_Object.reserve(256);
+			this->m_Object.reserve(256);
 		}
 		ObjectManager(const ObjectManager&) = delete;
 		ObjectManager(ObjectManager&& o) = delete;
@@ -27,22 +28,19 @@ namespace DXLibRef {
 
 		~ObjectManager(void) noexcept {
 			DeleteAll();
-			m_Object.shrink_to_fit();
+			this->m_Object.shrink_to_fit();
 		}
 	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 		SharedObj*		GetObj(int ModelType, int num) noexcept;
 		void			DelObj(SharedObj* ptr) noexcept;
-		void			DelObj(int ModelType, int num) noexcept { DelObj(GetObj(ModelType, num)); }
+
 	public:
 		void			ExecuteObject(void) noexcept;
 		void			LateExecuteObject(void) noexcept;
-
-		void			Draw_Depth(void) noexcept;
 		void			Draw(void) noexcept;
 		void			Draw_Shadow(void) noexcept;
-
 		void			DeleteAll(void) noexcept;
 	};
 };
