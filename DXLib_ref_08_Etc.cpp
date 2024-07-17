@@ -139,7 +139,7 @@ namespace DXLibRef {
 					  MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
 			}
 			xp = (xmin + (xmax - xmin) / 2);
-			SetMsgWW(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
+			SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
 
 			return value;
 		}
@@ -225,9 +225,9 @@ namespace DXLibRef {
 				int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
 					xp1 - DrawParts->GetUIY(6), yp + DrawParts->GetUIY(18),
-					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(INVALID_ID, d.GetMsg()), DrawParts->GetUIY(200)))*d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
+					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 0)->GetStringWidth(INVALID_ID, d.GetMsg()), DrawParts->GetUIY(200)))*d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
 					Black);
-				Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+				Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 0)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
 																	 static_cast<int>(xp1), static_cast<int>(yp), d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}

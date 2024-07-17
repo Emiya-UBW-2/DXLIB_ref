@@ -184,7 +184,7 @@ namespace DXLibRef {
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		ypos += DrawParts->GetUIY(static_cast<int>(selanim));
-		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
+		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
 		m_Draw(xpos + DrawParts->GetUIY(720 - 324), ypos, isMine);
 	}
 	//
@@ -249,7 +249,7 @@ namespace DXLibRef {
 	}
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
-		WindowSystem::SetMsgWW(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
+		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
 	}
 	//
 	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
@@ -519,7 +519,7 @@ namespace DXLibRef {
 											 DrawParts->SetWindowOrBorderless();
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::WindowMode) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
 									 }
 									 );
@@ -616,7 +616,7 @@ namespace DXLibRef {
 												}
 												int value = WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, ret, FrameLimitsNum);
 												OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
-												WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(250), ypos + LineHeight/2, 
+												WindowSystem::SetMsg(xpos + DrawParts->GetUIY(250), ypos + LineHeight/2, 
 													LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 											}
 									 );
@@ -644,7 +644,7 @@ namespace DXLibRef {
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
 											 OptionWindowClass::Instance()->SetRestart();
 										 }
-										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 									 }
 									 );
@@ -932,7 +932,7 @@ namespace DXLibRef {
 											 LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 										 }
 
-										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight/2, 
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight/2, 
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 									 }
 									 );
@@ -1042,11 +1042,11 @@ namespace DXLibRef {
 										 }
 										 ypos -= LineHeight * 1 / 6;
 										 if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
-											 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
+											 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
 										 }
 										 else {
-											 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
+											 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3, 
 																	LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
 										 }
 
@@ -1059,12 +1059,12 @@ namespace DXLibRef {
 												 case DX_PADTYPE_SWITCH_JOY_CON_R:
 												 case DX_PADTYPE_SWITCH_PRO_CTRL:
 												 case DX_PADTYPE_SWITCH_HORI_PAD:
-													 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
+													 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "„§:DirectInput");
 													 break;
 												 case DX_PADTYPE_XBOX_360:
 												 case DX_PADTYPE_XBOX_ONE:
-													 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
+													 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3, 
 																			LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "„§:XInput");
 													 break;
 												 default:
@@ -1077,7 +1077,7 @@ namespace DXLibRef {
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
 		auto* DrawParts = DXDraw::Instance();
-		WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight/2,
+		WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight/2,
 							  LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
 							  "[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
@@ -1099,7 +1099,7 @@ namespace DXLibRef {
 										 if (isMine && PadControl::Instance()->GetMouseClick().trigger()) {
 											 PadControl::Instance()->ResetAssign();
 										 }
-										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -1267,7 +1267,7 @@ namespace DXLibRef {
 											 Pad->FlipAssign();
 											 Pad->Save();
 										 }
-										 WindowSystem::SetMsgWW(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
 	}

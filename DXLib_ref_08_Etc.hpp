@@ -464,7 +464,7 @@ namespace DXLibRef {
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
+			return Fonts->Get(FontPool::FontType::MS_Gothic, ySize, std::min(ySize / 6, 3))->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
 		}
 
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
@@ -479,32 +479,13 @@ namespace DXLibRef {
 			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
 				return;
 			}
-			Fonts->Get(FontPool::FontType::Nomal_EdgeL, ySize)->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
-		};
-		//
-		template <typename... Args>
-		extern int GetMsgLenWW(int ySize, std::string_view String, Args&&... args) noexcept {
-			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
-		}
-
-		template <typename... Args>
-		extern void SetMsgWW(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
-			if (String == "") {
-				return;
-			}
-			auto* Fonts = FontPool::Instance();
-			int xSize = (FontX == FontHandle::FontXCenter::LEFT) ? 0 : GetMsgLenWW(ySize, String, args...);//¶‘µ‚¦‚Å‚ÍŒvŽZ‚Ì•K—v‚ª‚È‚¢
-			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
-				return;
-			}
-			Fonts->Get(FontPool::FontType::WW_Gothic, ySize)->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			Fonts->Get(FontPool::FontType::MS_Gothic, ySize, std::min(ySize / 6, 3))->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		};
 		//
 		template <typename... Args>
 		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
 			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsgWW((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
+			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
 		template <typename... Args>

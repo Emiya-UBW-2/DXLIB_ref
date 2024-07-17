@@ -664,7 +664,7 @@ namespace DXLibRef {
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{
 				PopUpParts->Draw(GetUIY(720 / 2 + 16), GetUIY(720 / 2 + 16));
-				Fonts->Get(FontPool::FontType::Nomal_EdgeL)->DrawString(GetUIY(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, GetUIY(32), GetUIY(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
+				Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(12), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, GetUIY(32), GetUIY(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
 
 				int xp = GetUIY(720 + 16 + 16);
 				int yp = GetUIY(16);
@@ -894,7 +894,7 @@ namespace DXLibRef {
 						xp1 = xmin + GetUIY(24);
 						yp1 = ymin + LineHeight;
 
-						WindowSystem::SetMsgWW(xp1, yp1 + LineHeight/2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
+						WindowSystem::SetMsg(xp1, yp1 + LineHeight/2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					//
 					{
@@ -924,7 +924,7 @@ namespace DXLibRef {
 						xp1 = xmin + GetUIY(24);
 						yp1 = ymin + LineHeight;
 
-						WindowSystem::SetMsgWW(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
+						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 					}
 					//
 					{
@@ -1047,7 +1047,7 @@ namespace DXLibRef {
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//
 				if (m_PauseFlashCount > 0.5f) {
-					Fonts->Get(FontPool::FontType::Nomal_EdgeL)->DrawString(GetUIY(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
+					Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
 				}
 			}
 			};
@@ -1111,7 +1111,7 @@ namespace DXLibRef {
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//
 				if (m_PauseFlashCount > 0.5f) {
-					Fonts->Get(FontPool::FontType::Nomal_EdgeL)->DrawString(GetUIY(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
+					Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
 				}
 			}
 		};

@@ -72,7 +72,7 @@ namespace DXLibRef {
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
 		if (GuideString != "") {
-			ofs += Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->GetStringWidth(INVALID_ID, GuideString) + DrawParts->GetUIY(12);
+			ofs += Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->GetStringWidth(INVALID_ID, GuideString) + DrawParts->GetUIY(12);
 		}
 		return ofs;
 	}
@@ -86,7 +86,7 @@ namespace DXLibRef {
 			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
-		Fonts->Get(FontPool::FontType::Nomal_Edge, DrawParts->GetUIY(18))->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
+		Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
 	}
 
