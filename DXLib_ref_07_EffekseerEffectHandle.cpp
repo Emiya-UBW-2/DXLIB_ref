@@ -5,5 +5,7 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//ƒVƒ“ƒOƒ‹ƒgƒ“
 	//--------------------------------------------------------------------------------------------------
+#ifdef _USE_EFFEKSEER_
 	const EffectResource* SingletonBase<EffectResource>::m_Singleton = nullptr;
+#endif
 };

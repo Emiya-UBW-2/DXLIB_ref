@@ -7,7 +7,7 @@
 namespace std {
 	template <>
 	struct default_delete<b2Body> {
-		void		operator()(b2Body* body) const {
+		void		operator()(b2Body* body) const noexcept {
 			body->GetWorld()->DestroyBody(body);
 		}
 	};

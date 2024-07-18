@@ -7,6 +7,7 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
+#ifdef _USE_EFFEKSEER_
 	class EffekseerEffectHandle;
 	/*
 	class Effekseer2DPlayingHandle {
@@ -483,5 +484,5 @@ namespace DXLibRef {
 			}
 		}
 	};
-
+#endif
 }

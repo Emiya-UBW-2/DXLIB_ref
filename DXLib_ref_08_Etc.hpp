@@ -1,6 +1,6 @@
 #pragma once
 #include "DXLib_ref.h"
-
+#include<thread>
 //ƒŠƒTƒCƒY
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
@@ -595,7 +595,7 @@ namespace DXLibRef {
 			FileRead_gets(mstr, charLength, p1);
 			return getright(mstr);
 		}
-		static long int			_int(int p1) noexcept {
+		static int			_int(int p1) noexcept {
 			char mstr[charLength] = "";
 			FileRead_gets(mstr, charLength, p1);
 			return std::stoi(getright(mstr));

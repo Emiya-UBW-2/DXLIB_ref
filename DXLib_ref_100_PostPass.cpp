@@ -535,9 +535,9 @@ namespace DXLibRef {
 			int i;
 			VERTEX2D *Vert;
 			WORD *Ind;
-			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleCosTable;
-			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleSinTable;
-			std::array<float, CIRCLE_RADIUS_VERTEX_NUM> InCircleCosTable;
+			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleCosTable{};
+			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleSinTable{};
+			std::array<float, CIRCLE_RADIUS_VERTEX_NUM> InCircleCosTable{};
 
 			// スタックに積むには大きいので static 配列にしました
 			static VERTEX2D Vertex[CIRCLE_RADIUS_VERTEX_NUM * CIRCLE_ANGLE_VERTEX_NUM];
@@ -882,16 +882,24 @@ namespace DXLibRef {
 			}, camInfo);
 		//中間
 		DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [&]() {
+#ifdef _USE_EFFEKSEER_
 			Effekseer_Sync3DSetting();
+#endif
 			doing();
+#ifdef _USE_EFFEKSEER_
 			DrawEffekseer3D();
+#endif
 			doingFront();
 			}, camInfo);
 		//至近
 		DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [&]() {
+#ifdef _USE_EFFEKSEER_
 			Effekseer_Sync3DSetting();
+#endif
 			doing();
+#ifdef _USE_EFFEKSEER_
 			DrawEffekseer3D();
+#endif
 			doingFront();
 			}, camInfo);
 		BufferScreen.SetDraw_Screen(false);

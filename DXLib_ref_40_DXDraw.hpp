@@ -108,20 +108,20 @@ namespace DXLibRef {
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
 
 		//UI以外のスクリーン空間
-		const auto		GetScreenX(int value) const noexcept { return (value * this->m_DispXSize_Max / this->m_DispXSize_Win); }
-		const auto		GetScreenY(int value) const noexcept { return (value * this->m_DispYSize_Max / this->m_DispYSize_Win); }
+		auto			GetScreenX(int value) const noexcept { return (value * this->m_DispXSize_Max / this->m_DispXSize_Win); }
+		auto			GetScreenY(int value) const noexcept { return (value * this->m_DispYSize_Max / this->m_DispYSize_Win); }
 		//UI用
-		int				GetUIX(int p1) noexcept { return (int(p1) * m_DispXSize / basex); }
-		int				GetUIY(int p1) noexcept { return (int(p1) * m_DispYSize / basey); }
+		int				GetUIX(int p1) const noexcept { return (int(p1) * m_DispXSize / basex); }
+		int				GetUIY(int p1) const noexcept { return (int(p1) * m_DispYSize / basey); }
 		//
-		void			GetMousePosition(int* MouseX, int* MouseY) noexcept;
+		void			GetMousePosition(int* MouseX, int* MouseY) const noexcept;
 		const auto&		GetFps(void) const noexcept { return m_FPS; }
 		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
 		const auto&		GetCamViewMatrix(void) const noexcept { return m_CamViewMatrix; }
 		const auto&		GetCamProjectionMatrix(void) const noexcept { return m_CamProjectionMatrix; }
 		const auto&		IsExit(void) const noexcept { return m_IsExitSelect; }
 		const auto&		IsRestart(void) const noexcept { return m_IsRestartSelect; }
-		const auto		IsPause(void) const noexcept { return m_PauseActive.on(); }
+		auto			IsPause(void) const noexcept { return m_PauseActive.on(); }
 		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }

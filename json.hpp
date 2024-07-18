@@ -31,6 +31,8 @@
 #include <utility> // declval, forward, move, pair, swap
 #include <vector> // vector
 
+
+
 // #include <nlohmann/adl_serializer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
@@ -4280,7 +4282,7 @@ inline void concat_into(OutStringType& out, const Arg& arg, Args&& ... rest)
 template<typename OutStringType = std::string, typename... Args>
 inline OutStringType concat(Args && ... args)
 {
-    OutStringType str;
+    OutStringType str{};
     str.reserve(concat_length(args...));
     concat_into(str, std::forward<Args>(args)...);
     return str;
@@ -4316,6 +4318,12 @@ class exception : public std::exception
   protected:
     JSON_HEDLEY_NON_NULL(3)
     exception(int id_, const char* what_arg) : id(id_), m(what_arg) {} // NOLINT(bugprone-throw-keyword-missing)
+
+    //exception(const exception&) = delete;
+    //exception(exception&& o) = delete;
+    //exception& operator=(const exception& o) = delete;
+    //exception& operator=(exception&& o) = delete;
+
 
     static std::string name(const std::string& ename, int id_)
     {
@@ -4443,6 +4451,11 @@ class parse_error : public exception
     parse_error(int id_, std::size_t byte_, const char* what_arg)
         : exception(id_, what_arg), byte(byte_) {}
 
+    //parse_error(const  parse_error&) = delete;
+    //parse_error(parse_error&& o) = delete;
+    //parse_error& operator=(const  parse_error&) = delete;
+    //parse_error& operator=(parse_error&& o) = delete;
+
     static std::string position_string(const position_t& pos)
     {
         return concat(" at line ", std::to_string(pos.lines_read + 1),
@@ -4466,6 +4479,11 @@ class invalid_iterator : public exception
     JSON_HEDLEY_NON_NULL(3)
     invalid_iterator(int id_, const char* what_arg)
         : exception(id_, what_arg) {}
+
+    //invalid_iterator(const invalid_iterator&) = delete;
+    //invalid_iterator(invalid_iterator&& o) = delete;
+    invalid_iterator& operator=(const invalid_iterator&) = delete;
+    //invalid_iterator& operator=(invalid_iterator&& o) = delete;
 };
 
 /// @brief exception indicating executing a member function with a wrong type
@@ -4483,6 +4501,11 @@ class type_error : public exception
   private:
     JSON_HEDLEY_NON_NULL(3)
     type_error(int id_, const char* what_arg) : exception(id_, what_arg) {}
+
+    //type_error(const type_error&) = delete;
+    //type_error(type_error&& o) = delete;
+    type_error& operator=(const type_error&) = delete;
+    //type_error& operator=(type_error&& o) = delete;
 };
 
 /// @brief exception indicating access out of the defined range
@@ -4500,6 +4523,11 @@ class out_of_range : public exception
   private:
     JSON_HEDLEY_NON_NULL(3)
     out_of_range(int id_, const char* what_arg) : exception(id_, what_arg) {}
+
+    //out_of_range(const out_of_range&) = delete;
+    //out_of_range(out_of_range&& o) = delete;
+    //out_of_range& operator=(const out_of_range&) = delete;
+    //out_of_range& operator=(out_of_range&& o) = delete;
 };
 
 /// @brief exception indicating other library errors
@@ -4517,6 +4545,11 @@ class other_error : public exception
   private:
     JSON_HEDLEY_NON_NULL(3)
     other_error(int id_, const char* what_arg) : exception(id_, what_arg) {}
+
+    //other_error(const other_error&) = delete;
+    //other_error(other_error&& o) = delete;
+    other_error& operator=(const other_error&) = delete;
+    //other_error& operator=(other_error&& o) = delete;
 };
 
 }  // namespace detail
@@ -4700,7 +4733,7 @@ template<typename BasicJsonType, typename EnumType,
          enable_if_t<std::is_enum<EnumType>::value, int> = 0>
 inline void from_json(const BasicJsonType& j, EnumType& e)
 {
-    typename std::underlying_type<EnumType>::type val;
+    typename std::underlying_type<EnumType>::type val{};
     get_arithmetic_value(j, val);
     e = static_cast<EnumType>(val);
 }
@@ -4779,7 +4812,7 @@ auto from_json_array_impl(const BasicJsonType& j, ConstructibleArrayType& arr, p
 {
     using std::end;
 
-    ConstructibleArrayType ret;
+    ConstructibleArrayType ret{};
     ret.reserve(j.size());
     std::transform(j.begin(), j.end(),
                    std::inserter(ret, end(ret)), [](const BasicJsonType & i)
@@ -4800,7 +4833,7 @@ inline void from_json_array_impl(const BasicJsonType& j, ConstructibleArrayType&
 {
     using std::end;
 
-    ConstructibleArrayType ret;
+    ConstructibleArrayType ret{};
     std::transform(
         j.begin(), j.end(), std::inserter(ret, end(ret)),
         [](const BasicJsonType & i)
@@ -4872,7 +4905,7 @@ inline void from_json(const BasicJsonType& j, ConstructibleObjectType& obj)
         JSON_THROW(type_error::create(302, concat("type must be object, but is ", j.type_name()), &j));
     }
 
-    ConstructibleObjectType ret;
+    ConstructibleObjectType ret{};
     const auto* inner_object = j.template get_ptr<const typename BasicJsonType::object_t*>();
     using value_type = typename ConstructibleObjectType::value_type;
     std::transform(
@@ -8167,6 +8200,8 @@ class lexer : public lexer_base<BasicJsonType>
                             break;
                     }
                 }
+                error_message = "invalid comment; expecting '/' or '*' after '/'";
+                return false;
             }
 
             // multi-line comments skip input until */ is read
@@ -8202,8 +8237,9 @@ class lexer : public lexer_base<BasicJsonType>
                             continue;
                     }
                 }
+                error_message = "invalid comment; expecting '/' or '*' after '/'";
+                return false;
             }
-
             // unexpected character after reading '/'
             default:
             {
@@ -9361,7 +9397,7 @@ class binary_reader
             case 0x02: // string
             {
                 std::int32_t len{};
-                string_t value;
+                string_t value{};
                 return get_number<std::int32_t, true>(input_format_t::bson, len) && get_bson_string(len, value) && sax->string(value);
             }
 
@@ -9378,7 +9414,7 @@ class binary_reader
             case 0x05: // binary
             {
                 std::int32_t len{};
-                binary_t value;
+                binary_t value{};
                 return get_number<std::int32_t, true>(input_format_t::bson, len) && get_bson_binary(len, value) && sax->binary(value);
             }
 
@@ -9852,7 +9888,7 @@ class binary_reader
 
                     case cbor_tag_handler_t::store:
                     {
-                        binary_t b;
+                        binary_t b{};
                         // use binary subtype and store in binary container
                         switch (current)
                         {
@@ -10225,7 +10261,7 @@ class binary_reader
 
         if (len != 0)
         {
-            string_t key;
+            string_t key{};
             if (len != static_cast<std::size_t>(-1))
             {
                 for (std::size_t i = 0; i < len; ++i)
@@ -10875,7 +10911,7 @@ class binary_reader
             return false;
         }
 
-        string_t key;
+        string_t key{};
         for (std::size_t i = 0; i < len; ++i)
         {
             get();
@@ -11681,7 +11717,7 @@ class binary_reader
                                     exception_message(input_format, "BJData object does not support ND-array size in optimized format", "object"), nullptr));
         }
 
-        string_t key;
+        string_t key{};
         if (size_and_type.first != npos)
         {
             if (JSON_HEDLEY_UNLIKELY(!sax->start_object(size_and_type.first)))
@@ -12181,6 +12217,11 @@ class parser
         // read first token
         get_token();
     }
+
+    parser(const parser&) = delete;
+    parser(parser&& o) = delete;
+    parser& operator=(const parser&) = delete;
+    parser& operator=(parser&& o) = delete;
 
     /*!
     @brief public parser interface
@@ -14530,7 +14571,7 @@ class json_pointer
             JSON_THROW(detail::type_error::create(314, "only objects can be unflattened", &value));
         }
 
-        BasicJsonType result;
+        BasicJsonType result{};
 
         // iterate the JSON object values
         for (const auto& element : *value.m_value.object)
@@ -16756,7 +16797,7 @@ class binary_writer
     {
         static_assert(sizeof(std::uint8_t) == sizeof(CharType), "size of CharType must be equal to std::uint8_t");
         static_assert(std::is_trivial<CharType>::value, "CharType must be trivial");
-        CharType result;
+        CharType result{};
         std::memcpy(&result, &x, sizeof(x));
         return result;
     }
@@ -16870,7 +16911,7 @@ Target reinterpret_bits(const Source source)
 {
     static_assert(sizeof(Target) == sizeof(Source), "size mismatch");
 
-    Target target;
+    Target target{};
     std::memcpy(&target, &source, sizeof(Source));
     return target;
 }
@@ -16998,6 +17039,11 @@ struct boundaries
     diyfp w;
     diyfp minus;
     diyfp plus;
+
+    boundaries(const boundaries&) = delete;
+    boundaries(boundaries&& o) = delete;
+    boundaries& operator=(const boundaries&) = delete;
+    boundaries& operator=(boundaries&& o) = delete;
 };
 
 /*!
@@ -20483,7 +20529,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                   const bool ensure_ascii = false,
                   const error_handler_t error_handler = error_handler_t::strict) const
     {
-        string_t result;
+        string_t result{};
         serializer s(detail::output_adapter<char, string_t>(result), indent_char, error_handler);
 
         if (indent >= 0)
@@ -24638,3 +24684,4 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
 
 
 #endif  // INCLUDE_NLOHMANN_JSON_HPP_
+

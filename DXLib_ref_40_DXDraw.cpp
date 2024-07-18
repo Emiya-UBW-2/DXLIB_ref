@@ -526,11 +526,13 @@ namespace DXLibRef {
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
 		}
+		SetSysCommandOffFlag(TRUE);									//
 		if (!m_IsFirstBoot) {
+#ifdef _USE_EFFEKSEER_
 			Effekseer_Init(8000);										//Effekseer
-			SetSysCommandOffFlag(TRUE);									//
 			SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//Effekseer
 			Effekseer_SetGraphicsDeviceLostCallbackFunctions();			//Effekseer
+#endif
 		}
 		SetAlwaysRunFlag(TRUE);										//background
 		SetUseZBuffer3D(TRUE);										//zbufuse
@@ -554,7 +556,9 @@ namespace DXLibRef {
 #ifdef DEBUG
 		DebugClass::Create();
 #endif // DEBUG
+#ifdef _USE_EFFEKSEER_
 		EffectResource::Create();						//エフェクト
+#endif
 		SoundPool::Create();							//サウンド
 		BGMPool::Create();
 		FontPool::Create();
@@ -588,7 +592,9 @@ namespace DXLibRef {
 				m_RealTimeCubeMap.Dispose();
 			}
 			m_PBR_Shader.Dispose();
+#ifdef _USE_EFFEKSEER_
 			Effkseer_End();
+#endif
 		}
 		DxLib_End();
 	}
@@ -812,7 +818,7 @@ namespace DXLibRef {
 		}
 		OptionParts->Save();
 	}
-	void DXDraw::GetMousePosition(int * MouseX, int * MouseY) noexcept {
+	void DXDraw::GetMousePosition(int * MouseX, int * MouseY) const noexcept {
 		auto y_UIMs = [&](int p1) {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
@@ -974,10 +980,12 @@ namespace DXLibRef {
 			Pad->SetGuideUpdate();
 		}
 		//
+#ifdef _USE_EFFEKSEER_
 		if (!IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
 			UpdateEffekseer3D();
 			Update_effect_was = m_StartTime;
-		}
+	}
+#endif
 		CameraShake::Instance()->Update();
 	}
 	void			DXDraw::Draw(
@@ -1140,11 +1148,11 @@ namespace DXLibRef {
 		ScreenFlip();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			//4msだけスリープ
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 1000 * 4) {
+			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
 				if (ProcessMessage() != 0) { return false; }
 				SleepThread(1);	// 1msecスリープする
 			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < 1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit)) {}
+			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {}
 		}
 		else {
 			WaitVSync(1);

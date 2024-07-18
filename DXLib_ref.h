@@ -3,9 +3,10 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*ビルド設定																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-#define DEBUG
+//#define DEBUG
 //#define _USE_OPENVR_
 //#define _USE_BOX2D_
+//#define _USE_EFFEKSEER_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*pragma																																	*/
@@ -30,6 +31,9 @@
 //エラー,警告取り
 #define NOMINMAX
 #pragma warning(disable:4505)
+#pragma warning(disable:4514)
+#pragma warning(disable:4710)
+#pragma warning(disable:4711)
 #pragma warning(disable:4820)
 #pragma warning(disable:5045)
 #pragma warning(disable:5259)
@@ -47,6 +51,7 @@
 #endif // _USE_BOX2D_
 
 //共通
+#pragma warning( push, 3 )
 #include <stdint.h>
 #include <array>
 #include <list>
@@ -65,10 +70,11 @@
 #include <iostream>
 #include <math.h>
 #include <shlwapi.h>
-
 #pragma comment(lib, "shlwapi.lib")
 //追加物
 #include "json.hpp"
+
+#pragma warning( pop )
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -98,7 +104,9 @@ enum class VR_PAD {
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 //DXLIB
 #include "DxLib.h"
+#ifdef _USE_EFFEKSEER_
 #include "EffekseerForDXLib.h"
+#endif
 //追加
 #include "DXLib_ref_00_Util.hpp"
 #include "DXLib_ref_01_Vector.hpp"

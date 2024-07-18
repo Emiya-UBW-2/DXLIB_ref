@@ -95,17 +95,17 @@ namespace DXLibRef {
 		int valueint{0};
 	public:
 		void SetEnumParamType(EnumParamType value) noexcept { m_EnumParamType = value; }
-		const auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
+		auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
 
 		void SetBoolean(bool use) noexcept { valueint = use ? 1 : 0; }
-		const auto GetBoolean() const { return (valueint != 0); }
+		auto GetBoolean() const noexcept { return (valueint != 0); }
 		void ChangeBoolean(void) noexcept { SetBoolean(GetBoolean() ^ 1); }
 
 		void SetInt(int use) noexcept { valueint = use; }
-		const auto GetInt(void) const noexcept { return valueint; }
+		auto GetInt(void) const noexcept { return valueint; }
 
 		void SetFloat(float use) noexcept { valueint = static_cast<int>(use*1000.f); }
-		const auto GetFloat(void) const noexcept { return static_cast<float>(valueint) / 1000.f; }
+		auto GetFloat(void) const noexcept { return static_cast<float>(valueint) / 1000.f; }
 
 	};
 
@@ -125,9 +125,9 @@ namespace DXLibRef {
 	private:
 		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
 	public:
-		const auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
-		const auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
-		const auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetFloat(); }
+		auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
+		auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
+		auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetFloat(); }
 	public:
 		void			SetParamBoolean(EnumSaveParam id, bool use) noexcept {
 			switch (id) {
@@ -350,7 +350,7 @@ namespace DXLibRef {
 	public:
 		void SetRestart(void) noexcept { m_RestartSwitch = true; }
 		void SetActive(void) noexcept { m_ActiveSwitch = true; }
-		const auto IsRestartSwitch(void) noexcept {
+		auto IsRestartSwitch(void) noexcept {
 			if (!m_Active && m_RestartSwitch) {
 				m_RestartSwitch = false;
 				return true;
