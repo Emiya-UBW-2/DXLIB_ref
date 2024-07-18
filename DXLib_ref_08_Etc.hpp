@@ -663,42 +663,30 @@ namespace DXLibRef {
 		//moves& operator=(const moves&) = delete;
 		//moves& operator=(moves&& o) = delete;
 		~moves(void) noexcept {}
-	public:
-		Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
 
 		void			operator=(const moves&tgt) noexcept {
 			this->pos = tgt.pos;
+			this->posbuf = tgt.posbuf;
 			this->repos = tgt.repos;
+			this->Speed = tgt.Speed;
 			this->vec = tgt.vec;
 			this->mat = tgt.mat;
 			this->rad = tgt.rad;
 		}
-		auto operator+(const moves& o) const noexcept {
-			//mat,reposに関しては必要に応じて1
-			moves tmp;
-			tmp.pos = this->pos + o.pos;
-			tmp.vec = this->vec + o.vec;
-			tmp.rad = this->rad + o.rad;
-			return tmp;
-		}
-		auto operator-(const moves& o) const noexcept {
-			//mat,reposに関しては必要に応じて1
-			moves tmp;
-			tmp.pos = this->pos - o.pos;
-			tmp.vec = this->vec - o.vec;
-			tmp.rad = this->rad - o.rad;
+	public:
+		Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
 
-			return tmp;
-		}
-		auto operator*(float per) const noexcept {
-			//mat,reposに関しては必要に応じて1
+		auto LerpMove(const moves&o, float Per) const noexcept {
 			moves tmp;
-			tmp.pos = this->pos*per;
-			tmp.vec = this->vec*per;
-			tmp.rad = this->rad*per;
+			tmp.pos = Lerp(this->pos, o.pos, Per);
+			tmp.posbuf = Lerp(this->posbuf, o.posbuf, Per);
+			tmp.repos = Lerp(this->repos, o.repos, Per);
+			tmp.Speed = Lerp(this->Speed, o.Speed, Per);
+			tmp.vec = Lerp(this->vec, o.vec, Per);
+			tmp.mat = Lerp(this->mat, o.mat, Per);
+			tmp.rad = Lerp(this->rad, o.rad, Per);
 			return tmp;
 		}
-
 
 		void			UpdatePos(const Vector3DX& tgt) noexcept {
 			this->repos = this->pos;
