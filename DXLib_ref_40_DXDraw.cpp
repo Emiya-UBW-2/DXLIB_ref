@@ -822,9 +822,9 @@ namespace DXLibRef {
 		auto y_UIMs = [&](int p1) {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
-				return (int(p1) * m_DispYSize_Border / basey);
+				return (int(p1) * m_DispYSize_Border / desky);
 			}
-			return GetUIY(p1);
+			return (int(p1) * m_DispYSize / desky);
 		};
 		int mx = 0, my = 0;
 		GetMousePoint(&mx, &my);
@@ -891,24 +891,25 @@ namespace DXLibRef {
 		m_StartTime = GetNowHiPerformanceCount();
 		if (Pad->GetEsc().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
-			PopUpParts->Add(LocalizeParts->Get(100), GetUIY(480), GetUIY(240),
+			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[&](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* DrawParts = DXDraw::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
-						xp1 = xmin + GetUIY(24);
+						xp1 = xmin + DrawParts->GetUIY(24);
 						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsg(xp1, yp1 + LineHeight/2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					//
 					{
-						xp1 = (xmax + xmin) / 2 - GetUIY(54);
+						xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 						}
@@ -921,24 +922,25 @@ namespace DXLibRef {
 		}
 		if (OptionWindowParts->IsRestartSwitch() && !m_IsRestartSelect) {
 			m_IsRestartSelect = true;
-			PopUpParts->Add(LocalizeParts->Get(100), GetUIY(480), GetUIY(240),
+			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[&](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* DrawParts = DXDraw::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					//タイトル
 					{
-						xp1 = xmin + GetUIY(24);
+						xp1 = xmin + DrawParts->GetUIY(24);
 						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 					}
 					//
 					{
-						xp1 = (xmax + xmin) / 2 - GetUIY(54);
+						xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(2102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 							StartMe();
