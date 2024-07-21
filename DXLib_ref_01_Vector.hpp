@@ -95,7 +95,7 @@ namespace DXLibRef {
 		static Vector3DX Vtrans(const Vector3DX& p1, const Matrix4x4DX& p2) noexcept { return DxLib::VTransform(p1.get(), p2.get()); }
 		//
 		Matrix4x4DX inverse(void) const noexcept { return DxLib::MInverse(this->get()); }		//‹t
-		bool isIdentity(void) const noexcept { return *this == identity(); }		//‹t
+		bool isIdentity(void) const noexcept { return *this == DxLib::MGetIdent(); }		//‹t
 		//lossyScale
 		Vector3DX lossyScale(void) const noexcept { return DxLib::MGetSize(this->get()); }
 		Matrix4x4DX rotation(void) const noexcept { return DxLib::MGetRotElem(this->get()); }		//‹t
@@ -105,6 +105,36 @@ namespace DXLibRef {
 		Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), rotation()); }
 		Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), rotation()); }
 		Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), rotation()); }
+		//
+		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
+			constexpr float threshold = 0.001f;
+			if (std::abs(value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1‚ÌŽž
+				if (angle_x) { *angle_x = DX_PI_F / 2.f; }
+				if (angle_y) { *angle_y = 0.f; }
+				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+			}
+			else if (std::abs(value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1‚ÌŽž
+				if (angle_x) { *angle_x = -DX_PI_F / 2.f; }
+				if (angle_y) { *angle_y = 0.f; }
+				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+			}
+			else {
+				if (angle_x) { *angle_x = std::asinf(value.m[1][2]); }
+				if (angle_y) { *angle_y = std::atan2f(-value.m[0][2], value.m[2][2]); }
+				if (angle_z) { *angle_z = std::atan2f(-value.m[1][0], value.m[1][1]); }
+			}
+		}
+		void SetRadian(float x, float y, float z) noexcept {
+			value.m[0][0] = std::cos(y) * std::cos(z) - std::sin(x) * std::sin(y) * std::sin(z);
+			value.m[1][0] = -std::cos(x) * std::sin(z);
+			value.m[2][0] = std::sin(y) * std::cos(z) + std::sin(x) * std::cos(y) * std::sin(z);
+			value.m[0][1] = std::cos(y) * std::sin(z) + std::sin(x) * std::sin(y) * std::cos(z);
+			value.m[1][1] = std::cos(x) * std::cos(z);
+			value.m[2][1] = std::sin(y) * std::sin(z) - std::sin(x) * std::cos(y) * std::cos(z);
+			value.m[0][2] = -std::cos(x) * std::sin(y);
+			value.m[1][2] = std::sin(x);
+			value.m[2][2] = std::cos(x) * std::cos(y);
+		}
 		//”äŠr
 		bool operator==(const Matrix4x4DX& obj) const noexcept {
 			for (int x = 0;x < 4;x++) {

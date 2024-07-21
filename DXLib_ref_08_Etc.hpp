@@ -646,16 +646,27 @@ namespace DXLibRef {
 		const auto&		GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
 		const auto&		GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
 	};
+
 	//位置情報
 	class moves {
-	public:
-		Vector3DX pos;		//座標
-		Vector3DX posbuf;	//座標
+		Vector3DX pos;		//反映用座標
+		Vector3DX posbuf;	//演算用座標
 		Vector3DX repos;	//前フレームの座標
-		float		Speed{0.f};
 		Vector3DX vec;		//加速
-		Matrix4x4DX mat;		//回転
-		Vector3DX rad;		//回転
+		Matrix4x4DX mat;	//回転
+		Matrix4x4DX matbuf;	//回転
+	public:
+		const auto& GetPos(void) const noexcept { return pos; }
+		const auto& GetRePos(void) const noexcept { return repos; }
+		const auto& GetVec(void) const noexcept { return vec; }
+		const auto& GetMat(void) const noexcept { return mat; }
+
+		const auto& GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
+		const auto& GetMatBuf(void) const noexcept { return matbuf; }//演算以外では使うな
+	public:
+		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
+		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
+		void			SetMat(const Matrix4x4DX& tgt) noexcept { this->matbuf = tgt; }
 	public:
 		moves(void) noexcept {}
 		moves(const moves& tgt) noexcept { *this = tgt; }
@@ -668,43 +679,34 @@ namespace DXLibRef {
 			this->pos = tgt.pos;
 			this->posbuf = tgt.posbuf;
 			this->repos = tgt.repos;
-			this->Speed = tgt.Speed;
 			this->vec = tgt.vec;
 			this->mat = tgt.mat;
-			this->rad = tgt.rad;
+			this->matbuf = tgt.matbuf;
 		}
 	public:
-		Matrix4x4DX MatIn(void) const noexcept { return mat * Matrix4x4DX::Mtrans(pos); }
-
 		auto LerpMove(const moves&o, float Per) const noexcept {
 			moves tmp;
 			tmp.pos = Lerp(this->pos, o.pos, Per);
 			tmp.posbuf = Lerp(this->posbuf, o.posbuf, Per);
 			tmp.repos = Lerp(this->repos, o.repos, Per);
-			tmp.Speed = Lerp(this->Speed, o.Speed, Per);
 			tmp.vec = Lerp(this->vec, o.vec, Per);
 			tmp.mat = Lerp(this->mat, o.mat, Per);
-			tmp.rad = Lerp(this->rad, o.rad, Per);
+			tmp.matbuf = Lerp(this->matbuf, o.matbuf, Per);
 			return tmp;
 		}
-
-		void			UpdatePos(const Vector3DX& tgt) noexcept {
-			this->repos = this->pos;
-			this->pos = tgt;
+	public:
+		void			Init(const Vector3DX& Pos_t, const Vector3DX& Vec_t, const Matrix4x4DX& Mat_t) noexcept {
+			this->pos = Pos_t;
+			this->posbuf = Pos_t;
+			this->repos = Pos_t;
+			this->vec = Vec_t;
+			this->mat = Mat_t;
+			this->matbuf = Mat_t;
 		}
-		void			UpdatePosBuf(const Vector3DX& tgt, float per) noexcept {
-			this->posbuf = tgt;
-			auto Repos = this->pos;
-			Easing(&this->pos, this->posbuf, per, EasingType::OutExpo);
-			this->Speed = (this->pos - Repos).magnitude();
+		void			Update(float posper, float matper) noexcept {
+			Easing(&this->pos, this->posbuf, posper, EasingType::OutExpo);
 			this->repos = this->posbuf;
-		}
-
-		void			Update_Physics(float speed_randam = 0.f, float rate = 1.f) noexcept;
-
-		void			HitGround(const MV1_COLL_RESULT_POLY& colres, float hight) noexcept {//0.005f
-			this->pos = Vector3DX(colres.HitPosition) + Vector3DX(colres.Normal)*hight;
-			this->mat *= Matrix4x4DX::RotVec2(this->mat.xvec(), Vector3DX(colres.Normal)*-1.f);
+			Easing(&this->mat, this->matbuf, matper, EasingType::OutExpo);
 		}
 	};
 	//キー押し判定
@@ -904,7 +906,7 @@ namespace DXLibRef {
 			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
 		//シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) noexcept {
+		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			if (this->m_GeometryShaderhandle == INVALID_ID) { return; }
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
@@ -955,7 +957,7 @@ namespace DXLibRef {
 			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)), DX_SHADERTYPE_PIXEL, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
 		}
 		//ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
-		void			SetPixelDispSize(int dispx, int dispy) noexcept {
+		void			SetPixelDispSize(int dispx, int dispy) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
 			dispsize->u = static_cast<float>(dispx);
@@ -975,7 +977,7 @@ namespace DXLibRef {
 			SetShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)), DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
 		}
 		//3D空間に適用する場合の関数(引数に3D描画のラムダ式を代入)
-		void			Draw_lamda(std::function<void()> doing) noexcept {
+		void			Draw_lamda(std::function<void()> doing) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
 				doing();
 				return;
@@ -991,7 +993,7 @@ namespace DXLibRef {
 			SetUseGeometryShader(INVALID_ID);
 		}
 		//2D画像に適用する場合の関数
-		void			Draw(ScreenVertex& Screenvertex) noexcept {
+		void			Draw(ScreenVertex& Screenvertex) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
@@ -1657,4 +1659,65 @@ namespace DXLibRef {
 		FILEINFO FileInfo;
 		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)-1);
 	}
+
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*UDP通信																																	*/
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	class UDPNetWorkDX {
+		int			m_Handle{-1};				// ネットワークハンドル
+		IPDATA		m_SendIP{127,0,0,1};		// 送信用ＩＰアドレスデータ
+		int			m_SendPort{-1};				// 通信用ポート
+		IPDATA		m_RecvIp{127,0,0,1};			// 受信用ＩＰアドレスデータ
+		int			m_RecvPort{0};				// 受信用ポート
+	public:
+		auto			IsActive(void) const noexcept { return (m_Handle != -1); }
+	public:
+		void			SetServerIP(const IPDATA& pIP) noexcept { m_SendIP = pIP; }//クライアントは必ず行う
+		bool			Init(bool IsServer, int PORT = -1) noexcept {
+			if (!IsActive()) {
+				m_SendPort = PORT;
+				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : -1);
+			}
+			return m_Handle != -1;
+		}
+		void			Dispose(void) noexcept {
+			if (IsActive()) {
+				DeleteUDPSocket(m_Handle);	// ＵＤＰソケットハンドルの削除
+				m_Handle = -1;
+				m_SendPort = -1;
+			}
+		}
+	private:
+		template<class T>
+		int				SendData(IPDATA& Ip, int SendPort, const T& Data) noexcept {
+			if (IsActive()) {
+				return NetWorkSendUDP(m_Handle, Ip, SendPort, &Data, sizeof(T));
+			}
+			return -1;
+		}
+	public:
+		//送信
+		template<class T>
+		int				SendData(const T& Data) noexcept { return SendData(m_SendIP, m_SendPort, Data); }
+		//受信
+		template<class T>
+		bool			RecvData(T* Data, int* RecvReturn, bool IsPeek) noexcept {
+			*RecvReturn = -1;
+			if (IsActive()) {
+				switch (CheckNetWorkRecvUDP(m_Handle)) {
+					case TRUE:
+						*RecvReturn = NetWorkRecvUDP(m_Handle, &m_RecvIp, &m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// 受信
+						return true;
+					case FALSE://待機
+						break;
+					default://error
+						break;
+				}
+			}
+			return false;
+		}
+		//返送
+		template<class T>
+		int				ReturnData(const T& Data) noexcept { return SendData(m_RecvIp, m_RecvPort, Data); }
+	};
 };

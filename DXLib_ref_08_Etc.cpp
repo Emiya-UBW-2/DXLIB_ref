@@ -164,14 +164,6 @@ namespace DXLibRef {
 		}
 	};
 	//
-	void			moves::Update_Physics(float speed_randam, float rate) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		this->pos += this->vec*(static_cast<float>((1000 - int(1000.f*speed_randam)) + GetRand(int(1000.f*speed_randam) * 2)) / 1000.f);
-		this->vec.y += M_GR / powf((DrawParts->GetFps() / rate), 2.f);
-
-		//this->gun_m.pos += this->gun_m.vec;
-		//this->gun_m.vec.yadd(M_GR / std::powf(DrawParts->GetFps(), 2.f));
-	}
 	void			switchs::Execute(bool key) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		m_press = key;
@@ -630,8 +622,9 @@ namespace DXLibRef {
 		//
 		m_TargetID.clear();
 		for (auto& n : pJson["Target"]) {
+			std::string S = n;
 			for (auto& p : Parts) {
-				if (p->GetName() == n) {
+				if (p->GetName() == S) {
 					m_TargetID.emplace_back(p->GetUniqueID());
 					break;
 				}

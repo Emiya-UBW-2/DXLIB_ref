@@ -213,10 +213,9 @@ namespace DXLibRef {
 			this->m_IsDraw |= true;
 		}
 
-		auto pos = this->GetMove().pos;
-		Vector3DX campos = ConvWorldPosToScreenPos(pos.get());
+		Vector3DX campos = ConvWorldPosToScreenPos(this->GetMove().GetPos().get());
 		if (0.f < campos.z && campos.z < 1.f) {
-			this->SetScreenPosition(campos, std::max(20.f / ((pos - GetCameraPosition()).magnitude() / 2.f), 0.2f));
+			this->SetScreenPosition(campos, std::max(20.f / ((this->GetMove().GetPos() - GetCameraPosition()).magnitude() / 2.f), 0.2f));
 		}
 	}
 	void			ObjectBaseClass::Draw(bool isDrawSemiTrans) noexcept {

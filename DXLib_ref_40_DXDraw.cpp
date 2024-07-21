@@ -105,8 +105,8 @@ namespace DXLibRef {
 				this->m_ButtonPressFlag = 0;
 				this->m_ButtonTouchFlag = 0;
 				this->m_TouchPadPoint = Vector3DX::zero();
-				this->m_move.pos.clear();
-				this->m_move.mat.clear();
+				this->m_move.pos = Vector3DX::zero();
+				this->m_move.mat = Matrix4x4DX::identity();
 			}
 		};
 	private:
@@ -144,8 +144,8 @@ namespace DXLibRef {
 				if (m_VR_HMD_StartFlag && HMDPtr->IsActive() != m_VR_PrevHMDIsActive) {
 					m_VR_HMD_StartFlag = false;
 					//
-					Vector3DX pos = HMDPtr->GetMove().pos; pos.y(0.f);
-					Vector3DX tmp = mat->zvec(); tmp.y(0.f); tmp = tmp.normalized();
+					Vector3DX pos = HMDPtr->GetMove().pos; pos.y = 0.f;
+					Vector3DX tmp = mat->zvec(); tmp.y = 0.f; tmp = tmp.normalized();
 					float rad = DX_PI_F + std::atan2f(tmp.x, -tmp.z);
 					m_VR_HMD_StartPoint = Matrix4x4DX::RotAxis(Vector3DX::up(), rad) * Matrix4x4DX::Mtrans(pos);
 				}
@@ -169,8 +169,10 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
-				const vr::HmdMatrix34_t tmpmat = vr::VRSystem()->GetEyeToHeadTransform((vr::EVREye)eye_type);
-				return Matrix4x4DX::Vtrans(Vector3DX::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMove().mat);
+				if (HMDPtr) {
+					const vr::HmdMatrix34_t tmpmat = vr::VRSystem()->GetEyeToHeadTransform((vr::EVREye)eye_type);
+					return Matrix4x4DX::Vtrans(Vector3DX::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMove().mat);
+				}
 			}
 			return Vector3DX::zero();
 		}
@@ -194,7 +196,7 @@ namespace DXLibRef {
 				m_VR_SystemPtr = vr::VR_Init(&m_VR_ErrorHandle, vr::VRApplication_Scene);
 				if (m_VR_ErrorHandle != vr::VRInitError_None) {
 					m_VR_SystemPtr = nullptr;
-					OptionParts->Set_useVR(false);
+					OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 				}
 			}
 			//デバイスセット
@@ -238,7 +240,6 @@ namespace DXLibRef {
 		void SetupBuffer(int xsize,int ysize) noexcept {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-				auto* DrawParts = DXDraw::Instance();
 				//画面セット
 				m_OutScreen = GraphHandle::Make(xsize, ysize);	//左目
 			}

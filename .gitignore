@@ -7,3 +7,6 @@
 /x64/Debug
 /DXLib_ref.lib.lastcodeanalysissucceeded
 /DXLib_ref.lib
+/DXLib_ref/x64/Release/DXLib_ref.tlog
+/DXLib_ref/x64/Release
+/DXLib_ref.pdb

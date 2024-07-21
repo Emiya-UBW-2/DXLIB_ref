@@ -73,6 +73,7 @@ namespace DXLibRef {
 		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
+		auto&		SetMove(void) noexcept { return this->m_move; }
 
 		void			SetAnimOnce(int ID, float speed) noexcept;
 		void			SetAnimLoop(int ID, float speed) noexcept;
@@ -94,32 +95,17 @@ namespace DXLibRef {
 			this->m_CameraSize = size;
 		}
 		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
-		void			ResetMove(const Matrix4x4DX& mat, const Vector3DX& pos) noexcept {
-			this->m_move.vec.Set(0, 0, 0);
-			SetMove(mat, pos);
+		void			ResetMove(const Matrix4x4DX& RotMat, const Vector3DX& pos) noexcept {
+			this->m_move.SetVec(Vector3DX::zero());
+			this->m_move.SetMat(RotMat);
+			this->m_move.SetPos(pos);
+			this->m_move.Update(0.f, 0.f);
+			UpdateObjMatrix(this->m_move.GetMat(), this->m_move.GetPos());
 		}
-		void			SetMove(const moves& movs) noexcept {
-			this->m_move = movs;
-			UpdateMove();
-		}
-		void			SetMove(const Matrix4x4DX& mat, const Vector3DX& pos) noexcept {
-			this->m_move.mat = mat;
-			this->m_move.pos = pos;
-			this->m_move.posbuf = pos;
-			UpdateMove();
-		}
-		void			SetMove(const Matrix4x4DX& mat, const Vector3DX& pos, const Vector3DX& vec) noexcept {
-			this->m_move.mat = mat;
-			this->m_move.pos = pos;
-			this->m_move.posbuf = pos;
-			this->m_move.vec = vec;
-			UpdateMove();
-		}
-
-		void			UpdateMove(void) noexcept {
-			this->GetObj().SetMatrix(this->m_move.MatIn());
+		void			UpdateObjMatrix(const Matrix4x4DX& RotMat, const Vector3DX& pos) noexcept {
+			this->GetObj().SetMatrix(RotMat * Matrix4x4DX::Mtrans(pos));
 			if (this->m_col.IsActive()) {
-				this->m_col.SetMatrix(this->m_move.MatIn());
+				this->m_col.SetMatrix(RotMat * Matrix4x4DX::Mtrans(pos));
 				this->m_ColActive = false;
 			}
 		}
@@ -131,7 +117,7 @@ namespace DXLibRef {
 		}
 		auto			RefreshCol(const Vector3DX& StartPos, const Vector3DX& EndPos, float pRange) noexcept {
 			if (this->m_ColActive) { return true; }				//‚·‚Å‚É‹N“®‚µ‚Ä‚¢‚é‚È‚ç–³Ž‹
-			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.pos) <= pRange) {
+			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.GetPos()) <= pRange) {
 				//”»’è‹N“®
 				this->m_ColActive = true;
 				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); i++) { this->m_col.RefreshCollInfo(INVALID_ID, i); }
