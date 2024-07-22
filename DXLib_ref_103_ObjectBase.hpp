@@ -95,17 +95,17 @@ namespace DXLibRef {
 			this->m_CameraSize = size;
 		}
 		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
-		void			ResetMove(const Matrix4x4DX& RotMat, const Vector3DX& pos) noexcept {
+		void			ResetMove(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
 			this->m_move.SetVec(Vector3DX::zero());
 			this->m_move.SetMat(RotMat);
 			this->m_move.SetPos(pos);
 			this->m_move.Update(0.f, 0.f);
 			UpdateObjMatrix(this->m_move.GetMat(), this->m_move.GetPos());
 		}
-		void			UpdateObjMatrix(const Matrix4x4DX& RotMat, const Vector3DX& pos) noexcept {
-			this->GetObj().SetMatrix(RotMat * Matrix4x4DX::Mtrans(pos));
+		void			UpdateObjMatrix(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
+			this->GetObj().SetMatrix(RotMat.Get44DX() * Matrix4x4DX::Mtrans(pos));
 			if (this->m_col.IsActive()) {
-				this->m_col.SetMatrix(RotMat * Matrix4x4DX::Mtrans(pos));
+				this->m_col.SetMatrix(RotMat.Get44DX() * Matrix4x4DX::Mtrans(pos));
 				this->m_ColActive = false;
 			}
 		}

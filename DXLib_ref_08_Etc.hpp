@@ -28,12 +28,16 @@ namespace DXLibRef {
 		}
 	}
 	//Matrixî≈ÇÃê¸å`ï‚äÆ
-	template <>
 	inline Matrix4x4DX Lerp(const Matrix4x4DX& A, const Matrix4x4DX& B, float Per) noexcept {
 		return Matrix4x4DX::Axis1(
 			Lerp(A.yvec(), B.yvec(), Per).normalized(),
 			Lerp(A.zvec(), B.zvec(), Per).normalized(),
 			Lerp(A.pos(), B.pos(), Per));
+	}
+	inline Matrix3x3DX Lerp(const Matrix3x3DX& A, const Matrix3x3DX& B, float Per) noexcept {
+		return Matrix3x3DX::Axis1(
+			Lerp(A.yvec(), B.yvec(), Per).normalized(),
+			Lerp(A.zvec(), B.zvec(), Per).normalized());
 	}
 	//
 	template <class T>
@@ -653,8 +657,8 @@ namespace DXLibRef {
 		Vector3DX posbuf;	//ââéZópç¿ïW
 		Vector3DX repos;	//ëOÉtÉåÅ[ÉÄÇÃç¿ïW
 		Vector3DX vec;		//â¡ë¨
-		Matrix4x4DX mat;	//âÒì]
-		Matrix4x4DX matbuf;	//âÒì]
+		Matrix3x3DX mat;	//âÒì]
+		Matrix3x3DX matbuf;	//âÒì]
 	public:
 		const auto& GetPos(void) const noexcept { return pos; }
 		const auto& GetRePos(void) const noexcept { return repos; }
@@ -666,7 +670,7 @@ namespace DXLibRef {
 	public:
 		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
 		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
-		void			SetMat(const Matrix4x4DX& tgt) noexcept { this->matbuf = tgt; }
+		void			SetMat(const Matrix3x3DX& tgt) noexcept { this->matbuf = tgt; }
 	public:
 		moves(void) noexcept {}
 		moves(const moves& tgt) noexcept { *this = tgt; }
@@ -695,7 +699,7 @@ namespace DXLibRef {
 			return tmp;
 		}
 	public:
-		void			Init(const Vector3DX& Pos_t, const Vector3DX& Vec_t, const Matrix4x4DX& Mat_t) noexcept {
+		void			Init(const Vector3DX& Pos_t, const Vector3DX& Vec_t, const Matrix3x3DX& Mat_t) noexcept {
 			this->pos = Pos_t;
 			this->posbuf = Pos_t;
 			this->repos = Pos_t;
