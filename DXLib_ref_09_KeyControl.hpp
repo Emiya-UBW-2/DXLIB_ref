@@ -804,6 +804,8 @@ namespace DXLibRef {
 	private:
 		float			m_AddxRad{0.f};
 		float			m_AddyRad{0.f};
+		float			m_xRad{ 0.f };
+		float			m_yRad{ 0.f };
 		unsigned long long	m_Flags{0};
 	public:
 		InputControl(void) noexcept {}
@@ -833,10 +835,14 @@ namespace DXLibRef {
 
 		void			SetAddxRad(float AddxRad) noexcept { this->m_AddxRad = AddxRad; }
 		void			SetAddyRad(float AddyRad) noexcept { this->m_AddyRad = AddyRad; }
+		void			SetxRad(float xRad) noexcept { this->m_xRad = xRad; }
+		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetKeyInputFlags(const InputControl& o) noexcept { this->m_Flags = o.m_Flags; }
 
 		const auto&		GetAddxRad(void) const noexcept { return this->m_AddxRad; }
 		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
+		const auto&		GetxRad(void) const noexcept { return this->m_xRad; }
+		const auto&		GetyRad(void) const noexcept { return this->m_yRad; }
 
 		auto		GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
 
@@ -844,6 +850,8 @@ namespace DXLibRef {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad + o.m_AddxRad;
 			tmp.m_AddyRad = this->m_AddyRad + o.m_AddyRad;
+			tmp.m_xRad = this->m_xRad + o.m_xRad;
+			tmp.m_yRad = this->m_yRad + o.m_yRad;
 			tmp.m_Flags = this->m_Flags;
 			return tmp;
 		}
@@ -851,6 +859,8 @@ namespace DXLibRef {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad - o.m_AddxRad;
 			tmp.m_AddyRad = this->m_AddyRad - o.m_AddyRad;
+			tmp.m_xRad = this->m_xRad - o.m_xRad;
+			tmp.m_yRad = this->m_yRad - o.m_yRad;
 			tmp.m_Flags = this->m_Flags;
 			return tmp;
 		}
@@ -858,6 +868,8 @@ namespace DXLibRef {
 			InputControl tmp;
 			tmp.m_AddxRad = this->m_AddxRad *per;
 			tmp.m_AddyRad = this->m_AddyRad *per;
+			tmp.m_xRad = this->m_xRad * per;
+			tmp.m_yRad = this->m_yRad * per;
 			tmp.m_Flags = this->m_Flags;
 			return tmp;
 		}
@@ -865,6 +877,8 @@ namespace DXLibRef {
 		void operator=(const InputControl& o) noexcept {
 			this->m_AddxRad = o.m_AddxRad;
 			this->m_AddyRad = o.m_AddyRad;
+			this->m_xRad = o.m_xRad;
+			this->m_yRad = o.m_yRad;
 			this->m_Flags = o.m_Flags;
 		}
 	};

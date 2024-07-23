@@ -712,6 +712,95 @@ namespace DXLibRef {
 			this->repos = this->posbuf;
 			Easing(&this->mat, this->matbuf, matper, EasingType::OutExpo);
 		}
+		void			SetAll(const Vector3DX& Pos_t, const Vector3DX& PosBuf_t, const Vector3DX& RePos_t, const Vector3DX& Vec_t, const Matrix3x3DX& Mat_t, const Matrix3x3DX& MatBuf_t) noexcept {
+			this->pos = Pos_t;
+			this->posbuf = PosBuf_t;
+			this->repos = RePos_t;
+			this->vec = Vec_t;
+			this->mat = Mat_t;
+			this->matbuf = MatBuf_t;
+		}
+	};
+	//軽量版
+	class movesLight {
+		Vector3DX pos;		//反映用座標
+		Vector3DX posbuf;	//演算用座標
+		Vector3DX repos;	//前フレームの座標
+		Vector3DX vec;		//加速
+		Vector3DX rot;		//回転
+		Vector3DX rotbuf;	//回転
+	public:
+		const auto& GetPos(void) const noexcept { return pos; }
+		const auto& GetRePos(void) const noexcept { return repos; }
+		const auto& GetVec(void) const noexcept { return vec; }
+		Matrix3x3DX GetMat(void) const noexcept {
+			Matrix3x3DX Ret; Ret.SetRadian(rot.x, rot.y, rot.z);
+			return Ret;
+		}
+
+		const auto& GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
+		auto		GetMatBuf(void) const noexcept {
+			Matrix3x3DX Ret; Ret.SetRadian(rotbuf.x, rotbuf.y, rotbuf.z);
+			return Ret;
+		}//演算以外では使うな
+	public:
+		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
+		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
+		void			SetMat(const Matrix3x3DX& tgt) noexcept { tgt.GetRadian(&this->rotbuf.x, &this->rotbuf.y, &this->rotbuf.z); }
+	public:
+		movesLight(void) noexcept {}
+		movesLight(const movesLight& tgt) noexcept { *this = tgt; }
+		movesLight(movesLight&& tgt) noexcept { *this = tgt; }
+		//movesLight& operator=(const movesLight&) = delete;
+		//movesLight& operator=(movesLight&& o) = delete;
+		~movesLight(void) noexcept {}
+
+		void			operator=(const movesLight& tgt) noexcept {
+			this->pos = tgt.pos;
+			this->posbuf = tgt.posbuf;
+			this->repos = tgt.repos;
+			this->vec = tgt.vec;
+			this->rot = tgt.rot;
+			this->rotbuf = tgt.rotbuf;
+		}
+		moves			GetMoves() const noexcept {
+			moves Ret;
+			Ret.SetAll(pos, posbuf, repos, vec, GetMat(), GetMatBuf());
+			return Ret;
+		}
+		void			SetByMoves(const moves& o) noexcept {
+			this->pos = o.GetPos();
+			this->posbuf = o.GetPosBuf();
+			this->repos = o.GetRePos();
+			this->vec = o.GetVec();
+			o.GetMat().GetRadian(&this->rot.x, &this->rot.y, &this->rot.z);
+			o.GetMatBuf().GetRadian(&this->rotbuf.x, &this->rotbuf.y, &this->rotbuf.z);
+		}
+	public:
+		auto LerpMove(const movesLight& o, float Per) const noexcept {
+			movesLight tmp;
+			tmp.pos = Lerp(this->pos, o.pos, Per);
+			tmp.posbuf = Lerp(this->posbuf, o.posbuf, Per);
+			tmp.repos = Lerp(this->repos, o.repos, Per);
+			tmp.vec = Lerp(this->vec, o.vec, Per);
+			tmp.rot = Lerp(this->rot, o.rot, Per);
+			tmp.rotbuf = Lerp(this->rotbuf, o.rotbuf, Per);
+			return tmp;
+		}
+	public:
+		void			Init(const Vector3DX& Pos_t, const Vector3DX& Vec_t, const Matrix3x3DX& Mat_t) noexcept {
+			this->pos = Pos_t;
+			this->posbuf = Pos_t;
+			this->repos = Pos_t;
+			this->vec = Vec_t;
+			Mat_t.GetRadian(&this->rot.x, &this->rot.y, &this->rot.z);
+			this->rotbuf = this->rot;
+		}
+		void			Update(float posper, float matper) noexcept {
+			Easing(&this->pos, this->posbuf, posper, EasingType::OutExpo);
+			this->repos = this->posbuf;
+			Easing(&this->rot, this->rotbuf, matper, EasingType::OutExpo);
+		}
 	};
 	//キー押し判定
 	class switchs {

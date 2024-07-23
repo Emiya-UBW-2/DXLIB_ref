@@ -3,7 +3,7 @@
 
 namespace DXLibRef {
 	//---------------------------------------------------------------------------------------------
-	//Vector
+	//Vector3
 	//---------------------------------------------------------------------------------------------
 	class Vector3DX {
 	public:
@@ -16,16 +16,16 @@ namespace DXLibRef {
 		VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					//ïœä∑
 		static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	//ì¸óÕ
 		//
-		static const Vector3DX back(void) noexcept { return DxLib::VGet(0.f, 0.f, -1.f); }
-		static const Vector3DX down(void) noexcept { return DxLib::VGet(0.f, -1.f, 0.f); }
-		static const Vector3DX forward(void) noexcept { return DxLib::VGet(0.f, 0.f, 1.f); }
-		static const Vector3DX left(void) noexcept { return DxLib::VGet(-1.f, 0.f, 0.f); }
+		static const Vector3DX back(void) noexcept { return vget(0.f, 0.f, -1.f); }
+		static const Vector3DX down(void) noexcept { return vget(0.f, -1.f, 0.f); }
+		static const Vector3DX forward(void) noexcept { return vget(0.f, 0.f, 1.f); }
+		static const Vector3DX left(void) noexcept { return vget(-1.f, 0.f, 0.f); }
 
-		static const Vector3DX one(void) noexcept { return DxLib::VGet(1.f, 1.f, 1.f); }
+		static const Vector3DX one(void) noexcept { return vget(1.f, 1.f, 1.f); }
 
-		static const Vector3DX right(void) noexcept { return DxLib::VGet(1.f, 0.f, 0.f); }
-		static const Vector3DX up(void) noexcept { return DxLib::VGet(0.f, 1.f, 0.f); }
-		static const Vector3DX zero(void) noexcept { return DxLib::VGet(0.f, 0.f, 0.f); }
+		static const Vector3DX right(void) noexcept { return vget(1.f, 0.f, 0.f); }
+		static const Vector3DX up(void) noexcept { return vget(0.f, 1.f, 0.f); }
+		static const Vector3DX zero(void) noexcept { return vget(0.f, 0.f, 0.f); }
 		//
 		float magnitude(void) const noexcept { return DxLib::VSize(this->get()); }				//ÉTÉCÉY
 		Vector3DX normalized(void) const noexcept { return DxLib::VNorm(this->get()); }		//ê≥ãKâª
@@ -48,8 +48,8 @@ namespace DXLibRef {
 		static float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
 		//static Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
 		//LerpUnclamped
-		static Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
-		static Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
+		static Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
+		static Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
 		//MoveTowards
 		static Vector3DX		Normalize(const Vector3DX& A) noexcept { return A.normalized(); }
 		//OrthoNormalize
@@ -57,7 +57,7 @@ namespace DXLibRef {
 		//ProjectOnPlane
 		static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Vector3DX::Dot(inNormal, inDirection*-1.f))*2.f; }
 		//RotateTowards
-		static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VGet((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
+		static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
 		//SignedAngle
 		//Slerp
 		//SlerpUnclamped
@@ -77,6 +77,77 @@ namespace DXLibRef {
 		void operator*=(float p1) noexcept { *this = *this * p1; }
 		//èúéZ
 		Vector3DX operator/(float p1) const noexcept { return DxLib::VScale(this->get(), 1.f / p1); }
+		void operator/=(float p1) noexcept { *this = *this / p1; }
+	};
+	//---------------------------------------------------------------------------------------------
+	//Vector3
+	//---------------------------------------------------------------------------------------------
+	class Vector2DX {
+	public:
+		float x{ 0 };
+		float y{ 0 };
+	public:
+		Vector2DX(void) noexcept : x(0), y(0) {}
+		Vector2DX(VECTOR value) noexcept { this->Set(value.x, value.y); }
+		VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, 0.f); }				//ïœä∑
+		static const Vector2DX vget(float x, float y) noexcept { return DxLib::VGet(x, y, 0.f); }	//ì¸óÕ
+		//
+		static const Vector2DX down(void) noexcept { return vget(0.f, -1.f); }
+		static const Vector2DX left(void) noexcept { return vget(-1.f, 0.f); }
+		static const Vector2DX one(void) noexcept { return vget(1.f, 1.f); }
+		static const Vector2DX right(void) noexcept { return vget(1.f, 0.f); }
+		static const Vector2DX up(void) noexcept { return vget(0.f, 1.f); }
+		static const Vector2DX zero(void) noexcept { return vget(0.f, 0.f); }
+		//
+		float magnitude(void) const noexcept { return DxLib::VSize(this->get()); }				//ÉTÉCÉY
+		Vector2DX normalized(void) const noexcept { return DxLib::VNorm(this->get()); }		//ê≥ãKâª
+		float sqrMagnitude(void) const noexcept { return DxLib::VSquareSize(this->get()); }		//ÉTÉCÉY
+		//
+		bool Equals(const Vector2DX& obj) const noexcept { return *this == obj; }
+		void Set(float x1, float y1) noexcept {
+			this->x = x1;
+			this->y = y1;
+		}
+		//
+		static float			Angle(const Vector2DX& A, const Vector2DX& B) noexcept { return std::acos(Vector2DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
+		static Vector2DX		ClampMagnitude(const Vector2DX& A, float Limit) noexcept {
+			auto Len = A.magnitude();
+			return A.normalized() * std::clamp(Len, 0.f, Limit);
+		}
+		static float			Cross(const Vector2DX& A, const Vector2DX& B) noexcept { return DxLib::VCross(A.get(), B.get()).z; }
+		static float			Distance(const Vector2DX& A, const Vector2DX& B) noexcept { return (A - B).magnitude(); }
+		static float			Dot(const Vector2DX& A, const Vector2DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
+		//static Vector2DX		Lerp(const Vector2DX& A, const Vector2DX& B, float Per) noexcept { return Lerp<Vector2DX>(A, B, Per); }
+		//LerpUnclamped
+		static Vector2DX		Max(const Vector2DX& A, const Vector2DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y)); }
+		static Vector2DX		Min(const Vector2DX& A, const Vector2DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y)); }
+		//MoveTowards
+		static Vector2DX		Normalize(const Vector2DX& A) noexcept { return A.normalized(); }
+		//OrthoNormalize
+		//Project
+		//ProjectOnPlane
+		static Vector2DX		Reflect(const Vector2DX& inDirection, const Vector2DX& inNormal) noexcept { return inDirection + inNormal * (Vector2DX::Dot(inNormal, inDirection * -1.f)) * 2.f; }
+		//RotateTowards
+		static Vector2DX		Scale(const Vector2DX& A, const Vector2DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y)); }
+		//SignedAngle
+		//Slerp
+		//SlerpUnclamped
+		//SmoothDamp
+
+		//î‰är
+		bool operator==(const Vector2DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
+		bool operator!=(const Vector2DX& obj) const noexcept { return !(*this == obj); }
+		//â¡éZ
+		Vector2DX operator+(const Vector2DX& obj) const noexcept { return DxLib::VAdd(this->get(), obj.get()); }
+		void operator+=(const Vector2DX& obj) noexcept { *this = *this + obj; }
+		//å∏éZ
+		Vector2DX operator-(const Vector2DX& obj) const noexcept { return DxLib::VSub(this->get(), obj.get()); }
+		void operator-=(const Vector2DX& obj) noexcept { *this = *this - obj; }
+		//èÊéZ
+		Vector2DX operator*(float p1) const noexcept { return DxLib::VScale(this->get(), p1); }
+		void operator*=(float p1) noexcept { *this = *this * p1; }
+		//èúéZ
+		Vector2DX operator/(float p1) const noexcept { return DxLib::VScale(this->get(), 1.f / p1); }
 		void operator/=(float p1) noexcept { *this = *this / p1; }
 	};
 	//---------------------------------------------------------------------------------------------
