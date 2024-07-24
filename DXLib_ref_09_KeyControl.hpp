@@ -606,6 +606,7 @@ namespace DXLibRef {
 			switchs m_Key;
 			int		m_assign = 0;
 			int		m_reserve = 0;
+			bool	m_IsUse{ true };
 		};
 	private:
 		//ƒ{ƒ^ƒ“
@@ -736,12 +737,13 @@ namespace DXLibRef {
 		const auto& GetMouseClick(void) const noexcept { return MouseClick; }
 		const auto& GetEsc(void) const noexcept { return KeyEsc; }
 
-		auto& GetKey(PADS select) noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
+		const auto& IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
 		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
-		auto GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
-		auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
+		const auto& GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
+		const auto& GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
+		const auto& GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
 
-		auto GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
+		void SetIsUseButton(PADS select, bool value) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse = value; }
 		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_reserve = assign; }
 
 		bool GetButtonPress(int ID);

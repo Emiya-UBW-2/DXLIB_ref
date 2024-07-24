@@ -5,11 +5,10 @@ namespace DXLibRef {
 
 	DXLib_ref::DXLib_ref(void) noexcept {
 		DXDraw::Create();						//汎用
-		auto* DrawParts = DXDraw::Instance();
-		DrawParts->Init();
 	}
 	bool DXLib_ref::StartLogic(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		DrawParts->Init();
 		if (DrawParts->IsFirstBoot()) {
 			StartMe();
 			return false;

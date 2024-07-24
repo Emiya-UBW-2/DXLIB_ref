@@ -59,12 +59,12 @@ namespace DXLibRef {
 			SSRScreen = GraphHandle::Make(xsize, ysize, true);
 			{
 				bkScreen2 = GraphHandle::Make(xsize, ysize, false);
-				bkScreen2.SetDraw_Screen();
+				bkScreen2.SetDraw_Screen(false);
+				FillGraph(bkScreen2.get(), 0, 0, 0);
 				{
 					int xr = xsize * 30 / 100;
 					int yr = ysize * 60 / 100;
 
-					DrawBox_2D(0, 0, xsize, ysize, Black, TRUE);
 					DrawOval(xsize / 2, ysize / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
@@ -269,21 +269,21 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
-			BufScreen[0].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
-			BufScreen[1].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
-			BufScreen[2].SetDraw_Screen(true);
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
+			BufScreen[0].SetDraw_Screen(false);
+				FillGraph(BufScreen[0].get(), 0, 0, 0);
+			BufScreen[1].SetDraw_Screen(false);
+				FillGraph(BufScreen[1].get(), 0, 0, 0);
+			BufScreen[2].SetDraw_Screen(false);
+				FillGraph(BufScreen[2].get(), 0, 0, 0);
 			GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					  DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[2].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
-			TargetGraph->SetDraw_Screen(true);
+			TargetGraph->SetDraw_Screen(false);
 			{
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
+				FillGraph(TargetGraph->get(), 0, 0, 0);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 				BufScreen[0].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
 				BufScreen[1].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f, 0.f, true);
@@ -404,12 +404,12 @@ namespace DXLibRef {
 			AberrationScreen = GraphHandle::Make(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND, true);
 			{
 				bkScreen2 = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
-				bkScreen2.SetDraw_Screen(true);
+				bkScreen2.SetDraw_Screen(false);
 				{
+					FillGraph(bkScreen2.get(), 0, 0, 0);
 					int xr = DrawParts->GetScreenY(1920) * 60 / 100;
 					int yr = DrawParts->GetScreenY(1080) * 70 / 100;
 
-					DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
 					DrawOval(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
@@ -464,10 +464,9 @@ namespace DXLibRef {
 			{
 				bkScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
 				bkScreen.SetDraw_Screen(true);
+				FillGraph(bkScreen.get(), 255, 255, 255);
 				{
 					int y = 0, c = 0, p = 2;
-					DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), White, TRUE);
-
 					p = 1;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f)*64.f);
@@ -491,12 +490,11 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			GraphBlendBlt(TargetGraph->get(), bkScreen.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
-			TargetGraph->SetDraw_Screen();
+			TargetGraph->SetDraw_Screen(false);
 			{
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Black, TRUE);
+				FillGraph(TargetGraph->get(), 0, 0, 0);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
@@ -905,15 +903,14 @@ namespace DXLibRef {
 		BufferScreen.SetDraw_Screen(false);
 	}
 	void PostPassEffect::Draw2D(std::function<void()> doing) {
-		auto* DrawParts = DXDraw::Instance();
 		//全ての画面を初期化
 		if (m_IsActiveGBuffer) {
 			//リセット替わり
 			ColorScreen.SetDraw_Screen();
 			NormalScreen.SetDraw_Screen();
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), GetColor(128,128,255), TRUE);
+				FillGraph(NormalScreen.get(), 128, 128, 255);
 			DepthScreen.SetDraw_Screen();
-				DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Red, TRUE);
+				FillGraph(DepthScreen.get(), 255, 0, 0);
 		}
 		BufferScreen.SetDraw_Screen();
 		{

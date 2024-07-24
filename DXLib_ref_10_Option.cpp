@@ -24,7 +24,7 @@ namespace DXLibRef {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SE)).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::VOICE)).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::BGM)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::WindowMode)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::WindowMode)).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ScreenEffect)).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Reflection)).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::MotionBlur)).SetEnumParamType(EnumParamType::Boolean);
@@ -73,7 +73,7 @@ namespace DXLibRef {
 				SetParamFloat(EnumSaveParam::SE, 0.5f);
 				SetParamFloat(EnumSaveParam::VOICE, 0.5f);
 				SetParamFloat(EnumSaveParam::BGM, 0.5f);
-				SetParamBoolean(EnumSaveParam::WindowMode, true);
+				SetParamBoolean(EnumSaveParam::WindowMode, static_cast<int>(WindowType::Borderless));
 				SetParamBoolean(EnumSaveParam::ScreenEffect, true);
 				SetParamInt(EnumSaveParam::Reflection, 2);
 				SetParamBoolean(EnumSaveParam::MotionBlur, false);
@@ -102,10 +102,16 @@ namespace DXLibRef {
 						SetParamBoolean((EnumSaveParam)loop, (RIGHT.find("true") != std::string::npos));
 						break;
 					case EnumParamType::Int:
-						SetParamInt((EnumSaveParam)loop, std::stoi(RIGHT));
+						if (std::all_of(RIGHT.cbegin(), RIGHT.cend(), isdigit))
+						{
+							SetParamInt((EnumSaveParam)loop, std::stoi(RIGHT));
+						}
+						else {
+							SetParamInt((EnumSaveParam)loop, 0);
+						}
 						break;
 					case EnumParamType::Float:
-						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));
+						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));//todo 小数か確認
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
@@ -257,24 +263,29 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("BGM", 1110,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
+										 auto* BGM = BGMPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) - 0.1f, 0.f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
+										 auto* BGM = BGMPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) + 0.1f, 0.f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* DrawParts = DXDraw::Instance();
 										 auto* OptionParts = OPTION::Instance();
+										 auto* BGM = BGMPool::Instance();
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM)*100.f + 0.5f), 0, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::BGM, static_cast<float>(value) / 100.f);
-										 BGMPool::Instance()->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+										 BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -315,8 +326,9 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Graphics Preset", 1120,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 case 0:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -372,8 +384,9 @@ namespace DXLibRef {
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) + 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 											 case 0:
 												 OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -494,15 +507,17 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Window Mode", 1121,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->ChangeParamBoolean(EnumSaveParam::WindowMode);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* SE = SoundPool::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) - 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 auto* DrawParts = DXDraw::Instance();
 										 DrawParts->SetWindowOrBorderless();
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
-										 OptionParts->ChangeParamBoolean(EnumSaveParam::WindowMode);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 auto* SE = SoundPool::Instance();
+										 OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) + 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 										 auto* DrawParts = DXDraw::Instance();
 										 DrawParts->SetWindowOrBorderless();
 									 },
@@ -512,34 +527,48 @@ namespace DXLibRef {
 										 auto* LocalizeParts = LocalizePool::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 auto* DrawParts = DXDraw::Instance();
-										 auto prev = OptionParts->GetParamBoolean(EnumSaveParam::WindowMode);
-
-										 OptionParts->SetParamBoolean(EnumSaveParam::WindowMode, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)));
-										 if (prev != OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
+										 auto prev = OptionParts->GetParamInt(EnumSaveParam::WindowMode);
+										 OptionParts->SetParamInt(EnumSaveParam::WindowMode, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::WindowMode), static_cast<int>(WindowType::Max)));
+										 if (prev != OptionParts->GetParamInt(EnumSaveParam::WindowMode)) {
 											 DrawParts->SetWindowOrBorderless();
 										 }
-
-										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
-																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, OptionParts->GetParamBoolean(EnumSaveParam::WindowMode) ? LocalizeParts->Get(1135) : LocalizeParts->Get(1136));
+										 std::string Type;
+										 switch (static_cast<WindowType>(OptionParts->GetParamInt(EnumSaveParam::WindowMode))) {
+										 case WindowType::Window:
+											 Type = LocalizeParts->Get(1135);
+											 break;
+										 case WindowType::Borderless:
+											 Type = LocalizeParts->Get(1136);
+											 break;
+										 case WindowType::FullScreen:
+											 Type = "フルスクリーン";//LocalizeParts->Get(1137)
+											 break;
+										 default:
+											 break;
+										 }
+										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(250), ypos + LineHeight/2, 
+																LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, Type.c_str());
 									 }
 									 );
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("V Sync", 1123,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::vsync);
 										 if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 											 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::vsync);
 										 if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 											 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -561,6 +590,7 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("FPS Limit", 1124,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
@@ -578,10 +608,11 @@ namespace DXLibRef {
 										 }
 
 										 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
 										 for (int i = 0;i < FrameLimitsNum;i++) {
@@ -597,7 +628,7 @@ namespace DXLibRef {
 											 value = FrameLimits[1];
 										 }
 										 OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -624,25 +655,30 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("DirectX Version", 1125,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowParts->SetRestart();
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowParts->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* DrawParts = DXDraw::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 auto prev = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
 										 OptionParts->SetParamInt(EnumSaveParam::DirectXVer, WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1)) ? 1 : 0);
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
-											 OptionWindowClass::Instance()->SetRestart();
+											 OptionWindowParts->SetRestart();
 										 }
 										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
 																LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
@@ -652,13 +688,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("AntiAlias", 1126,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -672,13 +710,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("SSAO", 1127,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -691,13 +731,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Reflection", 1128,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) - 1, 0, 3));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) + 1, 0, 3));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -712,13 +754,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Shadow", 1129,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) - 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) + 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -732,13 +776,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Object Level", 1130,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) + 1, 0, 4));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -752,13 +798,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Bloom Effect", 1131,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -771,13 +819,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Screen Effect", 1132,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -790,13 +840,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("DoF", 1133,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -809,13 +861,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("MotionBlur", 1134,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -828,13 +882,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Fov", 1122,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -848,26 +904,31 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Render Scale", 1137,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) - 0.1f, 0.25f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowParts->SetRestart();
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 OptionWindowParts->SetRestart();
 									 },
 										 [&]() {},
 										 [&]() {},
 										 [&](int xpos, int ypos, bool) {
 										 auto* DrawParts = DXDraw::Instance();
+										 auto* OptionWindowParts = OptionWindowClass::Instance();
 										 auto* OptionParts = OPTION::Instance();
 										 int prev = static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f);
 										 int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale)*100.f + 0.5f), 25, 100);
 										 OptionParts->SetParamFloat(EnumSaveParam::DrawScale, static_cast<float>(value) / 100.f);
 										 if (prev != value) {
-											 OptionWindowClass::Instance()->SetRestart();
+											 OptionWindowParts->SetRestart();
 										 }
 									 }
 									 );
@@ -877,6 +938,7 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Language", 1145,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 											 case LanguageType::Eng:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
@@ -887,8 +949,7 @@ namespace DXLibRef {
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
 										 auto* LocalizeParts = LocalizePool::Instance();
 										 LocalizeParts->Dispose();
@@ -896,6 +957,7 @@ namespace DXLibRef {
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 											 case LanguageType::Eng:
 												 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
@@ -906,8 +968,7 @@ namespace DXLibRef {
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-										 OptionWindowClass::Instance()->SetRestart();
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
 										 auto* LocalizeParts = LocalizePool::Instance();
 										 LocalizeParts->Dispose();
@@ -926,7 +987,6 @@ namespace DXLibRef {
 											 OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 										 }
 										 if (prev != OptionParts->GetParamInt(EnumSaveParam::Language)) {
-											 OptionWindowClass::Instance()->SetRestart();
 											 auto* LocalizeParts = LocalizePool::Instance();
 											 LocalizeParts->Dispose();
 											 LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
@@ -940,13 +1000,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("X sensing", 1140,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) - 0.01f, 0.01f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) + 0.01f, 0.01f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -961,13 +1023,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("Y sensing", 1141,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) - 0.01f, 0.f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) + 0.01f, 0.f, 1.f));
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -982,13 +1046,15 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("HeadBobbing", 1142,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -1001,6 +1067,7 @@ namespace DXLibRef {
 		this->m_Elements.back().Init("GamePadType", 1144,
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
 											 case ControlType::PS4:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
@@ -1012,10 +1079,11 @@ namespace DXLibRef {
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 									 [&]() {
 										 auto* OptionParts = OPTION::Instance();
+										 auto* SE = SoundPool::Instance();
 										 switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
 											 case ControlType::PS4:
 												 OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
@@ -1027,7 +1095,7 @@ namespace DXLibRef {
 											 default:
 												 break;
 										 }
-										 SoundPool::Instance()->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+										 SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 									 },
 										 [&]() {},
 										 [&]() {},
@@ -1102,158 +1170,196 @@ namespace DXLibRef {
 										 WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 									 }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)0); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)2); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)1); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)3); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)10); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)11); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)12); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)13); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)14); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)15); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)16); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)18); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)19); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)20); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)21); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)22); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)23); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)24); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
-		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
-									 [&]() {},
-									 [&]() {},
-									 [&]() {},
-									 [&]() { PadControl::Instance()->GetPushAnySwitch((PADS)25); },
-									 [&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 25); }
-		);
+		if (PadControl::Instance()->IsUseButton((PADS)0)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)0); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)2)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)2); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)1)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)1); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)3)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)3); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)10)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)10); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)11)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)11); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)12)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)12); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)13)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)13); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)14)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)14); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)15)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)15); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)16)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)16); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)18)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)18); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)19)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)19); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)20)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)20); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)21)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)21); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)22)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)22); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)23)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)23); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)24)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)24); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
+			);
+		}
+		if (PadControl::Instance()->IsUseButton((PADS)25)) {
+			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
+				[&]() {},
+				[&]() {},
+				[&]() {},
+				[&]() { PadControl::Instance()->GetPushAnySwitch((PADS)25); },
+				[&](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 25); }
+			);
+		}
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Save", 1152,
 									 [&]() {},

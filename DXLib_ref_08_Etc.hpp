@@ -208,10 +208,15 @@ namespace DXLibRef {
 	}
 	//縁ぬき四角
 	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
-		DrawLine_2D(p1x, p1y, p1x, p2y, color, thickness);
-		DrawLine_2D(p1x, p1y, p2x, p1y, color, thickness);
-		DrawLine_2D(p1x, p2y, p2x, p2y, color, thickness);
-		DrawLine_2D(p2x, p1y, p2x, p2y, color, thickness);
+		if (thickness == 1) {
+			DrawBox(p1x, p1y, p2x, p2y, color, FALSE);
+		}
+		else {
+			DrawLine_2D(p1x, p1y, p1x, p2y, color, thickness);
+			DrawLine_2D(p1x, p1y, p2x, p1y, color, thickness);
+			DrawLine_2D(p1x, p2y, p2x, p2y, color, thickness);
+			DrawLine_2D(p2x, p1y, p2x, p2y, color, thickness);
+		}
 	}
 	//グラデーションのある矩形を描画
 	static void DrawGradationBox_2D(int x1, int y1, int x2, int y2, COLOR_U8 color1, COLOR_U8 color2, const unsigned char UorL = 255) noexcept {
@@ -348,7 +353,7 @@ namespace DXLibRef {
 		float CenterX = static_cast<float>(x1) + xs * XCenter;
 		float CenterY = static_cast<float>(y1) + ys * YCenter;
 
-		auto SetPoint = [&](float xper, float yper, int xc, int yc) {
+		auto SetUpPoint = [&](float xper, float yper, int xc, int yc) {
 			Vertex.resize(Vertex.size() + 1);
 			Vertex.back().pos = VGet(
 				static_cast<float>(x1) + xs * xper - CenterX,
@@ -366,13 +371,13 @@ namespace DXLibRef {
 			Vertex.back().v = static_cast<float>(yc) / 3.f;
 			return (unsigned short)(Vertex.size() - 1);
 		};
-		auto SetBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
-			Index.emplace_back(SetPoint(xmin, ymin, xc, yc));// 左上の頂点の情報をセット
-			auto RU = SetPoint(xmax, ymin, xc + 1, yc);
-			auto LD = SetPoint(xmin, ymax, xc, yc + 1);
+		auto SetUpBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
+			Index.emplace_back(SetUpPoint(xmin, ymin, xc, yc));// 左上の頂点の情報をセット
+			auto RU = SetUpPoint(xmax, ymin, xc + 1, yc);
+			auto LD = SetUpPoint(xmin, ymax, xc, yc + 1);
 			Index.emplace_back(RU);// 右上の頂点の情報をセット
 			Index.emplace_back(LD);// 左下の頂点の情報をセット
-			Index.emplace_back(SetPoint(xmax, ymax, xc + 1, yc + 1));// 右下の頂点の情報をセット
+			Index.emplace_back(SetUpPoint(xmax, ymax, xc + 1, yc + 1));// 右下の頂点の情報をセット
 			Index.emplace_back(LD);// 左下の頂点の情報をセット
 			Index.emplace_back(RU);// 右上の頂点の情報をセット
 		};
@@ -406,7 +411,7 @@ namespace DXLibRef {
 			float ymax = yminpt;
 			int yc = 0;
 			for (int y = 0;y < ytile + 2;y++) {
-				SetBox(xmin, ymin, xmax, ymax, xc, yc);
+				SetUpBox(xmin, ymin, xmax, ymax, xc, yc);
 				//次
 				ymin = ymax;
 				ymax = TilingFlag ? (ymin + ymidt / static_cast<float>(ytile)) : ymaxt;

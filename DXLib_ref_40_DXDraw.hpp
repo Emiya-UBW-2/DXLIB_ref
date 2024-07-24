@@ -135,6 +135,7 @@ namespace DXLibRef {
 		void			SetWindowOrBorderless(void) noexcept;
 	private:
 		void			FirstBootSetting(void) noexcept;
+		void			PauseDraw(void) noexcept;
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		DXDraw(const DXDraw&) = delete;

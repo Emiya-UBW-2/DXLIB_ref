@@ -7,8 +7,7 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 
 	void TEMPSCENE::BG_Draw_Sub(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		DrawBox_2D(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), Gray25, TRUE);
+		FillGraph(GetDrawScreen(), 192, 192, 192);
 	}
 
 	//--------------------------------------------------------------------------------------------------

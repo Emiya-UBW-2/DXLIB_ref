@@ -89,6 +89,14 @@ namespace DXLibRef {
 	"Eng",
 	};
 
+	enum class WindowType :int {
+		None=0,
+		Window=None,
+		Borderless,
+		FullScreen,
+		Max,
+	};
+
 	struct SaveParams {
 	private:
 		EnumParamType m_EnumParamType{};

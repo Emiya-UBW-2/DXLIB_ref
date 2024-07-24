@@ -87,6 +87,8 @@ constexpr int INVALID_ID = -1;
 //const int desky{ static_cast<int>(640 * 9 / 16) / 1 };
 const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) / 1};
 const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) / 1};
+//const int deskx{ static_cast<int>(960) / 1 };
+//const int desky{ static_cast<int>(960 * 9 / 16) / 1 };
 
 const int basex{1920 / 1};
 const int basey{1080 / 1};

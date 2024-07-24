@@ -521,8 +521,9 @@ namespace DXLibRef {
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag(FALSE);									//垂直同期
-		SetZBufferBitDepth(32);										//
-		DxLib_Init();												//
+		SetZBufferBitDepth(32);										//デフォのZバッファ精度を32bitに
+		DxLib_Init();												//初期化
+		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
 		SetUsePixelLighting(TRUE);									//ピクセルライティングの使用
 		if (GetUseDirect3DVersion() != DXVer) {
 			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
@@ -531,7 +532,6 @@ namespace DXLibRef {
 		if (!m_IsFirstBoot) {
 #ifdef _USE_EFFEKSEER_
 			Effekseer_Init(8000);										//Effekseer
-			SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//Effekseer
 			Effekseer_SetGraphicsDeviceLostCallbackFunctions();			//Effekseer
 #endif
 		}
@@ -624,19 +624,35 @@ namespace DXLibRef {
 	void			DXDraw::SetWindowOrBorderless(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			if (OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
+			switch (static_cast<WindowType>(OptionParts->GetParamInt(EnumSaveParam::WindowMode))) {
+			case WindowType::Window:
 				this->m_DispXSize = this->m_DispXSize_Win;
 				this->m_DispYSize = this->m_DispYSize_Win;
 				SetWindowStyleMode(0);
 				SetWindowPosition(0, 0);
 				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
-			}
-			else {
+				ChangeWindowMode(TRUE);
+				break;
+			case WindowType::Borderless:
 				this->m_DispXSize = this->m_DispXSize_Border;
 				this->m_DispYSize = this->m_DispYSize_Border;
 				SetWindowStyleMode(2);
 				SetWindowPosition(0, 0);
 				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+				ChangeWindowMode(TRUE);
+				break;
+			case WindowType::FullScreen:
+				this->m_DispXSize = this->m_DispXSize_Border;
+				this->m_DispYSize = this->m_DispYSize_Border;
+				SetWindowStyleMode(2);
+				SetWindowPosition(0, 0);
+				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+				SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_NATIVE);
+				SetFullScreenScalingMode(DX_FSSCALINGMODE_NEAREST);
+				ChangeWindowMode(FALSE);
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -819,10 +835,23 @@ namespace DXLibRef {
 		}
 		OptionParts->Save();
 	}
+	void DXDraw::PauseDraw(void) noexcept {
+		if (IsPause()) {
+			auto* Fonts = FontPool::Instance();
+			//
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
+			DrawBox_2D(0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			//
+			if (m_PauseFlashCount > 0.5f) {
+				Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
+			}
+		}
+	}
 	void DXDraw::GetMousePosition(int * MouseX, int * MouseY) const noexcept {
 		auto y_UIMs = [&](int p1) {
 			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->GetParamBoolean(EnumSaveParam::WindowMode)) {
+			if (OptionParts->GetParamInt(EnumSaveParam::WindowMode) == static_cast<int>(WindowType::Window)) {
 				return (int(p1) * m_DispYSize_Border / desky);
 			}
 			return (int(p1) * m_DispYSize / desky);
@@ -1000,7 +1029,6 @@ namespace DXLibRef {
 	) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-		auto* Fonts = FontPool::Instance();
 		auto* Pad = PadControl::Instance();
 		//描画
 		auto MainDraw = [&](const Camera3DInfo& camInfo) {
@@ -1050,18 +1078,6 @@ namespace DXLibRef {
 					});
 			}
 			};
-		auto PauseDraw = [&]() {
-			if (IsPause()) {
-				//
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-				DrawBox_2D(0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				//
-				if (m_PauseFlashCount > 0.5f) {
-					Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
-				}
-			}
-			};
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			//UIをスクリーンに描画しておく
 			UI_Screen.SetDraw_Screen();
@@ -1080,7 +1096,7 @@ namespace DXLibRef {
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
 			{
-				DrawBox_2D(0, 0, GetScreenY(1920), GetScreenY(1080), White, TRUE);
+				FillGraph(GetDrawScreen(), 0, 0, 0);
 				if (this->GetVRControl()->GetOutBuffer()) {
 					this->GetVRControl()->GetOutBuffer()->DrawRotaGraph(GetScreenY(1920) / 2, GetScreenY(1080) / 2, 0.5f, 0, false);
 				}
@@ -1095,13 +1111,12 @@ namespace DXLibRef {
 				//SetDrawMode(DX_DRAWMODE_NEAREST);
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->m_DispXSize, this->m_DispYSize, false);
-
+				SetDrawMode(Prev);
 				doingUI();
 				PauseDraw();
 				doingUI2();										//UI2
 				UISystem::Instance()->Draw();
 				Pad->Draw();
-				SetDrawMode(Prev);
 			}
 		}
 	}
@@ -1111,22 +1126,8 @@ namespace DXLibRef {
 		std::function<void()> doingUI2
 	) noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
-		auto* Fonts = FontPool::Instance();
 		auto* Pad = PadControl::Instance();
 		//描画
-		auto PauseDraw = [&]() {
-			if (IsPause()) {
-				//
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-				DrawBox_2D(0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
-				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				//
-				if (m_PauseFlashCount > 0.5f) {
-					Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
-				}
-			}
-		};
-		//
 		PostPassParts->Draw2D(doing);
 		//
 		PostPassParts->Draw();
@@ -1137,13 +1138,12 @@ namespace DXLibRef {
 			//SetDrawMode(DX_DRAWMODE_NEAREST);
 			SetDrawMode(DX_DRAWMODE_BILINEAR);
 			PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->m_DispXSize, this->m_DispYSize, false);
-
+			SetDrawMode(Prev);
 			doingUI();
 			PauseDraw();
 			doingUI2();										//UI2
 			UISystem::Instance()->Draw();
 			Pad->Draw();
-			SetDrawMode(Prev);
 		}
 	}
 	bool					DXDraw::Screen_Flip(void) noexcept {
