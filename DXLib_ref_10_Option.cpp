@@ -115,7 +115,7 @@ namespace DXLibRef {
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
-							for (size_t i = 0;i < 2;i++) {
+							for (size_t i = 0;i < 2;++i) {
 								if (RIGHT == DirectXVerStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -123,7 +123,7 @@ namespace DXLibRef {
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
-							for (size_t i = 1;i < 3;i++) {
+							for (size_t i = 1;i < 3;++i) {
 								if (RIGHT == ControlTypeStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -131,7 +131,7 @@ namespace DXLibRef {
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
-							for (size_t i = 0;i < 2;i++) {
+							for (size_t i = 0;i < 2;++i) {
 								if (RIGHT == LanguageStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -233,7 +233,7 @@ namespace DXLibRef {
 		{
 			xp1 = xpos + (DrawParts->GetUIY(140) + DrawParts->GetUIY(12)) * m_id;
 			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, (isActive ? Gray25 : Gray75), m_name)) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, (isActive ? Gray25 : Gray75), false, m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
@@ -244,7 +244,7 @@ namespace DXLibRef {
 		if (isActive) {
 			xp1 = xpos;
 			yp1 = ypos + LineHeight * 2;
-			for (int i = 0; i < static_cast<int>(m_Elements.size()); i++) {
+			for (int i = 0; i < static_cast<int>(m_Elements.size()); ++i) {
 				yp1 += (LineHeight + DrawParts->GetUIY(6));
 				if (IntoMouse(xp1, yp1, xp1 + DrawParts->GetUIY(500), yp1 + (LineHeight + DrawParts->GetUIY(6)))) {
 					*select = i;
@@ -594,7 +594,7 @@ namespace DXLibRef {
 
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
-										 for (int i = 0;i < FrameLimitsNum;i++) {
+										 for (int i = 0;i < FrameLimitsNum;++i) {
 											 if (FrameLimits[static_cast<size_t>(i)] == value) {
 												 i--;
 												 if (i < 0) { i = FrameLimitsNum - 1; }
@@ -615,9 +615,9 @@ namespace DXLibRef {
 										 auto* SE = SoundPool::Instance();
 										 int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 										 bool isHit = false;
-										 for (int i = 0;i < FrameLimitsNum;i++) {
+										 for (int i = 0;i < FrameLimitsNum;++i) {
 											 if (FrameLimits[static_cast<size_t>(i)] == value) {
-												 i++;
+												 ++i;
 												 if (i > FrameLimitsNum - 1) { i = 0; }
 												 value = FrameLimits[static_cast<size_t>(i)];
 												 isHit = true;
@@ -638,7 +638,7 @@ namespace DXLibRef {
 												int ret = 0;
 												//Œ‹‰Ê‚©‚çˆê”Ô‹ß‚¢‚â‚Â‚ÉŽw’è
 												int diff = 10000;
-												for (int i = 0; i < FrameLimitsNum; i++) {
+												for (int i = 0; i < FrameLimitsNum; ++i) {
 													int tmp = std::abs(FrameLimits[static_cast<size_t>(i)] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 													if (diff > tmp) {
 														diff = tmp;

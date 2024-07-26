@@ -111,8 +111,8 @@ namespace DXLibRef {
 		auto			GetScreenX(int value) const noexcept { return (value * this->m_DispXSize_Max / this->m_DispXSize_Win); }
 		auto			GetScreenY(int value) const noexcept { return (value * this->m_DispYSize_Max / this->m_DispYSize_Win); }
 		//UI—p
-		int				GetUIX(int p1) const noexcept { return (int(p1) * m_DispXSize / basex); }
-		int				GetUIY(int p1) const noexcept { return (int(p1) * m_DispYSize / basey); }
+		int				GetUIX(int value) const noexcept { return (value * m_DispXSize / basex); }
+		int				GetUIY(int value) const noexcept { return (value * m_DispYSize / basey); }
 		//
 		void			GetMousePosition(int* MouseX, int* MouseY) const noexcept;
 		const auto&		GetFps(void) const noexcept { return m_FPS; }

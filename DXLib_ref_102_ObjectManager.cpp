@@ -6,7 +6,7 @@ namespace DXLibRef {
 	void			ObjectManager::AddObject(const SharedObj& NewObj) noexcept {
 		this->m_Object.emplace_back(NewObj);
 		this->m_Object.back()->SetObjectID(this->m_LastUniqueID);
-		this->m_LastUniqueID++;
+		++this->m_LastUniqueID;
 	}
 	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		const SharedModel* Ptr = nullptr;
@@ -34,7 +34,7 @@ namespace DXLibRef {
 				if (cnt == num) {
 					return &o;
 				}
-				cnt++;
+				++cnt;
 			}
 		}
 		return nullptr;
@@ -51,7 +51,7 @@ namespace DXLibRef {
 	}
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		//オブジェクトが増えた場合に備えて範囲forは使わない
-		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); ++i) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				o->FirstExecute();
@@ -59,7 +59,7 @@ namespace DXLibRef {
 		}
 		//物理アップデート
 		this->m_ResetP.Execute(CheckHitKeyWithCheck(KEY_INPUT_P) != 0);
-		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); ++i) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				if (this->m_ResetP.trigger()) { o->SetResetP(true); }
@@ -67,7 +67,7 @@ namespace DXLibRef {
 			}
 		}
 		//オブジェクトの排除チェック
-		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); ++i) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (o->GetIsDelete()) {
 				//順番の維持のためここはerase

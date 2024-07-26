@@ -406,11 +406,11 @@ namespace DXLibRef {
 		float xmin = 0.f;
 		float xmax = xminpt;
 		int xc = 0;
-		for (int x = 0;x < xtile + 2;x++) {
+		for (int x = 0;x < xtile + 2;++x) {
 			float ymin = 0.f;
 			float ymax = yminpt;
 			int yc = 0;
-			for (int y = 0;y < ytile + 2;y++) {
+			for (int y = 0;y < ytile + 2;++y) {
 				SetUpBox(xmin, ymin, xmax, ymax, xc, yc);
 				//ŽŸ
 				ymin = ymax;
@@ -468,7 +468,7 @@ namespace DXLibRef {
 	namespace WindowSystem {
 		//” 
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
-		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
+		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat) noexcept;
 		//•¶Žš
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
@@ -492,8 +492,8 @@ namespace DXLibRef {
 		};
 		//
 		template <typename... Args>
-		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
-			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor);
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, std::string_view String, Args&&... args) noexcept {
+			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor, IsRepeat);
 			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
@@ -1140,8 +1140,8 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) noexcept {
-			for (int i = 0; i < 6; i++) {		// ‰f‚è‚±‚ÞŠÂ‹«‚ð•`‰æ‚·‚é–Ê‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
-				for (int j = 0; j < MIPLEVEL; j++) {			// ƒ~ƒbƒvƒ}ƒbƒv‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
+			for (int i = 0; i < 6; ++i) {		// ‰f‚è‚±‚ÞŠÂ‹«‚ð•`‰æ‚·‚é–Ê‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
+				for (int j = 0; j < MIPLEVEL; ++j) {			// ƒ~ƒbƒvƒ}ƒbƒv‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
 					SetRenderTargetToShader(0, dynamicCubeTex.get(), i, j);		// •`‰ææ”Ô†‚O”Ô‚Ì•`‰æ‘ÎÛ‚ð•`‰æ‘ÎÛ‚É‚Å‚«‚éƒLƒ…[ƒuƒ}ƒbƒv‚Ìi”Ô–Ú‚Ì–Ê‚ÉÝ’è
 					ClearDrawScreen();										// ƒNƒŠƒA
 					{
@@ -1405,7 +1405,7 @@ namespace DXLibRef {
 			for (auto& s : *String) {
 				s = "";
 			}
-			for (int i = 0;i < static_cast<int>(strlenDx(Target));i++) {
+			for (int i = 0;i < static_cast<int>(strlenDx(Target));++i) {
 				if (!
 					(
 						Target[static_cast<size_t>(i)] == ' ' ||
@@ -1416,7 +1416,7 @@ namespace DXLibRef {
 				}
 				else {
 					if (String->at(static_cast<size_t>(NumCount)) != "") {
-						NumCount++;
+						++NumCount;
 						String->at(static_cast<size_t>(NumCount)) = "";
 					}
 				}
@@ -1446,7 +1446,7 @@ namespace DXLibRef {
 							for (auto& t : TmpString) {
 								if (t == "") { continue; }
 								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
-									HitCount++;
+									++HitCount;
 								}
 							}
 						}
@@ -1486,7 +1486,7 @@ namespace DXLibRef {
 							for (auto& t : TmpString) {
 								if (t == "") { continue; }
 								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
-									HitCount++;
+									++HitCount;
 								}
 							}
 						}

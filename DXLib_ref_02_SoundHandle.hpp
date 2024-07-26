@@ -109,7 +109,7 @@ namespace DXLibRef {
 					SetCreate3DSoundFlag(TRUE);
 				}
 				this->shandle.back()->handle[0] = SoundHandle::Load(this->shandle.back()->path);
-				for (size_t i = 1; i < this->shandle.back()->handle.size(); i++) {
+				for (size_t i = 1; i < this->shandle.back()->handle.size(); ++i) {
 					if (is3Dsound) {
 						SetCreate3DSoundFlag(TRUE);
 					}
@@ -117,7 +117,7 @@ namespace DXLibRef {
 				}
 				SetCreate3DSoundFlag(FALSE);
 
-				for (size_t i = 0; i < this->shandle.back()->handle.size(); i++) {
+				for (size_t i = 0; i < this->shandle.back()->handle.size(); ++i) {
 					Set3DPresetReverbParamSoundMem(DX_REVERB_PRESET_MOUNTAINS, this->shandle.back()->handle.at(static_cast<size_t>(i)).get());
 				}
 
@@ -219,7 +219,7 @@ namespace DXLibRef {
 		}
 		Soundhave& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
 		void			Delete(int ID_t) noexcept {
-			for (int i = 0; i < static_cast<int>(this->havehandle.size()); i++) {
+			for (int i = 0; i < static_cast<int>(this->havehandle.size()); ++i) {
 				auto& h = this->havehandle.at(static_cast<size_t>(i));
 				if (h.Get_ID() == ID_t) {
 					h.StopAll(0);
@@ -323,7 +323,7 @@ namespace DXLibRef {
 		}
 		std::shared_ptr<BGMhave>&	Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
 		void						Delete(int ID_t) {
-			for (int i = 0; i < static_cast<int>(this->havehandle.size()); i++) {
+			for (int i = 0; i < static_cast<int>(this->havehandle.size()); ++i) {
 				auto& h = this->havehandle.at(static_cast<size_t>(i));
 				if (h->Get_ID() == ID_t) {
 					h->Stop();

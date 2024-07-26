@@ -337,7 +337,7 @@ namespace DXLibRef {
 				m_screen[static_cast<size_t>(m_current)].SetDraw_Screen();
 				{
 					doing();
-					if (m_notBlendDraw++ > MAX) {
+					if (++m_notBlendDraw > MAX) {
 						int drawMode = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
@@ -549,21 +549,21 @@ namespace DXLibRef {
 
 			// 外周部分用の Sin, Cos テーブルを作成する
 			Angle = 0.0f;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
 				AngleSinTable.at(static_cast<size_t>(i)) = std::sin(Angle);
 				AngleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
 			}
 
 			// 内側の盛り上がっているように見せる箇所で使用する Cos テーブルを作成する
 			Angle = 0.0f;
-			for (i = 0; i < CIRCLE_RADIUS_VERTEX_NUM; i++, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
+			for (i = 0; i < CIRCLE_RADIUS_VERTEX_NUM; ++i, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
 				InCircleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
 			}
 
 			// ポリゴン頂点インデックスの準備
 			Ind = Index;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++) {
-				for (WORD j = 0; j < CIRCLE_RADIUS_VERTEX_NUM - 1; j++, Ind += 6) {
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
+				for (WORD j = 0; j < CIRCLE_RADIUS_VERTEX_NUM - 1; ++j, Ind += 6) {
 					Ind[0] = static_cast<WORD>(i * CIRCLE_RADIUS_VERTEX_NUM + j);
 					Ind[1] = static_cast<WORD>(Ind[0] + 1);
 					if (i == CIRCLE_ANGLE_VERTEX_NUM - 1) {
@@ -587,12 +587,12 @@ namespace DXLibRef {
 
 			// 中心に向かうにしたがって中心方向にテクスチャ座標をずらす
 			Vert = Vertex;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++) {
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
 				// 使用する Sin, Cos の値をセット
 				Sin = AngleSinTable.at(static_cast<size_t>(i));
 				Cos = AngleCosTable.at(static_cast<size_t>(i));
 
-				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; j++, Vert++) {
+				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; ++j, ++Vert) {
 					// 円の中心までの距離を算出
 					CenterDistance = Radius;
 
@@ -626,12 +626,12 @@ namespace DXLibRef {
 
 			// Cosテーブルにしたがってテクスチャ座標をずらす
 			Vert = Vertex;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; i++) {
+			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
 				// 使用する Sin, Cos の値をセット
 				Sin = AngleSinTable.at(static_cast<size_t>(i));
 				Cos = AngleCosTable.at(static_cast<size_t>(i));
 
-				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; j++, Vert++) {
+				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; ++j, ++Vert) {
 					// 円の中心までの距離を算出
 					CenterDistance = InCircleCosTable[static_cast<size_t>(j)] * Radius;
 

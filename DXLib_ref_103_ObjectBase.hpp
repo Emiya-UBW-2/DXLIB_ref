@@ -120,7 +120,7 @@ namespace DXLibRef {
 			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.GetPos()) <= pRange) {
 				//”»’è‹N“®
 				this->m_ColActive = true;
-				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); i++) { this->m_col.RefreshCollInfo(INVALID_ID, i); }
+				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) { this->m_col.RefreshCollInfo(INVALID_ID, i); }
 				return true;
 			}
 			return false;

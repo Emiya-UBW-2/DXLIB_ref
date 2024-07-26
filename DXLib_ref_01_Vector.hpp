@@ -214,8 +214,8 @@ namespace DXLibRef {
 		}
 		//î‰är
 		bool operator==(const Matrix4x4DX& obj) const noexcept {
-			for (int x = 0;x < 4;x++) {
-				for (int y = 0;y < 4;y++) {
+			for (int x = 0;x < 4;++x) {
+				for (int y = 0;y < 4;++y) {
 					if (this->get().m[x][y] != obj.get().m[x][y]) {
 						return false;
 					}
@@ -240,16 +240,16 @@ namespace DXLibRef {
 	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr)
 	{
 		*pTarget = DxLib::MGetIdent();
-		for (int x = 0; x < 3; x++) {
-			for (int y = 0; y < 3; y++) {
+		for (int x = 0; x < 3; ++x) {
+			for (int y = 0; y < 3; ++y) {
 				pTarget->m[x][y] = pAtr.m[x][y];
 			}
 		}
 	}
 	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr)
 	{
-		for (int x = 0; x < 3; x++) {
-			for (int y = 0; y < 3; y++) {
+		for (int x = 0; x < 3; ++x) {
+			for (int y = 0; y < 3; ++y) {
 				pTarget->m[x][y] = pAtr.m[x][y];
 			}
 		}
@@ -504,8 +504,8 @@ namespace DXLibRef {
 		}
 		//î‰är
 		bool operator==(const Matrix3x3DX& obj) const noexcept {
-			for (int x = 0; x < 3; x++) {
-				for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 3; ++x) {
+				for (int y = 0; y < 3; ++y) {
 					if (this->get().m[x][y] != obj.get().m[x][y]) {
 						return false;
 					}

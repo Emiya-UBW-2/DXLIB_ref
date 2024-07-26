@@ -629,21 +629,21 @@ namespace DXLibRef {
 		const std::string	GetIDtoStr(int ID) const noexcept {
 			switch (m_ControlType) {
 				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; i++) {
+					for (size_t i = 0; i < XBoxNum; ++i) {
 						if (XBoxID[i] == ID) {
 							return XBoxStr[i];
 						}
 					}
 					break;
 				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; i++) {
+					for (size_t i = 0; i < DS4Num; ++i) {
 						if (DS4ID[i] == ID) {
 							return DS4Str[i];
 						}
 					}
 					break;
 				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; i++) {
+					for (size_t i = 0; i < KeyNum; ++i) {
 						if (KeyID[i] == ID) {
 							return KeyStr[i];
 						}
@@ -658,21 +658,21 @@ namespace DXLibRef {
 		int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
 				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; i++) {
+					for (size_t i = 0; i < XBoxNum; ++i) {
 						if (strcmpDx(XBoxStr[i], Str) == 0) {
 							return XBoxID[i];
 						}
 					}
 					break;
 				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; i++) {
+					for (size_t i = 0; i < DS4Num; ++i) {
 						if (strcmpDx(DS4Str[i], Str) == 0) {
 							return DS4ID[i];
 						}
 					}
 					break;
 				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; i++) {
+					for (size_t i = 0; i < KeyNum; ++i) {
 						if (strcmpDx(KeyStr[i], Str) == 0) {
 							return KeyID[i];
 						}
@@ -767,7 +767,7 @@ namespace DXLibRef {
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			switch (m_ControlType) {
 				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; i++) {
+					for (size_t i = 0; i < XBoxNum; ++i) {
 						if (XBoxID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 							Key.back()->AddGuideXBox(static_cast<int>(i), GuideStr);
 							return;
@@ -775,7 +775,7 @@ namespace DXLibRef {
 					}
 					break;
 				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; i++) {
+					for (size_t i = 0; i < DS4Num; ++i) {
 						if (DS4ID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 							Key.back()->AddGuideDS4(static_cast<int>(i), GuideStr);
 							return;
@@ -783,7 +783,7 @@ namespace DXLibRef {
 					}
 					break;
 				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; i++) {
+					for (size_t i = 0; i < KeyNum; ++i) {
 						if (KeyID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 							Key.back()->AddGuidePC(static_cast<int>(i), GuideStr);
 							return;

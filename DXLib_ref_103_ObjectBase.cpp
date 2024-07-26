@@ -87,7 +87,7 @@ namespace DXLibRef {
 				MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
 				if (!UseToonWhenCreateFile) {
 					obj->SetMaterialTypeAll(DX_MATERIAL_TYPE_NORMAL);
-					for (int i = 0, Max = obj->GetMaterialNum(); i < Max; i++) {
+					for (int i = 0, Max = obj->GetMaterialNum(); i < Max; ++i) {
 						obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
 						obj->SetMaterialSpcColor(i, GetColorF(0.f, 0.f, 0.f, 0.f));
 						obj->SetMaterialAmbColor(i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
@@ -187,7 +187,7 @@ namespace DXLibRef {
 				if (DrawParts->GetFps() > 120.f) {
 					Max = 1;
 				}
-				for (int i = 0; i < Max; i++) {
+				for (int i = 0; i < Max; ++i) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
 					this->GetObj().PhysicsCalculation(1000.0f *60.f / DrawParts->GetFps() / static_cast<float>(Max));
 				}
@@ -224,7 +224,7 @@ namespace DXLibRef {
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f*12.5f, -0.f*12.5f, -1.f*12.5f)).get(),
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f*12.5f, 1.f*12.5f, 1.f*12.5f)).get()) == FALSE
 				) {
-				for (int i = 0; i < static_cast<int>(this->GetObj().GetMeshNum()); i++) {
+				for (int i = 0; i < static_cast<int>(this->GetObj().GetMeshNum()); ++i) {
 					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {
 						this->GetObj().DrawMesh(i);
 					}

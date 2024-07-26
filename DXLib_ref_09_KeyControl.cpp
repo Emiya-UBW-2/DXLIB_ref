@@ -179,7 +179,7 @@ namespace DXLibRef {
 			}
 
 			//既にアサイン済のものがあった場合そいつを無効化
-			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
 				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
 					P2.m_reserve = INVALID_ID;
@@ -196,14 +196,14 @@ namespace DXLibRef {
 	}
 
 	void PadControl::GetPushAnySwitch(PADS select) {
-		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
 			if (p == static_cast<size_t>(select)) { continue; }
 			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_reserve)) {
 				break;
 			}
 		}
-		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); p++) {
+		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
 			if (p == static_cast<size_t>(select)) { continue; }
 			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_assign)) {
@@ -212,21 +212,21 @@ namespace DXLibRef {
 		}
 		switch (m_ControlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < XBoxNum; i++) {
+				for (size_t i = 0; i < XBoxNum; ++i) {
 					if (GetPushAnySwitchLocal(select, XBoxID[i])) {
 						break;
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < DS4Num; i++) {
+				for (size_t i = 0; i < DS4Num; ++i) {
 					if (GetPushAnySwitchLocal(select, DS4ID[i])) {
 						break;
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < KeyNum; i++) {
+				for (size_t i = 0; i < KeyNum; ++i) {
 					if (GetPushAnySwitchLocal(select, KeyID[i])) {
 						break;
 					}
@@ -252,7 +252,7 @@ namespace DXLibRef {
 			if (ALL == "") { continue; }
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
-			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 				if (LEFT == PADSStr[i]) {
 					this->m_PadsInfo.at(i).m_assign = GetStrtoID(RIGHT.c_str());
 					this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
@@ -264,19 +264,19 @@ namespace DXLibRef {
 	}
 	void PadControl::Save(void) noexcept {
 		std::ofstream outputfile(GetSavePath());
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 			outputfile << (std::string)PADSStr[i] + "=" + GetIDtoStr(this->m_PadsInfo[i].m_assign) + "\n";
 		}
 		outputfile.close();
 	}
 
 	void PadControl::ResetAssign(void) noexcept {
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 			this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
 		}
 	}
 	void PadControl::FlipAssign(void) noexcept {
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 			this->m_PadsInfo.at(i).m_assign = this->m_PadsInfo.at(i).m_reserve;
 		}
 	}
@@ -291,7 +291,7 @@ namespace DXLibRef {
 			Key.resize(Key.size() + 1);
 			//
 			Key.back() = std::make_unique<KeyGuideGraphs>();
-			for (size_t i = 0; i < KeyNum; i++) {
+			for (size_t i = 0; i < KeyNum; ++i) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
 					Key.back()->AddGuidePC(static_cast<int>(i), LocalizeParts->Get(9990));
 					break;
@@ -466,7 +466,7 @@ namespace DXLibRef {
 				break;
 		}
 		//ボタン
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); i++) {
+		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
 					case PADS::MOVE_W:

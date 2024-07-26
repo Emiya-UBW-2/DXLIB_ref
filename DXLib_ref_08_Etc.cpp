@@ -65,11 +65,11 @@ namespace DXLibRef {
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
 			DrawBox_2D(static_cast<int>(xp1), static_cast<int>(yp1), static_cast<int>(xp2), static_cast<int>(yp2), colorSet, true);
 		}
-		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
+		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat) noexcept {
 			auto* Pad = PadControl::Instance();
 			bool MouseOver = IntoMouse(xp1, yp1, xp2, yp2);
 			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
-			return (MouseOver && Pad->GetMouseClick().trigger());
+			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
 		};
 		//ï∂éö
 		bool GetMsgPosOn(int* xp1, int *yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
@@ -150,9 +150,9 @@ namespace DXLibRef {
 				int r = LineHeight / 3;
 				int xps = (xmax + xmin) / 2;
 				int yps = yp + LineHeight / 2;
-				for (int loop = 0; loop < valueMax; loop++) {
+				for (int loop = 0; loop < valueMax; ++loop) {
 					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
-					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen)) {
+					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen, false)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 
@@ -304,7 +304,7 @@ namespace DXLibRef {
 			if (m_Active) {
 				xp1 = xm2 - DrawParts->GetUIY(140);
 				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, LocalizeParts->Get(20))) {
+				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, false, LocalizeParts->Get(20))) {
 					End();
 				}
 			}
@@ -372,7 +372,7 @@ namespace DXLibRef {
 		this->m_Name = pJson["Name"];
 		//
 		std::string Type = pJson["Type"];
-		for (size_t i = 0; i < static_cast<size_t>(EnumUIPartsType::Max); i++) {
+		for (size_t i = 0; i < static_cast<size_t>(EnumUIPartsType::Max); ++i) {
 			if (Type == g_UIPartsString[i]) {
 				this->m_EnumUIPartsType = (EnumUIPartsType)i;
 				break;
@@ -390,14 +390,14 @@ namespace DXLibRef {
 		this->m_ZRotate = pJson["ZRotate"];
 		//
 		std::string XCenter = pJson["XCenter"];
-		for (size_t i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; ++i) {
 			if (XCenter == g_UIXCenterString[i]) {
 				this->m_UIXCenter = (UIXCenter)i;
 				break;
 			}
 		}
 		std::string YCenter = pJson["YCenter"];
-		for (size_t i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; ++i) {
 			if (YCenter == g_UIYCenterString[i]) {
 				this->m_UIYCenter = (UIYCenter)i;
 				break;
@@ -405,7 +405,7 @@ namespace DXLibRef {
 		}
 		//êFä÷åW
 		auto GetColorByPallet = [&](const std::string& ColorStr) {
-			for (size_t i = 0; i < g_UIColorPalletNum; i++) {
+			for (size_t i = 0; i < g_UIColorPalletNum; ++i) {
 				if (ColorStr == g_UIColorPalletString[i]) {
 					return g_UIColorPallet[i];
 					break;
@@ -642,7 +642,7 @@ namespace DXLibRef {
 			tmp.m_YOfs = n["YOffset"];
 			tmp.m_ZRotOfs = n["ZRotOfs"];
 			std::string Lerptype = n["LerpType"];
-			for (size_t i = 0; i < static_cast<size_t>(LerpType::Max); i++) {
+			for (size_t i = 0; i < static_cast<size_t>(LerpType::Max); ++i) {
 				if (Lerptype == g_LerpTypeStr[i]) {
 					tmp.m_LerpType = (LerpType)i;
 					break;
@@ -718,7 +718,7 @@ namespace DXLibRef {
 			m_CommonParts.emplace_back(std::make_unique<UI_CommonParts>());
 			m_CommonParts.back()->SetUniqueID(UniqueIDNum);
 			m_CommonParts.back()->SetParts(j);
-			UniqueIDNum++;
+			++UniqueIDNum;
 		}
 		for (auto& j : pJson["TotalAnim"]) {
 			m_CommonAnimes.emplace_back(std::make_unique<UI_CommonAnimes>());

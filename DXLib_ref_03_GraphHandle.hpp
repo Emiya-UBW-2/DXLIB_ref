@@ -179,7 +179,7 @@ namespace DXLibRef {
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
 
 			Handles->clear();
-			for (int i = 0; i < AllNum; i++) {
+			for (int i = 0; i < AllNum; ++i) {
 				Handles->resize(Handles->size() + 1);
 				Handles->back() = HandleArray[static_cast<size_t>(i)];
 			}

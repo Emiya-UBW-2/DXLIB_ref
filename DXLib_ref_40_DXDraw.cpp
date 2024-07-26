@@ -204,7 +204,7 @@ namespace DXLibRef {
 				m_VR_TrackerID.clear();
 				char DeviceCount = 0;
 				bool IsFirstHand = true;
-				for (char i = 0; i < 8; i++) {
+				for (char i = 0; i < 8; ++i) {
 					auto DeviceID = DeviceCount;
 					auto DeviceType = m_VR_SystemPtr->GetTrackedDeviceClass(i);
 					switch (DeviceType) {
@@ -691,7 +691,7 @@ namespace DXLibRef {
 
 				int xp = GetUIY(720 + 16 + 16);
 				int yp = GetUIY(16);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, LocalizeParts->Get(2000))) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, LocalizeParts->Get(2000))) {
 					m_CheckPCSpec.StartSearch();
 				}
 				yp += GetUIY(24);
@@ -827,7 +827,7 @@ namespace DXLibRef {
 
 				xp = GetUIY(720 + 16 + 32);
 				yp = GetUIY(720);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, "Start Game!")) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, false, "Start Game!")) {
 					PopUpParts->EndAll();
 				}
 			}
@@ -939,7 +939,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, LocalizeParts->Get(102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 						}
@@ -970,7 +970,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, LocalizeParts->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, LocalizeParts->Get(2102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 							StartMe();
@@ -1088,7 +1088,7 @@ namespace DXLibRef {
 				Pad->Draw();
 			}
 			//VRに移す
-			for (char i = 0; i < 2; i++) {
+			for (char i = 0; i < 2; ++i) {
 				MainDraw(this->GetVRControl()->GetCamPos(i));
 				//それぞれの目に内容を送信
 				this->GetVRControl()->SubmitDraw(i, PostPassParts->Get_MAIN_Screen(), UI_Screen, doingUI2);
