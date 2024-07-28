@@ -164,8 +164,97 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->Seg_Point_MinDist_Square <= (len*len));
 	}
+	//--------------------------------------------------------------------------------------------------
+	// IK
+	//--------------------------------------------------------------------------------------------------
+	static void			IK_move_Arm(
+		const Vector3DX& Localyvec,
+		const Vector3DX& Localzvec,
+		MV1* pObj,
+		float XPer,
+		int Arm, const Matrix4x4DX& FrameBaseLocalMatArm,
+		int Arm2, const Matrix4x4DX& FrameBaseLocalMatArm2,
+		int Wrist, const Matrix4x4DX& FrameBaseLocalMatWrist,
+		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
 
-	//カメラから画面上の座標を取得
+		auto GetFramePosition = [&](int frame) { return Vector3DX(MV1GetFramePosition(pObj->GetHandle(), frame)); };
+		auto AngleOf2Vector = [&](Vector3DX A, Vector3DX B) { return acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); };			//２つのベクトルABのなす角度θを求める
+
+		pObj->ResetFrameUserLocalMatrix(Arm);
+		pObj->ResetFrameUserLocalMatrix(Arm2);
+		pObj->ResetFrameUserLocalMatrix(Wrist);
+		auto matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Arm))).rotation().inverse();
+
+		Vector3DX Dirxvec = Vector3DX::Cross(Dirzvec, Diryvec) * -1.f;
+
+		Vector3DX RetPos = DirPos;
+		//基準
+		auto vec_a1 = Matrix4x4DX::Vtrans((RetPos - GetFramePosition(Arm)).normalized(), matBase);//基準
+		auto vec_a1L1 = Vector3DX(Vector3DX::vget(XPer, -1.f, vec_a1.y / -abs(vec_a1.z))).normalized();//x=0とする
+		float cos_t = GetCosFormula((GetFramePosition(Wrist) - GetFramePosition(Arm2)).magnitude(), (GetFramePosition(Arm2) - GetFramePosition(Arm)).magnitude(), (GetFramePosition(Arm) - RetPos).magnitude());
+		auto vec_t = vec_a1 * cos_t + vec_a1L1 * std::sqrtf(1.f - cos_t * cos_t);
+		//上腕
+		pObj->SetFrameLocalMatrix(Arm, Matrix4x4DX::identity() * FrameBaseLocalMatArm);
+		Matrix4x4DX a1_inv = Matrix4x4DX::RotVec2(Matrix4x4DX::Vtrans(GetFramePosition(Arm2) - GetFramePosition(Arm), matBase), vec_t);
+		pObj->SetFrameLocalMatrix(Arm, a1_inv * FrameBaseLocalMatArm);
+		//下腕
+		matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Arm2))).rotation().inverse();
+		pObj->SetFrameLocalMatrix(Arm2, Matrix4x4DX::identity() * FrameBaseLocalMatArm2);
+		Matrix4x4DX a2_inv = Matrix4x4DX::RotVec2(
+			Matrix4x4DX::Vtrans(GetFramePosition(Wrist) - GetFramePosition(Arm2), matBase),
+			Matrix4x4DX::Vtrans(RetPos - GetFramePosition(Arm2), matBase));
+		pObj->SetFrameLocalMatrix(Arm2, a2_inv * FrameBaseLocalMatArm2);
+		//手
+		matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Wrist))).rotation().inverse();
+		Matrix4x4DX mat1;
+		{
+			auto zvec = Matrix4x4DX::Vtrans(Localzvec, pObj->GetFrameLocalWorldMatrix(Wrist).rotation());
+			mat1 = Matrix4x4DX::RotVec2(Matrix4x4DX::Vtrans(zvec, matBase), Matrix4x4DX::Vtrans(Dirzvec, matBase)) * mat1;
+			pObj->SetFrameLocalMatrix(Wrist, mat1 * FrameBaseLocalMatWrist);
+			auto xvec = Matrix4x4DX::Vtrans(Localyvec, pObj->GetFrameLocalWorldMatrix(Wrist).rotation());
+			mat1 = Matrix4x4DX::RotAxis(Localzvec, AngleOf2Vector(xvec, Dirxvec) * ((Vector3DX::Dot(Diryvec, xvec) > 0.f) ? -1.f : 1.f)) * mat1;
+		}
+		pObj->SetFrameLocalMatrix(Wrist, mat1 * FrameBaseLocalMatWrist);
+	}
+
+	static void			IK_RightArm(MV1* pObj,
+		int Arm, const Matrix4x4DX& FrameBaseLocalMatArm,
+		int Arm2, const Matrix4x4DX& FrameBaseLocalMatArm2,
+		int Wrist, const Matrix4x4DX& FrameBaseLocalMatWrist,
+		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
+		IK_move_Arm(
+			Vector3DX::vget(0.f, 0.f, -1.f).normalized(),
+			Vector3DX::vget(-1.f, -1.f, 0.f).normalized(),
+			pObj, -0.5f,
+			Arm,
+			FrameBaseLocalMatArm,
+			Arm2,
+			FrameBaseLocalMatArm2,
+			Wrist,
+			FrameBaseLocalMatWrist,
+			DirPos, Diryvec * -1.f, Dirzvec);
+	}
+	static void			IK_LeftArm(MV1* pObj,
+		int Arm, const Matrix4x4DX& FrameBaseLocalMatArm,
+		int Arm2, const Matrix4x4DX& FrameBaseLocalMatArm2,
+		int Wrist, const Matrix4x4DX& FrameBaseLocalMatWrist,
+		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
+
+		IK_move_Arm(
+			Vector3DX::vget(0.f, 0.f, -1.f).normalized(),
+			Vector3DX::vget(1.f, -1.f, 0.f).normalized(),
+			pObj, 1.5f,
+			Arm,
+			FrameBaseLocalMatArm,
+			Arm2,
+			FrameBaseLocalMatArm2,
+			Wrist,
+			FrameBaseLocalMatWrist,
+			DirPos, Diryvec, Dirzvec);
+	}
+	//--------------------------------------------------------------------------------------------------
+	// カメラから画面上の座標を取得
+	//--------------------------------------------------------------------------------------------------
 	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept;
 	//--------------------------------------------------------------------------------------------------
 	// ウィンドウアクティブチェック付きキー操作

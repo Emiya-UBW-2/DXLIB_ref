@@ -56,6 +56,8 @@ namespace DXLibRef {
 				return false;
 			}
 		}
+		LONGLONG GetTotalTIme() const noexcept { return DxLib::GetSoundTotalTime(handle_); }
+		
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
 		auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
 		bool SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
@@ -171,6 +173,9 @@ namespace DXLibRef {
 			}
 			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) {
 				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].SetPosition(pos_t);
+			}
+			LONGLONG			GetTotalTIme(int Sel_t, int Sel2_t) {
+				return shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].GetTotalTIme();
 			}
 			void			SetVol_Local(int vol) {
 				Set_vol = std::clamp(vol, 0, 255);
