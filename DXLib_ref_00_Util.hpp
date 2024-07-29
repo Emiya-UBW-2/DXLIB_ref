@@ -1,5 +1,5 @@
 #pragma once
-#include "DXLib_ref.h"
+//#include "DXLib_ref.h"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*DXLIBに直接かかわりのない便利モノ																											*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -25,13 +25,13 @@ namespace DXLibRef {
 			return (T*)m_Singleton;
 		}
 	protected:
-		SingletonBase() noexcept {}
-		virtual ~SingletonBase() noexcept {}
+		SingletonBase(void) noexcept {}
+		virtual ~SingletonBase(void) noexcept {}
 	private:
-		SingletonBase(const SingletonBase &) = delete;
-		SingletonBase& operator=(const SingletonBase &) = delete;
-		SingletonBase(SingletonBase &&) = delete;
-		SingletonBase& operator=(SingletonBase &&) = delete;
+		SingletonBase(const SingletonBase&) = delete;
+		SingletonBase& operator=(const SingletonBase&) = delete;
+		SingletonBase(SingletonBase&&) = delete;
+		SingletonBase& operator=(SingletonBase&&) = delete;
 	};
 	//子のサンプル
 	/*
@@ -71,7 +71,7 @@ namespace DXLibRef {
 			GetModuleFileName(NULL, Path, MAX_PATH);			// EXEのあるフォルダのパスを取得
 			SetCurrentDirectory(Path);							// カレントディレクトリの設定
 		}
-		~DialogManager(void) noexcept { }
+		~DialogManager(void) noexcept {}
 	public:
 		void			Init(void) noexcept {
 			GetCurrentDirectory(MAX_PATH, cdir);
@@ -99,7 +99,7 @@ namespace DXLibRef {
 			ofn.lpstrTitle = "保存";
 			return GetSaveFileName(&ofn);
 		}
-		const auto*		GetPath(void) noexcept {
+		const auto* GetPath(void) noexcept {
 			std::string str = strFile;
 			return (str.find(cdir) != std::string::npos) ? &strFile[strlen(cdir) + 1] : strFile;
 		}
@@ -142,7 +142,7 @@ namespace DXLibRef {
 	//余弦定理
 	constexpr float GetCosFormula(float a, float b, float c) noexcept {
 		if (b + c > a && c + a > b && a + b > c) {
-			return std::clamp((b * b + c * c - a * a) / (2.f * b*c), -1.f, 1.f);
+			return std::clamp((b * b + c * c - a * a) / (2.f * b * c), -1.f, 1.f);
 		}
 		return 1.f;
 	}
@@ -192,7 +192,7 @@ namespace DXLibRef {
 				MessageBox(NULL, "フォント読込失敗", "", MB_OK);
 			}
 		}
-		void Remove() noexcept {
+		void Remove(void) noexcept {
 			if (RemoveFontResourceEx(m_Path.c_str(), FR_PRIVATE, NULL) == 0) {
 				MessageBox(NULL, "フォント読込削除", "", MB_OK);
 			}

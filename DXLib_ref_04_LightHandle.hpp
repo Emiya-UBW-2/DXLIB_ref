@@ -10,11 +10,11 @@ namespace DXLibRef {
 	class LightHandle {
 	private:
 		int handle_;
-		constexpr LightHandle(int h) : handle_(h) {}
+		constexpr LightHandle(int h) noexcept : handle_(h) {}
 		static constexpr int invalid_handle = INVALID_ID;
 
 	public:
-		constexpr LightHandle(void) : handle_(invalid_handle) {}
+		constexpr LightHandle(void) noexcept : handle_(invalid_handle) {}
 		LightHandle(const LightHandle&) = delete;
 		LightHandle(LightHandle&& o) noexcept : handle_(o.handle_) {
 			o.handle_ = invalid_handle;
@@ -25,7 +25,7 @@ namespace DXLibRef {
 			o.handle_ = invalid_handle;
 			return *this;
 		}
-		LightHandle& operator=(int handle) {
+		LightHandle& operator=(int handle) noexcept {
 			this->handle_ = handle;
 			return *this;
 		}
@@ -42,24 +42,24 @@ namespace DXLibRef {
 		int get(void) const noexcept { return handle_; }
 
 		LightHandle Duplicate(void) const noexcept { return this->handle_; }
-		void SetPos(const Vector3DX& Position) {
+		void SetPos(const Vector3DX& Position) noexcept {
 			SetLightPositionHandle(this->handle_, Position.get());
 		}
-		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) {
+		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) noexcept {
 			SetLightPositionHandle(this->handle_, Position.get());
 			SetLightDirectionHandle(this->handle_, Direction.get());
 		}
 
-		static LightHandle CreateSpot(const Vector3DX& Position, const Vector3DX& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) {
+		static LightHandle CreateSpot(const Vector3DX& Position, const Vector3DX& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) noexcept {
 			return { DxLib::CreateSpotLightHandle(Position.get(), Direction.get(), OutAngle, InAngle, Range, Atten0, Atten1, Atten2) };
 		}
 
-		static LightHandle CreatePoint(const Vector3DX& Position, float Range, float Atten0, float Atten1, float Atten2) {
+		static LightHandle CreatePoint(const Vector3DX& Position, float Range, float Atten0, float Atten1, float Atten2) noexcept {
 			return { DxLib::CreatePointLightHandle(Position.get(), Range, Atten0, Atten1, Atten2) };
 		}
 
-		static LightHandle CreateDir(const Vector3DX& Directional) {
-			return {DxLib::CreateDirLightHandle(Directional.get())};
+		static LightHandle CreateDir(const Vector3DX& Directional) noexcept {
+			return { DxLib::CreateDirLightHandle(Directional.get()) };
 		}
 	};
 	//ライトプール
@@ -78,33 +78,36 @@ namespace DXLibRef {
 
 		~LightPool(void) noexcept {}
 	public:
-		const LightHandle&			Put(LightType Lighttype, const Vector3DX& pos) noexcept {
+		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			auto prev = now;
 			if (handles[static_cast<size_t>(now)].get() != INVALID_ID) {
 				handles[static_cast<size_t>(now)].Dispose();
 			}
 			//handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
 			switch (Lighttype) {
-				case LightType::POINT:
-					handles[static_cast<size_t>(now)] = LightHandle::CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
-					break;
-				case LightType::SPOT:
-					handles[static_cast<size_t>(now)] = LightHandle::CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
-					break;
-				case LightType::DIRECTIONAL:
-					handles[static_cast<size_t>(now)] = LightHandle::CreateDir(pos);
-					break;
-				default:
-					break;
+			case LightType::POINT:
+				handles[static_cast<size_t>(now)] = LightHandle::CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
+				break;
+			case LightType::SPOT:
+				handles[static_cast<size_t>(now)] = LightHandle::CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
+				break;
+			case LightType::DIRECTIONAL:
+				handles[static_cast<size_t>(now)] = LightHandle::CreateDir(pos);
+				break;
+			default:
+				break;
 			}
 			++now %= handles.size();
 			return handles[static_cast<size_t>(prev)];
 		}
 		void			Update(void) noexcept {
 			/*
-			for (auto& h : handles) {
-				if (h.get() != INVALID_ID) {
-					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30) {
+			for (auto& h : handles)
+			{
+				if (h.get() != INVALID_ID)
+				{
+					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30)
+					{
 						h.Dispose();
 					}
 				}

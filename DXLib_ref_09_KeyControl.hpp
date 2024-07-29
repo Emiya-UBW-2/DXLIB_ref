@@ -11,7 +11,7 @@ namespace DXLibRef {
 		PS4,
 		PC,
 	};
-	static const char* ControlTypeStr[]= {
+	static const char* ControlTypeStr[] = {
 		"XBox",
 		"PS4",
 		"PC",
@@ -578,7 +578,7 @@ namespace DXLibRef {
 	private:
 		class KeyGuideGraphs {
 		public:
-			int xsize{0}, ysize{0};
+			int xsize{ 0 }, ysize{ 0 };
 			GraphHandle GuideImg;
 			std::string GuideString;
 		public:
@@ -612,100 +612,100 @@ namespace DXLibRef {
 		//ボタン
 		std::array<PadsInfo, static_cast<int>(PADS::MAX)> m_PadsInfo;
 		//右スティック
-		float Look_XradAdd{0.f};
-		float Look_YradAdd{0.f};
+		float Look_XradAdd{ 0.f };
+		float Look_YradAdd{ 0.f };
 		//
-		int MouseX{0};
-		int MouseY{0};
+		int MouseX{ 0 };
+		int MouseY{ 0 };
 		switchs MouseClick;
 		switchs KeyEsc;
 		//ガイド等のコントロール
-		bool		m_IsUpdate{true};
-		bool		m_MouseMoveEnable{true};
-		ControlType	m_ControlType{ControlType::PC};
+		bool		m_IsUpdate{ true };
+		bool		m_MouseMoveEnable{ true };
+		ControlType	m_ControlType{ ControlType::PC };
 	private:
 		std::vector<std::unique_ptr<KeyGuideGraphs>>	Key;
 	public:
 		const std::string	GetIDtoStr(int ID) const noexcept {
 			switch (m_ControlType) {
-				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; ++i) {
-						if (XBoxID[i] == ID) {
-							return XBoxStr[i];
-						}
+			case ControlType::XBox:
+				for (size_t i = 0; i < XBoxNum; ++i) {
+					if (XBoxID[i] == ID) {
+						return XBoxStr[i];
 					}
-					break;
-				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; ++i) {
-						if (DS4ID[i] == ID) {
-							return DS4Str[i];
-						}
+				}
+				break;
+			case ControlType::PS4:
+				for (size_t i = 0; i < DS4Num; ++i) {
+					if (DS4ID[i] == ID) {
+						return DS4Str[i];
 					}
-					break;
-				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; ++i) {
-						if (KeyID[i] == ID) {
-							return KeyStr[i];
-						}
+				}
+				break;
+			case ControlType::PC:
+				for (size_t i = 0; i < KeyNum; ++i) {
+					if (KeyID[i] == ID) {
+						return KeyStr[i];
 					}
-					break;
-				default:
-					break;
+				}
+				break;
+			default:
+				break;
 			}
 			return "NONE";
 		};
 	private:
 		int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
-				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; ++i) {
-						if (strcmpDx(XBoxStr[i], Str) == 0) {
-							return XBoxID[i];
-						}
+			case ControlType::XBox:
+				for (size_t i = 0; i < XBoxNum; ++i) {
+					if (strcmpDx(XBoxStr[i], Str) == 0) {
+						return XBoxID[i];
 					}
-					break;
-				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; ++i) {
-						if (strcmpDx(DS4Str[i], Str) == 0) {
-							return DS4ID[i];
-						}
+				}
+				break;
+			case ControlType::PS4:
+				for (size_t i = 0; i < DS4Num; ++i) {
+					if (strcmpDx(DS4Str[i], Str) == 0) {
+						return DS4ID[i];
 					}
-					break;
-				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; ++i) {
-						if (strcmpDx(KeyStr[i], Str) == 0) {
-							return KeyID[i];
-						}
+				}
+				break;
+			case ControlType::PC:
+				for (size_t i = 0; i < KeyNum; ++i) {
+					if (strcmpDx(KeyStr[i], Str) == 0) {
+						return KeyID[i];
 					}
-					break;
-				default:
-					break;
+				}
+				break;
+			default:
+				break;
 			}
 			return INVALID_ID;
 		}
-		const char*			GetSavePath(void) const noexcept {
+		const char* GetSavePath(void) const noexcept {
 			switch (m_ControlType) {
-				case ControlType::XBox:
-					return "Save/KeyConfig_XBox.txt";
-				case ControlType::PS4:
-					return "Save/KeyConfig_DS4.txt";
-				case ControlType::PC:
-					return "Save/KeyConfig_PC.txt";
-				default:
-					break;
+			case ControlType::XBox:
+				return "Save/KeyConfig_XBox.txt";
+			case ControlType::PS4:
+				return "Save/KeyConfig_DS4.txt";
+			case ControlType::PC:
+				return "Save/KeyConfig_PC.txt";
+			default:
+				break;
 			}
 			return "NONE";
 		};
-		const char*			GetBasePath(void) const noexcept {
+		const char* GetBasePath(void) const noexcept {
 			switch (m_ControlType) {
-				case ControlType::XBox:
-					return "data/KeyConfigBase_XBox.txt";
-				case ControlType::PS4:
-					return "data/KeyConfigBase_DS4.txt";
-				case ControlType::PC:
-					return "data/KeyConfigBase_PC.txt";
-				default:
-					break;
+			case ControlType::XBox:
+				return "data/KeyConfigBase_XBox.txt";
+			case ControlType::PS4:
+				return "data/KeyConfigBase_DS4.txt";
+			case ControlType::PC:
+				return "data/KeyConfigBase_PC.txt";
+			default:
+				break;
 			}
 			return "NONE";
 		};
@@ -746,10 +746,10 @@ namespace DXLibRef {
 		void SetIsUseButton(PADS select, bool value) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse = value; }
 		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_reserve = assign; }
 
-		bool GetButtonPress(int ID);
-		void GetPushAnySwitch(PADS select);
+		bool GetButtonPress(int ID) noexcept;
+		void GetPushAnySwitch(PADS select) noexcept;
 
-		bool GetPushAnySwitchLocal(PADS select, int ID);
+		bool GetPushAnySwitchLocal(PADS select, int ID) noexcept;
 	public:
 		void SetMouseMoveEnable(bool value) noexcept { m_MouseMoveEnable = value; }
 		void SetGuideUpdate(void) noexcept { m_IsUpdate = true; }
@@ -766,32 +766,32 @@ namespace DXLibRef {
 			Key.resize(Key.size() + 1);
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			switch (m_ControlType) {
-				case ControlType::XBox:
-					for (size_t i = 0; i < XBoxNum; ++i) {
-						if (XBoxID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-							Key.back()->AddGuideXBox(static_cast<int>(i), GuideStr);
-							return;
-						}
+			case ControlType::XBox:
+				for (size_t i = 0; i < XBoxNum; ++i) {
+					if (XBoxID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
+						Key.back()->AddGuideXBox(static_cast<int>(i), GuideStr);
+						return;
 					}
-					break;
-				case ControlType::PS4:
-					for (size_t i = 0; i < DS4Num; ++i) {
-						if (DS4ID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-							Key.back()->AddGuideDS4(static_cast<int>(i), GuideStr);
-							return;
-						}
+				}
+				break;
+			case ControlType::PS4:
+				for (size_t i = 0; i < DS4Num; ++i) {
+					if (DS4ID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
+						Key.back()->AddGuideDS4(static_cast<int>(i), GuideStr);
+						return;
 					}
-					break;
-				case ControlType::PC:
-					for (size_t i = 0; i < KeyNum; ++i) {
-						if (KeyID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-							Key.back()->AddGuidePC(static_cast<int>(i), GuideStr);
-							return;
-						}
+				}
+				break;
+			case ControlType::PC:
+				for (size_t i = 0; i < KeyNum; ++i) {
+					if (KeyID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
+						Key.back()->AddGuidePC(static_cast<int>(i), GuideStr);
+						return;
 					}
-					break;
-				default:
-					break;
+				}
+				break;
+			default:
+				break;
 			}
 			Key.back()->AddGuidePC(INVALID_ID, GuideStr);
 		}
@@ -804,11 +804,11 @@ namespace DXLibRef {
 	//入力
 	class InputControl {
 	private:
-		float			m_AddxRad{0.f};
-		float			m_AddyRad{0.f};
+		float			m_AddxRad{ 0.f };
+		float			m_AddyRad{ 0.f };
 		float			m_xRad{ 0.f };
 		float			m_yRad{ 0.f };
-		unsigned long long	m_Flags{0};
+		unsigned long long	m_Flags{ 0 };
 	public:
 		InputControl(void) noexcept {}
 		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
@@ -832,7 +832,9 @@ namespace DXLibRef {
 			this->m_Flags = 0;
 		}
 		void			SetInputPADS(PADS select, bool value) noexcept {
-			if (value) { this->m_Flags |= ((unsigned long long)1 << (0 + static_cast<int>(select))); }
+			if (value) {
+				this->m_Flags |= ((unsigned long long)1 << (0 + static_cast<int>(select)));
+			}
 		}
 
 		void			SetAddxRad(float AddxRad) noexcept { this->m_AddxRad = AddxRad; }
@@ -841,10 +843,10 @@ namespace DXLibRef {
 		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetKeyInputFlags(const InputControl& o) noexcept { this->m_Flags = o.m_Flags; }
 
-		const auto&		GetAddxRad(void) const noexcept { return this->m_AddxRad; }
-		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
-		const auto&		GetxRad(void) const noexcept { return this->m_xRad; }
-		const auto&		GetyRad(void) const noexcept { return this->m_yRad; }
+		const auto& GetAddxRad(void) const noexcept { return this->m_AddxRad; }
+		const auto& GetAddyRad(void) const noexcept { return this->m_AddyRad; }
+		const auto& GetxRad(void) const noexcept { return this->m_xRad; }
+		const auto& GetyRad(void) const noexcept { return this->m_yRad; }
 
 		auto		GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
 
@@ -868,8 +870,8 @@ namespace DXLibRef {
 		}
 		auto operator*(float per) const noexcept {
 			InputControl tmp;
-			tmp.m_AddxRad = this->m_AddxRad *per;
-			tmp.m_AddyRad = this->m_AddyRad *per;
+			tmp.m_AddxRad = this->m_AddxRad * per;
+			tmp.m_AddyRad = this->m_AddyRad * per;
 			tmp.m_xRad = this->m_xRad * per;
 			tmp.m_yRad = this->m_yRad * per;
 			tmp.m_Flags = this->m_Flags;

@@ -30,12 +30,14 @@
 
 //エラー,警告取り
 #define NOMINMAX
-#pragma warning(disable:4505)
-#pragma warning(disable:4514)
+/*
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
-#pragma warning(disable:4820)
 #pragma warning(disable:5045)
+//*/
+#pragma warning(disable:4505)
+#pragma warning(disable:4514)
+#pragma warning(disable:4820)
 #pragma warning(disable:5259)
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -52,6 +54,7 @@
 
 //共通
 #pragma warning( push, 3 )
+
 #include <stdint.h>
 #include <array>
 #include <list>
@@ -70,6 +73,7 @@
 #include <iostream>
 #include <math.h>
 #include <shlwapi.h>
+#include <thread>
 #pragma comment(lib, "shlwapi.lib")
 //追加物
 #include "json.hpp"
@@ -78,7 +82,7 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-constexpr float M_GR{-122.5f};				/*重力加速度*/
+constexpr float M_GR{ -122.5f };				/*重力加速度*/
 //constexpr float M_GR{ -9.8f };				/*重力加速度*/
 constexpr int INVALID_ID = -1;
 
@@ -87,11 +91,9 @@ constexpr int INVALID_ID = -1;
 //const int desky{ static_cast<int>(640 * 9 / 16) / 1 };
 const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) / 1};
 const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) / 1};
-//const int deskx{ static_cast<int>(960) / 1 };
-//const int desky{ static_cast<int>(960 * 9 / 16) / 1 };
 
-const int basex{1920 / 1};
-const int basey{1080 / 1};
+const int basex{ 1920 / 1 };
+const int basey{ 1080 / 1 };
 
 enum class VR_PAD {
 	TRIGGER,

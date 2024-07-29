@@ -5,9 +5,9 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
-	void MV1::AnimControler::Update(const bool& loop, float speed) {
+	void MV1::AnimControler::Update(const bool& loop, float speed) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		this->m_time += 30.f / DrawParts->GetFps()*speed;
+		this->m_time += 30.f / DrawParts->GetFps() * speed;
 		if (loop) {
 			if (speed >= 0.f) {
 				if (this->m_time >= this->m_AllTime) {

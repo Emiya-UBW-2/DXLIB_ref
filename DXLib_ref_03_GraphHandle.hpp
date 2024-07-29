@@ -15,24 +15,24 @@ namespace DXLibRef {
 		float		m_near{ 0.1f };
 		float		m_far{ 10.f };	//ニアファー
 	public:
-		const auto&		GetCamPos(void)const noexcept { return m_pos; }
-		const auto&		GetCamVec(void)const noexcept { return m_vec; }
-		const auto&		GetCamUp(void)const noexcept { return m_up; }
-		const auto&		GetCamFov(void)const noexcept { return m_fov; }
-		const auto&		GetCamNear(void)const noexcept { return m_near; }
-		const auto&		GetCamFar(void)const noexcept { return m_far; }
+		const auto& GetCamPos(void)const noexcept { return m_pos; }
+		const auto& GetCamVec(void)const noexcept { return m_vec; }
+		const auto& GetCamUp(void)const noexcept { return m_up; }
+		const auto& GetCamFov(void)const noexcept { return m_fov; }
+		const auto& GetCamNear(void)const noexcept { return m_near; }
+		const auto& GetCamFar(void)const noexcept { return m_far; }
 	public:
-		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) {
+		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) noexcept {
 			m_pos = cam_pos;
 			m_vec = cam_vec;
 			m_up = cam_up;
 		}
-		void			SetNowCamPos() {
+		void			SetNowCamPos() noexcept {
 			m_pos = DxLib::GetCameraPosition();
 			m_vec = DxLib::GetCameraTarget();
 			m_up = DxLib::GetCameraUpVector();
 		}
-		void			SetCamInfo(float cam_fov_, float cam_near_, float cam_far_) {
+		void			SetCamInfo(float cam_fov_, float cam_near_, float cam_far_) noexcept {
 			m_fov = cam_fov_;
 			m_near = cam_near_;
 			m_far = cam_far_;
@@ -56,7 +56,7 @@ namespace DXLibRef {
 			return mat_view;
 		}
 
-		static void SetUpCamInfo(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_) {
+		static void SetUpCamInfo(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_, float far_) noexcept {
 			SetCameraNearFar(near_, far_);
 			SetupCamera_Perspective(fov);
 			SetCameraPositionAndTargetAndUpVec(campos.get(), camvec.get(), camup.get());
@@ -98,7 +98,7 @@ namespace DXLibRef {
 		static GraphHandle Load(std::basic_string_view<TCHAR> FileName, bool NotUse3DFlag = false) noexcept {
 			return { DxLib::LoadGraphWithStrLen(FileName.data(), FileName.length(), NotUse3DFlag) };
 		}
-		static GraphHandle LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int *HandleArray, bool NotUse3DFlag = false) noexcept {
+		static GraphHandle LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int* HandleArray, bool NotUse3DFlag = false) noexcept {
 			return { DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum,  XSize, YSize, HandleArray, NotUse3DFlag) };
 		}
 
@@ -153,20 +153,20 @@ namespace DXLibRef {
 			}
 		}
 		//GetGraphSize
-		void GetSize(int*xsize, int*ysize) const noexcept {
+		void GetSize(int* xsize, int* ysize) const noexcept {
 			if (IsActive()) {
 				GetGraphSize(this->handle_, xsize, ysize);
 			}
 		}
 		//
-		void SetDraw_Screen(const bool& Clear = true) {
+		void SetDraw_Screen(const bool& Clear = true) noexcept {
 			SetDrawScreen(this->handle_);
 			if (Clear) {
 				ClearDrawScreen();
 			}
 		}
 		//
-		static void SetDraw_Screen(int handle, const bool& Clear = true) {
+		static void SetDraw_Screen(int handle, const bool& Clear = true) noexcept {
 			SetDrawScreen(handle);
 			if (Clear) {
 				ClearDrawScreen();
@@ -174,7 +174,7 @@ namespace DXLibRef {
 		}
 
 		auto getp(void) noexcept { return &handle_; }
-		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int  XSize, int  YSize, std::vector<GraphHandle> *Handles, bool NotUse3DFlag = false) noexcept {
+		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int  XSize, int  YSize, std::vector<GraphHandle>* Handles, bool NotUse3DFlag = false) noexcept {
 			int* HandleArray = new int[static_cast<size_t>(AllNum)];
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
 

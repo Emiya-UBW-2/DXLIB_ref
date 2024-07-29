@@ -26,7 +26,7 @@ namespace DXLibRef {
 	private:
 		b2FixtureDef				fixtureDef;				//動的ボディフィクスチャを定義します
 		std::unique_ptr<b2Body>		body;					//
-		b2Fixture*					playerfix{ nullptr };	//
+		b2Fixture* playerfix{ nullptr };	//
 	public:
 		Vector3DX					pos;//仮
 	public:

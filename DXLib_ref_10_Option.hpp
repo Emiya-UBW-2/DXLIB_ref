@@ -1,5 +1,4 @@
 #pragma once
-#include "DXLib_ref.h"
 
 namespace DXLibRef {
 	enum class EnumSaveParam {
@@ -90,8 +89,8 @@ namespace DXLibRef {
 	};
 
 	enum class WindowType :int {
-		None=0,
-		Window=None,
+		None = 0,
+		Window = None,
 		Borderless,
 		FullScreen,
 		Max,
@@ -100,19 +99,19 @@ namespace DXLibRef {
 	struct SaveParams {
 	private:
 		EnumParamType m_EnumParamType{};
-		int valueint{0};
+		int valueint{ 0 };
 	public:
 		void SetEnumParamType(EnumParamType value) noexcept { m_EnumParamType = value; }
 		auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
 
 		void SetBoolean(bool use) noexcept { valueint = use ? 1 : 0; }
-		auto GetBoolean() const noexcept { return (valueint != 0); }
+		auto GetBoolean(void) const noexcept { return (valueint != 0); }
 		void ChangeBoolean(void) noexcept { SetBoolean(GetBoolean() ^ 1); }
 
 		void SetInt(int use) noexcept { valueint = use; }
 		auto GetInt(void) const noexcept { return valueint; }
 
-		void SetFloat(float use) noexcept { valueint = static_cast<int>(use*1000.f); }
+		void SetFloat(float use) noexcept { valueint = static_cast<int>(use * 1000.f); }
 		auto GetFloat(void) const noexcept { return static_cast<float>(valueint) / 1000.f; }
 
 	};
@@ -139,49 +138,59 @@ namespace DXLibRef {
 	public:
 		void			SetParamBoolean(EnumSaveParam id, bool use) noexcept {
 			switch (id) {
-				case EnumSaveParam::SSAO:
-				case EnumSaveParam::AA:
-				case EnumSaveParam::DoF:
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
-					break;
-				case EnumSaveParam::usevr:
-#ifndef _USE_OPENVR_
+			case EnumSaveParam::SSAO:
+			case EnumSaveParam::AA:
+			case EnumSaveParam::DoF:
+				if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) {
 					use = false;
+				}
+				if (GetParamBoolean(EnumSaveParam::usevr)) {
+					use = false;
+				}
+				break;
+			case EnumSaveParam::usevr:
+#ifndef _USE_OPENVR_
+				use = false;
 #endif
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					break;
-				case EnumSaveParam::bloom:
-					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
-					break;
-				case EnumSaveParam::ScreenEffect:
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					break;
-				case EnumSaveParam::GraphicsPreset:
-				case EnumSaveParam::DirectXVer:
-				case EnumSaveParam::ObjLevel:
-				case EnumSaveParam::shadow:
-				case EnumSaveParam::fov:
-				case EnumSaveParam::vsync:
-				case EnumSaveParam::FpsLimit:
-				case EnumSaveParam::SE:
-				case EnumSaveParam::VOICE:
-				case EnumSaveParam::BGM:
-				case EnumSaveParam::WindowMode:
-				case EnumSaveParam::Reflection:
-				case EnumSaveParam::MotionBlur:
-				case EnumSaveParam::Xsensing:
-				case EnumSaveParam::Ysensing:
-				case EnumSaveParam::HeadBobbing:
-				case EnumSaveParam::ControlType:
-				case EnumSaveParam::Language:
-				case EnumSaveParam::DrawScale:
-				case EnumSaveParam::GodRay:
-				case EnumSaveParam::PBR:
-				case EnumSaveParam::Distortion:
-				case EnumSaveParam::Max:
-				default:
-					break;
+				if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) {
+					use = false;
+				}
+				break;
+			case EnumSaveParam::bloom:
+				if (GetParamBoolean(EnumSaveParam::usevr)) {
+					use = false;
+				}
+				break;
+			case EnumSaveParam::ScreenEffect:
+				if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) {
+					use = false;
+				}
+				break;
+			case EnumSaveParam::GraphicsPreset:
+			case EnumSaveParam::DirectXVer:
+			case EnumSaveParam::ObjLevel:
+			case EnumSaveParam::shadow:
+			case EnumSaveParam::fov:
+			case EnumSaveParam::vsync:
+			case EnumSaveParam::FpsLimit:
+			case EnumSaveParam::SE:
+			case EnumSaveParam::VOICE:
+			case EnumSaveParam::BGM:
+			case EnumSaveParam::WindowMode:
+			case EnumSaveParam::Reflection:
+			case EnumSaveParam::MotionBlur:
+			case EnumSaveParam::Xsensing:
+			case EnumSaveParam::Ysensing:
+			case EnumSaveParam::HeadBobbing:
+			case EnumSaveParam::ControlType:
+			case EnumSaveParam::Language:
+			case EnumSaveParam::DrawScale:
+			case EnumSaveParam::GodRay:
+			case EnumSaveParam::PBR:
+			case EnumSaveParam::Distortion:
+			case EnumSaveParam::Max:
+			default:
+				break;
 			}
 			m_SaveParams.at(static_cast<size_t>(id)).SetBoolean(use);
 		}
@@ -189,49 +198,55 @@ namespace DXLibRef {
 
 		void			SetParamInt(EnumSaveParam id, int use) noexcept {
 			switch (id) {
-				case EnumSaveParam::Reflection:
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = false; }
-					if (GetParamBoolean(EnumSaveParam::usevr)) { use = false; }
-					break;
-				case EnumSaveParam::shadow:
-					if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) { use = 0; }
-					break;
-				case EnumSaveParam::GraphicsPreset:
-				case EnumSaveParam::DirectXVer:
-				case EnumSaveParam::usevr:
-				case EnumSaveParam::ObjLevel:
-				case EnumSaveParam::DoF:
-				case EnumSaveParam::bloom:
-				case EnumSaveParam::SSAO:
-				case EnumSaveParam::fov:
-				case EnumSaveParam::vsync:
-				case EnumSaveParam::FpsLimit:
-				case EnumSaveParam::SE:
-				case EnumSaveParam::VOICE:
-				case EnumSaveParam::BGM:
-				case EnumSaveParam::WindowMode:
-				case EnumSaveParam::ScreenEffect:
-				case EnumSaveParam::MotionBlur:
-				case EnumSaveParam::Xsensing:
-				case EnumSaveParam::Ysensing:
-				case EnumSaveParam::HeadBobbing:
-				case EnumSaveParam::ControlType:
-				case EnumSaveParam::Language:
-				case EnumSaveParam::AA:
-				case EnumSaveParam::DrawScale:
-				case EnumSaveParam::GodRay:
-				case EnumSaveParam::PBR:
-				case EnumSaveParam::Distortion:
-				case EnumSaveParam::Max:
-				default:
-					break;
+			case EnumSaveParam::Reflection:
+				if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) {
+					use = false;
+				}
+				if (GetParamBoolean(EnumSaveParam::usevr)) {
+					use = false;
+				}
+				break;
+			case EnumSaveParam::shadow:
+				if (DirectXVerID[GetParamInt(EnumSaveParam::DirectXVer)] != DX_DIRECT3D_11) {
+					use = 0;
+				}
+				break;
+			case EnumSaveParam::GraphicsPreset:
+			case EnumSaveParam::DirectXVer:
+			case EnumSaveParam::usevr:
+			case EnumSaveParam::ObjLevel:
+			case EnumSaveParam::DoF:
+			case EnumSaveParam::bloom:
+			case EnumSaveParam::SSAO:
+			case EnumSaveParam::fov:
+			case EnumSaveParam::vsync:
+			case EnumSaveParam::FpsLimit:
+			case EnumSaveParam::SE:
+			case EnumSaveParam::VOICE:
+			case EnumSaveParam::BGM:
+			case EnumSaveParam::WindowMode:
+			case EnumSaveParam::ScreenEffect:
+			case EnumSaveParam::MotionBlur:
+			case EnumSaveParam::Xsensing:
+			case EnumSaveParam::Ysensing:
+			case EnumSaveParam::HeadBobbing:
+			case EnumSaveParam::ControlType:
+			case EnumSaveParam::Language:
+			case EnumSaveParam::AA:
+			case EnumSaveParam::DrawScale:
+			case EnumSaveParam::GodRay:
+			case EnumSaveParam::PBR:
+			case EnumSaveParam::Distortion:
+			case EnumSaveParam::Max:
+			default:
+				break;
 			}
 			m_SaveParams.at(static_cast<size_t>(id)).SetInt(use);
 		}
 		void			SetParamFloat(EnumSaveParam id, float use) noexcept { m_SaveParams.at(static_cast<size_t>(id)).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
-		void			Save(void) noexcept;
+		void			Save(void) const noexcept;
 	};
 
 	class OptionWindowClass : public SingletonBase<OptionWindowClass> {
@@ -241,14 +256,14 @@ namespace DXLibRef {
 		class OptionElementsInfo {
 		private:
 			std::string m_Name;
-			int m_Info{0};
+			int m_Info{ 0 };
 			std::function<void()> m_LeftPush;
 			std::function<void()> m_RightPush;
 			std::function<void()> m_OKPush;
 			std::function<void()> m_AnyDoing;
 			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
 		public:
-			float selanim{0.f};
+			float selanim{ 0.f };
 		public:
 			const auto& GetName(void) const noexcept { return m_Name; }
 			const auto& GetInfoTextID(void) const noexcept { return m_Info; }
@@ -259,8 +274,8 @@ namespace DXLibRef {
 			void GetAnyDoing(void) const noexcept { m_AnyDoing(); }
 		public:
 			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
-					  std::function<void()> AnyDoing,
-					  std::function<void(int xpos, int ypos, bool isMine)> draw) noexcept {
+				std::function<void()> AnyDoing,
+				std::function<void(int xpos, int ypos, bool isMine)> draw) noexcept {
 				selanim = 0;
 
 				m_Name = name;
@@ -276,7 +291,7 @@ namespace DXLibRef {
 		class OptionTabsInfo {
 		private:
 		protected:
-			int m_id{0};
+			int m_id{ 0 };
 			std::string m_name;
 			std::vector<OptionElementsInfo> m_Elements;
 		protected:
@@ -292,8 +307,8 @@ namespace DXLibRef {
 				m_name = name;
 				Init_Sub();
 			}
-			void Execute(int *select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int *select) noexcept;
+			void Execute(int* select, bool CanPress) noexcept;
+			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int* select) noexcept;
 
 			void DrawInfo(int xpos, int ypos, int select) noexcept;
 		};
@@ -320,7 +335,7 @@ namespace DXLibRef {
 				1000,
 			};
 		private:
-			int RefreshRate{FrameLimits[1]};
+			int RefreshRate{ FrameLimits[1] };
 		public:
 			GraphicTabsInfo(void) noexcept {}
 			GraphicTabsInfo(const GraphicTabsInfo&) = delete;
@@ -349,12 +364,12 @@ namespace DXLibRef {
 			void Init_Sub(void) noexcept override;
 		};
 	private:
-		int m_tabsel{0};
-		int m_select{0};
+		int m_tabsel{ 0 };
+		int m_select{ 0 };
 		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
 		bool						m_Active{ false };
-		bool						m_ActiveSwitch{false};
-		bool						m_RestartSwitch{false};
+		bool						m_ActiveSwitch{ false };
+		bool						m_RestartSwitch{ false };
 	public:
 		void SetRestart(void) noexcept { m_RestartSwitch = true; }
 		void SetActive(void) noexcept { m_ActiveSwitch = true; }

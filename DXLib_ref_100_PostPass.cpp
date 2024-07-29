@@ -44,7 +44,7 @@ namespace DXLibRef {
 
 		static const int EXTEND = 4;
 	public:
-		PostPassSSR() {}
+		PostPassSSR() noexcept {}
 		PostPassSSR(const PostPassSSR&) = delete;
 		PostPassSSR(PostPassSSR&& o) = delete;
 		PostPassSSR& operator=(const PostPassSSR&) = delete;
@@ -71,7 +71,7 @@ namespace DXLibRef {
 
 					p = 1;
 					for (r = 0; r < 255; r += p) {
-						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
+						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f) * 255.f);
 
 						DrawOval(xsize / 2, ysize / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
@@ -128,7 +128,7 @@ namespace DXLibRef {
 				SetUseTextureToShader(4, bkScreen2.get());
 				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
 				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
-				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)),0.f,0.f, 0.f);
+				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), 0.f, 0.f, 0.f);
 				{
 					m_Shader.Draw(m_SSRScreenVertex);
 				}
@@ -152,7 +152,7 @@ namespace DXLibRef {
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderUseClass		m_Shader;			// シェーダー
 	public:
-		PostPassDoF() {}
+		PostPassDoF() noexcept {}
 		PostPassDoF(const PostPassDoF&) = delete;
 		PostPassDoF(PostPassDoF&& o) = delete;
 		PostPassDoF& operator=(const PostPassDoF&) = delete;
@@ -175,7 +175,7 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::DoF);
 		}
 	public:
-		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* , GraphHandle* DepthPtr) noexcept override {
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 			GraphFilterBlt(TargetGraph->get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 2000);
@@ -202,7 +202,7 @@ namespace DXLibRef {
 		GraphHandle GaussScreen_;	//描画スクリーン
 		GraphHandle	BufScreen;
 	public:
-		PostPassBloom() {}
+		PostPassBloom() noexcept {}
 		PostPassBloom(const PostPassBloom&) = delete;
 		PostPassBloom(PostPassBloom&& o) = delete;
 		PostPassBloom& operator=(const PostPassBloom&) = delete;
@@ -244,7 +244,7 @@ namespace DXLibRef {
 	private:
 		std::array<GraphHandle, 3>		BufScreen;
 	public:
-		PostPassAberration() {}
+		PostPassAberration() noexcept {}
 		PostPassAberration(const PostPassAberration&) = delete;
 		PostPassAberration(PostPassAberration&& o) = delete;
 		PostPassAberration& operator=(const PostPassAberration&) = delete;
@@ -254,12 +254,12 @@ namespace DXLibRef {
 	public:
 		void Load_Sub(void) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
-			for (auto&buf : BufScreen) {
+			for (auto& buf : BufScreen) {
 				buf = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
 			}
 		}
 		void Dispose_Sub(void) noexcept override {
-			for (auto&buf : BufScreen) {
+			for (auto& buf : BufScreen) {
 				buf.Dispose();
 			}
 		}
@@ -270,24 +270,24 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			BufScreen[0].SetDraw_Screen(false);
-				FillGraph(BufScreen[0].get(), 0, 0, 0);
+			FillGraph(BufScreen[0].get(), 0, 0, 0);
 			BufScreen[1].SetDraw_Screen(false);
-				FillGraph(BufScreen[1].get(), 0, 0, 0);
+			FillGraph(BufScreen[1].get(), 0, 0, 0);
 			BufScreen[2].SetDraw_Screen(false);
-				FillGraph(BufScreen[2].get(), 0, 0, 0);
+			FillGraph(BufScreen[2].get(), 0, 0, 0);
 			GraphBlend(BufScreen[0].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					  DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
+				DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[1].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
+				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
 			GraphBlend(BufScreen[2].get(), TargetGraph->get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
+				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				FillGraph(TargetGraph->get(), 0, 0, 0);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				BufScreen[0].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f + 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen[0].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
 				BufScreen[1].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f, 0.f, true);
-				BufScreen[2].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f - 0.005f*DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen[2].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -296,14 +296,14 @@ namespace DXLibRef {
 	private:
 		class BlurScreen {
 			static const int MAX = 3;
-			std::array<GraphHandle,MAX> m_screen;
-			int m_current{0};
-			int m_alpha{0};
-			int m_screenWidth{0}, m_screenHeight{0};
-			int m_offsetX1{0}, m_offsetX2{0}, m_offsetY1{0}, offsetY2{0};
-			int m_notBlendDraw{0};
+			std::array<GraphHandle, MAX> m_screen;
+			int m_current{ 0 };
+			int m_alpha{ 0 };
+			int m_screenWidth{ 0 }, m_screenHeight{ 0 };
+			int m_offsetX1{ 0 }, m_offsetX2{ 0 }, m_offsetY1{ 0 }, offsetY2{ 0 };
+			int m_notBlendDraw{ 0 };
 		public:
-			BlurScreen() {}
+			BlurScreen() noexcept {}
 			BlurScreen(const BlurScreen&) = delete;
 			BlurScreen(BlurScreen&& o) = delete;
 			BlurScreen& operator=(const BlurScreen&) = delete;
@@ -311,7 +311,7 @@ namespace DXLibRef {
 
 			~BlurScreen(void) noexcept {}
 		public:
-			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) {
+			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
 				auto* DrawParts = DXDraw::Instance();
 				for (int i = 0; i < MAX; ++i) {
 					m_screen.at(static_cast<size_t>(i)) = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
@@ -325,13 +325,13 @@ namespace DXLibRef {
 
 				m_notBlendDraw = 0;
 			}
-			void Release() {
+			void Release() noexcept {
 				for (int i = 0; i < MAX; ++i) {
 					m_screen.at(static_cast<size_t>(i)).Dispose();
 				}
 			}
 		public:
-			auto* PostRenderBlurScreen(std::function<void()> doing) {
+			auto* PostRenderBlurScreen(std::function<void()> doing) noexcept {
 				auto* DrawParts = DXDraw::Instance();
 				auto next = (m_current != 0) ? (m_current - 1) : MAX - 1;
 				m_screen[static_cast<size_t>(m_current)].SetDraw_Screen();
@@ -354,7 +354,7 @@ namespace DXLibRef {
 	private:
 		BlurScreen				m_BlurScreen;
 	public:
-		PostPassMotionBlur() {}
+		PostPassMotionBlur() noexcept {}
 		PostPassMotionBlur(const PostPassMotionBlur&) = delete;
 		PostPassMotionBlur(PostPassMotionBlur&& o) = delete;
 		PostPassMotionBlur& operator=(const PostPassMotionBlur&) = delete;
@@ -376,7 +376,7 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen([&]() {
 				TargetGraph->DrawGraph(0, 0, false);
-																 });
+				});
 			TargetGraph->SetDraw_Screen(false);
 			{
 				buf->DrawGraph(0, 0, false);
@@ -391,7 +391,7 @@ namespace DXLibRef {
 		GraphHandle bkScreen2;
 		GraphHandle	BufScreen;
 	public:
-		PostPassCornerBlur() {}
+		PostPassCornerBlur() noexcept {}
 		PostPassCornerBlur(const PostPassCornerBlur&) = delete;
 		PostPassCornerBlur(PostPassCornerBlur&& o) = delete;
 		PostPassCornerBlur& operator=(const PostPassCornerBlur&) = delete;
@@ -416,7 +416,7 @@ namespace DXLibRef {
 
 					p = 1;
 					for (r = 0; r < 255; r += p) {
-						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f)*255.f);
+						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f) * 255.f);
 
 						DrawOval(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
@@ -438,7 +438,7 @@ namespace DXLibRef {
 			GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 			GraphBlendBlt(TargetGraph->get(), bkScreen2.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
+				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				AberrationScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
@@ -451,7 +451,7 @@ namespace DXLibRef {
 		GraphHandle bkScreen;
 		GraphHandle	BufScreen;
 	public:
-		PostPassVignette() {}
+		PostPassVignette() noexcept {}
 		PostPassVignette(const PostPassVignette&) = delete;
 		PostPassVignette(PostPassVignette&& o) = delete;
 		PostPassVignette& operator=(const PostPassVignette&) = delete;
@@ -469,12 +469,12 @@ namespace DXLibRef {
 					int y = 0, c = 0, p = 2;
 					p = 1;
 					for (y = 0; y < 255; y += p) {
-						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f)*64.f);
+						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 64.f);
 						DrawLine_2D(0, y / p, DrawParts->GetScreenY(1920), y / p, GetColor(c, c, c));
 					}
 					p = 2;
 					for (y = 0; y < 255; y += p) {
-						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f)*128.f);
+						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 128.f);
 						DrawLine_2D(0, DrawParts->GetScreenY(1080) - y / p, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080) - y / p, GetColor(c, c, c));
 					}
 				}
@@ -491,7 +491,7 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			GraphBlendBlt(TargetGraph->get(), bkScreen.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
-					  DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
+				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				FillGraph(TargetGraph->get(), 0, 0, 0);
@@ -503,7 +503,7 @@ namespace DXLibRef {
 	private:
 		GraphHandle	BufScreen;
 	public:
-		PostPassDistortion() {}
+		PostPassDistortion() noexcept {}
 		PostPassDistortion(const PostPassDistortion&) = delete;
 		PostPassDistortion(PostPassDistortion&& o) = delete;
 		PostPassDistortion& operator=(const PostPassDistortion&) = delete;
@@ -531,8 +531,8 @@ namespace DXLibRef {
 			float Sin, Cos;
 			COLOR_U8 DiffuseColor;
 			int i;
-			VERTEX2D *Vert;
-			WORD *Ind;
+			VERTEX2D* Vert;
+			WORD* Ind;
 			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleCosTable{};
 			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleSinTable{};
 			std::array<float, CIRCLE_RADIUS_VERTEX_NUM> InCircleCosTable{};
@@ -701,7 +701,7 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::AA);
 		}
-		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* , GraphHandle*) noexcept override {
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			TargetGraph->SetDraw_Screen();
 			{
@@ -726,7 +726,7 @@ namespace DXLibRef {
 
 		static const int EXTEND = 4;
 	public:
-		PostPassGodRay() {}
+		PostPassGodRay() noexcept {}
 		PostPassGodRay(const PostPassGodRay&) = delete;
 		PostPassGodRay(PostPassGodRay&& o) = delete;
 		PostPassGodRay& operator=(const PostPassGodRay&) = delete;
@@ -750,7 +750,7 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumSaveParam::GodRay);
 		}
-		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* , GraphHandle* DepthPtr) noexcept override {
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
 			GraphFilterBlt(DepthPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
@@ -766,17 +766,17 @@ namespace DXLibRef {
 				{
 					float Power = 1.f;
 					switch (OptionParts->GetParamInt(EnumSaveParam::shadow)) {
-						case 1:
-							Power = 20.f;
-							break;
-						case 2:
-							Power = 35.f;
-							break;
-						case 3:
-							Power = 50.f;
-							break;
-						default:
-							break;
+					case 1:
+						Power = 20.f;
+						break;
+					case 2:
+						Power = 35.f;
+						break;
+					case 3:
+						Power = 50.f;
+						break;
+					default:
+						break;
 					}
 					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 					m_Shader.Draw(m_ScreenVertex);
@@ -800,7 +800,7 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	//
-	PostPassEffect::PostPassEffect(void) {
+	PostPassEffect::PostPassEffect(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		BufferScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
 		ColorScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
@@ -850,7 +850,7 @@ namespace DXLibRef {
 				ActiveGBuffer = true;
 			}
 		}
-		if (m_IsActiveGBuffer!= ActiveGBuffer) {
+		if (m_IsActiveGBuffer != ActiveGBuffer) {
 			m_IsActiveGBuffer = ActiveGBuffer;
 			if (m_IsActiveGBuffer) {
 				LoadGBuffer();
@@ -863,7 +863,7 @@ namespace DXLibRef {
 			P->UpdateActive();
 		}
 	}
-	void PostPassEffect::DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& camInfo) {
+	void PostPassEffect::DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& camInfo) noexcept {
 		//全ての画面を初期化
 		if (m_IsActiveGBuffer) {
 			//リセット替わり
@@ -902,15 +902,15 @@ namespace DXLibRef {
 			}, camInfo);
 		BufferScreen.SetDraw_Screen(false);
 	}
-	void PostPassEffect::Draw2D(std::function<void()> doing) {
+	void PostPassEffect::Draw2D(std::function<void()> doing) noexcept {
 		//全ての画面を初期化
 		if (m_IsActiveGBuffer) {
 			//リセット替わり
 			ColorScreen.SetDraw_Screen();
 			NormalScreen.SetDraw_Screen();
-				FillGraph(NormalScreen.get(), 128, 128, 255);
+			FillGraph(NormalScreen.get(), 128, 128, 255);
 			DepthScreen.SetDraw_Screen();
-				FillGraph(DepthScreen.get(), 255, 0, 0);
+			FillGraph(DepthScreen.get(), 255, 0, 0);
 		}
 		BufferScreen.SetDraw_Screen();
 		{
@@ -918,7 +918,7 @@ namespace DXLibRef {
 		}
 		BufferScreen.SetDraw_Screen(false);
 	}
-	void PostPassEffect::Draw() {
+	void PostPassEffect::Draw() noexcept {
 		//色味補正
 		GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), 0, 255);
 		//ポストパスエフェクトのbufに描画
@@ -930,7 +930,7 @@ namespace DXLibRef {
 		}
 	}
 	//
-	void PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& camInfo) {
+	void PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& camInfo) noexcept {
 		// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
 		SetRenderTargetToShader(0, BufferScreen.get());
 		if (m_IsActiveGBuffer) {

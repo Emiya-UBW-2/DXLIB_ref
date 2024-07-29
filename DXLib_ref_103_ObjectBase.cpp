@@ -19,17 +19,17 @@ namespace DXLibRef {
 			};
 		//model
 		switch (this->m_PHYSICS_SETUP) {
-			case PHYSICS_SETUP::DISABLE:
-				Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
-				break;
-			case PHYSICS_SETUP::LOADCALC:
-				Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
-				break;
-			case PHYSICS_SETUP::REALTIME:
-				Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
-				break;
-			default:
-				break;
+		case PHYSICS_SETUP::DISABLE:
+			Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
+			break;
+		case PHYSICS_SETUP::LOADCALC:
+			Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
+			break;
+		case PHYSICS_SETUP::REALTIME:
+			Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
+			break;
+		default:
+			break;
 		}
 		//col
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
@@ -172,7 +172,9 @@ namespace DXLibRef {
 		}
 		//シェイプ更新
 		for (auto& f : this->m_Shapes) {
-			if ((&f - &this->m_Shapes.front()) == 0) { continue; }
+			if ((&f - &this->m_Shapes.front()) == 0) {
+				continue;
+			}
 			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes[0].second) * f.second);
 		}
 		//物理更新
@@ -189,7 +191,7 @@ namespace DXLibRef {
 				}
 				for (int i = 0; i < Max; ++i) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f *60.f / DrawParts->GetFps() / static_cast<float>(Max));
+					this->GetObj().PhysicsCalculation(1000.0f * 60.f / DrawParts->GetFps() / static_cast<float>(Max));
 				}
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();
@@ -207,8 +209,8 @@ namespace DXLibRef {
 		this->m_IsDraw = false;
 		this->m_DistanceToCam = (this->GetObj().GetMatrix().pos() - GetScreenPosition()).magnitude();
 		if (CheckCameraViewClip_Box(
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f*12.5f, -0.f*12.5f, -1.f*12.5f)).get(),
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f*12.5f, 1.f*12.5f, 1.f*12.5f)).get()) == FALSE
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * 12.5f, -0.f * 12.5f, -1.f * 12.5f)).get(),
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * 12.5f, 1.f * 12.5f, 1.f * 12.5f)).get()) == FALSE
 			) {
 			this->m_IsDraw |= true;
 		}
@@ -221,8 +223,8 @@ namespace DXLibRef {
 	void			ObjectBaseClass::Draw(bool isDrawSemiTrans) noexcept {
 		if (this->m_IsActive && this->m_IsDraw) {
 			if (CheckCameraViewClip_Box(
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f*12.5f, -0.f*12.5f, -1.f*12.5f)).get(),
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f*12.5f, 1.f*12.5f, 1.f*12.5f)).get()) == FALSE
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * 12.5f, -0.f * 12.5f, -1.f * 12.5f)).get(),
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * 12.5f, 1.f * 12.5f, 1.f * 12.5f)).get()) == FALSE
 				) {
 				for (int i = 0; i < static_cast<int>(this->GetObj().GetMeshNum()); ++i) {
 					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {

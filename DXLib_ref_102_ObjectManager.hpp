@@ -1,5 +1,4 @@
 #pragma once
-#include "DXLib_ref.h"
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
@@ -33,7 +32,7 @@ namespace DXLibRef {
 	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
-		SharedObj*		GetObj(int ModelType, int num) noexcept;
+		SharedObj* GetObj(int ModelType, int num) noexcept;
 		void			DelObj(SharedObj* ptr) noexcept;
 
 	public:

@@ -8,7 +8,7 @@ namespace DXLibRef {
 		friend class SingletonBase<DebugClass>;
 	private:
 		static const int	PointMax{ 12 };
-		static const int	PointFrame{120};
+		static const int	PointFrame{ 120 };
 	private:
 		LONGLONG																m_StartTime{ 0 };
 		std::array<std::string, PointMax + 1>									m_Str;

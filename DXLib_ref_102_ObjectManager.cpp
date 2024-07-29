@@ -11,7 +11,9 @@ namespace DXLibRef {
 	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		const SharedModel* Ptr = nullptr;
 		for (auto& o : this->m_Model) {
-			if (!o->GetPathCompare(filepath, objfilename, colfilename)) { continue; }
+			if (!o->GetPathCompare(filepath, objfilename, colfilename)) {
+				continue;
+			}
 			Ptr = &o;
 			break;
 		}
@@ -27,9 +29,9 @@ namespace DXLibRef {
 			MV1::SetAnime(&pObj->GetObj(), pAnim->GetObj());
 		}
 	}
-	SharedObj*		ObjectManager::GetObj(int ModelType, int num) noexcept {
+	SharedObj* ObjectManager::GetObj(int ModelType, int num) noexcept {
 		int cnt = 0;
-		for (auto&o : this->m_Object) {
+		for (auto& o : this->m_Object) {
 			if (o->GetobjType() == ModelType) {
 				if (cnt == num) {
 					return &o;
@@ -40,7 +42,7 @@ namespace DXLibRef {
 		return nullptr;
 	}
 	void			ObjectManager::DelObj(SharedObj* ptr) noexcept {
-		for (auto&o : this->m_Object) {
+		for (auto& o : this->m_Object) {
 			if (o == *ptr) {
 				//‡”Ô‚ÌˆÛŽ‚Ì‚½‚ß‚±‚±‚Íerase
 				o->Dispose();
@@ -62,7 +64,9 @@ namespace DXLibRef {
 		for (int i = 0; i < static_cast<int>(this->m_Object.size()); ++i) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
-				if (this->m_ResetP.trigger()) { o->SetResetP(true); }
+				if (this->m_ResetP.trigger()) {
+					o->SetResetP(true);
+				}
 				o->ExecuteCommon();
 			}
 		}
@@ -78,7 +82,7 @@ namespace DXLibRef {
 		}
 	}
 	void			ObjectManager::LateExecuteObject(void) noexcept {
-		for (auto&o : this->m_Object) {
+		for (auto& o : this->m_Object) {
 			o->LateExecute();
 			Vector3DX campos; campos.z = (-1.f);
 			o->SetScreenPosition(campos, -1.f);

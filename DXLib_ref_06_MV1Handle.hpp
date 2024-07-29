@@ -18,8 +18,8 @@ namespace DXLibRef {
 			float	per_prev{ -1.f };
 			float	time_prev{ -1.f };
 		public:
-			auto&			GetPer(void) noexcept { return this->m_per; }
-			auto&			GetTime(void) noexcept { return this->m_time; }
+			auto& GetPer(void) noexcept { return this->m_per; }
+			auto& GetTime(void) noexcept { return this->m_time; }
 			auto			GetTimePer(void) const noexcept { return (this->m_AllTime > 0) ? this->m_time / this->m_AllTime : 1.f; }
 			auto			TimeStart(void) const noexcept { return m_time <= 0; }
 			auto			TimeEnd(void) const noexcept { return m_time >= m_AllTime; }
@@ -33,13 +33,13 @@ namespace DXLibRef {
 			void			SetPer(float value) noexcept { this->m_per = value; }
 			void			SetTime(float value) noexcept { this->m_time = value; }
 		public:
-			void			Set(MV1* model, int AnimIndex, const MV1* model_haveanim = nullptr) {
+			void			Set(MV1* model, int AnimIndex, const MV1* model_haveanim = nullptr) noexcept {
 				this->m_handle = model->AttachAnim(AnimIndex, model_haveanim);
 				this->Reset();
 				UpdateAnim(model);
 				this->m_AllTime = MV1GetAttachAnimTotalTime(model->GetHandle(), this->m_handle);
 			}
-			void			Update(const bool& loop, float speed);
+			void			Update(const bool& loop, float speed) noexcept;
 			void			UpdateAnim(MV1* model) noexcept {
 				if (this->time_prev != this->m_time) {
 					MV1SetAttachAnimTime(model->GetHandle(), this->m_handle, this->m_time);
@@ -95,7 +95,9 @@ namespace DXLibRef {
 			//元用、アニメ用が読めていない場合は待つ
 			{
 				while (ProcessMessage() == 0) {
-					if ((CheckHandleASyncLoad(_ModelHandle->GetHandle()) == TRUE) && (CheckHandleASyncLoad(_Have_Anim.GetHandle()) == TRUE)) { continue; }
+					if ((CheckHandleASyncLoad(_ModelHandle->GetHandle()) == TRUE) && (CheckHandleASyncLoad(_Have_Anim.GetHandle()) == TRUE)) {
+						continue;
+					}
 					break;
 				}
 			}
@@ -129,7 +131,7 @@ namespace DXLibRef {
 		}
 	public:
 		//getter
-		const int&		GetHandle(void) const noexcept { return this->m_handle; }
+		const int& GetHandle(void) const noexcept { return this->m_handle; }
 		auto			IsActive(void) const noexcept { return GetHandle() != invalid_handle; }
 		auto			GetPosition(void) const noexcept { return MV1GetPosition(GetHandle()); }
 		auto			GetOpacityRate(void) const noexcept { return MV1GetOpacityRate(GetHandle()); }
@@ -171,12 +173,12 @@ namespace DXLibRef {
 		void			SetMaterialDifColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialDifColor(GetHandle(), p1, color); }
 		void			SetMaterialSpcColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialSpcColor(GetHandle(), p1, color); }
 		void			SetMaterialAmbColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialAmbColor(GetHandle(), p1, color); }
-		void			SetMaterialSpcPower(int p1,float power) const noexcept { MV1SetMaterialSpcPower(GetHandle(), p1, power); }
+		void			SetMaterialSpcPower(int p1, float power) const noexcept { MV1SetMaterialSpcPower(GetHandle(), p1, power); }
 		void			SaveModelToMV1File(std::basic_string_view<TCHAR> FileName) const noexcept { MV1SaveModelToMV1FileWithStrLen(GetHandle(), FileName.data(), FileName.length()); }
 
 		/*アニメーション*/
-		auto&			SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
-		auto&			GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		auto& SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		auto& GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
 		auto			GetAnimNum(void) const noexcept { return this->m_AnimControler.size(); }
 		int				AttachAnim(int AnimIndex, const MV1* model_haveanim = nullptr) noexcept {
 			if (model_haveanim && (this->GetHandle() != model_haveanim->GetHandle())) {

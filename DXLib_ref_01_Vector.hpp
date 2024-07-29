@@ -1,5 +1,4 @@
 #pragma once
-#include "DXLib_ref.h"
 
 namespace DXLibRef {
 	//---------------------------------------------------------------------------------------------
@@ -7,9 +6,9 @@ namespace DXLibRef {
 	//---------------------------------------------------------------------------------------------
 	class Vector3DX {
 	public:
-		float x{0};
-		float y{0};
-		float z{0};
+		float x{ 0 };
+		float y{ 0 };
+		float z{ 0 };
 	public:
 		Vector3DX(void) noexcept : x(0), y(0), z(0) {}
 		Vector3DX(VECTOR value) noexcept { this->Set(value.x, value.y, value.z); }
@@ -41,7 +40,7 @@ namespace DXLibRef {
 		static float			Angle(const Vector3DX& A, const Vector3DX& B) noexcept { return std::acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
 		static Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept {
 			auto Len = A.magnitude();
-			return A.normalized() * std::clamp(Len,0.f,Limit);
+			return A.normalized() * std::clamp(Len, 0.f, Limit);
 		}
 		static Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VCross(A.get(), B.get()); }
 		static float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
@@ -55,7 +54,7 @@ namespace DXLibRef {
 		//OrthoNormalize
 		//Project
 		//ProjectOnPlane
-		static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Vector3DX::Dot(inNormal, inDirection*-1.f))*2.f; }
+		static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Vector3DX::Dot(inNormal, inDirection * -1.f)) * 2.f; }
 		//RotateTowards
 		static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
 		//SignedAngle
@@ -162,12 +161,12 @@ namespace DXLibRef {
 		//
 		static Matrix4x4DX identity(void) noexcept { return DxLib::MGetIdent(); }
 
-		static Matrix4x4DX Axis1(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis1(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }
-		static Matrix4x4DX Axis2(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return {DxLib::MGetAxis2(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get())}; }
+		static Matrix4x4DX Axis1(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return { DxLib::MGetAxis1(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get()) }; }
+		static Matrix4x4DX Axis2(const Vector3DX& yvec, const Vector3DX& zvec, const Vector3DX& pos = Vector3DX::zero()) noexcept { return { DxLib::MGetAxis2(Vector3DX::Cross(yvec, zvec).get(),yvec.get(),zvec.get(),pos.get()) }; }
 		static Matrix4x4DX RotAxis(const Vector3DX& p1, float p2) noexcept { return DxLib::MGetRotAxis(p1.get(), p2); }
-		static Matrix4x4DX RotVec2(const Vector3DX& p1, const Vector3DX& p2) noexcept { return {DxLib::MGetRotVec2(p1.get(), p2.get())}; }
-		static Matrix4x4DX GetScale(float scale) noexcept { return {DxLib::MGetScale(DxLib::VGet(scale,scale,scale))}; }
-		static Matrix4x4DX GetScale(const Vector3DX& scale) noexcept { return {DxLib::MGetScale(scale.get())}; }
+		static Matrix4x4DX RotVec2(const Vector3DX& p1, const Vector3DX& p2) noexcept { return { DxLib::MGetRotVec2(p1.get(), p2.get()) }; }
+		static Matrix4x4DX GetScale(float scale) noexcept { return { DxLib::MGetScale(DxLib::VGet(scale,scale,scale)) }; }
+		static Matrix4x4DX GetScale(const Vector3DX& scale) noexcept { return { DxLib::MGetScale(scale.get()) }; }
 		static Matrix4x4DX Mtrans(const Vector3DX& p1) noexcept { return DxLib::MGetTranslate(p1.get()); }
 		static Vector3DX Vtrans(const Vector3DX& p1, const Matrix4x4DX& p2) noexcept { return DxLib::VTransform(p1.get(), p2.get()); }
 		//
@@ -186,19 +185,37 @@ namespace DXLibRef {
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
 			if (std::abs(value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1の時
-				if (angle_x) { *angle_x = DX_PI_F / 2.f; }
-				if (angle_y) { *angle_y = 0.f; }
-				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+				if (angle_x) {
+					*angle_x = DX_PI_F / 2.f;
+				}
+				if (angle_y) {
+					*angle_y = 0.f;
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(value.m[0][1], value.m[0][0]);
+				}
 			}
 			else if (std::abs(value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1の時
-				if (angle_x) { *angle_x = -DX_PI_F / 2.f; }
-				if (angle_y) { *angle_y = 0.f; }
-				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+				if (angle_x) {
+					*angle_x = -DX_PI_F / 2.f;
+				}
+				if (angle_y) {
+					*angle_y = 0.f;
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(value.m[0][1], value.m[0][0]);
+				}
 			}
 			else {
-				if (angle_x) { *angle_x = std::asinf(value.m[1][2]); }
-				if (angle_y) { *angle_y = std::atan2f(-value.m[0][2], value.m[2][2]); }
-				if (angle_z) { *angle_z = std::atan2f(-value.m[1][0], value.m[1][1]); }
+				if (angle_x) {
+					*angle_x = std::asinf(value.m[1][2]);
+				}
+				if (angle_y) {
+					*angle_y = std::atan2f(-value.m[0][2], value.m[2][2]);
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(-value.m[1][0], value.m[1][1]);
+				}
 			}
 		}
 		void SetRadian(float x, float y, float z) noexcept {
@@ -214,8 +231,8 @@ namespace DXLibRef {
 		}
 		//比較
 		bool operator==(const Matrix4x4DX& obj) const noexcept {
-			for (int x = 0;x < 4;++x) {
-				for (int y = 0;y < 4;++y) {
+			for (int x = 0; x < 4; ++x) {
+				for (int y = 0; y < 4; ++y) {
 					if (this->get().m[x][y] != obj.get().m[x][y]) {
 						return false;
 					}
@@ -232,13 +249,11 @@ namespace DXLibRef {
 	//Matrix 3x3バージョン
 	//---------------------------------------------------------------------------------------------
 	// 行列構造体
-	struct MATRIX33
-	{
+	struct MATRIX33 {
 		float					m[3][3];
 	};
 	//相互変換
-	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr)
-	{
+	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr) {
 		*pTarget = DxLib::MGetIdent();
 		for (int x = 0; x < 3; ++x) {
 			for (int y = 0; y < 3; ++y) {
@@ -246,8 +261,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr)
-	{
+	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr) {
 		for (int x = 0; x < 3; ++x) {
 			for (int y = 0; y < 3; ++y) {
 				pTarget->m[x][y] = pAtr.m[x][y];
@@ -256,8 +270,7 @@ namespace DXLibRef {
 	}
 
 	// 単位行列を得る
-	static MATRIX33 M33GetIdent(void)
-	{
+	static MATRIX33 M33GetIdent(void) {
 		static MATRIX33 Result =
 		{
 			{
@@ -272,8 +285,7 @@ namespace DXLibRef {
 	// x' = XAxis.x * x + YAixs.x * y + ZAxis.z * z + Pos.x
 	// y' = XAxis.y * x + YAixs.y * y + ZAxis.y * z + Pos.y
 	// z' = XAxis.z * x + YAixs.z * y + ZAxis.z * z + Pos.z
-	static MATRIX33 M33GetAxis1(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis)
-	{
+	static MATRIX33 M33GetAxis1(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) {
 		MATRIX33 Result =
 		{
 			{
@@ -288,8 +300,7 @@ namespace DXLibRef {
 	// x' = XAxis.x * ( x - Pos.x ) + XAxis.y * ( x - Pos.x ) + XAxis.z * ( x - Pos.x )
 	// y' = YAxis.x * ( x - Pos.x ) + YAxis.y * ( x - Pos.x ) + YAxis.z * ( x - Pos.x )
 	// z' = ZAxis.x * ( x - Pos.x ) + ZAxis.y * ( x - Pos.x ) + ZAxis.z * ( x - Pos.x )
-	static MATRIX33 M33GetAxis2(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis)
-	{
+	static MATRIX33 M33GetAxis2(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) {
 		MATRIX33 Result =
 		{
 			{
@@ -301,8 +312,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 指定軸で指定角度回転する行列を得る
-	static MATRIX33 M33GetRotAxis(VECTOR RotateAxis, float Rotate)
-	{
+	static MATRIX33 M33GetRotAxis(VECTOR RotateAxis, float Rotate) {
 		MATRIX33 Result{};
 		VECTOR xv = { 1.0f, 0.0f, 0.0f }, yv = { 0.0f, 1.0f, 0.0f }, zv = { 0.0f, 0.0f, 1.0f };
 		VECTOR xv2{}, yv2{}, zv2{}, xv3{}, yv3{}, zv3{};
@@ -370,8 +380,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// In1 の向きから In2 の向きへ変換する回転行列を得る
-	static MATRIX33 M33GetRotVec2(VECTOR In1, VECTOR In2)
-	{
+	static MATRIX33 M33GetRotVec2(VECTOR In1, VECTOR In2) {
 		VECTOR av;
 		float rad;
 
@@ -382,8 +391,7 @@ namespace DXLibRef {
 		return M33GetRotAxis(av, rad);
 	}
 	// 逆行列を得る
-	static MATRIX33 M33Inverse(MATRIX33 InM)
-	{
+	static MATRIX33 M33Inverse(MATRIX33 InM) {
 		MATRIX In;
 		MATRIX33 Result;
 		M33toMATRIX(&In, InM);
@@ -392,8 +400,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 転置行列を得る
-	static MATRIX33 M33Transpose(MATRIX33 InM)
-	{
+	static MATRIX33 M33Transpose(MATRIX33 InM) {
 		MATRIX33 Result =
 		{
 			{
@@ -405,8 +412,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 行列の乗算を行う
-	static MATRIX33 M33Mult(MATRIX33 In1, MATRIX33 In2)
-	{
+	static MATRIX33 M33Mult(MATRIX33 In1, MATRIX33 In2) {
 		MATRIX33 Result =
 		{
 			{
@@ -430,8 +436,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 行列を使った座標変換
-	static VECTOR		V33Transform(const VECTOR& InV, const MATRIX33& InM)
-	{
+	static VECTOR		V33Transform(const VECTOR& InV, const MATRIX33& InM) {
 		VECTOR Result{};
 		Result.x = InV.x * InM.m[0][0] + InV.y * InM.m[1][0] + InV.z * InM.m[2][0];
 		Result.y = InV.x * InM.m[0][1] + InV.y * InM.m[1][1] + InV.z * InM.m[2][1];
@@ -476,19 +481,37 @@ namespace DXLibRef {
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
 			if (std::abs(value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1の時
-				if (angle_x) { *angle_x = DX_PI_F / 2.f; }
-				if (angle_y) { *angle_y = 0.f; }
-				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+				if (angle_x) {
+					*angle_x = DX_PI_F / 2.f;
+				}
+				if (angle_y) {
+					*angle_y = 0.f;
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(value.m[0][1], value.m[0][0]);
+				}
 			}
 			else if (std::abs(value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1の時
-				if (angle_x) { *angle_x = -DX_PI_F / 2.f; }
-				if (angle_y) { *angle_y = 0.f; }
-				if (angle_z) { *angle_z = std::atan2f(value.m[0][1], value.m[0][0]); }
+				if (angle_x) {
+					*angle_x = -DX_PI_F / 2.f;
+				}
+				if (angle_y) {
+					*angle_y = 0.f;
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(value.m[0][1], value.m[0][0]);
+				}
 			}
 			else {
-				if (angle_x) { *angle_x = std::asinf(value.m[1][2]); }
-				if (angle_y) { *angle_y = std::atan2f(-value.m[0][2], value.m[2][2]); }
-				if (angle_z) { *angle_z = std::atan2f(-value.m[1][0], value.m[1][1]); }
+				if (angle_x) {
+					*angle_x = std::asinf(value.m[1][2]);
+				}
+				if (angle_y) {
+					*angle_y = std::atan2f(-value.m[0][2], value.m[2][2]);
+				}
+				if (angle_z) {
+					*angle_z = std::atan2f(-value.m[1][0], value.m[1][1]);
+				}
 			}
 		}
 		void SetRadian(float x, float y, float z) noexcept {

@@ -1,5 +1,4 @@
-﻿#include "DXLib_ref.h"
-//#include "DXLib_ref_02_SoundHandle.hpp"
+﻿#include "DXLib_ref_02_SoundHandle.hpp"
 
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------

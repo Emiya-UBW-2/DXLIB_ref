@@ -30,8 +30,7 @@ namespace DXLibRef {
 		const std::basic_string<TCHAR>& string,
 		unsigned int color, int font_handle,
 		unsigned int edge_color = 0
-	)
-	{
+	) {
 		if (0 == string.length()) throw std::invalid_argument("empty string not allowed.");
 		if (draw_area_x_right < draw_area_x_left || draw_area_y_bottom < draw_area_y_top) throw std::invalid_argument("");
 
@@ -101,9 +100,9 @@ namespace DXLibRef {
 		int m_handle;
 		static constexpr int invalid_handle = INVALID_ID;
 	private:
-		constexpr FontHandle(int h) : m_handle(h) {}
+		constexpr FontHandle(int h) noexcept : m_handle(h) {}
 	public:
-		constexpr FontHandle(void) : m_handle(invalid_handle) {}
+		constexpr FontHandle(void) noexcept : m_handle(invalid_handle) {}
 		FontHandle(const FontHandle&) = delete;
 		FontHandle(FontHandle&& o) noexcept : m_handle(o.m_handle) {
 			o.m_handle = invalid_handle;
@@ -119,14 +118,14 @@ namespace DXLibRef {
 		}
 	public:
 		//ハンドル作成
-		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) {
+		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) noexcept {
 			return { DxLib::CreateFontToHandleWithStrLen(FontName.data(), FontName.length(), Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
-		static FontHandle Create(int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) {
+		static FontHandle Create(int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) noexcept {
 			return { DxLib::CreateFontToHandle(nullptr, Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
 		//DXフォント用ハンドル作成
-		static FontHandle Load(std::basic_string_view<TCHAR> FontDataPath, int EdgeSize) {
+		static FontHandle Load(std::basic_string_view<TCHAR> FontDataPath, int EdgeSize) noexcept {
 			return { DxLib::LoadFontDataToHandleWithStrLen(FontDataPath.data(), FontDataPath.length(), EdgeSize) };
 		}
 		void Dispose(void) noexcept {
@@ -179,10 +178,10 @@ namespace DXLibRef {
 			case FontYCenter::TOP:
 				break;
 			case FontYCenter::MIDDLE:
-				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(GetHandle()) / 2)*ysiz);
+				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(GetHandle()) / 2) * ysiz);
 				break;
 			case FontYCenter::BOTTOM:
-				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(GetHandle()))*ysiz);
+				y -= static_cast<int>(static_cast<float>(GetFontSizeToHandle(GetHandle())) * ysiz);
 				break;
 			default:
 				break;
@@ -220,8 +219,8 @@ namespace DXLibRef {
 		class Fonthave {
 			//カスタム項目
 			FontType		m_Type{ 0 };
-			int				m_EdgeSize{INVALID_ID};//エッジサイズ
-			int				m_CustomSize{0};//フォントハンドル固有のサイズ
+			int				m_EdgeSize{ INVALID_ID };//エッジサイズ
+			int				m_CustomSize{ 0 };//フォントハンドル固有のサイズ
 			//
 			int				m_scaleType{ DX_DRAWMODE_BILINEAR };
 			int				m_commonsize{ 0 };//フォントハンドル固有のサイズ
@@ -324,8 +323,8 @@ namespace DXLibRef {
 			Dispose();
 		}
 	public:
-		void Load(const char* Lang);
-		void Dispose() {
+		void Load(const char* Lang) noexcept;
+		void Dispose() noexcept {
 			this->havehandle.clear();
 			this->havehandle.shrink_to_fit();
 		}

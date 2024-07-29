@@ -44,16 +44,20 @@ namespace DXLibRef {
 		auto* OptionParts = OPTION::Instance();
 		Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 	}
-	void LocalizePool::Load(const char* Lang) {
+	void LocalizePool::Load(const char* Lang) noexcept {
 		std::string Path = "data/Localize/";
 		Path += Lang;
 		Path += ".txt";
 		this->havehandle.reserve(256);
 		int mdata = FileRead_open(Path.c_str(), FALSE);
 		while (true) {
-			if (FileRead_eof(mdata) != 0) { break; }
+			if (FileRead_eof(mdata) != 0) {
+				break;
+			}
 			auto ALL = getparams::Getstr(mdata);
-			if (ALL == "") { continue; }
+			if (ALL == "") {
+				continue;
+			}
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
 			LocalizeID ID = (LocalizeID)(std::stoi(LEFT));

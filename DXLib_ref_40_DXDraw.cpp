@@ -9,53 +9,53 @@ namespace DXLibRef {
 	class DXDraw::VRControl {
 		class VRDeviceClass {
 		private:
-			int							m_ID{0};
-			char						m_DeviceNumber{0};
-			vr::ETrackedDeviceClass 	m_type{vr::TrackedDeviceClass_Invalid};
-			bool						m_isInitialized{false};
-			bool						m_isActive{false};
+			int							m_ID{ 0 };
+			char						m_DeviceNumber{ 0 };
+			vr::ETrackedDeviceClass 	m_type{ vr::TrackedDeviceClass_Invalid };
+			bool						m_isInitialized{ false };
+			bool						m_isActive{ false };
 			//位置やボタン判定
-			uint64_t					m_ButtonPressFlag{0};
-			uint64_t					m_ButtonTouchFlag{0};
-			Vector3DX					m_TouchPadPoint{Vector3DX::zero()};
+			uint64_t					m_ButtonPressFlag{ 0 };
+			uint64_t					m_ButtonTouchFlag{ 0 };
+			Vector3DX					m_TouchPadPoint{ Vector3DX::zero() };
 			moves						m_move;
 		public:
-			const auto&		GetID(void) const noexcept { return m_ID; }
+			const auto& GetID(void) const noexcept { return m_ID; }
 			auto			IsActive(void) const noexcept { return m_isInitialized && m_isActive; }
 			bool			PadPress(VR_PAD ID) const noexcept {
 				switch (ID) {
-					case VR_PAD::TRIGGER:
-						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
-					case VR_PAD::SIDEBUTTON:
-						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
-					case VR_PAD::TOUCHPAD:
-						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
-					case VR_PAD::TOPBUTTON1:
-						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
-					case VR_PAD::TOPBUTTON2:
-						return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
-					default:
-						return false;
+				case VR_PAD::TRIGGER:
+					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
+				case VR_PAD::SIDEBUTTON:
+					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
+				case VR_PAD::TOUCHPAD:
+					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
+				case VR_PAD::TOPBUTTON1:
+					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
+				case VR_PAD::TOPBUTTON2:
+					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
+				default:
+					return false;
 				}
 			}
 			bool			PadTouch(VR_PAD ID) const noexcept {
 				switch (ID) {
-					case VR_PAD::TRIGGER:
-						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
-					case VR_PAD::SIDEBUTTON:
-						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
-					case VR_PAD::TOUCHPAD:
-						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
-					case VR_PAD::TOPBUTTON1:
-						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
-					case VR_PAD::TOPBUTTON2:
-						return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
-					default:
-						return false;
+				case VR_PAD::TRIGGER:
+					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
+				case VR_PAD::SIDEBUTTON:
+					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
+				case VR_PAD::TOUCHPAD:
+					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
+				case VR_PAD::TOPBUTTON1:
+					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
+				case VR_PAD::TOPBUTTON2:
+					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
+				default:
+					return false;
 				}
 			}
-			const auto&		GetTouchPadPoint(void) const noexcept { return m_TouchPadPoint; }
-			const auto&		GetMove(void) const noexcept { return m_move; }
+			const auto& GetTouchPadPoint(void) const noexcept { return m_TouchPadPoint; }
+			const auto& GetMove(void) const noexcept { return m_move; }
 		public:
 			void Init(int ID, char Num, vr::ETrackedDeviceClass Type) noexcept {
 				this->m_ID = ID;
@@ -68,37 +68,37 @@ namespace DXLibRef {
 			void Update(vr::IVRSystem* SystemPtr) noexcept {
 				vr::TrackedDevicePose_t tmp;
 				switch (this->m_type) {
-					case vr::TrackedDeviceClass_HMD:
-						SystemPtr->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0.0f, &tmp, 1);
-						this->m_ButtonPressFlag = 0;
-						this->m_ButtonTouchFlag = 0;
-						this->m_TouchPadPoint = Vector3DX::zero();
-						this->m_isActive = tmp.bPoseIsValid;
-						this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
-						this->m_move.mat = Matrix4x4DX::Axis1(
-							Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
-							Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
-						);
-						break;
-					case vr::TrackedDeviceClass_Controller:
-					case vr::TrackedDeviceClass_TrackingReference:
-					case vr::TrackedDeviceClass_GenericTracker:
-						{
-							vr::VRControllerState_t night;
-							SystemPtr->GetControllerStateWithPose(vr::TrackingUniverseStanding, this->m_DeviceNumber, &night, sizeof(night), &tmp);
-							this->m_ButtonPressFlag = night.ulButtonPressed;
-							this->m_ButtonTouchFlag = night.ulButtonTouched;
-							this->m_TouchPadPoint = Vector3DX::vget(night.rAxis[0].x, night.rAxis[0].y, 0);
-							this->m_isActive = tmp.bPoseIsValid;
-							this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
-							this->m_move.mat = Matrix4x4DX::Axis1(
-								Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
-								Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2])*-1.f
-							);
-						}
-						break;
-					default:
-						break;
+				case vr::TrackedDeviceClass_HMD:
+					SystemPtr->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0.0f, &tmp, 1);
+					this->m_ButtonPressFlag = 0;
+					this->m_ButtonTouchFlag = 0;
+					this->m_TouchPadPoint = Vector3DX::zero();
+					this->m_isActive = tmp.bPoseIsValid;
+					this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
+					this->m_move.mat = Matrix4x4DX::Axis1(
+						Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
+						Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2]) * -1.f
+					);
+					break;
+				case vr::TrackedDeviceClass_Controller:
+				case vr::TrackedDeviceClass_TrackingReference:
+				case vr::TrackedDeviceClass_GenericTracker:
+				{
+					vr::VRControllerState_t night;
+					SystemPtr->GetControllerStateWithPose(vr::TrackingUniverseStanding, this->m_DeviceNumber, &night, sizeof(night), &tmp);
+					this->m_ButtonPressFlag = night.ulButtonPressed;
+					this->m_ButtonTouchFlag = night.ulButtonTouched;
+					this->m_TouchPadPoint = Vector3DX::vget(night.rAxis[0].x, night.rAxis[0].y, 0);
+					this->m_isActive = tmp.bPoseIsValid;
+					this->m_move.pos = Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][3], tmp.mDeviceToAbsoluteTracking.m[1][3], -tmp.mDeviceToAbsoluteTracking.m[2][3]);
+					this->m_move.mat = Matrix4x4DX::Axis1(
+						Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][1], tmp.mDeviceToAbsoluteTracking.m[1][1], -tmp.mDeviceToAbsoluteTracking.m[2][1]),
+						Vector3DX::vget(tmp.mDeviceToAbsoluteTracking.m[0][2], tmp.mDeviceToAbsoluteTracking.m[1][2], -tmp.mDeviceToAbsoluteTracking.m[2][2]) * -1.f
+					);
+				}
+				break;
+				default:
+					break;
 				}
 			}
 			void Reset(void) noexcept {
@@ -110,15 +110,15 @@ namespace DXLibRef {
 			}
 		};
 	private:
-		vr::IVRSystem*				m_VR_SystemPtr{nullptr};
-		vr::EVRInitError			m_VR_ErrorHandle{vr::VRInitError_None};
+		vr::IVRSystem* m_VR_SystemPtr{ nullptr };
+		vr::EVRInitError			m_VR_ErrorHandle{ vr::VRInitError_None };
 		std::vector<VRDeviceClass>	m_VR_DeviceInfo;
 		char						m_VR_HMDID{ INVALID_ID };
 		char						m_VR_Hand1ID{ INVALID_ID };
 		char						m_VR_Hand2ID{ INVALID_ID };
 		std::vector<char>			m_VR_TrackerID;
-		bool						m_VR_PrevHMDIsActive{false};
-		bool						m_VR_HMD_StartFlag{true};
+		bool						m_VR_PrevHMDIsActive{ false };
+		bool						m_VR_HMD_StartFlag{ true };
 		Matrix4x4DX					m_VR_HMD_StartPoint;
 		//
 		GraphHandle					m_OutScreen;							//スクリーンバッファ
@@ -126,18 +126,18 @@ namespace DXLibRef {
 		VRControl(void) noexcept {}
 		~VRControl(void) noexcept {}
 	public:
-		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
-		const VRDeviceClass*	Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
-		const VRDeviceClass*	GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
+		const VRDeviceClass* Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
+		const VRDeviceClass* Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
+		const VRDeviceClass* GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
 		void			ResetHMD(void) noexcept {
 			m_VR_PrevHMDIsActive = false;
 			m_VR_HMD_StartFlag = true;
 		}
-		void			GetHMDPosition(Vector3DX* pos_, Matrix4x4DX*mat) noexcept {
+		void			GetHMDPosition(Vector3DX* pos_, Matrix4x4DX* mat) noexcept {
 			auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
 			if (HMDPtr) {
 				*mat = HMDPtr->GetMove().mat;
-				*mat = Matrix4x4DX::Axis1((*mat).yvec(), (*mat).zvec()*-1.f);
+				*mat = Matrix4x4DX::Axis1((*mat).yvec(), (*mat).zvec() * -1.f);
 				if (!HMDPtr->IsActive()) {
 					m_VR_HMD_StartFlag = true;
 				}
@@ -208,36 +208,36 @@ namespace DXLibRef {
 					auto DeviceID = DeviceCount;
 					auto DeviceType = m_VR_SystemPtr->GetTrackedDeviceClass(i);
 					switch (DeviceType) {
-						case vr::TrackedDeviceClass_HMD:
-							m_VR_HMDID = DeviceID;
-							DeviceCount++;
-							break;
-						case vr::TrackedDeviceClass_Controller:
-							if (IsFirstHand) {
-								IsFirstHand = false;
-								m_VR_Hand1ID = DeviceID;
-							}
-							else {
-								m_VR_Hand2ID = DeviceID;
-							}
-							DeviceCount++;
-							break;
-						case vr::TrackedDeviceClass_GenericTracker:
-							m_VR_TrackerID.emplace_back(DeviceID);
-							DeviceCount++;
-							break;
-						case vr::TrackedDeviceClass_TrackingReference:
-							DeviceCount++;
-							break;
-						default:
-							continue;
+					case vr::TrackedDeviceClass_HMD:
+						m_VR_HMDID = DeviceID;
+						DeviceCount++;
+						break;
+					case vr::TrackedDeviceClass_Controller:
+						if (IsFirstHand) {
+							IsFirstHand = false;
+							m_VR_Hand1ID = DeviceID;
+						}
+						else {
+							m_VR_Hand2ID = DeviceID;
+						}
+						DeviceCount++;
+						break;
+					case vr::TrackedDeviceClass_GenericTracker:
+						m_VR_TrackerID.emplace_back(DeviceID);
+						DeviceCount++;
+						break;
+					case vr::TrackedDeviceClass_TrackingReference:
+						DeviceCount++;
+						break;
+					default:
+						continue;
 					}
 					m_VR_DeviceInfo.resize(DeviceCount);
 					m_VR_DeviceInfo.back().Init(DeviceID, i, DeviceType);
 				}
 			}
 		}
-		void SetupBuffer(int xsize,int ysize) noexcept {
+		void SetupBuffer(int xsize, int ysize) noexcept {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				//画面セット
@@ -258,7 +258,7 @@ namespace DXLibRef {
 			}
 		}
 		void Submit(char eye_type) noexcept {
-			vr::Texture_t tex = {(void*)GetUseDirect3D11BackBufferTexture2D(), vr::ETextureType::TextureType_DirectX,vr::EColorSpace::ColorSpace_Auto};
+			vr::Texture_t tex = { (void*)GetUseDirect3D11BackBufferTexture2D(), vr::ETextureType::TextureType_DirectX,vr::EColorSpace::ColorSpace_Auto };
 			vr::VRCompositor()->Submit((vr::EVREye)eye_type, &tex, NULL, vr::Submit_Default);
 		}
 		void SubmitDraw(char eye_type, const GraphHandle& MainDrawScreen, const GraphHandle& UIScreen, std::function<void()> doingUI2) noexcept {
@@ -317,9 +317,9 @@ namespace DXLibRef {
 		VRControl(void) noexcept {}
 		~VRControl(void) noexcept {}
 	public:
-		const VRDeviceClass*	Get_VR_Hand1Device(void) const noexcept { return nullptr; }
-		const VRDeviceClass*	Get_VR_Hand2Device(void) const noexcept { return nullptr; }
-		const VRDeviceClass*	GetTrackerDevice(int) const noexcept { return nullptr; }
+		const VRDeviceClass* Get_VR_Hand1Device(void) const noexcept { return nullptr; }
+		const VRDeviceClass* Get_VR_Hand2Device(void) const noexcept { return nullptr; }
+		const VRDeviceClass* GetTrackerDevice(int) const noexcept { return nullptr; }
 		void			ResetHMD(void) noexcept {}
 		void			GetHMDPosition(Vector3DX*, Matrix4x4DX*) noexcept {}
 		void			Haptic(char, unsigned short) noexcept {}
@@ -550,8 +550,8 @@ namespace DXLibRef {
 			this->m_DispXSize_Border = this->m_DispXSize;
 			this->m_DispYSize_Border = this->m_DispYSize;
 		}
-		m_DispXSize_Max = std::min(m_DispXSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basex, this->m_DispXSize))*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		m_DispYSize_Max = std::min(m_DispYSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basey, this->m_DispYSize))*std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		m_DispXSize_Max = std::min(m_DispXSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basex, this->m_DispXSize)) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		m_DispYSize_Max = std::min(m_DispYSize_Border, static_cast<int>(static_cast<float>(std::min<int>(basey, this->m_DispYSize)) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
 		SetWindowOrBorderless();
 		//
 #ifdef DEBUG
@@ -651,6 +651,7 @@ namespace DXLibRef {
 				SetFullScreenScalingMode(DX_FSSCALINGMODE_NEAREST);
 				ChangeWindowMode(FALSE);
 				break;
+			case WindowType::Max:
 			default:
 				break;
 			}
@@ -716,17 +717,17 @@ namespace DXLibRef {
 						}
 						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 2)) {
 							switch (TextID) {
-								case 2002:
-									MouseOverID = 2040;
-									break;
-								case 2003:
-									MouseOverID = 2041;
-									break;
-								case 2004:
-									MouseOverID = 2042;
-									break;
-								default:
-									break;
+							case 2002:
+								MouseOverID = 2040;
+								break;
+							case 2003:
+								MouseOverID = 2041;
+								break;
+							case 2004:
+								MouseOverID = 2042;
+								break;
+							default:
+								break;
 							}
 						}
 						WindowSystem::SetMsg(xp + GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
@@ -753,14 +754,14 @@ namespace DXLibRef {
 						}
 						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 1)) {
 							switch (TextID) {
-								case 2012:
-									MouseOverID = 2043;
-									break;
-								case 2013:
-									MouseOverID = 2044;
-									break;
-								default:
-									break;
+							case 2012:
+								MouseOverID = 2043;
+								break;
+							case 2013:
+								MouseOverID = 2044;
+								break;
+							default:
+								break;
 							}
 						}
 						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
@@ -785,17 +786,17 @@ namespace DXLibRef {
 						}
 						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 2)) {
 							switch (TextID) {
-								case 2022:
-									MouseOverID = 2045;
-									break;
-								case 2023:
-									MouseOverID = 2046;
-									break;
-								case 2024:
-									MouseOverID = 2047;
-									break;
-								default:
-									break;
+							case 2022:
+								MouseOverID = 2045;
+								break;
+							case 2023:
+								MouseOverID = 2046;
+								break;
+							case 2024:
+								MouseOverID = 2047;
+								break;
+							default:
+								break;
 							}
 						}
 						WindowSystem::SetMsg(xp + GetUIY(16), yp + LineHeight / 2, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
@@ -835,7 +836,7 @@ namespace DXLibRef {
 		}
 		OptionParts->Save();
 	}
-	void DXDraw::PauseDraw(void) noexcept {
+	void DXDraw::PauseDraw(void) const noexcept {
 		if (IsPause()) {
 			auto* Fonts = FontPool::Instance();
 			//
@@ -848,14 +849,14 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void DXDraw::GetMousePosition(int * MouseX, int * MouseY) const noexcept {
+	void DXDraw::GetMousePosition(int* MouseX, int* MouseY) const noexcept {
 		auto y_UIMs = [&](int p1) {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamInt(EnumSaveParam::WindowMode) == static_cast<int>(WindowType::Window)) {
 				return (int(p1) * m_DispYSize_Border / desky);
 			}
 			return (int(p1) * m_DispYSize / desky);
-		};
+			};
 		int mx = 0, my = 0;
 		GetMousePoint(&mx, &my);
 		*MouseX = y_UIMs(mx);
@@ -915,7 +916,9 @@ namespace DXLibRef {
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-		if (!(ProcessMessage() == 0)) { return false; }
+		if (!(ProcessMessage() == 0)) {
+			return false;
+		}
 
 		m_FPS = std::max(GetFPS(), 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
@@ -931,7 +934,7 @@ namespace DXLibRef {
 						xp1 = xmin + DrawParts->GetUIY(24);
 						yp1 = ymin + LineHeight;
 
-						WindowSystem::SetMsg(xp1, yp1 + LineHeight/2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
+						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					//
 					{
@@ -1005,7 +1008,9 @@ namespace DXLibRef {
 		this->GetVRControl()->Execute();		//VR空間に適用
 		//
 		m_PauseFlashCount += 1.f / GetFps();
-		if (m_PauseFlashCount > 1.f) { m_PauseFlashCount -= 1.f; }
+		if (m_PauseFlashCount > 1.f) {
+			m_PauseFlashCount -= 1.f;
+		}
 		//
 		m_PauseActive.Execute(Pad->GetKey(PADS::INVENTORY).press() && !OptionWindowParts->IsActive());
 		if (m_PauseActive.trigger()) {
@@ -1016,7 +1021,7 @@ namespace DXLibRef {
 		if (!IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
 			UpdateEffekseer3D();
 			Update_effect_was = m_StartTime;
-	}
+		}
 #endif
 		CameraShake::Instance()->Update();
 	}
@@ -1050,7 +1055,7 @@ namespace DXLibRef {
 				else {
 					doing();
 				}
-								  }, doingFront, camInfo);
+				}, doingFront, camInfo);
 			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw->Draw(); });
@@ -1152,10 +1157,13 @@ namespace DXLibRef {
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			//4msだけスリープ
 			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
-				if (ProcessMessage() != 0) { return false; }
+				if (ProcessMessage() != 0) {
+					return false;
+				}
 				SleepThread(1);	// 1msecスリープする
 			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {}
+			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {
+			}
 		}
 		else {
 			WaitVSync(1);
@@ -1164,7 +1172,7 @@ namespace DXLibRef {
 		return true;
 	}
 	//VR
-	void			DXDraw::Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX*mat) noexcept { this->GetVRControl()->GetHMDPosition(pos_, mat); }
+	void			DXDraw::Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX* mat) noexcept { this->GetVRControl()->GetHMDPosition(pos_, mat); }
 	void			DXDraw::Reset_VR_HMD(void) noexcept { this->GetVRControl()->ResetHMD(); }
 	bool			DXDraw::Get_VR_Hand1PadPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->PadPress(ID) : false; }
 	bool			DXDraw::Get_VR_Hand1TouchPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand1Device() ? this->GetVRControl()->Get_VR_Hand1Device()->PadTouch(ID) : false; }

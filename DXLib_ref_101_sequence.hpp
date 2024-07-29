@@ -7,21 +7,21 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	class TEMPSCENE {
 	private:
-		bool			m_IsFirstLoop{true};			//初回チェック
-		bool			m_IsLoading{false};
+		bool			m_IsFirstLoop{ true };			//初回チェック
+		bool			m_IsLoading{ false };
 
-		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{nullptr};
-		size_t			m_Next_Select{0};
+		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{ nullptr };
+		size_t			m_Next_Select{ 0 };
 
-		bool			m_Is3DActive{true};
+		bool			m_Is3DActive{ true };
 	public:
 		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
-		auto&		Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
+		auto& Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
 	public://ゲッター
-		const auto&		GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
-		const auto&		Get3DActive(void) const noexcept { return m_Is3DActive; }
+		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
+		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;

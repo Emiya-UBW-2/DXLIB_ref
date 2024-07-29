@@ -1,5 +1,4 @@
 #include "DXLib_ref_09_KeyControl.hpp"
-
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	//
@@ -53,7 +52,9 @@ namespace DXLibRef {
 			}
 			GuideImg = GraphHandle::Load(Path);
 			GuideImg.GetSize(&xsize, &ysize);
-			if (ysize == 0) { ysize = 1; }
+			if (ysize == 0) {
+				ysize = 1;
+			}
 			xsize = xsize * DrawParts->GetUIY(21) / ysize;
 			ysize = ysize * DrawParts->GetUIY(21) / ysize;
 		}
@@ -90,82 +91,82 @@ namespace DXLibRef {
 		return GetDrawSize();
 	}
 
-	bool PadControl::GetButtonPress(int ID) {
+	bool PadControl::GetButtonPress(int ID) noexcept {
 		switch (m_ControlType) {
-			case ControlType::XBox:
-				{
-					XINPUT_STATE input;
-					GetJoypadXInputState(DX_INPUT_PAD1, &input);
-					//ボタン
-					if (ID >= 0xF100) {
-						switch (ID) {
-							case 0xF100:
-								return input.LeftTrigger > 0;
-							case 0xF200:
-								return input.RightTrigger > 0;
-							default:
-								break;
-						}
-					}
-					else if (0 <= ID && ID < 16) {
-						return (input.Buttons[ID] != 0);
-					}
+		case ControlType::XBox:
+		{
+			XINPUT_STATE input;
+			GetJoypadXInputState(DX_INPUT_PAD1, &input);
+			//ボタン
+			if (ID >= 0xF100) {
+				switch (ID) {
+				case 0xF100:
+					return input.LeftTrigger > 0;
+				case 0xF200:
+					return input.RightTrigger > 0;
+				default:
+					break;
 				}
-				break;
-			case ControlType::PS4:
-				{
-					DINPUT_JOYSTATE input;
-					GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-					//ボタン
-					if (ID >= 0xF010) {
-						//十字キー
-						float deg = static_cast<float>(input.POV[0]) / 100.f;
-						bool w_key = false;
-						bool s_key = false;
-						bool a_key = false;
-						bool d_key = false;
-						if (input.POV[0] != 0xffffffff) {
-							w_key = (310.f <= deg || deg <= 50.f);
-							s_key = (130.f <= deg && deg <= 230.f);
-							a_key = (220.f <= deg && deg <= 320.f);
-							d_key = (40.f <= deg && deg <= 140.f);
-						}
-						switch (ID) {
-							case 0xF010:
-								return a_key;
-							case 0xF020:
-								return w_key;
-							case 0xF040:
-								return d_key;
-							case 0xF080:
-								return s_key;
-							default:
-								break;
-						}
-					}
-					else if (0 <= ID && ID < 32) {
-						return (input.Buttons[ID] != 0);
-					}
+			}
+			else if (0 <= ID && ID < 16) {
+				return (input.Buttons[ID] != 0);
+			}
+		}
+		break;
+		case ControlType::PS4:
+		{
+			DINPUT_JOYSTATE input;
+			GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
+			//ボタン
+			if (ID >= 0xF010) {
+				//十字キー
+				float deg = static_cast<float>(input.POV[0]) / 100.f;
+				bool w_key = false;
+				bool s_key = false;
+				bool a_key = false;
+				bool d_key = false;
+				if (input.POV[0] != 0xffffffff) {
+					w_key = (310.f <= deg || deg <= 50.f);
+					s_key = (130.f <= deg && deg <= 230.f);
+					a_key = (220.f <= deg && deg <= 320.f);
+					d_key = (40.f <= deg && deg <= 140.f);
 				}
-				break;
-			case ControlType::PC:
-				//ボタン
-				if (0 <= ID) {
-					if ((ID & 0xF00) != 0) {
-						return ((GetMouseInputWithCheck() & (ID & 0xFF)) != 0);
-					}
-					else {
-						return (CheckHitKeyWithCheck(ID) != 0);
-					}
+				switch (ID) {
+				case 0xF010:
+					return a_key;
+				case 0xF020:
+					return w_key;
+				case 0xF040:
+					return d_key;
+				case 0xF080:
+					return s_key;
+				default:
+					break;
 				}
-				break;
-			default:
-				break;
+			}
+			else if (0 <= ID && ID < 32) {
+				return (input.Buttons[ID] != 0);
+			}
+		}
+		break;
+		case ControlType::PC:
+			//ボタン
+			if (0 <= ID) {
+				if ((ID & 0xF00) != 0) {
+					return ((GetMouseInputWithCheck() & (ID & 0xFF)) != 0);
+				}
+				else {
+					return (CheckHitKeyWithCheck(ID) != 0);
+				}
+			}
+			break;
+		default:
+			break;
 		}
 		return false;
 	}
 
-	bool PadControl::GetPushAnySwitchLocal(PADS select, int ID) {
+	bool PadControl::GetPushAnySwitchLocal(PADS select, int ID) noexcept {
 		auto* SE = SoundPool::Instance();
 		if (GetButtonPress(ID)) {
 			auto& P = m_PadsInfo.at(static_cast<size_t>(select));
@@ -195,45 +196,49 @@ namespace DXLibRef {
 		return false;
 	}
 
-	void PadControl::GetPushAnySwitch(PADS select) {
+	void PadControl::GetPushAnySwitch(PADS select) noexcept {
 		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
-			if (p == static_cast<size_t>(select)) { continue; }
+			if (p == static_cast<size_t>(select)) {
+				continue;
+			}
 			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_reserve)) {
 				break;
 			}
 		}
 		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
-			if (p == static_cast<size_t>(select)) { continue; }
+			if (p == static_cast<size_t>(select)) {
+				continue;
+			}
 			auto& P = m_PadsInfo.at(p);
 			if (GetPushAnySwitchLocal(select, P.m_assign)) {
 				break;
 			}
 		}
 		switch (m_ControlType) {
-			case ControlType::XBox:
-				for (size_t i = 0; i < XBoxNum; ++i) {
-					if (GetPushAnySwitchLocal(select, XBoxID[i])) {
-						break;
-					}
+		case ControlType::XBox:
+			for (size_t i = 0; i < XBoxNum; ++i) {
+				if (GetPushAnySwitchLocal(select, XBoxID[i])) {
+					break;
 				}
-				break;
-			case ControlType::PS4:
-				for (size_t i = 0; i < DS4Num; ++i) {
-					if (GetPushAnySwitchLocal(select, DS4ID[i])) {
-						break;
-					}
+			}
+			break;
+		case ControlType::PS4:
+			for (size_t i = 0; i < DS4Num; ++i) {
+				if (GetPushAnySwitchLocal(select, DS4ID[i])) {
+					break;
 				}
-				break;
-			case ControlType::PC:
-				for (size_t i = 0; i < KeyNum; ++i) {
-					if (GetPushAnySwitchLocal(select, KeyID[i])) {
-						break;
-					}
+			}
+			break;
+		case ControlType::PC:
+			for (size_t i = 0; i < KeyNum; ++i) {
+				if (GetPushAnySwitchLocal(select, KeyID[i])) {
+					break;
 				}
-				break;
-			default:
-				break;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -247,9 +252,13 @@ namespace DXLibRef {
 			mdata = FileRead_open(GetBasePath(), FALSE);
 		}
 		while (true) {
-			if (FileRead_eof(mdata) != 0) { break; }
+			if (FileRead_eof(mdata) != 0) {
+				break;
+			}
 			auto ALL = getparams::Getstr(mdata);
-			if (ALL == "") { continue; }
+			if (ALL == "") {
+				continue;
+			}
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
 			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
@@ -327,179 +336,183 @@ namespace DXLibRef {
 		}
 		//タイプに合わせた操作
 		switch (m_ControlType) {
-			case ControlType::XBox:
-				{
-					XINPUT_STATE input;
-					GetJoypadXInputState(DX_INPUT_PAD1, &input);
-					//左スティック
-					{
-						int LS_X = input.ThumbLX;
-						int LS_Y = -input.ThumbLY;
-						if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
-							LS_X = input.ThumbRX;
-							LS_Y = -input.ThumbRY;
-						}
-						LS_X = 1000 * LS_X / 32768;
-						LS_Y = 1000 * LS_Y / 32768;
-
-						if (abs(LS_X) < 10) { LS_X = 0; }
-						if (abs(LS_Y) < 10) { LS_Y = 0; }
-
-						float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
-						bool w_key = false;
-						bool s_key = false;
-						bool a_key = false;
-						bool d_key = false;
-						if (!(LS_X == 0 && LS_Y == 0)) {
-							w_key = (-50.f <= deg && deg <= 50.f);
-							a_key = (-140.f <= deg && deg <= -40.f);
-							s_key = (130.f <= deg || deg <= -130.f);
-							d_key = (40.f <= deg && deg <= 140.f);
-						}
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
-					}
-					//右スティック
-					{
-						DrawParts->GetMousePosition(&MouseX, &MouseY);
-						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
-						SetMouseDispFlag(TRUE);
-						int RS_X = input.ThumbRX;
-						int RS_Y = -input.ThumbRY;
-						if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
-							RS_X = input.ThumbLX;
-							RS_Y = -input.ThumbLY;
-						}
-						RS_X = 1000 * RS_X / 32768;
-						RS_Y = 1000 * RS_Y / 32768;
-
-						if (!DrawParts->IsPause()) {
-							auto* OptionParts = OPTION::Instance();
-							Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-							Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
-						}
-						else {
-							Look_XradAdd = 0.f;
-							Look_YradAdd = 0.f;
-						}
-					}
+		case ControlType::XBox:
+		{
+			XINPUT_STATE input;
+			GetJoypadXInputState(DX_INPUT_PAD1, &input);
+			//左スティック
+			{
+				int LS_X = input.ThumbLX;
+				int LS_Y = -input.ThumbLY;
+				if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
+					LS_X = input.ThumbRX;
+					LS_Y = -input.ThumbRY;
 				}
-				break;
-			case ControlType::PS4:
-				{
-					DINPUT_JOYSTATE input;
-					GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-					//左スティック
-					{
-						int LS_X = input.X;
-						int LS_Y = input.Y;
-						if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
-							LS_X = input.Z;
-							LS_Y = input.Rz;
-						}
+				LS_X = 1000 * LS_X / 32768;
+				LS_Y = 1000 * LS_Y / 32768;
 
-						float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
-						bool w_key = false;
-						bool s_key = false;
-						bool a_key = false;
-						bool d_key = false;
-						if (!(input.X == 0 && input.Y == 0)) {
-							w_key = (-50.f <= deg && deg <= 50.f);
-							a_key = (-140.f <= deg && deg <= -40.f);
-							s_key = (130.f <= deg || deg <= -130.f);
-							d_key = (40.f <= deg && deg <= 140.f);
-						}
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
-						this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
-					}
-					//右スティック
-					{
-						DrawParts->GetMousePosition(&MouseX, &MouseY);
-						MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
-						SetMouseDispFlag(TRUE);
-						int RS_X = input.Z;
-						int RS_Y = input.Rz;
-						if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
-							RS_X = input.X;
-							RS_Y = input.Y;
-						}
-
-						auto* OptionParts = OPTION::Instance();
-						Look_XradAdd = static_cast<float>(RS_X) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-						Look_YradAdd = -static_cast<float>(RS_Y) / 100.f*4.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
-					}
+				if (abs(LS_X) < 10) {
+					LS_X = 0;
 				}
-				break;
-			case ControlType::PC:
-				//右スティック
-				{
-					DrawParts->GetMousePosition(&MouseX, &MouseY);
-					MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
+				if (abs(LS_Y) < 10) {
+					LS_Y = 0;
+				}
 
-					if (m_MouseMoveEnable) {
-						if (GetMainWindowHandle() != GetForegroundWindow()) {//次画面が最前ではないよん
-							SetMouseDispFlag(TRUE);
-						}
-						else {
-							if (!DrawParts->IsPause()) {
-								SetMousePoint(DrawParts->GetUIY(1920 / 2), DrawParts->GetUIY(1080 / 2));
-								SetMouseDispFlag(FALSE);
-							}
-							else {
-								SetMouseDispFlag(TRUE);
-							}
-						}
+				float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
+				bool w_key = false;
+				bool s_key = false;
+				bool a_key = false;
+				bool d_key = false;
+				if (!(LS_X == 0 && LS_Y == 0)) {
+					w_key = (-50.f <= deg && deg <= 50.f);
+					a_key = (-140.f <= deg && deg <= -40.f);
+					s_key = (130.f <= deg || deg <= -130.f);
+					d_key = (40.f <= deg && deg <= 140.f);
+				}
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
+			}
+			//右スティック
+			{
+				DrawParts->GetMousePosition(&MouseX, &MouseY);
+				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
+				SetMouseDispFlag(TRUE);
+				int RS_X = input.ThumbRX;
+				int RS_Y = -input.ThumbRY;
+				if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
+					RS_X = input.ThumbLX;
+					RS_Y = -input.ThumbLY;
+				}
+				RS_X = 1000 * RS_X / 32768;
+				RS_Y = 1000 * RS_Y / 32768;
+
+				if (!DrawParts->IsPause()) {
+					auto* OptionParts = OPTION::Instance();
+					Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+					Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+				}
+				else {
+					Look_XradAdd = 0.f;
+					Look_YradAdd = 0.f;
+				}
+			}
+		}
+		break;
+		case ControlType::PS4:
+		{
+			DINPUT_JOYSTATE input;
+			GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
+			//左スティック
+			{
+				int LS_X = input.X;
+				int LS_Y = input.Y;
+				if (this->m_PadsInfo[static_cast<int>(PADS::MOVE_STICK)].m_assign == 0xF002) {
+					LS_X = input.Z;
+					LS_Y = input.Rz;
+				}
+
+				float deg = rad2deg(atan2f(static_cast<float>(LS_X), static_cast<float>(-LS_Y)));
+				bool w_key = false;
+				bool s_key = false;
+				bool a_key = false;
+				bool d_key = false;
+				if (!(input.X == 0 && input.Y == 0)) {
+					w_key = (-50.f <= deg && deg <= 50.f);
+					a_key = (-140.f <= deg && deg <= -40.f);
+					s_key = (130.f <= deg || deg <= -130.f);
+					d_key = (40.f <= deg && deg <= 140.f);
+				}
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_W)].m_Key.Execute(w_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_S)].m_Key.Execute(s_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
+				this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
+			}
+			//右スティック
+			{
+				DrawParts->GetMousePosition(&MouseX, &MouseY);
+				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
+				SetMouseDispFlag(TRUE);
+				int RS_X = input.Z;
+				int RS_Y = input.Rz;
+				if (this->m_PadsInfo[static_cast<int>(PADS::DIR_STICK)].m_assign == 0xF001) {
+					RS_X = input.X;
+					RS_Y = input.Y;
+				}
+
+				auto* OptionParts = OPTION::Instance();
+				Look_XradAdd = static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+				Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+			}
+		}
+		break;
+		case ControlType::PC:
+			//右スティック
+		{
+			DrawParts->GetMousePosition(&MouseX, &MouseY);
+			MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
+
+			if (m_MouseMoveEnable) {
+				if (GetMainWindowHandle() != GetForegroundWindow()) {//次画面が最前ではないよん
+					SetMouseDispFlag(TRUE);
+				}
+				else {
+					if (!DrawParts->IsPause()) {
+						SetMousePoint(DrawParts->GetUIY(1920 / 2), DrawParts->GetUIY(1080 / 2));
+						SetMouseDispFlag(FALSE);
 					}
 					else {
 						SetMouseDispFlag(TRUE);
 					}
-					auto* OptionParts = OPTION::Instance();
-					Look_XradAdd = static_cast<float>(MouseX - DrawParts->GetUIY(1920 / 2))*2.f*OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					Look_YradAdd = -static_cast<float>(MouseY - DrawParts->GetUIY(1080 / 2))*2.f*OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
-				break;
-			default:
-				break;
+			}
+			else {
+				SetMouseDispFlag(TRUE);
+			}
+			auto* OptionParts = OPTION::Instance();
+			Look_XradAdd = static_cast<float>(MouseX - DrawParts->GetUIY(1920 / 2)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+			Look_YradAdd = -static_cast<float>(MouseY - DrawParts->GetUIY(1080 / 2)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+		}
+		break;
+		default:
+			break;
 		}
 		//ボタン
 		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
 			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
-					case PADS::MOVE_W:
-					case PADS::MOVE_A:
-					case PADS::MOVE_S:
-					case PADS::MOVE_D:
-						continue;
-						break;
-					case PADS::MOVE_STICK:
-					case PADS::DIR_UP:
-					case PADS::DIR_DOWN:
-					case PADS::DIR_LEFT:
-					case PADS::DIR_RIGHT:
-					case PADS::DIR_STICK:
-					case PADS::LEAN_L:
-					case PADS::LEAN_R:
-					case PADS::RELOAD:
-					case PADS::INTERACT:
-					case PADS::THROW:
-					case PADS::MELEE:
-					case PADS::JUMP:
-					case PADS::INVENTORY:
-					case PADS::RUN:
-					case PADS::WALK:
-					case PADS::SHOT:
-					case PADS::AIM:
-					case PADS::ULT:
-					case PADS::SQUAT:
-					case PADS::PRONE:
-					case PADS::CHECK:
-					case PADS::MAX:
-					default:
-						break;
+				case PADS::MOVE_W:
+				case PADS::MOVE_A:
+				case PADS::MOVE_S:
+				case PADS::MOVE_D:
+					continue;
+					break;
+				case PADS::MOVE_STICK:
+				case PADS::DIR_UP:
+				case PADS::DIR_DOWN:
+				case PADS::DIR_LEFT:
+				case PADS::DIR_RIGHT:
+				case PADS::DIR_STICK:
+				case PADS::LEAN_L:
+				case PADS::LEAN_R:
+				case PADS::RELOAD:
+				case PADS::INTERACT:
+				case PADS::THROW:
+				case PADS::MELEE:
+				case PADS::JUMP:
+				case PADS::INVENTORY:
+				case PADS::RUN:
+				case PADS::WALK:
+				case PADS::SHOT:
+				case PADS::AIM:
+				case PADS::ULT:
+				case PADS::SQUAT:
+				case PADS::PRONE:
+				case PADS::CHECK:
+				case PADS::MAX:
+				default:
+					break;
 				}
 			}
 			this->m_PadsInfo.at(i).m_Key.Execute(GetButtonPress(this->m_PadsInfo.at(i).m_assign));

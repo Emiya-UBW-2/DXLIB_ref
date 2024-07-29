@@ -5,7 +5,7 @@ namespace DXLibRef {
 	//ベース
 	class PostPassBase {
 	protected:
-		bool m_PrevActive{false};
+		bool m_PrevActive{ false };
 	public:
 		PostPassBase(void) noexcept {}
 		virtual ~PostPassBase(void) noexcept {}
@@ -52,7 +52,7 @@ namespace DXLibRef {
 	private:
 
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
-		bool										m_IsActiveGBuffer{true};
+		bool										m_IsActiveGBuffer{ true };
 		GraphHandle BufferScreen;	//描画スクリーン
 
 		GraphHandle ColorScreen;	//そのまま透過なしにしたスクリーン
@@ -89,7 +89,7 @@ namespace DXLibRef {
 			InColorGamma = std::max(1.f, gamma);
 		}
 	private:
-		PostPassEffect(void);
+		PostPassEffect(void) noexcept;
 		PostPassEffect(const PostPassEffect&) = delete;
 		PostPassEffect(PostPassEffect&& o) = delete;
 		PostPassEffect& operator=(const PostPassEffect&) = delete;
@@ -98,9 +98,9 @@ namespace DXLibRef {
 		~PostPassEffect(void) noexcept;
 	public:
 		void Update(void) noexcept;
-		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams);
-		void Draw2D(std::function<void()> doing);
-		void Draw();
+		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams) noexcept;
+		void Draw2D(std::function<void()> doing) noexcept;
+		void Draw() noexcept;
 		void Plus_Draw(std::function<void()> doing) noexcept {
 			GraphFilterBlt(BufferScreen.get(), ColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, 1);
 			BufferScreen.SetDraw_Screen(false);
@@ -109,7 +109,7 @@ namespace DXLibRef {
 			}
 		}
 	private:
-		void DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams);
+		void DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& cams) noexcept;
 		void LoadGBuffer(void) noexcept;
 		void DisposeGBuffer(void) noexcept;
 	};

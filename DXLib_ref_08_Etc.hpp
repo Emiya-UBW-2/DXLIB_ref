@@ -1,6 +1,5 @@
 #pragma once
 #include "DXLib_ref.h"
-#include<thread>
 //リサイズ
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
@@ -24,7 +23,7 @@ namespace DXLibRef {
 			return B;
 		}
 		else {
-			return A + (T)((B - A)*Per);
+			return A + (T)((B - A) * Per);
 		}
 	}
 	//Matrix版の線形補完
@@ -49,11 +48,17 @@ namespace DXLibRef {
 	static auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
 		HWND  hwnd = GetMainWindowHandle();
 
-		if (IsClipboardFormatAvailable(CF_BITMAP) == FALSE) { return false; }	// 指定した形式のデータがクリップボードにあるかを問い合わせる
-		if (OpenClipboard(hwnd) == FALSE) { return false; }						// オープン
+		if (IsClipboardFormatAvailable(CF_BITMAP) == FALSE) {
+			return false;
+		}	// 指定した形式のデータがクリップボードにあるかを問い合わせる
+		if (OpenClipboard(hwnd) == FALSE) {
+			return false;
+		}						// オープン
 		HBITMAP hBitmap = (HBITMAP)GetClipboardData(CF_BITMAP);					// データ取得
 		CloseClipboard();														// クローズ
-		if (hBitmap == NULL) { return false; }
+		if (hBitmap == NULL) {
+			return false;
+		}
 
 		BITMAP bitmap{};
 		GetObject(hBitmap, sizeof(BITMAP), &bitmap);
@@ -67,7 +72,7 @@ namespace DXLibRef {
 		bmpInfo.bmiHeader.biCompression = BI_RGB;
 
 		size_t Siz = static_cast<size_t>(bitmap.bmWidth * bitmap.bmHeight * (LONG)4);
-		BYTE *bmpData = new BYTE[Siz];
+		BYTE* bmpData = new BYTE[Siz];
 		HDC hDC = GetDC(hwnd);
 		GetDIBits(hDC, hBitmap, 0, static_cast<UINT>(bitmap.bmHeight), (void*)bmpData, &bmpInfo, DIB_RGB_COLORS);
 		ReleaseDC(hwnd, hDC);
@@ -84,10 +89,18 @@ namespace DXLibRef {
 	static bool HitRectangleToRectangle(int xp1, int yp1, int xp2, int yp2, int x1, int y1, int x2, int y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
 
 	static bool HitPointToSquare(int xp, int yp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) noexcept {
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.f), VGet(static_cast<float>(xp - x1), static_cast<float>(yp - y1), 0.f)).z) { return false; }
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2), 0.f), VGet(static_cast<float>(xp - x2), static_cast<float>(yp - y2), 0.f)).z) { return false; }
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3), 0.f), VGet(static_cast<float>(xp - x3), static_cast<float>(yp - y3), 0.f)).z) { return false; }
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x1 - x4), static_cast<float>(y1 - y4), 0.f), VGet(static_cast<float>(xp - x4), static_cast<float>(yp - y4), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.f), VGet(static_cast<float>(xp - x1), static_cast<float>(yp - y1), 0.f)).z) {
+			return false;
+		}
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2), 0.f), VGet(static_cast<float>(xp - x2), static_cast<float>(yp - y2), 0.f)).z) {
+			return false;
+		}
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3), 0.f), VGet(static_cast<float>(xp - x3), static_cast<float>(yp - y3), 0.f)).z) {
+			return false;
+		}
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x1 - x4), static_cast<float>(y1 - y4), 0.f), VGet(static_cast<float>(xp - x4), static_cast<float>(yp - y4), 0.f)).z) {
+			return false;
+		}
 		return true;
 	}
 
@@ -103,7 +116,7 @@ namespace DXLibRef {
 	static bool GetHitSphereToTriangle(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Sphere_Triangle(pos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
-	
+
 	//三角とカプセルとの判定
 	static bool GetHitCapsuleToTriangle(const Vector3DX& startpos, const Vector3DX& endpos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
@@ -132,7 +145,7 @@ namespace DXLibRef {
 	//ランダム
 	static float GetRandf(float m_arg) noexcept { return -m_arg + static_cast<float>(GetRand(static_cast<int>(m_arg * 2.f * 10000.f))) / 10000.f; }
 	//線分同士の交差判定
-	static bool GetSegmenttoSegment(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &SegmentBPos1, const Vector3DX &SegmentBPos2, SEGMENT_SEGMENT_RESULT *Result) noexcept {
+	static bool GetSegmenttoSegment(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
 		VECTOR PosAt = SegmentBPos1.get();
@@ -140,10 +153,10 @@ namespace DXLibRef {
 
 		Segment_Segment_Analyse(&Pos1t, &Pos2t, &PosAt, &PosBt, Result);
 		float len = 0.001f;
-		return (Result->SegA_SegB_MinDist_Square <= (len*len));
+		return (Result->SegA_SegB_MinDist_Square <= (len * len));
 	}
 
-	static bool GetSegmenttoTriangle(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &SegmentBPos1, const Vector3DX &SegmentBPos2, const Vector3DX &SegmentBPos3, SEGMENT_TRIANGLE_RESULT *Result) noexcept {
+	static bool GetSegmenttoTriangle(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, const Vector3DX& SegmentBPos3, SEGMENT_TRIANGLE_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
 		VECTOR PosAt = SegmentBPos1.get();
@@ -152,17 +165,17 @@ namespace DXLibRef {
 
 		Segment_Triangle_Analyse(&Pos1t, &Pos2t, &PosAt, &PosBt, &PosCt, Result);
 		float len = 0.001f;
-		return (Result->Seg_Tri_MinDist_Square <= (len*len));
+		return (Result->Seg_Tri_MinDist_Square <= (len * len));
 	}
 	//線分と点の最接近点情報を解析する
-	static bool GetSegmenttoPoint(const Vector3DX &SegmentAPos1, const Vector3DX &SegmentAPos2, const Vector3DX &PointPos, SEGMENT_POINT_RESULT *Result) noexcept {
+	static bool GetSegmenttoPoint(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& PointPos, SEGMENT_POINT_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
 		VECTOR PosAt = PointPos.get();
 
 		Segment_Point_Analyse(&Pos1t, &Pos2t, &PosAt, Result);
 		float len = 0.001f;
-		return (Result->Seg_Point_MinDist_Square <= (len*len));
+		return (Result->Seg_Point_MinDist_Square <= (len * len));
 	}
 	//--------------------------------------------------------------------------------------------------
 	// IK
@@ -255,7 +268,7 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	// カメラから画面上の座標を取得
 	//--------------------------------------------------------------------------------------------------
-	static Vector3DX GetScreenPos(const Vector3DX&campos, const Vector3DX&camvec, const Vector3DX&camup, float fov, float near_t, float far_t, const Vector3DX&worldpos) noexcept;
+	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept;
 	//--------------------------------------------------------------------------------------------------
 	// ウィンドウアクティブチェック付きキー操作
 	//--------------------------------------------------------------------------------------------------
@@ -349,8 +362,7 @@ namespace DXLibRef {
 		Vertex[3].u = 0.0f;
 		Vertex[3].v = 0.0f;
 
-		switch (UorL)
-		{
+		switch (UorL) {
 		case 3://横(右)
 			// 左上の頂点の情報をセット
 			Vertex[0].dif = color1;
@@ -430,8 +442,12 @@ namespace DXLibRef {
 		float XCenter, float YCenter, float Angle,
 		int GrHandle, bool TransFlag, bool TilingFlag) noexcept {
 		//最低限のサイズを指定
-		if (x2 < x1 + xminp + xmaxp) { x2 = x1 + xminp + xmaxp; }
-		if (y2 < y1 + yminp + ymaxp) { y2 = y1 + yminp + ymaxp; }
+		if (x2 < x1 + xminp + xmaxp) {
+			x2 = x1 + xminp + xmaxp;
+		}
+		if (y2 < y1 + yminp + ymaxp) {
+			y2 = y1 + yminp + ymaxp;
+		}
 		//用意する頂点情報
 		std::vector<VERTEX2D> Vertex;
 		std::vector<unsigned short> Index;
@@ -446,12 +462,12 @@ namespace DXLibRef {
 			Vertex.resize(Vertex.size() + 1);
 			Vertex.back().pos = VGet(
 				static_cast<float>(x1) + xs * xper - CenterX,
-					static_cast<float>(y1) + ys * yper - CenterY,
+				static_cast<float>(y1) + ys * yper - CenterY,
 				0.f);
 
 			Vertex.back().pos = VGet(
-				CenterX + Vertex.back().pos.x*std::cos(Angle) - Vertex.back().pos.y*std::sin(Angle),
-				CenterY + Vertex.back().pos.x*std::sin(Angle) + Vertex.back().pos.y*std::cos(Angle),
+				CenterX + Vertex.back().pos.x * std::cos(Angle) - Vertex.back().pos.y * std::sin(Angle),
+				CenterY + Vertex.back().pos.x * std::sin(Angle) + Vertex.back().pos.y * std::cos(Angle),
 				0.f);
 
 			Vertex.back().rhw = 1.0f;
@@ -459,7 +475,7 @@ namespace DXLibRef {
 			Vertex.back().u = static_cast<float>(xc) / 3.f;
 			Vertex.back().v = static_cast<float>(yc) / 3.f;
 			return (unsigned short)(Vertex.size() - 1);
-		};
+			};
 		auto SetUpBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
 			Index.emplace_back(SetUpPoint(xmin, ymin, xc, yc));// 左上の頂点の情報をセット
 			auto RU = SetUpPoint(xmax, ymin, xc + 1, yc);
@@ -469,7 +485,7 @@ namespace DXLibRef {
 			Index.emplace_back(SetUpPoint(xmax, ymax, xc + 1, yc + 1));// 右下の頂点の情報をセット
 			Index.emplace_back(LD);// 左下の頂点の情報をセット
 			Index.emplace_back(RU);// 右上の頂点の情報をセット
-		};
+			};
 
 		float xminpt = static_cast<float>(xminp) / xs;
 		float xmaxpt = static_cast<float>(xmaxp) / xs;
@@ -486,20 +502,24 @@ namespace DXLibRef {
 		//タイリング
 		if (TilingFlag) {
 			xtile = static_cast<int>(xmidt / ((xminpt + xmaxpt) / 2.f)) + 1;
-			if (xtile <= 0) { xtile = 1; }
+			if (xtile <= 0) {
+				xtile = 1;
+			}
 			ytile = static_cast<int>(ymidt / ((yminpt + ymaxpt) / 2.f)) + 1;
-			if (ytile <= 0) { ytile = 1; }
+			if (ytile <= 0) {
+				ytile = 1;
+			}
 		}
 
 		Vertex.reserve(static_cast<size_t>(3 * 2 * ((xtile + 2) * (ytile + 2))));
 		float xmin = 0.f;
 		float xmax = xminpt;
 		int xc = 0;
-		for (int x = 0;x < xtile + 2;++x) {
+		for (int x = 0; x < xtile + 2; ++x) {
 			float ymin = 0.f;
 			float ymax = yminpt;
 			int yc = 0;
-			for (int y = 0;y < ytile + 2;++y) {
+			for (int y = 0; y < ytile + 2; ++y) {
 				SetUpBox(xmin, ymin, xmax, ymax, xc, yc);
 				//次
 				ymin = ymax;
@@ -535,24 +555,24 @@ namespace DXLibRef {
 	}
 
 	//カラー指定
-	static const unsigned int Red{GetColor(255, 0, 0)};
+	static const unsigned int Red{ GetColor(255, 0, 0) };
 
-	static const unsigned int Green{GetColor(0, 255, 0)};//GetColor(43, 255, 91)
-	static const unsigned int DarkGreen{GetColor(0, 64, 0)};//GetColor(21, 128, 45)
+	static const unsigned int Green{ GetColor(0, 255, 0) };//GetColor(43, 255, 91)
+	static const unsigned int DarkGreen{ GetColor(0, 64, 0) };//GetColor(21, 128, 45)
 
-	static const unsigned int Blue{GetColor(0, 0, 255)};
+	static const unsigned int Blue{ GetColor(0, 0, 255) };
 
-	static const unsigned int Yellow{GetColor(255, 255, 0)};
+	static const unsigned int Yellow{ GetColor(255, 255, 0) };
 
-	static const unsigned int WhiteSel{GetColor(216, 255, 216)};
+	static const unsigned int WhiteSel{ GetColor(216, 255, 216) };
 
-	static const unsigned int White{GetColor(255, 255, 255)};
-	static const unsigned int Gray15{GetColor(216, 216, 216)};
-	static const unsigned int Gray25{GetColor(192, 192, 192)};
-	static const unsigned int Gray50{GetColor(128, 128, 128)};
-	static const unsigned int Gray65{GetColor(96, 96, 96)};
-	static const unsigned int Gray75{GetColor(64, 64, 64)};
-	static const unsigned int Black{GetColor(0, 0, 0)};
+	static const unsigned int White{ GetColor(255, 255, 255) };
+	static const unsigned int Gray15{ GetColor(216, 216, 216) };
+	static const unsigned int Gray25{ GetColor(192, 192, 192) };
+	static const unsigned int Gray50{ GetColor(128, 128, 128) };
+	static const unsigned int Gray65{ GetColor(96, 96, 96) };
+	static const unsigned int Gray75{ GetColor(64, 64, 64) };
+	static const unsigned int Black{ GetColor(0, 0, 0) };
 
 	namespace WindowSystem {
 		//箱
@@ -616,24 +636,32 @@ namespace DXLibRef {
 				int Yp_s = std::max(yp1, yp1 + Yp_t);
 				int Yp_e = std::min(yp2, Yp_s + length);
 
-				if (IsActive) {
-					if (IntoMouse(xp1, yp1, xp2, yp2)) {
-						if (Pad->GetWheelAdd() != 0.f) {
+				if (IsActive)
+		{
+					if (IntoMouse(xp1, yp1, xp2, yp2))
+		{
+						if (Pad->GetWheelAdd() != 0.f)
+		{
 							m_NowScrollYPer = std::clamp(m_NowScrollYPer + static_cast<float>(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
-					if (IntoMouse(xp2 - DrawParts->GetUIY(24), yp1, xp2, yp2)) {
-						if (Pad->GetINTERACTKey().trigger()) {
+					if (IntoMouse(xp2 - DrawParts->GetUIY(24), yp1, xp2, yp2))
+		{
+						if (Pad->GetINTERACTKey().trigger())
+		{
 							m_IsChangeScrollY = true;
 						}
 
-						if (!m_IsChangeScrollY) {
+						if (!m_IsChangeScrollY)
+		{
 							HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
 							SetCursor(hCursor);
 						}
 					}
-					if (m_IsChangeScrollY) {
-						if (Pad->GetINTERACTKey().press()) {
+					if (m_IsChangeScrollY)
+		{
+						if (Pad->GetINTERACTKey().press())
+		{
 							color = White;
 							m_NowScrollYPer = std::clamp(static_cast<float>(Pad->GetMouseY() - this->m_BaseScrollY) / Total, 0.f, 1.f);
 
@@ -646,11 +674,13 @@ namespace DXLibRef {
 					}
 					else {
 						m_BaseScrollY = Pad->GetMouseY() - Yp_t;
-						if (Pad->GetMouseY() < Yp_s) {
+						if (Pad->GetMouseY() < Yp_s)
+		{
 							m_BaseScrollY += Yp_s - Pad->GetMouseY();
 						}
 
-						if (Pad->GetMouseY() > Yp_e) {
+						if (Pad->GetMouseY() > Yp_e)
+		{
 							m_BaseScrollY += Yp_e - Pad->GetMouseY();
 						}
 					}
@@ -675,7 +705,7 @@ namespace DXLibRef {
 		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
 	public:
 		//左辺の情報もとる
-		static std::string		getcmd(int p1, int *p2) noexcept {
+		static std::string		getcmd(int p1, int* p2) noexcept {
 			char mstr[charLength]; /*tank*/
 			FileRead_gets(mstr, charLength, p1);
 			*p2 = std::stoi(getright(mstr));
@@ -740,9 +770,9 @@ namespace DXLibRef {
 				m_LocalPos = obj.GetFrameLocalWorldMatrix(i);//
 			}
 		}
-		const auto&		GetFrameID(void) const noexcept { return m_FrameID; }
-		const auto&		GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
-		const auto&		GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
+		const auto& GetFrameID(void) const noexcept { return m_FrameID; }
+		const auto& GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
+		const auto& GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
 	};
 
 	//位置情報
@@ -773,7 +803,7 @@ namespace DXLibRef {
 		//moves& operator=(moves&& o) = delete;
 		~moves(void) noexcept {}
 
-		void			operator=(const moves&tgt) noexcept {
+		void			operator=(const moves& tgt) noexcept {
 			this->pos = tgt.pos;
 			this->posbuf = tgt.posbuf;
 			this->repos = tgt.repos;
@@ -782,7 +812,7 @@ namespace DXLibRef {
 			this->matbuf = tgt.matbuf;
 		}
 	public:
-		auto LerpMove(const moves&o, float Per) const noexcept {
+		auto LerpMove(const moves& o, float Per) const noexcept {
 			moves tmp;
 			tmp.pos = Lerp(this->pos, o.pos, Per);
 			tmp.posbuf = Lerp(this->posbuf, o.posbuf, Per);
@@ -857,7 +887,7 @@ namespace DXLibRef {
 			this->rot = tgt.rot;
 			this->rotbuf = tgt.rotbuf;
 		}
-		moves			GetMoves() const noexcept {
+		moves			GetMoves(void) const noexcept {
 			moves Ret;
 			Ret.SetAll(pos, posbuf, repos, vec, GetMat(), GetMatBuf());
 			return Ret;
@@ -898,11 +928,11 @@ namespace DXLibRef {
 	};
 	//キー押し判定
 	class switchs {
-		bool		m_on{false};//オンオフ判定
-		bool		m_press{false};//オンオフ判定
-		bool		m_repeat{false};//オンオフ判定
-		int8_t		m_presscount{0};//プッシュ判定
-		float		m_repeatcount{30.f};//プッシュ判定
+		bool		m_on{ false };//オンオフ判定
+		bool		m_press{ false };//オンオフ判定
+		bool		m_repeat{ false };//オンオフ判定
+		int8_t		m_presscount{ 0 };//プッシュ判定
+		float		m_repeatcount{ 30.f };//プッシュ判定
 	public:
 		switchs(void) noexcept {
 			Set(false);
@@ -960,7 +990,7 @@ namespace DXLibRef {
 			VERTEX3DSHADER Screen_vertex[6] = {};
 		public:
 			// 頂点データの取得
-			const auto*		GetScreenVertex(void) noexcept { return Screen_vertex; }
+			const auto* GetScreenVertex(void) noexcept { return Screen_vertex; }
 			// 頂点データの準備
 			void			SetScreenVertex(int dispx, int dispy) noexcept {
 				int xp1 = 0;
@@ -1015,10 +1045,14 @@ namespace DXLibRef {
 			m_GeometryShaderhandle = INVALID_ID;
 			m_PixelShaderhandle = INVALID_ID;
 			//シェーダーに渡す追加パラメーターを配するハンドル
-			for (auto& h : m_VertexShadercbhandle) { h = INVALID_ID; }
+			for (auto& h : m_VertexShadercbhandle) {
+				h = INVALID_ID;
+			}
 			m_GeometryShaderMatcbhandle = INVALID_ID;
 			m_PixelShaderSendDispSizeHandle = INVALID_ID;
-			for (auto& h : m_PixelShadercbhandle) { h = INVALID_ID; }
+			for (auto& h : m_PixelShadercbhandle) {
+				h = INVALID_ID;
+			}
 		}
 		~ShaderUseClass(void) noexcept {
 			Dispose();
@@ -1026,7 +1060,9 @@ namespace DXLibRef {
 	public:
 		//初期化
 		void			Init(const char* VertexShader, const char* PixelShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			//頂点シェーダー周り
 			for (auto& h : m_VertexShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
@@ -1044,13 +1080,17 @@ namespace DXLibRef {
 			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);			// ピクセルシェーダーバイナリコードの読み込み
 		}
 		void			AddGeometryShader(const char* GeometryShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			this->m_GeometryShaderMatcbhandle = CreateShaderConstantBuffer(sizeof(DX_D3D11_GS_CONST_BUFFER_BASE));
 			this->m_GeometryShaderhandle = LoadGeometryShader(GeometryShader);
 		}
 		//後始末
 		void			Dispose(void) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			//頂点シェーダー周り
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				DeleteShaderConstantBuffer(h);
@@ -1072,7 +1112,9 @@ namespace DXLibRef {
 	public:
 		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -1083,8 +1125,10 @@ namespace DXLibRef {
 		}
 		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			FLOAT4* f4 = (FLOAT4 *)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle[0]);		// 頂点シェーダー用の定数バッファのアドレスを取得
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
+			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle[0]);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
@@ -1094,8 +1138,12 @@ namespace DXLibRef {
 		}
 		//シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			if (this->m_GeometryShaderhandle == INVALID_ID) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
+			if (this->m_GeometryShaderhandle == INVALID_ID) {
+				return;
+			}
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
 
 			// ビュー変換用行列をセットする
@@ -1134,7 +1182,9 @@ namespace DXLibRef {
 		}
 		//ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -1145,7 +1195,9 @@ namespace DXLibRef {
 		}
 		//ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
 		void			SetPixelDispSize(int dispx, int dispy) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
 			dispsize->u = static_cast<float>(dispx);
 			dispsize->v = static_cast<float>(dispy);
@@ -1154,7 +1206,9 @@ namespace DXLibRef {
 		}
 		//ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)));				// ピクセルシェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
@@ -1181,7 +1235,9 @@ namespace DXLibRef {
 		}
 		//2D画像に適用する場合の関数
 		void			Draw(ScreenVertex& Screenvertex) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				return;
+			}
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
 	};
@@ -1235,7 +1291,7 @@ namespace DXLibRef {
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
-						SetCameraNearFar(0.5f*12.5f, 1000.0f*12.5f);									// Nearクリップ面とFarクリップ面の距離を設定
+						SetCameraNearFar(0.5f * 12.5f, 1000.0f * 12.5f);									// Nearクリップ面とFarクリップ面の距離を設定
 						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[static_cast<size_t>(i)]).get(), up[static_cast<size_t>(i)]);	// カメラの位置と注視点、カメラの上方向を設定
 						Doing();
 					}
@@ -1309,7 +1365,9 @@ namespace DXLibRef {
 			m_data.clear();
 
 			std::ifstream inputputfile("Save/new.svf");
-			if (!inputputfile) { return false; }
+			if (!inputputfile) {
+				return false;
+			}
 			std::string line;
 			while (std::getline(inputputfile, line)) {
 				auto Start = line.find("=");
@@ -1334,12 +1392,12 @@ namespace DXLibRef {
 		friend class SingletonBase<SideLog>;
 	private:
 		class SideLogData {
-			unsigned int m_Color{0};
+			unsigned int m_Color{ 0 };
 			char m_Message[64]{};
-			float m_TimeMax{-1.f};
-			float m_Time{-1.f};
-			float m_Flip{0.f};
-			float m_Flip_Y{0.f};
+			float m_TimeMax{ -1.f };
+			float m_Time{ -1.f };
+			float m_Flip{ 0.f };
+			float m_Flip_Y{ 0.f };
 		public:
 			void AddFlip(float value) noexcept { m_Flip += value; }
 			template <typename... Args>
@@ -1354,13 +1412,13 @@ namespace DXLibRef {
 			void UpdateActive(void) noexcept;
 		public:
 			float GetFlip(void) const noexcept { return m_Flip_Y; }
-			float ActivePer(void) const noexcept { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time)*5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
+			float ActivePer(void) const noexcept { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time) * 5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
 			const char* GetMsg(void) const noexcept { return m_Message; }
 			unsigned int GetMsgColor(void) const noexcept { return m_Color; }
 		};
 	private:
 		std::array<SideLogData, 16> data;
-		size_t		m_LastSel{0};
+		size_t		m_LastSel{ 0 };
 
 	private:
 		SideLog(void) noexcept {}
@@ -1433,7 +1491,7 @@ namespace DXLibRef {
 			void			Start(void) noexcept;
 			void			End(void) noexcept;
 			void			Update(void) noexcept;
-			void			Draw(int xcenter,int ycenter) noexcept;
+			void			Draw(int xcenter, int ycenter) noexcept;
 		public:
 			auto IsEnd(void) const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
@@ -1441,7 +1499,7 @@ namespace DXLibRef {
 		std::array<PopUpDrawClass, 24> que;
 		size_t NowSel{ 0 };
 		size_t LastSel{ 0 };
-		bool PrevPause{false};
+		bool PrevPause{ false };
 	private:
 		PopUp(void) noexcept {}
 		PopUp(const PopUp&) = delete;
@@ -1454,14 +1512,16 @@ namespace DXLibRef {
 		auto IsActivePop(void) const noexcept { return (NowSel != LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
-					std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
-					std::function<void()> ExitDoing,
-					std::function<void()> GuideDoing,
-					bool IsInsert = false) noexcept;
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
+			std::function<void()> ExitDoing,
+			std::function<void()> GuideDoing,
+			bool IsInsert = false) noexcept;
 		void EndAll(void) noexcept;
 		void Update(void) noexcept;
 		void Draw(int xcenter, int ycenter) noexcept {
-			if (!IsActivePop()) { return; }
+			if (!IsActivePop()) {
+				return;
+			}
 			que.at(static_cast<size_t>(NowSel)).Draw(xcenter, ycenter);
 		}
 	};
@@ -1472,18 +1532,18 @@ namespace DXLibRef {
 	class CheckPCSpec {
 		struct MatchScore {
 			std::string		m_Name;
-			int				m_Score{0};
-			int				m_HitCount{0};
+			int				m_Score{ 0 };
+			int				m_HitCount{ 0 };
 		};
 	private:
 		bool IsEnd = false;
 		std::vector<MatchScore> CPUResult;
 		std::vector<MatchScore> GPUResult;
 
-		TCHAR CPUString[256]{""};
-		double FreeMemorySize{0};
-		double TotalMemorySize{0};
-		TCHAR GPUString[256]{""};
+		TCHAR CPUString[256]{ "" };
+		double FreeMemorySize{ 0 };
+		double TotalMemorySize{ 0 };
+		TCHAR GPUString[256]{ "" };
 
 		std::array<std::string, 12> CPUStr;
 		std::array<std::string, 12> GPUStr;
@@ -1494,7 +1554,7 @@ namespace DXLibRef {
 			for (auto& s : *String) {
 				s = "";
 			}
-			for (int i = 0;i < static_cast<int>(strlenDx(Target));++i) {
+			for (int i = 0; i < static_cast<int>(strlenDx(Target)); ++i) {
 				if (!
 					(
 						Target[static_cast<size_t>(i)] == ' ' ||
@@ -1514,7 +1574,7 @@ namespace DXLibRef {
 	public:
 		void FindCPU(void) noexcept {
 			IsEnd = false;
-			std::vector<MatchScore> Tmp;Tmp.reserve(64);
+			std::vector<MatchScore> Tmp; Tmp.reserve(64);
 			{
 				CPUResult.clear();
 				std::ifstream inputputfile("data/PassMarkCPU.txt");
@@ -1525,15 +1585,21 @@ namespace DXLibRef {
 					int HitCount = 0;
 					int border = 0;
 					while (std::getline(inputputfile, ALL)) {
-						if (ALL == "") { continue; }
+						if (ALL == "") {
+							continue;
+						}
 						auto LEFT = getparams::getleft(ALL);
 						auto RIGHT = getparams::getright(ALL);
 						GetOnlyNumber(LEFT.c_str(), &TmpString);
 						HitCount = 0;
 						for (auto& s : CPUStr) {
-							if (s == "") { continue; }
+							if (s == "") {
+								continue;
+							}
 							for (auto& t : TmpString) {
-								if (t == "") { continue; }
+								if (t == "") {
+									continue;
+								}
 								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
 									++HitCount;
 								}
@@ -1565,15 +1631,21 @@ namespace DXLibRef {
 					int HitCount = 0;
 					int border = 0;
 					while (std::getline(inputputfile, ALL)) {
-						if (ALL == "") { continue; }
+						if (ALL == "") {
+							continue;
+						}
 						auto LEFT = getparams::getleft(ALL);
 						auto RIGHT = getparams::getright(ALL);
 						GetOnlyNumber(LEFT.c_str(), &TmpString);
 						HitCount = 0;
 						for (auto& s : GPUStr) {
-							if (s == "") { continue; }
+							if (s == "") {
+								continue;
+							}
 							for (auto& t : TmpString) {
-								if (t == "") { continue; }
+								if (t == "") {
+									continue;
+								}
 								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
 									++HitCount;
 								}
@@ -1749,7 +1821,7 @@ namespace DXLibRef {
 			int				m_DrawYCenter{ 0 };
 		public://外からいじられるもの
 			FrameInfo					m_FrameInfo{};
-			std::array<std::string,3>	m_TextEX0{};
+			std::array<std::string, 3>	m_TextEX0{};
 		public:
 			const auto& GetUniqueID(void) const noexcept { return m_UniqueID; }
 			const auto& GetName(void) const noexcept { return m_Name; }
@@ -1800,8 +1872,7 @@ namespace DXLibRef {
 		UISystem(UISystem&& o) = delete;
 		UISystem& operator=(const UISystem&) = delete;
 		UISystem& operator=(UISystem&& o) = delete;
-		~UISystem(void) noexcept {
-		}
+		~UISystem(void) noexcept {}
 	public:
 		int AddUI(const char* path) noexcept;
 		void DelUI(int layer) noexcept;
@@ -1815,14 +1886,14 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<CameraShake>;
 	private:
-		bool						m_SendCamShake{false};
-		float						m_SendCamShakeTime{1.f};
-		float						m_SendCamShakePower{1.f};
-		float						m_CamShake{0.f};
+		bool						m_SendCamShake{ false };
+		float						m_SendCamShakeTime{ 1.f };
+		float						m_SendCamShakePower{ 1.f };
+		float						m_CamShake{ 0.f };
 		Vector3DX					m_CamShake1;
 		Vector3DX					m_CamShake2;
 	public:
-		const auto&		GetCamShake(void) const noexcept { return m_CamShake2; }
+		const auto& GetCamShake(void) const noexcept { return m_CamShake2; }
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -1851,11 +1922,11 @@ namespace DXLibRef {
 	/*UDP通信																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class UDPNetWorkDX {
-		int			m_Handle{-1};				// ネットワークハンドル
-		IPDATA		m_SendIP{127,0,0,1};		// 送信用ＩＰアドレスデータ
-		int			m_SendPort{-1};				// 通信用ポート
-		IPDATA		m_RecvIp{127,0,0,1};			// 受信用ＩＰアドレスデータ
-		int			m_RecvPort{0};				// 受信用ポート
+		int			m_Handle{ -1 };				// ネットワークハンドル
+		IPDATA		m_SendIP{ 127,0,0,1 };		// 送信用ＩＰアドレスデータ
+		int			m_SendPort{ -1 };				// 通信用ポート
+		IPDATA		m_RecvIp{ 127,0,0,1 };			// 受信用ＩＰアドレスデータ
+		int			m_RecvPort{ 0 };				// 受信用ポート
 	public:
 		auto			IsActive(void) const noexcept { return (m_Handle != -1); }
 	public:
@@ -1892,13 +1963,13 @@ namespace DXLibRef {
 			*RecvReturn = -1;
 			if (IsActive()) {
 				switch (CheckNetWorkRecvUDP(m_Handle)) {
-					case TRUE:
-						*RecvReturn = NetWorkRecvUDP(m_Handle, &m_RecvIp, &m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// 受信
-						return true;
-					case FALSE://待機
-						break;
-					default://error
-						break;
+				case TRUE:
+					*RecvReturn = NetWorkRecvUDP(m_Handle, &m_RecvIp, &m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// 受信
+					return true;
+				case FALSE://待機
+					break;
+				default://error
+					break;
 				}
 			}
 			return false;

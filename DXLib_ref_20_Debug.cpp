@@ -9,18 +9,22 @@ namespace DXLibRef {
 
 
 	DebugClass::DebugClass(void) noexcept {
-		m_Point.resize(PointFrame +1);
+		m_Point.resize(PointFrame + 1);
 		m_Switch.Set(true);
 	}
 
 	void DebugClass::SetStartPoint(void) noexcept {
-		if (!m_Switch.on()) { return; }
+		if (!m_Switch.on()) {
+			return;
+		}
 		m_StartTime = GetNowHiPerformanceCount();
 		m_PointSel = 0;
 		SetPoint("-----Start-----");
 	}
 	void DebugClass::SetPoint(const char* DebugMes) noexcept {
-		if (!m_Switch.on()) { return; }
+		if (!m_Switch.on()) {
+			return;
+		}
 		if (m_PointSel < PointMax) {
 			m_Point[0][m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
 			m_Str[m_PointSel] = DebugMes;
@@ -30,7 +34,9 @@ namespace DXLibRef {
 	}
 	void DebugClass::SetEndPoint(void) noexcept {
 		m_Switch.Execute(CheckHitKeyWithCheck(KEY_INPUT_F1) != 0);
-		if (!m_Switch.on()) { return; }
+		if (!m_Switch.on()) {
+			return;
+		}
 		auto PMax = PointMax + 1;
 		//ç≈å„ÇÃââéZ
 		SetPoint("-----End-----");
@@ -63,7 +69,9 @@ namespace DXLibRef {
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
-		if (!m_Switch.on()) { return; }
+		if (!m_Switch.on()) {
+			return;
+		}
 		const unsigned int Colors[PointMax + 1] = {
 				Red,
 				Yellow,
@@ -111,7 +119,8 @@ namespace DXLibRef {
 							TRUE);
 					}
 					/*
-					for (int index = 0; index < PMax; ++index) {
+					for (int index = 0; index < PMax; ++index)
+		{
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
 						DrawLine_2D(xnow, ynow, xnext, ynext, Gray75);

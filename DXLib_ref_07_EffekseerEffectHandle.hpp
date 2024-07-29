@@ -30,7 +30,8 @@ namespace DXLibRef {
 			return *this;
 		}
 		~Effekseer2DPlayingHandle(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (INVALID_ID != this->handle_)
+		{
 				this->Stop();
 			}
 		}
@@ -83,7 +84,8 @@ namespace DXLibRef {
 		}
 		// * @brief ハンドルを破棄する
 		void Dispose(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (INVALID_ID != this->handle_)
+		{
 				this->Stop();
 				this->handle_ = INVALID_ID;
 			}
@@ -290,7 +292,7 @@ namespace DXLibRef {
 	public:
 		std::vector<EffekseerEffectHandle> effsorce;	/*エフェクトリソース*/
 	private:
-		EffectResource() {
+		EffectResource() noexcept {
 			std::vector<WIN32_FIND_DATA> data_t;
 			GetFileNamesInDirectory("data/effect/*", &data_t);
 			for (const auto& d : data_t) {
@@ -308,7 +310,7 @@ namespace DXLibRef {
 		EffectResource& operator=(const EffectResource&) = delete;
 		EffectResource& operator=(EffectResource&& o) = delete;
 
-		~EffectResource() {
+		~EffectResource() noexcept {
 			for (auto& e : effsorce) {
 				e.Dispose();
 			}
@@ -336,7 +338,7 @@ namespace DXLibRef {
 			~EffectS(void) noexcept {}
 		public:
 			auto			GetIsPlaying(void) const noexcept { return this->m_handle.IsPlaying(); }
-			const auto&		GetIsFirst(void) const noexcept { return this->m_IsFirst; }
+			const auto& GetIsFirst(void) const noexcept { return this->m_IsFirst; }
 		private:
 			void			Ef_Set(const EffekseerEffectHandle& handle_, const Vector3DX& pPos, const Vector3DX& pNormal, float pScale = 1.f) noexcept {
 				this->m_IsFirst = true;
@@ -428,7 +430,9 @@ namespace DXLibRef {
 			int cnt = 0;
 			for (int i = 0; i < EffectNum; ++i) {
 				for (auto& t : this->m_effect.at(static_cast<size_t>(i)).second) {
-					if (t->GetIsPlaying()) { ++cnt; }
+					if (t->GetIsPlaying()) {
+						++cnt;
+					}
 				}
 			}
 			return cnt;

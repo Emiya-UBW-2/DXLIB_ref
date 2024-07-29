@@ -19,10 +19,10 @@ namespace DXLibRef {
 	class SoundHandle {
 	private:
 		int handle_;
-		constexpr SoundHandle(int h) : handle_(h) {}
+		constexpr SoundHandle(int h) noexcept : handle_(h) {}
 		static constexpr int invalid_handle = INVALID_ID;
 	public:
-		constexpr SoundHandle() : handle_(invalid_handle) {}
+		constexpr SoundHandle() noexcept : handle_(invalid_handle) {}
 		SoundHandle(const SoundHandle&) = delete;
 		SoundHandle(SoundHandle&& o) noexcept : handle_(o.handle_) {
 			o.handle_ = invalid_handle;
@@ -46,7 +46,7 @@ namespace DXLibRef {
 		}
 		int get(void) const noexcept { return handle_; }
 		SoundHandle Duplicate(void) const noexcept { return DxLib::DuplicateSoundMem(this->handle_); }
-		bool check() const noexcept { return (DxLib::CheckSoundMem(handle_) == TRUE); }
+		bool check(void) const noexcept { return (DxLib::CheckSoundMem(handle_) == TRUE); }
 		bool play(int type, int flag = 1) const noexcept { return (PlaySoundMem(handle_, type, flag) == 0); }
 		bool stop(void) const noexcept {
 			if (invalid_handle != this->handle_) {
@@ -56,8 +56,8 @@ namespace DXLibRef {
 				return false;
 			}
 		}
-		LONGLONG GetTotalTIme() const noexcept { return DxLib::GetSoundTotalTime(handle_); }
-		
+		LONGLONG GetTotalTIme(void) const noexcept { return DxLib::GetSoundTotalTime(handle_); }
+
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
 		auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
 		bool SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
@@ -67,8 +67,8 @@ namespace DXLibRef {
 			Radius(radius);
 			play(type_t, TRUE);
 		}
-		static SoundHandle Load(std::basic_string_view<TCHAR> FileName, int BufferNum = 3) {
-			return {DxLib::LoadSoundMemWithStrLen(FileName.data(), FileName.length(), BufferNum)};
+		static SoundHandle Load(std::basic_string_view<TCHAR> FileName, int BufferNum = 3) noexcept {
+			return { DxLib::LoadSoundMemWithStrLen(FileName.data(), FileName.length(), BufferNum) };
 		}
 	};
 
@@ -96,12 +96,16 @@ namespace DXLibRef {
 			int Set_vol = 255;
 			float vol_rate = 1.f;
 		public:
-			const auto&		GetHandles(void)const noexcept { return shandle; }
-			const auto&		Get_ID(void)const noexcept { return ID; }
-			void			Set(int ID_t, size_t buffersize, std::string path_t, bool is3Dsound = true) {
-				if (path_t == "") { return; }
+			const auto& GetHandles(void)const noexcept { return shandle; }
+			const auto& Get_ID(void)const noexcept { return ID; }
+			void			Set(int ID_t, size_t buffersize, std::string path_t, bool is3Dsound = true) noexcept {
+				if (path_t == "") {
+					return;
+				}
 				for (auto& h : this->shandle) {
-					if (h->path == path_t) { return; }
+					if (h->path == path_t) {
+						return;
+					}
 				}
 				this->ID = ID_t;
 				this->shandle.emplace_back(std::make_shared<handles>());
@@ -124,19 +128,19 @@ namespace DXLibRef {
 				}
 
 			}
-			void			Delete() {
+			void			Delete() noexcept {
 				for (auto& h : shandle) {
 					h->handle.clear();
 					h.reset();
 				}
 				shandle.clear();
 			}
-			void			StopAll(int Sel_t) {
+			void			StopAll(int Sel_t) noexcept {
 				for (auto& h : shandle.at(static_cast<size_t>(Sel_t))->handle) {
 					h.stop();
 				}
 			}
-			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = INVALID_ID, int panpal = -256) {
+			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = INVALID_ID, int panpal = -256) noexcept {
 				auto ans = now;
 				shandle.at(static_cast<size_t>(Sel_t))->handle[now].play(type_t, Flag_t);
 				if (vol_t != INVALID_ID) {
@@ -168,16 +172,16 @@ namespace DXLibRef {
 				}
 				return INVALID_ID;
 			}
-			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) {
+			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) noexcept {
 				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].vol(static_cast<int>(vol_rate * static_cast<float>(std::clamp(vol, 0, 255))));
 			}
-			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) {
+			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) noexcept {
 				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].SetPosition(pos_t);
 			}
-			LONGLONG			GetTotalTIme(int Sel_t, int Sel2_t) {
+			LONGLONG			GetTotalTIme(int Sel_t, int Sel2_t) noexcept {
 				return shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].GetTotalTIme();
 			}
-			void			SetVol_Local(int vol) {
+			void			SetVol_Local(int vol) noexcept {
 				Set_vol = std::clamp(vol, 0, 255);
 				for (auto& sh : this->shandle) {
 					for (auto& h : sh->handle) {
@@ -185,7 +189,7 @@ namespace DXLibRef {
 					}
 				}
 			}
-			void			SetVol(float vol) {
+			void			SetVol(float vol) noexcept {
 				vol_rate = std::clamp(vol, 0.f, 1.f);
 				for (auto& sh : this->shandle) {
 					for (auto& h : sh->handle) {
@@ -205,13 +209,13 @@ namespace DXLibRef {
 
 		~SoundPool(void) noexcept {}
 	public:
-		void			SetVol(float vol) {
+		void			SetVol(float vol) noexcept {
 			for (auto& h : this->havehandle) {
 				h.SetVol(vol);
 			}
 		}
 	public:
-		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) {
+		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) noexcept {
 			for (auto& h : this->havehandle) {
 				if (h.Get_ID() == ID_t) {
 					h.Set(ID_t, buffersize, path_t, is3Dsound);
@@ -243,7 +247,7 @@ namespace DXLibRef {
 		friend class SingletonBase<BGMPool>;
 	private:
 		class BGMhave {
-			int ID{0};
+			int ID{ 0 };
 			std::string path;
 			SoundHandle handle;
 			int Set_vol = 255;
@@ -256,26 +260,30 @@ namespace DXLibRef {
 			BGMhave& operator=(BGMhave&& o) = delete;
 		public:
 			//const auto&		GetHandles(void)const noexcept { return shandle; }
-			const auto&		Get_ID(void)const noexcept { return ID; }
-			void			Set(int ID_t, std::string path_t, bool is3Dsound = false) {
-				if (path_t == "") { return; }
-				if (path_t == path) { return; }
+			const auto& Get_ID(void)const noexcept { return ID; }
+			void			Set(int ID_t, std::string path_t, bool is3Dsound = false) noexcept {
+				if (path_t == "") {
+					return;
+				}
+				if (path_t == path) {
+					return;
+				}
 				this->ID = ID_t;
 				this->path = path_t;
 				SetCreate3DSoundFlag(is3Dsound ? TRUE : FALSE);
 				this->handle = SoundHandle::Load(this->path);
 				SetCreate3DSoundFlag(FALSE);
 			}
-			bool			Check() {
+			bool			Check() noexcept {
 				return this->handle.check();
 			}
-			void			Delete() {
+			void			Delete() noexcept {
 				this->handle.Dispose();
 			}
-			void			Stop() {
+			void			Stop() noexcept {
 				this->handle.stop();
 			}
-			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) {
+			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) noexcept {
 				this->handle.play(type_t, Flag_t);
 			}
 			void 			Play_3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
@@ -289,11 +297,11 @@ namespace DXLibRef {
 					this->handle.play_3D(pos_t, radius, type_t);
 				}
 			}
-			void			SetVol_Local(int vol) {
+			void			SetVol_Local(int vol) noexcept {
 				Set_vol = std::clamp(vol, 0, 255);
 				this->handle.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 			}
-			void			SetVol(float vol) {
+			void			SetVol(float vol) noexcept {
 				vol_rate = std::clamp(vol, 0.f, 1.f);
 				this->handle.vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 			}
@@ -309,13 +317,13 @@ namespace DXLibRef {
 	private:
 		std::vector<std::shared_ptr<BGMhave>> havehandle;
 	public:
-		void			SetVol(float vol) {
+		void			SetVol(float vol) noexcept {
 			for (auto& h : this->havehandle) {
 				h->SetVol(vol);
 			}
 		}
 	public:
-		size_t						Add(int ID_t, std::string path_t = "", bool is3Dsound = false) {
+		size_t						Add(int ID_t, std::string path_t = "", bool is3Dsound = false) noexcept {
 			for (auto& h : this->havehandle) {
 				if (h->Get_ID() == ID_t) {
 					h->Set(ID_t, path_t, is3Dsound);
@@ -326,8 +334,8 @@ namespace DXLibRef {
 			this->havehandle.back()->Set(ID_t, path_t, is3Dsound);
 			return this->havehandle.size() - 1;
 		}
-		std::shared_ptr<BGMhave>&	Get(int ID_t) { return this->havehandle[Add(ID_t)]; }
-		void						Delete(int ID_t) {
+		auto& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
+		void						Delete(int ID_t) noexcept {
 			for (int i = 0; i < static_cast<int>(this->havehandle.size()); ++i) {
 				auto& h = this->havehandle.at(static_cast<size_t>(i));
 				if (h->Get_ID() == ID_t) {
@@ -340,7 +348,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void						StopAll() {
+		void						StopAll() noexcept {
 			for (auto& h : this->havehandle) {
 				h->Stop();
 			}

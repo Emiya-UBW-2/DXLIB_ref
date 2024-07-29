@@ -24,8 +24,12 @@ namespace DXLibRef {
 		while (true) {
 			SceneParts->StartScene();
 			while (true) {
-				if (!SceneParts->FirstExecute()) { return false; }
-				if (SceneParts->Execute()) { break; }
+				if (!SceneParts->FirstExecute()) {
+					return false;
+				}
+				if (SceneParts->Execute()) {
+					break;
+				}
 			}
 			SceneParts->NextScene();							//次のシーンへ移行
 		}

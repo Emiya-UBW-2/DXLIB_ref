@@ -55,7 +55,7 @@ namespace DXLibRef {
 				DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
 			}
 		}
-		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos();Pos.y *= -1.f;
+		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
 		if (GetNowScene()->Get3DActive()) {
 			DrawParts->Update_CubeMap([&]() { GetNowScene()->CubeMapDraw(); }, Pos);
 		}
@@ -115,7 +115,7 @@ namespace DXLibRef {
 						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
 						Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																			 DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
+							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
 					DebugParts->DebugWindow(DrawParts->GetUIY(1920 - 350), DrawParts->GetUIY(150));
@@ -163,7 +163,7 @@ namespace DXLibRef {
 						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
 						Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
-																			 DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
+							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
 					DebugParts->DebugWindow(DrawParts->GetUIY(1920 - 350), DrawParts->GetUIY(150));
