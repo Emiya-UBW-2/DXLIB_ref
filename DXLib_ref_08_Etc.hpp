@@ -196,7 +196,7 @@ namespace DXLibRef {
 		pObj->ResetFrameUserLocalMatrix(Arm);
 		pObj->ResetFrameUserLocalMatrix(Arm2);
 		pObj->ResetFrameUserLocalMatrix(Wrist);
-		auto matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Arm))).rotation().inverse();
+		auto matBase = pObj->GetParentFrameWorldMatrix(Arm).rotation().inverse();
 
 		Vector3DX Dirxvec = Vector3DX::Cross(Dirzvec, Diryvec) * -1.f;
 
@@ -211,14 +211,14 @@ namespace DXLibRef {
 		Matrix4x4DX a1_inv = Matrix4x4DX::RotVec2(Matrix4x4DX::Vtrans(GetFramePosition(Arm2) - GetFramePosition(Arm), matBase), vec_t);
 		pObj->SetFrameLocalMatrix(Arm, a1_inv * FrameBaseLocalMatArm);
 		//‰º˜r
-		matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Arm2))).rotation().inverse();
+		matBase = pObj->GetParentFrameWorldMatrix(Arm2).rotation().inverse();
 		pObj->SetFrameLocalMatrix(Arm2, Matrix4x4DX::identity() * FrameBaseLocalMatArm2);
 		Matrix4x4DX a2_inv = Matrix4x4DX::RotVec2(
 			Matrix4x4DX::Vtrans(GetFramePosition(Wrist) - GetFramePosition(Arm2), matBase),
 			Matrix4x4DX::Vtrans(RetPos - GetFramePosition(Arm2), matBase));
 		pObj->SetFrameLocalMatrix(Arm2, a2_inv * FrameBaseLocalMatArm2);
 		//Žè
-		matBase = pObj->GetFrameLocalWorldMatrix(static_cast<int>(pObj->GetFrameParent(Wrist))).rotation().inverse();
+		matBase = pObj->GetParentFrameWorldMatrix(Wrist).rotation().inverse();
 		Matrix4x4DX mat1;
 		{
 			auto zvec = Matrix4x4DX::Vtrans(Localzvec, pObj->GetFrameLocalWorldMatrix(Wrist).rotation());

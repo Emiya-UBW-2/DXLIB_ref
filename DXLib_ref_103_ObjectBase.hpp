@@ -62,19 +62,13 @@ namespace DXLibRef {
 	public:
 		auto& GetObj(void) noexcept { return this->m_obj; }
 		const auto& GetObj_const(void) const noexcept { return this->m_obj; }
-		//auto		GetMatrix(void) const noexcept { return GetObj().GetMatrix(); }
-		auto		GetFrameLocalMat(int frame) const noexcept { return this->m_obj.GetFrameLocalMatrix(frame); }
-		auto		GetFrameWorldMat(int frame) const noexcept { return this->m_obj.GetFrameLocalWorldMatrix(frame); }
-		auto		GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.GetFrameParent(frame))); }
-		auto		GetChildFrameNum(int frame) const noexcept { return static_cast<int>(this->m_obj.GetFrameChildNum(frame)); }
-		auto		GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameWorldMat(static_cast<int>(this->m_obj.GetFrameChild(frame, ID))); }
-
+		//
 		bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
 		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
 		auto& SetMove(void) noexcept { return this->m_move; }
-
+		//
 		void			SetAnimOnce(int ID, float speed) noexcept;
 		void			SetAnimLoop(int ID, float speed) noexcept;
 	public:

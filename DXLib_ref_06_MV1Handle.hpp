@@ -151,6 +151,9 @@ namespace DXLibRef {
 		auto			GetMeshMinPosition(int p1) const noexcept { return MV1GetMeshMinPosition(GetHandle(), p1); }
 		auto			GetMeshSemiTransState(int p1) const noexcept { return (MV1GetMeshSemiTransState(GetHandle(), p1) == TRUE); }
 		auto			SearchShape(const char* str) const noexcept { return MV1SearchShape(GetHandle(), str); }
+
+		auto			GetParentFrameWorldMatrix(int frame) const noexcept { return GetFrameLocalWorldMatrix(GetFrameParent(frame)); }
+		auto			GetChildFrameWorldMatrix(int frame, int ID) const noexcept { return GetFrameLocalWorldMatrix(GetFrameChild(frame, ID)); }
 	public:
 		//描画
 		auto			DrawModel(void) const noexcept { return MV1DrawModel(GetHandle()) == TRUE; }
@@ -170,6 +173,9 @@ namespace DXLibRef {
 		void			SetMaterialTypeAll(int mode) const noexcept { MV1SetMaterialTypeAll(GetHandle(), mode); }
 		auto			SetShapeRate(int p1, float p2) const noexcept { return MV1SetShapeRate(GetHandle(), p1, p2) == TRUE; }
 
+		void			SetDifColorScale(COLOR_F color) const noexcept { MV1SetDifColorScale(GetHandle(), color); }
+		void			SetAmbColorScale(COLOR_F color) const noexcept { MV1SetAmbColorScale(GetHandle(), color); }
+		void			SetSpcColorScale(COLOR_F color) const noexcept { MV1SetSpcColorScale(GetHandle(), color); }
 		void			SetMaterialDifColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialDifColor(GetHandle(), p1, color); }
 		void			SetMaterialSpcColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialSpcColor(GetHandle(), p1, color); }
 		void			SetMaterialAmbColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialAmbColor(GetHandle(), p1, color); }
