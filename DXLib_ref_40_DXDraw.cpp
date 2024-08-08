@@ -1028,6 +1028,7 @@ namespace DXLibRef {
 	}
 	void			DXDraw::Draw(
 		std::function<void()> sky_doing,
+		std::function<void()> setshadowdoing,
 		std::function<void()> doing,
 		std::function<void()> doingFront,
 		std::function<void()> doingUI,
@@ -1040,7 +1041,7 @@ namespace DXLibRef {
 		auto MainDraw = [&](const Camera3DInfo& camInfo) {
 			//影画像の用意
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-				m_ShadowDraw->SetDraw(doing, camInfo);
+				m_ShadowDraw->SetDraw(setshadowdoing, camInfo);
 			}
 			m_CamViewMatrix = camInfo.GetViewMatrix();
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();

@@ -157,6 +157,7 @@ namespace DXLibRef {
 		void			Execute(void) noexcept;
 		void			Draw(
 			std::function<void()> sky_doing,
+			std::function<void()> setshadowdoing,
 			std::function<void()> doing,
 			std::function<void()> doingFront,
 			std::function<void()> doingUI,

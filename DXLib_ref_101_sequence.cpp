@@ -78,6 +78,7 @@ namespace DXLibRef {
 			//‰æ–Ê‚É”½‰f
 			DrawParts->Draw(
 				[&]() { GetNowScene()->BG_Draw(); },
+				[&]() { GetNowScene()->SetShadowDraw(); },
 				[&]() { GetNowScene()->MainDraw(); },
 				[&]() { GetNowScene()->MainDrawFront(); },
 				[&]() { GetNowScene()->DrawUI_Base(); },

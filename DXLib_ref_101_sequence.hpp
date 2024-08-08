@@ -50,6 +50,7 @@ namespace DXLibRef {
 
 		void CubeMapDraw(void) noexcept { CubeMap_Sub(); }
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
+		void SetShadowDraw(void) noexcept { SetShadowDraw_Sub(); }
 		void MainDraw(void) noexcept { MainDraw_Sub(); }
 		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
 		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
@@ -71,6 +72,7 @@ namespace DXLibRef {
 
 		virtual void CubeMap_Sub(void) noexcept {}
 		virtual void BG_Draw_Sub(void) noexcept;
+		virtual void SetShadowDraw_Sub(void) noexcept {}
 		virtual void MainDraw_Sub(void) noexcept {}
 		virtual void MainDrawFront_Sub(void) noexcept {}
 		virtual void DrawUI_Base_Sub(void) noexcept {}
