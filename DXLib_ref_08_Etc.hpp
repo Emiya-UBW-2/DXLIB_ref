@@ -1021,10 +1021,20 @@ namespace DXLibRef {
 		};
 	private:
 		//DXLIBから引っ張ってきたシェーダー用の定義
+		typedef float DX_D3D11_SHADER_FLOAT2[2];
 		typedef float DX_D3D11_SHADER_FLOAT4[4];
+
 		struct DX_D3D11_GS_CONST_BUFFER_BASE {
-			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4];											// ビュー　→　プロジェクション行列
-			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3];												// ワールド　→　ビュー行列
+			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4]{};											// ビュー　→　プロジェクション行列
+			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3]{};												// ワールド　→　ビュー行列
+		};
+		struct Wave {
+			DX_D3D11_SHADER_FLOAT2 dir{};
+			float amplitude{};
+			float waveLength{};
+		};
+		struct ImmutableCB {
+			Wave waves[20]{};
 		};
 	private:
 		//シェーダーハンドル
@@ -1037,7 +1047,8 @@ namespace DXLibRef {
 		int m_GeometryShaderMatcbhandle{ INVALID_ID };
 		int m_PixelShaderSendDispSizeHandle{ INVALID_ID };
 		std::array<int, 4> m_PixelShadercbhandle{};
-
+		ImmutableCB WaveData{};
+		int m_VertexShadercbWaveDataHandle{ -1 };
 	public:
 		ShaderUseClass(void) noexcept {
 			//シェーダーハンドル
@@ -1067,6 +1078,7 @@ namespace DXLibRef {
 			for (auto& h : m_VertexShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
+			m_VertexShadercbWaveDataHandle = CreateShaderConstantBuffer(sizeof(ImmutableCB));
 			// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファの作成
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				h = CreateShaderConstantBuffer(sizeof(LIGHTCAMERA_MATRIX));
@@ -1098,6 +1110,7 @@ namespace DXLibRef {
 			for (auto& h : m_VertexShadercbhandle) {
 				DeleteShaderConstantBuffer(h);
 			}
+			DeleteShaderConstantBuffer(m_VertexShadercbWaveDataHandle);
 			DeleteShader(this->m_VertexShaderhandle);
 			//
 			DeleteShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
@@ -1135,6 +1148,26 @@ namespace DXLibRef {
 			f4->w = param4;
 			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle[0]);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
+		}
+		//
+		void CalcGWave() {
+			for (int i = 0; i < 20; i++)
+			{
+				Wave& w = WaveData.waves[i];
+				float randomRad = (float)(GetRand(30) * DX_PI_F * 2 * 0.3f);
+				w.dir[0] = sinf(randomRad);
+				w.dir[1] = cosf(randomRad);
+				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f*12.5f;
+				w.waveLength = 1.0f + powf(2.f, 1.f + (float)GetRand(3)) * 10.f;
+			}
+		}
+		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
+		void			SetVertexWave() noexcept {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			ImmutableCB* f4 = (ImmutableCB*)GetBufferShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
+			*f4 = WaveData;
+			UpdateShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
+			SetShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle, DX_SHADERTYPE_VERTEX, 5);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
 		}
 		//シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {

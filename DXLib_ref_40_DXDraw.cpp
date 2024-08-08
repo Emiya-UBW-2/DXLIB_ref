@@ -359,8 +359,8 @@ namespace DXLibRef {
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
 		ClearDrawScreen();
-		SetupCamera_Ortho(30.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
-		SetCameraNearFar(0.05f * scale * Scale_Rate, 60.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
+		SetupCamera_Ortho(35.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+		SetCameraNearFar(0.5f * scale * Scale_Rate, 50.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
 		// カメラの位置と注視点はステージ全体が見渡せる位置
 		auto Vec = m_ShadowVec;
 		if (m_ShadowVec.x == 0.f && m_ShadowVec.z == 0.f) {
@@ -374,7 +374,7 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
-			SetupCam(Center, 1.f);
+			SetupCam(Center, 20.f);
 			m_CamViewMatrix[0] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -389,7 +389,7 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			SetupCam(Center, 2.f);
+			SetupCam(Center, 80.f);
 			m_CamViewMatrix[1] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -404,7 +404,7 @@ namespace DXLibRef {
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
 		float Scale_Rate = 12.5f;
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f * Scale_Rate, 100.f * Scale_Rate);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 1.f * Scale_Rate, 300.f * Scale_Rate);
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
@@ -423,6 +423,7 @@ namespace DXLibRef {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 		BaseShadowHandle.DrawGraph(0, 0, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+		//DepthBaseScreenHandle.DrawExtendGraph(0, 0,1080,1080, true);
 	}
 	void DXDraw::ShadowDraw::Dispose(void) noexcept {
 		BaseShadowHandle.Dispose();
