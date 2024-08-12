@@ -52,7 +52,7 @@ namespace DXLibRef {
 #endif // DEBUG
 		if (GetNowScene()->Get3DActive()) {
 			if (DrawParts->UpdateShadowActive() || GetNowScene()->GetIsFirstLoop()) {
-				DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), true);
+				DrawParts->Update_Shadow([&]() { GetNowScene()->ShadowDraw_Far(); }, Vector3DX::zero(), m_NowScenesPtr->GetShadowScale() *4.f, true);
 			}
 		}
 		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
@@ -74,7 +74,7 @@ namespace DXLibRef {
 		//‰æ–Ê‚É”½‰f
 		if (GetNowScene()->Get3DActive()) {
 			//‰e‚ðƒZƒbƒg
-			DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), false);
+			DrawParts->Update_Shadow([&] { GetNowScene()->ShadowDraw(); }, DrawParts->SetMainCamera().GetCamPos(), m_NowScenesPtr->GetShadowScale(), false);
 			//‰æ–Ê‚É”½‰f
 			DrawParts->Draw(
 				[&]() { GetNowScene()->BG_Draw(); },

@@ -62,6 +62,34 @@ namespace DXLibRef {
 				}
 			}
 		}
+		//フレーム
+		{
+			this->m_Materials.clear();
+			if (pBase->GetMaterialNum() > 0) {
+				this->m_Materials.resize(static_cast<std::size_t>(pBase->GetMaterialNum()));
+			}
+			for (auto& f : this->m_Materials) {
+				f = INVALID_ID;
+			}
+			if (this->m_Materials.size() > 0) {
+				int count = 0;
+				int Max = this->m_obj.GetMaterialNum();
+				for (int frameNum = 0; frameNum < Max; frameNum++) {
+					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(count)) {
+						//そのフレームを登録
+						this->m_Materials[static_cast<size_t>(count)] = frameNum;
+					}
+					else if (frameNum < Max - 1) {
+						continue;//飛ばす
+					}
+					count++;
+					frameNum = 0;
+					if (count >= static_cast<int>(this->m_Materials.size())) {
+						break;
+					}
+				}
+			}
+		}
 		//シェイプ
 		{
 			this->m_Shapes.clear();
@@ -138,6 +166,12 @@ namespace DXLibRef {
 			if (f.first != INVALID_ID) {
 				f.second = pBase->m_Frames.at(index).second;
 			}
+		}
+		//フレーム
+		this->m_Materials.resize(pBase->m_Materials.size());
+		for (auto& f : this->m_Materials) {
+			auto index = static_cast<std::size_t>(&f - &this->m_Materials.front());
+			f = pBase->m_Materials.at(index);
 		}
 		//シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());

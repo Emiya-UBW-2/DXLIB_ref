@@ -27,8 +27,8 @@ namespace DXLibRef {
 			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey) noexcept;
-			void Update(std::function<void()> Shadowdoing, Vector3DX Center) noexcept;
-			void UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center) noexcept;
+			void Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
+			void UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
 			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
 			void Draw(void) noexcept;
 			void Dispose(void) noexcept;
@@ -130,7 +130,7 @@ namespace DXLibRef {
 		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
-		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept;
+		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;
 	private:

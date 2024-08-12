@@ -15,6 +15,7 @@ namespace DXLibRef {
 		MV1											m_obj;
 		MV1											m_col;
 		std::vector<std::pair<int, Matrix4x4DX>>	m_Frames;
+		std::vector<int>							m_Materials;
 		std::vector<std::pair<int, float>>			m_Shapes;
 		std::string									m_FilePath;
 		std::string									m_ObjFileName;
@@ -66,6 +67,11 @@ namespace DXLibRef {
 		bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
 		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
+
+		bool		HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != INVALID_ID; }
+		const auto& GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
+		
+
 		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
 		auto& SetMove(void) noexcept { return this->m_move; }
 		//
@@ -140,6 +146,9 @@ namespace DXLibRef {
 	public:
 		virtual int	GetFrameNum(void) noexcept { return 0; }
 		virtual const char* GetFrameStr(int) noexcept { return nullptr; }
+
+		virtual int	GetMaterialNum(void) noexcept { return 0; }
+		virtual const char* GetMaterialStr(int) noexcept { return nullptr; }
 
 		virtual int	GetShapeNum(void) noexcept { return 0; }
 		virtual const char* GetShapeStr(int) noexcept { return nullptr; }
