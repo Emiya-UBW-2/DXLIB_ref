@@ -110,38 +110,48 @@ namespace DXLibRef {
 		}
 	}
 	void			ModelBaseClass::SaveModel(bool UseToonWhenCreateFile) noexcept {
-		auto Save = [&](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
-			if (!IsFileExist((Path + NameAdd + ".mv1").c_str()) && IsFileExist((Path + ".pmx").c_str())) {
+		auto Save = [&](MV1* obj, std::string NameAdd, int PHYSICS_TYPE) {
+			if (!IsFileExist((this->m_FilePath + this->m_ObjFileName + NameAdd + ".mv1").c_str()) && IsFileExist((this->m_FilePath + this->m_ObjFileName + ".pmx").c_str())) {
 				MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
 				if (!UseToonWhenCreateFile) {
 					obj->SetMaterialTypeAll(DX_MATERIAL_TYPE_NORMAL);
+
 					for (int i = 0, Max = obj->GetMaterialNum(); i < Max; ++i) {
+						//*
+						// テクスチャ追加前のテクスチャ数を取得しておく
+						int TexIndex = MV1GetTextureNum(obj->GetHandle());
+						// モデルで使用するテクスチャを追加する
+						MV1AddTexture(obj->GetHandle(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
+						// 指定のマテリアル( ここでは例として3番のマテリアル )で使用する法線マップを設定する
+						MV1SetMaterialNormalMapTexture(obj->GetHandle(), i, TexIndex);
+						//*/
+
 						obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
 						obj->SetMaterialSpcColor(i, GetColorF(0.f, 0.f, 0.f, 0.f));
 						obj->SetMaterialAmbColor(i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
 						obj->SetMaterialSpcPower(i, 0.1f);
 					}
 				}
-				obj->SaveModelToMV1File(Path + NameAdd + ".mv1");
+				obj->SaveModelToMV1File(this->m_FilePath + this->m_ObjFileName + NameAdd + ".mv1");
 				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
 			}
 			};
 		//model
 		switch (this->m_PHYSICS_SETUP) {
 		case PHYSICS_SETUP::DISABLE:
-			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
+			Save(&this->m_obj, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
 			break;
 		case PHYSICS_SETUP::LOADCALC:
-			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
+			Save(&this->m_obj, "_LOADCALC", DX_LOADMODEL_PHYSICS_LOADCALC);
 			break;
 		case PHYSICS_SETUP::REALTIME:
-			Save(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
+			Save(&this->m_obj, "_REALTIME", DX_LOADMODEL_PHYSICS_REALTIME);
 			break;
 		default:
 			break;
 		}
 		//col
-		Save(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
+		Save(&this->m_col, "", DX_LOADMODEL_PHYSICS_DISABLE);
 	}
 	void			ModelBaseClass::DisposeModel(void) noexcept {
 		this->m_obj.Dispose();
