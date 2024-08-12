@@ -117,7 +117,7 @@ namespace DXLibRef {
 					obj->SetMaterialTypeAll(DX_MATERIAL_TYPE_NORMAL);
 
 					for (int i = 0, Max = obj->GetMaterialNum(); i < Max; ++i) {
-						//*
+						/*
 						// テクスチャ追加前のテクスチャ数を取得しておく
 						int TexIndex = MV1GetTextureNum(obj->GetHandle());
 						// モデルで使用するテクスチャを追加する
