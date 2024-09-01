@@ -14,14 +14,17 @@ namespace DXLibRef {
 		size_t			m_Next_Select{ 0 };
 
 		bool			m_Is3DActive{ true };
+		float			m_ShadowScale{ 1.f };
 	public:
 		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
 		auto& Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
+		void SetShadowScale(float value) noexcept { m_ShadowScale = value; }
 	public://ゲッター
 		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
+		const auto& GetShadowScale(void) const noexcept { return m_ShadowScale; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;

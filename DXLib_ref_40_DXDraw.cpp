@@ -368,13 +368,13 @@ namespace DXLibRef {
 		}
 		SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f * scale * Scale_Rate)).get(), Center.get());
 	}
-	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center) noexcept {
+	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
-			SetupCam(Center, 1.f);
+			SetupCam(Center, Scale);
 			m_CamViewMatrix[0] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -383,13 +383,13 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, INVALID_ID);
 	}
-	void DXDraw::ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center) noexcept {
+	void DXDraw::ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			SetupCam(Center, 2.f);
+			SetupCam(Center, Scale);
 			m_CamViewMatrix[1] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -604,15 +604,15 @@ namespace DXLibRef {
 	bool			DXDraw::UpdateShadowActive(void) noexcept {
 		return m_ShadowDraw->UpdateActive();
 	}
-	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept {
+	void			DXDraw::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 			// 影用の深度記録画像の準備を行う
 			if (!IsFar) {
-				m_ShadowDraw->Update(doing, CenterPos);
+				m_ShadowDraw->Update(doing, CenterPos, Scale);
 			}
 			else {
-				m_ShadowDraw->UpdateFar(doing, CenterPos);
+				m_ShadowDraw->UpdateFar(doing, CenterPos, Scale);
 			}
 		}
 	}
