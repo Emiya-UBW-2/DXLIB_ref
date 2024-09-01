@@ -123,11 +123,11 @@ namespace DXLibRef {
 		{
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
-						DrawLine_2D(xnow, ynow, xnext, ynext, Gray75);
+						WindowSystem::DrawControl::Instance()->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
 					}
 					//*/
 				}
-				DrawLine_2D(xp, ye - border, xp + wide, ye - border, White);//Šî€ü
+				WindowSystem::DrawControl::Instance()->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);//Šî€ü
 			}
 			ypos += height;
 		}

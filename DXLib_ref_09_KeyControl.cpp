@@ -80,14 +80,14 @@ namespace DXLibRef {
 
 	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		auto* Fonts = FontPool::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
 			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
-		Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
+		WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
+			FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, x + ofs, y + DrawParts->GetUIY(24) / 2, White, Black, GuideString);
 		return GetDrawSize();
 	}
 
@@ -518,7 +518,57 @@ namespace DXLibRef {
 			this->m_PadsInfo.at(i).m_Key.Execute(GetButtonPress(this->m_PadsInfo.at(i).m_assign));
 		}
 		//
+		{
+			int KEYS[26] = {
+				KEY_INPUT_A,
+				KEY_INPUT_B,
+				KEY_INPUT_C,
+				KEY_INPUT_D,
+				KEY_INPUT_E,
+				KEY_INPUT_F,
+				KEY_INPUT_G,
+				KEY_INPUT_H,
+				KEY_INPUT_I,
+				KEY_INPUT_J,
+				KEY_INPUT_K,
+				KEY_INPUT_L,
+				KEY_INPUT_M,
+				KEY_INPUT_N,
+				KEY_INPUT_O,
+				KEY_INPUT_P,
+				KEY_INPUT_Q,
+				KEY_INPUT_R,
+				KEY_INPUT_S,
+				KEY_INPUT_T,
+				KEY_INPUT_U,
+				KEY_INPUT_V,
+				KEY_INPUT_W,
+				KEY_INPUT_X,
+				KEY_INPUT_Y,
+				KEY_INPUT_Z,
+			};
+			for (int loop = 0; loop < this->m_AtoZKey.size(); loop++) {
+				m_AtoZKey[loop].Execute(CheckHitKeyWithCheck(KEYS[loop]) != 0);
+			}
+			int NUMKEYS[10] = {
+				KEY_INPUT_0,
+				KEY_INPUT_1,
+				KEY_INPUT_2,
+				KEY_INPUT_3,
+				KEY_INPUT_4,
+				KEY_INPUT_5,
+				KEY_INPUT_6,
+				KEY_INPUT_7,
+				KEY_INPUT_8,
+				KEY_INPUT_9,
+			};
+			for (int loop = 0; loop < this->m_NumKey.size(); loop++) {
+				m_NumKey[loop].Execute(CheckHitKeyWithCheck(NUMKEYS[loop]) != 0);
+			}
+		}
+		//
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
+		KeyBSorDel.Execute((CheckHitKeyWithCheck(KEY_INPUT_BACK) != 0) || (CheckHitKeyWithCheck(KEY_INPUT_DELETE) != 0));
 	}
 	void PadControl::Draw(void) const noexcept {
 		auto* DrawParts = DXDraw::Instance();

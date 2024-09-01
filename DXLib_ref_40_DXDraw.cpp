@@ -359,8 +359,8 @@ namespace DXLibRef {
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
 		ClearDrawScreen();
-		SetupCamera_Ortho(35.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
-		SetCameraNearFar(0.5f * scale * Scale_Rate, 50.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
+		SetupCamera_Ortho(30.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
+		SetCameraNearFar(0.05f * scale * Scale_Rate, 60.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
 		// カメラの位置と注視点はステージ全体が見渡せる位置
 		auto Vec = m_ShadowVec;
 		if (m_ShadowVec.x == 0.f && m_ShadowVec.z == 0.f) {
@@ -374,7 +374,7 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
-			SetupCam(Center, 20.f);
+			SetupCam(Center, 1.f);
 			m_CamViewMatrix[0] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -389,7 +389,7 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			SetupCam(Center, 80.f);
+			SetupCam(Center, 2.f);
 			m_CamViewMatrix[1] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -404,7 +404,7 @@ namespace DXLibRef {
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
 		float Scale_Rate = 12.5f;
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 1.f * Scale_Rate, 300.f * Scale_Rate);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f * Scale_Rate, 100.f * Scale_Rate);
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
@@ -663,7 +663,6 @@ namespace DXLibRef {
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
-		auto* Fonts = FontPool::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* OptionParts = OPTION::Instance();
 
@@ -689,11 +688,12 @@ namespace DXLibRef {
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{
 				PopUpParts->Draw(GetUIY(720 / 2 + 16), GetUIY(720 / 2 + 16));
-				Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(12), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, GetUIY(32), GetUIY(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
+				WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal, 
+					FontPool::FontType::MS_Gothic, GetUIY(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, GetUIY(32), GetUIY(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
 
 				int xp = GetUIY(720 + 16 + 16);
 				int yp = GetUIY(16);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, LocalizeParts->Get(2000))) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
 					m_CheckPCSpec.StartSearch();
 				}
 				yp += GetUIY(24);
@@ -829,7 +829,7 @@ namespace DXLibRef {
 
 				xp = GetUIY(720 + 16 + 32);
 				yp = GetUIY(720);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, false, "Start Game!")) {
+				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, false, true, "Start Game!")) {
 					PopUpParts->EndAll();
 				}
 			}
@@ -839,14 +839,14 @@ namespace DXLibRef {
 	}
 	void DXDraw::PauseDraw(void) const noexcept {
 		if (IsPause()) {
-			auto* Fonts = FontPool::Instance();
 			//
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-			DrawBox_2D(0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
+			WindowSystem::DrawControl::Instance()->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
+			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 			//
 			if (m_PauseFlashCount > 0.5f) {
-				Fonts->Get(FontPool::FontType::MS_Gothic, GetUIY(36), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
+				WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
+					FontPool::FontType::MS_Gothic, GetUIY(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
 			}
 		}
 	}
@@ -881,6 +881,7 @@ namespace DXLibRef {
 	}
 	//
 	void			DXDraw::Init(void) noexcept {
+		WindowSystem::DrawControl::Create();
 		if (m_IsFirstBoot) {
 			return;
 		}
@@ -943,7 +944,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, LocalizeParts->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 						}
@@ -974,7 +975,7 @@ namespace DXLibRef {
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, LocalizeParts->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
 						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
 							m_IsEnd = true;
 							StartMe();
@@ -1121,9 +1122,10 @@ namespace DXLibRef {
 				SetDrawMode(Prev);
 				doingUI();
 				PauseDraw();
-				doingUI2();										//UI2
 				UISystem::Instance()->Draw();
 				Pad->Draw();
+				doingUI2();										//UI2
+				WindowSystem::DrawControl::Instance()->Draw();
 			}
 		}
 	}
@@ -1148,9 +1150,10 @@ namespace DXLibRef {
 			SetDrawMode(Prev);
 			doingUI();
 			PauseDraw();
-			doingUI2();										//UI2
 			UISystem::Instance()->Draw();
 			Pad->Draw();
+			doingUI2();										//UI2
+			WindowSystem::DrawControl::Instance()->Draw();
 		}
 	}
 	bool					DXDraw::Screen_Flip(void) noexcept {

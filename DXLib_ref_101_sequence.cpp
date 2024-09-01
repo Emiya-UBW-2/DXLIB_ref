@@ -35,6 +35,7 @@ namespace DXLibRef {
 #ifdef DEBUG
 		clsDx();
 #endif // DEBUG
+		WindowSystem::DrawControl::Instance()->ClearList();
 		return DrawParts->FirstExecute();
 	}
 
@@ -87,7 +88,6 @@ namespace DXLibRef {
 					//’Ç‰Á‚Ì•`‰æ•¨
 					auto* ItemLogParts = SideLog::Instance();
 					auto* PopUpParts = PopUp::Instance();
-					auto* Fonts = FontPool::Instance();
 					auto* OptionParts = OPTION::Instance();
 					auto* DrawParts = DXDraw::Instance();
 					ItemLogParts->Draw();
@@ -115,7 +115,8 @@ namespace DXLibRef {
 						}
 						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+						WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal, 
+							FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG
@@ -135,7 +136,6 @@ namespace DXLibRef {
 					//’Ç‰Á‚Ì•`‰æ•¨
 					auto* ItemLogParts = SideLog::Instance();
 					auto* PopUpParts = PopUp::Instance();
-					auto* Fonts = FontPool::Instance();
 					auto* OptionParts = OPTION::Instance();
 					auto* DrawParts = DXDraw::Instance();
 					ItemLogParts->Draw();
@@ -163,7 +163,8 @@ namespace DXLibRef {
 						}
 						Avg = Avg / static_cast<float>(FPSAvgs.size());
 
-						Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 3)->DrawString(INVALID_ID, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+						WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
+							FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
 					}
 #ifdef DEBUG

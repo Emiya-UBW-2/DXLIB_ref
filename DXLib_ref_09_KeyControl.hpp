@@ -619,6 +619,10 @@ namespace DXLibRef {
 		int MouseY{ 0 };
 		switchs MouseClick;
 		switchs KeyEsc;
+		switchs KeyBSorDel;
+		//
+		std::array<switchs, 26>	m_AtoZKey;
+		std::array<switchs, 10>	m_NumKey;
 		//ガイド等のコントロール
 		bool		m_IsUpdate{ true };
 		bool		m_MouseMoveEnable{ true };
@@ -720,6 +724,12 @@ namespace DXLibRef {
 		PadControl(void) noexcept {
 			m_IsUpdate = true;
 			m_MouseMoveEnable = false;
+			for (auto& k : this->m_AtoZKey) {
+				k.Set(false);
+			}
+			for (auto& k : this->m_NumKey) {
+				k.Set(false);
+			}
 			Load();
 		}
 		PadControl(const PadControl&) = delete;
@@ -736,9 +746,25 @@ namespace DXLibRef {
 		const auto& GetMS_Y(void) const noexcept { return MouseY; }
 		const auto& GetMouseClick(void) const noexcept { return MouseClick; }
 		const auto& GetEsc(void) const noexcept { return KeyEsc; }
+		const auto& GetBSorDel(void) const noexcept { return KeyBSorDel; }
 
 		const auto& IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
 		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
+		const auto& GetAtoZKey(char AtoZ) const noexcept {
+			if ('A' <= AtoZ && AtoZ <= 'Z') {
+				return this->m_AtoZKey.at(static_cast<size_t>(AtoZ - 'A'));
+			}
+			if ('a' <= AtoZ && AtoZ <= 'z') {
+				return this->m_AtoZKey.at(static_cast<size_t>(AtoZ - 'a'));
+			}
+			return this->m_AtoZKey.at(0);
+		}
+		const auto& GetNumKey(int Num) const noexcept {
+			if (0 <= Num && Num <= 9) {
+				return this->m_NumKey.at(Num);
+			}
+			return this->m_NumKey.at(0);
+		}
 		const auto& GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
 		const auto& GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
 		const auto& GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }

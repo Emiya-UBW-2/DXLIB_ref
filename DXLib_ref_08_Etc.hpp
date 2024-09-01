@@ -304,10 +304,6 @@ namespace DXLibRef {
 	static bool DrawLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
 		return DxLib::DrawLine(p1x, p1y, p2x, p2y, color, thickness) == TRUE;
 	}
-	//縁付き四角
-	static bool DrawBox_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, bool IsFill) noexcept {
-		return DxLib::DrawBox(p1x, p1y, p2x, p2y, color, IsFill ? TRUE : FALSE) == TRUE;
-	}
 	//縁ぬき四角
 	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
 		if (thickness == 1) {
@@ -575,9 +571,287 @@ namespace DXLibRef {
 	static const unsigned int Black{ GetColor(0, 0, 0) };
 
 	namespace WindowSystem {
+		//
+		class Rect2D {
+			int			m_PosX{ 0 };
+			int			m_PosY{ 0 };
+			int			m_SizeX{ 0 };
+			int			m_SizeY{ 0 };
+		public:
+			const auto& GetPosX() const noexcept { return this->m_PosX; }
+			const auto& GetPosY() const noexcept { return this->m_PosY; }
+			void			Set(int posx, int posy, int sizex, int sizey) noexcept {
+				m_PosX = posx;
+				m_PosY = posy;
+				m_SizeX = sizex;
+				m_SizeY = sizey;
+			}
+		public:
+			bool			IsHit(const Rect2D& target) const noexcept {
+				return (
+					((this->m_PosX >= target.m_PosX && this->m_PosX < (target.m_PosX + target.m_SizeX)) || (target.m_PosX > this->m_PosX && target.m_PosX <= (this->m_PosX + this->m_SizeX))) &&
+					((this->m_PosY >= target.m_PosY && this->m_PosY < (target.m_PosY + target.m_SizeY)) || (target.m_PosY > this->m_PosY && target.m_PosY <= (this->m_PosY + this->m_SizeY)))
+					);
+			}
+		};
+		//
+		enum class DrawType : int {
+			Alpha,
+			Bright,
+			Box,
+			Circle,
+			Line,
+			String,
+			StringAutoFit,
+			RotaGraph,
+		};
+		class DrawData {
+			DrawType								m_type{ DrawType::Box };
+			std::array<int, 6>						m_intParam{ 0,0,0,0,0,0 };
+			std::array<unsigned int, 2>				m_UintParam{ 0,0 };
+			std::array<float, 6>					m_floatParam{ 0,0,0,0,0,0 };
+			std::array<bool, 1>						m_boolParam{ false };
+			std::array<const GraphHandle*, 1>		m_GraphHandleParam{ nullptr };
+			std::string								m_string;
+		public:
+			void InputType(DrawType type) noexcept { this->m_type = type; }
+			void InputintParam(int ID, int param) noexcept { this->m_intParam.at(ID) = param; }
+			void InputUintParam(int ID, unsigned int param) noexcept { this->m_UintParam.at(ID) = param; }
+			void InputfloatParam(int ID, float param) noexcept { this->m_floatParam.at(ID) = param; }
+			void InputboolParam(int ID, bool param) noexcept { this->m_boolParam.at(ID) = param; }
+			void InputGraphHandleParam(int ID, const GraphHandle* param) noexcept { this->m_GraphHandleParam.at(ID) = param; }
+			void InputStringParam(std::string_view param) noexcept { this->m_string = param; }
+		public:
+			void Output() const noexcept;
+		public:
+			void		operator=(const DrawData& tgt) noexcept {
+				this->m_type = tgt.m_type;
+				this->m_intParam = tgt.m_intParam;
+				this->m_UintParam = tgt.m_UintParam;
+				this->m_floatParam = tgt.m_floatParam;
+				this->m_boolParam = tgt.m_boolParam;
+				this->m_GraphHandleParam = tgt.m_GraphHandleParam;
+				this->m_string = tgt.m_string;
+			}
+			bool		operator==(const DrawData& tgt) const noexcept {
+				return (
+					this->m_type == tgt.m_type &&
+					this->m_intParam == tgt.m_intParam &&
+					this->m_UintParam == tgt.m_UintParam &&
+					this->m_floatParam == tgt.m_floatParam &&
+					this->m_boolParam == tgt.m_boolParam &&
+					this->m_GraphHandleParam == tgt.m_GraphHandleParam &&
+					this->m_string == tgt.m_string
+					);
+			}
+		};
+		//
+		enum class DrawLayer : int {
+			BackGround,
+			Back,
+			Back2,
+			Back3,
+			Back4,
+			Normal,
+			Front,
+
+			Max,
+		};
+		//
+		class DrawControl : public SingletonBase<DrawControl> {
+		private:
+			friend class SingletonBase<DrawControl>;
+		private:
+			std::vector<std::vector<DrawData>>	m_DrawDatas;
+			std::vector<std::vector<DrawData>>	m_PrevDrawDatas;
+
+			GraphHandle				m_BufferScreen;
+		private:
+			DrawControl() noexcept;
+			~DrawControl() noexcept {
+				for (auto& d : this->m_DrawDatas) {
+					d.clear();
+				}
+				this->m_DrawDatas.clear();
+
+				for (auto& d : this->m_PrevDrawDatas) {
+					d.clear();
+				}
+				this->m_PrevDrawDatas.clear();
+
+			}
+
+			DrawData* GetBack(DrawLayer Layer) noexcept {
+				this->m_DrawDatas.at((int)Layer).resize(this->m_DrawDatas.at((int)Layer).size() + 1);
+				return &this->m_DrawDatas.at((int)Layer).back();
+			}
+		public:
+			//
+			void	SetAlpha(DrawLayer Layer, int Alpha) {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Alpha);
+				Back->InputintParam(0, Alpha);
+			}
+			//
+			void	SetBright(DrawLayer Layer, int valueR, int valueG, int valueB) {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Bright);
+				Back->InputintParam(0, valueR);
+				Back->InputintParam(1, valueG);
+				Back->InputintParam(2, valueB);
+			}
+			//
+			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill);
+			//
+			void	SetDrawCircle(DrawLayer Layer, int x1, int y1, int radius, unsigned int color1, bool IsFill = true, int LineThickness = 1) {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Circle);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, radius);
+				Back->InputUintParam(0, color1);
+				Back->InputboolParam(0, IsFill);
+				Back->InputintParam(3, LineThickness);
+			}
+			//
+			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1);
+			//
+			void SetDrawRotaGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int posx, int posy, float Exrate, float rad, bool trns) noexcept {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::RotaGraph);
+				Back->InputGraphHandleParam(0, pGraphHandle);
+				Back->InputintParam(0, posx);
+				Back->InputintParam(1, posy);
+				Back->InputfloatParam(0, Exrate);
+				Back->InputfloatParam(1, rad);
+				Back->InputboolParam(0, trns);
+			}
+			//
+			//
+			template <typename... Args>
+			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
+				if (Str == "") { return; }
+				//auto* DrawParts = DXDraw::Instance();
+				//auto* Fonts = FontPool::Instance();
+				/*
+				int xSize = Fonts->Get(type, fontSize, 3)->GetStringWidth(-1, Str.c_str(), args...);
+
+				if ((y - fontSize) > DrawParts->GetScreenY(1080) || (y + fontSize) < 0) { return; }				//画面外は表示しない
+
+				switch (FontX) {
+				case FontHandle::FontXCenter::LEFT:
+					if ((x) > DrawParts->GetScreenX(1920) || (x + xSize) < 0) { return; }						//画面外は表示しない
+					break;
+				case FontHandle::FontXCenter::MIDDLE:
+					if ((x - xSize / 2) > DrawParts->GetScreenX(1920) || (x + xSize / 2) < 0) { return; }		//画面外は表示しない
+					break;
+				case FontHandle::FontXCenter::RIGHT:
+					if ((x - xSize) > DrawParts->GetScreenX(1920) || (x) < 0) { return; }						//画面外は表示しない
+					break;
+				default:
+					break;
+				}
+				//*/
+
+
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::String);
+
+				Back->InputintParam(0, (int)type);
+				Back->InputintParam(1, fontSize);
+				Back->InputintParam(2, (int)FontX);
+				Back->InputintParam(3, (int)FontY);
+				Back->InputintParam(4, x);
+				Back->InputintParam(5, y);
+				Back->InputUintParam(0, Color);
+				Back->InputUintParam(1, EdgeColor);
+
+				char ptr[1024] = "";
+				snprintfDx(ptr, 1024, Str.c_str(), args...);
+				Back->InputStringParam(ptr);
+			}
+			//
+			const auto	SetStringAutoFit(DrawLayer Layer, FontPool::FontType type, int fontSize, int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& Str) noexcept {
+				if (Str == "") { return 0.f; }
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::StringAutoFit);
+
+				Back->InputintParam(0, (int)type);
+				Back->InputintParam(1, fontSize);
+				Back->InputintParam(2, x1);
+				Back->InputintParam(3, y1);
+				Back->InputintParam(4, x2);
+				Back->InputintParam(5, y2);
+				Back->InputUintParam(0, Color);
+				Back->InputUintParam(1, EdgeColor);
+
+				Back->InputStringParam(Str);
+
+				return FontPool::Instance()->Get((FontPool::FontType)type, fontSize, 3)->DrawStringAutoFit(
+					x1 + 1920, y1 + 1080,
+					x2 + 1920, y2 + 1080,
+					Color,
+					EdgeColor,
+					Str
+				);
+			}
+			//
+		public:
+			void	ClearList() noexcept {
+				for (auto& d : this->m_DrawDatas) {
+					auto& pd = this->m_PrevDrawDatas.at(&d - &this->m_DrawDatas.front());
+					pd.clear();
+					for (auto& d2 : d) {
+						pd.resize(pd.size() + 1);
+						pd.back() = d2;
+					}
+				}
+				for (auto& d : this->m_DrawDatas) {
+					d.clear();
+				}
+			}
+			void	Draw() noexcept {
+				bool IsHit = false;
+				//同じかどうかチェック
+				for (auto& d : this->m_DrawDatas) {
+					auto& pd = this->m_PrevDrawDatas.at(&d - &this->m_DrawDatas.front());
+					if (pd.size() == d.size()) {
+						for (auto& d2 : d) {
+							auto& pd2 = pd.at(&d2 - &d.front());
+							if (!(pd2 == d2)) {
+								IsHit = true;
+								break;
+							}
+						}
+					}
+					else {
+						IsHit = true;
+					}
+				}
+				//
+				if (IsHit) {
+					{
+						auto NowScreen = GetDrawScreen();
+						m_BufferScreen.SetDraw_Screen(true);
+						{
+							for (auto& d : this->m_DrawDatas) {
+								for (auto& d2 : d) {
+									d2.Output();
+								}
+								WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+								SetDrawBright(255, 255, 255);
+							}
+						}
+						GraphHandle::SetDraw_Screen(NowScreen, false);
+					}
+				}
+				//前に描画したものをそのまま出す
+				m_BufferScreen.DrawGraph(0, 0, true);
+			}
+		};
 		//箱
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
-		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat) noexcept;
+		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
 		//文字
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
@@ -592,17 +866,18 @@ namespace DXLibRef {
 			if (String == "") {
 				return;
 			}
-			auto* Fonts = FontPool::Instance();
 			int xSize = (FontX == FontHandle::FontXCenter::LEFT) ? 0 : GetMsgLen(ySize, String, args...);//左揃えでは計算の必要がない
 			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
 				return;
 			}
-			Fonts->Get(FontPool::FontType::MS_Gothic, ySize, std::min(ySize / 6, 3))->DrawString(INVALID_ID, FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
+			// std::min(ySize / 6, 3)
+			DrawControl::Instance()->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, ySize,
+				FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		};
 		//
 		template <typename... Args>
-		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, std::string_view String, Args&&... args) noexcept {
-			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor, IsRepeat);
+		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, bool IsActive, std::string_view String, Args&&... args) noexcept {
+			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor, IsRepeat, IsActive);
 			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
