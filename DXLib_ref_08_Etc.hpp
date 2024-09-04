@@ -599,19 +599,21 @@ namespace DXLibRef {
 			Alpha,
 			Bright,
 			Box,
+			Quadrangle,
 			Circle,
 			Line,
 			String,
 			StringAutoFit,
 			RotaGraph,
+			ExtendGraph,
 		};
 		class DrawData {
 			DrawType								m_type{ DrawType::Box };
-			std::array<int, 6>						m_intParam{ 0,0,0,0,0,0 };
-			std::array<unsigned int, 2>				m_UintParam{ 0,0 };
-			std::array<float, 6>					m_floatParam{ 0,0,0,0,0,0 };
-			std::array<bool, 1>						m_boolParam{ false };
-			std::array<const GraphHandle*, 1>		m_GraphHandleParam{ nullptr };
+			std::array<int, 8>						m_intParam{};
+			std::array<unsigned int, 2>				m_UintParam{};
+			std::array<float, 6>					m_floatParam{};
+			std::array<bool, 1>						m_boolParam{};
+			std::array<const GraphHandle*, 1>		m_GraphHandleParam{};
 			std::string								m_string;
 		public:
 			void InputType(DrawType type) noexcept { this->m_type = type; }
@@ -703,6 +705,8 @@ namespace DXLibRef {
 			//
 			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill);
 			//
+			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill);
+			//
 			void	SetDrawCircle(DrawLayer Layer, int x1, int y1, int radius, unsigned int color1, bool IsFill = true, int LineThickness = 1) {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Circle);
@@ -727,6 +731,16 @@ namespace DXLibRef {
 				Back->InputboolParam(0, trns);
 			}
 			//
+			void SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int pos1x, int pos1y, int pos2x, int pos2y, bool trns) noexcept {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::ExtendGraph);
+				Back->InputGraphHandleParam(0, pGraphHandle);
+				Back->InputintParam(0, pos1x);
+				Back->InputintParam(1, pos1y);
+				Back->InputintParam(2, pos2x);
+				Back->InputintParam(3, pos2y);
+				Back->InputboolParam(0, trns);
+			}
 			//
 			template <typename... Args>
 			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {

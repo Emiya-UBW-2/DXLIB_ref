@@ -112,7 +112,8 @@ namespace DXLibRef {
 					for (size_t index = static_cast<size_t>(PMax - 1); index > 0; --index) {
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[j][index] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[j + 1][index] * ys));
-						DrawQuadrangle(
+						WindowSystem::DrawControl::Instance()->SetDrawQuadrangle(
+							WindowSystem::DrawLayer::Normal,
 							xnow, ynow, xnext, ynext,
 							xnext, ye, xnow, ye,
 							Colors[index],

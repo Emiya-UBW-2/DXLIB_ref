@@ -83,7 +83,8 @@ namespace DXLibRef {
 
 		int ofs = 0;
 		if (xsize > 0) {
-			GuideImg.DrawExtendGraph(x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
+			WindowSystem::DrawControl::Instance()->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
+				&GuideImg, x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
 		WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,

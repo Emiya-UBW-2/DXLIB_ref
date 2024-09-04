@@ -83,6 +83,16 @@ namespace DXLibRef {
 				}
 			}
 			break;
+			case DrawType::Quadrangle:
+			{
+				DxLib::DrawQuadrangle(
+					this->m_intParam[0], this->m_intParam[1],
+					this->m_intParam[2], this->m_intParam[3],
+					this->m_intParam[4], this->m_intParam[5],
+					this->m_intParam[6], this->m_intParam[7],
+					this->m_UintParam[0], (m_boolParam[0]) ? TRUE : FALSE);
+			}
+			break;
 			case DrawType::Circle:
 			{
 				Rect2D One; One.Set(this->m_intParam[0] - this->m_intParam[2] / 2, this->m_intParam[1] - this->m_intParam[2] / 2,
@@ -125,12 +135,20 @@ namespace DXLibRef {
 					if (m_floatParam[0] < 0.9f && 1.1f < this->m_floatParam[0]) {
 						auto prev = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
-						m_GraphHandleParam.at(0)->DrawRotaGraph(m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
+						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
 						SetDrawMode(prev);
 					}
 					else {
-						m_GraphHandleParam.at(0)->DrawRotaGraph(m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
+						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
 					}
+				}
+				break;
+			case DrawType::ExtendGraph:
+				if (m_GraphHandleParam.at(0)) {
+					auto prev = GetDrawMode();
+					SetDrawMode(DX_DRAWMODE_BILINEAR);
+					m_GraphHandleParam.at(0)->DrawExtendGraph(this->m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_intParam[3], this->m_boolParam[0]);
+					SetDrawMode(prev);
 				}
 				break;
 			default:
@@ -154,6 +172,23 @@ namespace DXLibRef {
 			Back->InputintParam(1, y1);
 			Back->InputintParam(2, x2);
 			Back->InputintParam(3, y2);
+			Back->InputUintParam(0, color1);
+			Back->InputboolParam(0, IsFill);
+		}
+		void DrawControl::SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill)
+		{
+			auto* DrawParts = DXDraw::Instance();
+
+			DrawData* Back = GetBack(Layer);
+			Back->InputType(DrawType::Quadrangle);
+			Back->InputintParam(0, x1);
+			Back->InputintParam(1, y1);
+			Back->InputintParam(2, x2);
+			Back->InputintParam(3, y2);
+			Back->InputintParam(4, x3);
+			Back->InputintParam(5, y3);
+			Back->InputintParam(6, x4);
+			Back->InputintParam(7, y4);
 			Back->InputUintParam(0, color1);
 			Back->InputboolParam(0, IsFill);
 		}
@@ -398,7 +433,7 @@ namespace DXLibRef {
 			ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
 
 			//”wŒi
-			auto per = std::clamp(m_ActivePer * 0.3f, 0.f, 1.f);
+			auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
 			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
 			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
 			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
@@ -423,7 +458,7 @@ namespace DXLibRef {
 			yp2 = ym2 - LineHeight;
 			//”wŒi
 			{
-				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.3f), 0, 255));
+				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
 				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
 				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 			}
