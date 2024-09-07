@@ -28,8 +28,8 @@ namespace DXLibRef {
 		AA,
 		DrawScale,
 		GodRay,
-		PBR,
 		Distortion,
+		PBR,
 		Max,
 	};
 	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
