@@ -597,6 +597,7 @@ namespace DXLibRef {
 		//
 		enum class DrawType : int {
 			Alpha,
+			Add,
 			Bright,
 			Box,
 			Quadrangle,
@@ -693,6 +694,12 @@ namespace DXLibRef {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Alpha);
 				Back->InputintParam(0, Alpha);
+			}
+			//
+			void	SetAdd(DrawLayer Layer, int Add) {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Add);
+				Back->InputintParam(0, Add);
 			}
 			//
 			void	SetBright(DrawLayer Layer, int valueR, int valueG, int valueB) {

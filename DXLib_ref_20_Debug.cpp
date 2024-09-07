@@ -146,7 +146,7 @@ namespace DXLibRef {
 			//“à—e
 			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());
 			++i;
-			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount() - 350);
+			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount());
 			++i;
 			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS    :%5.2f fps", GetFPS());
 			++i;

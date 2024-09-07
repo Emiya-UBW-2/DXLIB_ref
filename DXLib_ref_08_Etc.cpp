@@ -71,6 +71,9 @@ namespace DXLibRef {
 			case DrawType::Alpha:
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam[0]);
 				break;
+			case DrawType::Add:
+				SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam[0]);
+				break;
 			case DrawType::Bright:
 				SetDrawBright(this->m_intParam[0], this->m_intParam[1], this->m_intParam[2]);
 				break;
