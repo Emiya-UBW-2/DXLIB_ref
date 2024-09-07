@@ -177,8 +177,6 @@ namespace DXLibRef {
 		}
 		void DrawControl::SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill)
 		{
-			auto* DrawParts = DXDraw::Instance();
-
 			DrawData* Back = GetBack(Layer);
 			Back->InputType(DrawType::Quadrangle);
 			Back->InputintParam(0, x1);

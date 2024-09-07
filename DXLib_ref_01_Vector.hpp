@@ -1,4 +1,5 @@
 #pragma once
+//#include "DXLib_ref.h"
 
 namespace DXLibRef {
 	//---------------------------------------------------------------------------------------------
@@ -458,6 +459,11 @@ namespace DXLibRef {
 		Matrix4x4DX Get44DX(void) const noexcept {
 			MATRIX Result;
 			M33toMATRIX(&Result, this->value);
+			return Result;
+		}//•ÏŠ·
+		static Matrix3x3DX Get33DX(const Matrix4x4DX& value) noexcept {
+			MATRIX33 Result;
+			MATRIXtoM33(&Result, value.get());
 			return Result;
 		}//•ÏŠ·
 		//

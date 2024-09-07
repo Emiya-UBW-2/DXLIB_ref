@@ -766,7 +766,7 @@ namespace DXLibRef {
 			return this->m_NumKey.at(0);
 		}
 		const auto& GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
-		const auto& GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
+		const auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
 		const auto& GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
 
 		void SetIsUseButton(PADS select, bool value) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse = value; }
