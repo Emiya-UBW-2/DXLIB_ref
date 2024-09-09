@@ -8,7 +8,7 @@ namespace DXLibRef {
 	void PadControl::KeyGuideGraphs::AddGuideXBox(int ID, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < XBoxNum) {
-			std::string Path = "data/key/key_glay/";
+			std::string Path = "CommonData/key/key_glay/";
 			Path += XBoxGuidePath[ID];
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
@@ -25,7 +25,7 @@ namespace DXLibRef {
 	void PadControl::KeyGuideGraphs::AddGuideDS4(int ID, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < DS4Num) {
-			std::string Path = "data/key/key_glay/";
+			std::string Path = "CommonData/key/key_glay/";
 			Path += DS4GuidePath[ID];
 			Path += ".png";
 			GuideImg = GraphHandle::Load(Path);
@@ -42,7 +42,7 @@ namespace DXLibRef {
 	void PadControl::KeyGuideGraphs::AddGuidePC(int ID, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (0 <= ID && ID < KeyNum) {
-			std::string Path = "data/key/key_glay/";
+			std::string Path = "CommonData/key/key_glay/";
 			Path += KeyGuidePath[ID];
 			if ((KeyID[ID] & 0xF00) != 0) {
 				Path += ".png";

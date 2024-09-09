@@ -27,9 +27,6 @@ namespace DXLibRef {
 		Language,
 		AA,
 		DrawScale,
-		GodRay,
-		Distortion,
-		PBR,
 		Max,
 	};
 	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
@@ -58,11 +55,19 @@ namespace DXLibRef {
 		"Language",
 		"AA",
 		"DrawScale",
+	};
+
+	enum class EnumProjectSettingParam {
+		GodRay,
+		Distortion,
+		PBR,
+		Max,
+	};
+	static const char* ProjectSettingStr[static_cast<int>(EnumProjectSettingParam::Max)] = {
 		"GodRay",
 		"Distortion",
 		"PBR",
 	};
-
 	enum class EnumParamType {
 		Boolean,
 		Int,
@@ -131,6 +136,7 @@ namespace DXLibRef {
 		~OPTION(void) noexcept {}
 	private:
 		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
+		std::array<SaveParams, static_cast<int>(EnumProjectSettingParam::Max)> m_ProjectSettingParams;
 	public:
 		auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
 		auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
@@ -185,9 +191,6 @@ namespace DXLibRef {
 			case EnumSaveParam::ControlType:
 			case EnumSaveParam::Language:
 			case EnumSaveParam::DrawScale:
-			case EnumSaveParam::GodRay:
-			case EnumSaveParam::PBR:
-			case EnumSaveParam::Distortion:
 			case EnumSaveParam::Max:
 			default:
 				break;
@@ -234,9 +237,6 @@ namespace DXLibRef {
 			case EnumSaveParam::Language:
 			case EnumSaveParam::AA:
 			case EnumSaveParam::DrawScale:
-			case EnumSaveParam::GodRay:
-			case EnumSaveParam::PBR:
-			case EnumSaveParam::Distortion:
 			case EnumSaveParam::Max:
 			default:
 				break;
@@ -244,6 +244,14 @@ namespace DXLibRef {
 			m_SaveParams.at(static_cast<size_t>(id)).SetInt(use);
 		}
 		void			SetParamFloat(EnumSaveParam id, float use) noexcept { m_SaveParams.at(static_cast<size_t>(id)).SetFloat(use); }
+	public:
+		auto		GetParamBoolean(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetBoolean(); }
+		auto		GetParamInt(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetInt(); }
+		auto		GetParamFloat(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetFloat(); }
+	public:
+		void			SetParamBoolean(EnumProjectSettingParam id, bool use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetBoolean(use); }
+		void			SetParamInt(EnumProjectSettingParam id, int use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetInt(use); }
+		void			SetParamFloat(EnumProjectSettingParam id, float use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) const noexcept;

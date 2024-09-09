@@ -1906,7 +1906,7 @@ namespace DXLibRef {
 			std::vector<MatchScore> Tmp; Tmp.reserve(64);
 			{
 				CPUResult.clear();
-				std::ifstream inputputfile("data/PassMarkCPU.txt");
+				std::ifstream inputputfile("CommonData/PassMarkCPU.txt");
 				if (inputputfile) {
 					Tmp.clear();
 					std::string ALL;
@@ -1952,7 +1952,7 @@ namespace DXLibRef {
 			}
 			{
 				GPUResult.clear();
-				std::ifstream inputputfile("data/PassMarkGPU.txt");
+				std::ifstream inputputfile("CommonData/PassMarkGPU.txt");
 				if (inputputfile) {
 					Tmp.clear();
 					std::string ALL;

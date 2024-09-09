@@ -354,7 +354,7 @@ namespace DXLibRef {
 		DepthBaseScreenHandle = GraphHandle::Make(size, size, FALSE);			// 深度バッファ用の作成
 		DepthScreenHandle = GraphHandle::MakeDepth(size, size);					// 深度バッファの作成
 		DepthFarScreenHandle = GraphHandle::MakeDepth(size, size);				// 深度バッファの作成
-		m_Shader.Init("shader/VS_SoftShadow.vso", "shader/PS_SoftShadow.pso");
+		m_Shader.Init("CommonData/shader/VS_SoftShadow.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
@@ -574,10 +574,10 @@ namespace DXLibRef {
 		CameraShake::Create();
 
 		auto* SE = SoundPool::Instance();
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_Select), 2, "data/Sound/UI/cursor.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_CANCEL), 1, "data/Sound/UI/cancel.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_OK), 1, "data/Sound/UI/ok.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "data/Sound/UI/ng.wav", false);
+		SE->Add(static_cast<int>(SoundEnumCommon::UI_Select), 2, "CommonData/Sound/UI/cursor.wav", false);
+		SE->Add(static_cast<int>(SoundEnumCommon::UI_CANCEL), 1, "CommonData/Sound/UI/cancel.wav", false);
+		SE->Add(static_cast<int>(SoundEnumCommon::UI_OK), 1, "CommonData/Sound/UI/ok.wav", false);
+		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 
 		m_ShadowDraw = std::make_unique<ShadowDraw>();
@@ -892,10 +892,10 @@ namespace DXLibRef {
 		m_PauseActive.Set(false);
 		//シェーダー
 		this->m_ScreenVertex.SetScreenVertex(GetScreenY(1920), GetScreenY(1080));// 頂点データの準備
-		this->m_Shader2D[0].Init("shader/VS_lens.vso", "shader/PS_lens.pso");//レンズ
-		this->m_Shader2D[1].Init("shader/VS_BlackOut.vso", "shader/PS_BlackOut.pso");//ブラックアウト
-		m_PBR_Shader.Init("shader/VS_PBR3D.vso", "shader/PS_PBR3D.pso");
-		m_PBR_Shader.AddGeometryShader("shader/GS_PBR3D.pso");
+		this->m_Shader2D[0].Init("CommonData/shader/VS_lens.vso", "CommonData/shader/PS_lens.pso");//レンズ
+		this->m_Shader2D[1].Init("CommonData/shader/VS_BlackOut.vso", "CommonData/shader/PS_BlackOut.pso");//ブラックアウト
+		m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
+		m_PBR_Shader.AddGeometryShader("CommonData/shader/GS_PBR3D.pso");
 		//
 		LightPool::Create();
 		//シェーダー
@@ -1048,7 +1048,7 @@ namespace DXLibRef {
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
 			PostPassParts->DrawDoF(sky_doing, [&]() {
 				auto* OptionParts = OPTION::Instance();
-				if (OptionParts->GetParamBoolean(EnumSaveParam::PBR)) {
+				if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 					MATRIX view, projection;
 					GetTransformToViewMatrix(&view);
 					GetTransformToProjectionMatrix(&projection);

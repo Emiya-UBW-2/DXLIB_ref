@@ -33,122 +33,172 @@ namespace DXLibRef {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);//Language
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
+
+		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
+		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
+		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
 
 		//SetOutApplicationLogValidFlag(FALSE);
-		int mdata = INVALID_ID;
-		bool NewData = true;
-		if (std::filesystem::is_regular_file("Save/Setting.txt")) {
-			mdata = FileRead_open("Save/Setting.txt", FALSE);
-			NewData = false;
-		}
+		{
+			int mdata = INVALID_ID;
+			bool NewData = true;
+			if (std::filesystem::is_regular_file("Save/Setting.txt")) {
+				mdata = FileRead_open("Save/Setting.txt", FALSE);
+				NewData = false;
+			}
 
-		if (NewData) {
-			WCHAR localeName[LOCALE_NAME_MAX_LENGTH];
-			int retVal = GetUserDefaultLocaleName(localeName, ARRAYSIZE(localeName));
-			if (retVal > 0) {
-				SetParamInt(EnumSaveParam::Language, (StrCmpW(localeName, L"ja-JP") == 0) ? 0 : 1);
+			if (NewData) {
+				WCHAR localeName[LOCALE_NAME_MAX_LENGTH];
+				int retVal = GetUserDefaultLocaleName(localeName, ARRAYSIZE(localeName));
+				if (retVal > 0) {
+					SetParamInt(EnumSaveParam::Language, (StrCmpW(localeName, L"ja-JP") == 0) ? 0 : 1);
+				}
+				//共通設定項目
+				if (std::filesystem::is_regular_file("data/Setting.txt")) {
+					mdata = FileRead_open("data/Setting.txt", FALSE);
+				}
+				else {
+					//デフォ値
+					SetParamInt(EnumSaveParam::GraphicsPreset, 3);
+					SetParamInt(EnumSaveParam::DirectXVer, 1);
+					SetParamBoolean(EnumSaveParam::usevr, false);
+					SetParamInt(EnumSaveParam::ObjLevel, 3);
+					SetParamBoolean(EnumSaveParam::DoF, true);
+					SetParamBoolean(EnumSaveParam::bloom, true);
+					SetParamInt(EnumSaveParam::shadow, 3);
+					SetParamBoolean(EnumSaveParam::SSAO, true);
+					SetParamInt(EnumSaveParam::fov, 90);
+					SetParamBoolean(EnumSaveParam::vsync, true);
+					SetParamInt(EnumSaveParam::FpsLimit, 60);
+					SetParamFloat(EnumSaveParam::SE, 0.5f);
+					SetParamFloat(EnumSaveParam::VOICE, 0.5f);
+					SetParamFloat(EnumSaveParam::BGM, 0.5f);
+					SetParamBoolean(EnumSaveParam::WindowMode, static_cast<int>(WindowType::Borderless));
+					SetParamBoolean(EnumSaveParam::ScreenEffect, true);
+					SetParamInt(EnumSaveParam::Reflection, 2);
+					SetParamBoolean(EnumSaveParam::MotionBlur, false);
+					SetParamFloat(EnumSaveParam::Xsensing, 0.5f);
+					SetParamFloat(EnumSaveParam::Ysensing, 0.5f);
+					SetParamBoolean(EnumSaveParam::HeadBobbing, true);
+					SetParamInt(EnumSaveParam::ControlType, 2);
+					SetParamBoolean(EnumSaveParam::AA, true);
+					SetParamFloat(EnumSaveParam::DrawScale, 1.f);
+					return;
+				}
 			}
-			//共通設定項目
-			if (std::filesystem::is_regular_file("data/Setting.txt")) {
-				mdata = FileRead_open("data/Setting.txt", FALSE);
-			}
-			else {
-				//デフォ値
-				SetParamInt(EnumSaveParam::GraphicsPreset, 3);
-				SetParamInt(EnumSaveParam::DirectXVer, 1);
-				SetParamBoolean(EnumSaveParam::usevr, false);
-				SetParamInt(EnumSaveParam::ObjLevel, 3);
-				SetParamBoolean(EnumSaveParam::DoF, true);
-				SetParamBoolean(EnumSaveParam::bloom, true);
-				SetParamInt(EnumSaveParam::shadow, 3);
-				SetParamBoolean(EnumSaveParam::SSAO, true);
-				SetParamInt(EnumSaveParam::fov, 90);
-				SetParamBoolean(EnumSaveParam::vsync, true);
-				SetParamInt(EnumSaveParam::FpsLimit, 60);
-				SetParamFloat(EnumSaveParam::SE, 0.5f);
-				SetParamFloat(EnumSaveParam::VOICE, 0.5f);
-				SetParamFloat(EnumSaveParam::BGM, 0.5f);
-				SetParamBoolean(EnumSaveParam::WindowMode, static_cast<int>(WindowType::Borderless));
-				SetParamBoolean(EnumSaveParam::ScreenEffect, true);
-				SetParamInt(EnumSaveParam::Reflection, 2);
-				SetParamBoolean(EnumSaveParam::MotionBlur, false);
-				SetParamFloat(EnumSaveParam::Xsensing, 0.5f);
-				SetParamFloat(EnumSaveParam::Ysensing, 0.5f);
-				SetParamBoolean(EnumSaveParam::HeadBobbing, true);
-				SetParamInt(EnumSaveParam::ControlType, 2);
-				SetParamBoolean(EnumSaveParam::AA, true);
-				SetParamFloat(EnumSaveParam::DrawScale, 1.f);
-				SetParamBoolean(EnumSaveParam::GodRay, true);
-				SetParamBoolean(EnumSaveParam::PBR, true);
-				SetParamBoolean(EnumSaveParam::Distortion, true);
-				return;
-			}
-		}
-		while (true) {
-			if (FileRead_eof(mdata) != 0) {
-				break;
-			}
-			auto ALL = getparams::Getstr(mdata);
-			if (ALL == "") {
-				continue;
-			}
-			auto LEFT = getparams::getleft(ALL);
-			auto RIGHT = getparams::getright(ALL);
-			for (size_t loop = 0; loop < static_cast<size_t>(EnumSaveParam::Max); loop++) {
-				if (LEFT != OptionStr[loop]) {
+			while (true) {
+				if (FileRead_eof(mdata) != 0) {
+					break;
+				}
+				auto ALL = getparams::Getstr(mdata);
+				if (ALL == "") {
 					continue;
 				}
-				switch (m_SaveParams.at(loop).GetEnumParamType()) {
-				case EnumParamType::Boolean:
-					SetParamBoolean((EnumSaveParam)loop, (RIGHT.find("true") != std::string::npos));
-					break;
-				case EnumParamType::Int:
-					if (std::all_of(RIGHT.cbegin(), RIGHT.cend(), isdigit)) {
-						SetParamInt((EnumSaveParam)loop, std::stoi(RIGHT));
+				auto LEFT = getparams::getleft(ALL);
+				auto RIGHT = getparams::getright(ALL);
+				for (size_t loop = 0; loop < static_cast<size_t>(EnumSaveParam::Max); loop++) {
+					if (LEFT != OptionStr[loop]) {
+						continue;
 					}
-					else {
-						SetParamInt((EnumSaveParam)loop, 0);
-					}
-					break;
-				case EnumParamType::Float:
-					SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));//todo 小数か確認
-					break;
-				case EnumParamType::Else:
-					if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
-						for (size_t i = 0; i < 2; ++i) {
-							if (RIGHT == DirectXVerStr[i]) {
-								SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
-								break;
+					switch (m_SaveParams.at(loop).GetEnumParamType()) {
+					case EnumParamType::Boolean:
+						SetParamBoolean((EnumSaveParam)loop, (RIGHT.find("true") != std::string::npos));
+						break;
+					case EnumParamType::Int:
+						if (std::all_of(RIGHT.cbegin(), RIGHT.cend(), isdigit)) {
+							SetParamInt((EnumSaveParam)loop, std::stoi(RIGHT));
+						}
+						else {
+							SetParamInt((EnumSaveParam)loop, 0);
+						}
+						break;
+					case EnumParamType::Float:
+						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));//todo 小数か確認
+						break;
+					case EnumParamType::Else:
+						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
+							for (size_t i = 0; i < 2; ++i) {
+								if (RIGHT == DirectXVerStr[i]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+									break;
+								}
 							}
 						}
-					}
-					else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
-						for (size_t i = 1; i < 3; ++i) {
-							if (RIGHT == ControlTypeStr[i]) {
-								SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
-								break;
+						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
+							for (size_t i = 1; i < 3; ++i) {
+								if (RIGHT == ControlTypeStr[i]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+									break;
+								}
 							}
 						}
-					}
-					else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
-						for (size_t i = 0; i < 2; ++i) {
-							if (RIGHT == LanguageStr[i]) {
-								SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
-								break;
+						else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
+							for (size_t i = 0; i < 2; ++i) {
+								if (RIGHT == LanguageStr[i]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+									break;
+								}
 							}
 						}
+						break;
+					default:
+						break;
 					}
-					break;
-				default:
 					break;
 				}
-				break;
 			}
+			FileRead_close(mdata);
 		}
-		FileRead_close(mdata);
+		{
+			int mdata = INVALID_ID;
+			if (std::filesystem::is_regular_file("CommonData/ProjectSetting.txt")) {
+				mdata = FileRead_open("CommonData/ProjectSetting.txt", FALSE);
+			}
+			else {
+				SetParamBoolean(EnumProjectSettingParam::GodRay, true);
+				SetParamBoolean(EnumProjectSettingParam::PBR, true);
+				SetParamBoolean(EnumProjectSettingParam::Distortion, true);
+				return;
+			}
+			while (true) {
+				if (FileRead_eof(mdata) != 0) {
+					break;
+				}
+				auto ALL = getparams::Getstr(mdata);
+				if (ALL == "") {
+					continue;
+				}
+				auto LEFT = getparams::getleft(ALL);
+				auto RIGHT = getparams::getright(ALL);
+				for (size_t loop = 0; loop < static_cast<size_t>(EnumProjectSettingParam::Max); loop++) {
+					if (LEFT != ProjectSettingStr[loop]) {
+						continue;
+					}
+					switch (m_ProjectSettingParams.at(loop).GetEnumParamType()) {
+					case EnumParamType::Boolean:
+						SetParamBoolean((EnumProjectSettingParam)loop, (RIGHT.find("true") != std::string::npos));
+						break;
+					case EnumParamType::Int:
+						if (std::all_of(RIGHT.cbegin(), RIGHT.cend(), isdigit)) {
+							SetParamInt((EnumProjectSettingParam)loop, std::stoi(RIGHT));
+						}
+						else {
+							SetParamInt((EnumProjectSettingParam)loop, 0);
+						}
+						break;
+					case EnumParamType::Float:
+						SetParamFloat((EnumProjectSettingParam)loop, std::stof(RIGHT));//todo 小数か確認
+						break;
+					case EnumParamType::Else:
+						break;
+					default:
+						break;
+					}
+					break;
+				}
+			}
+			FileRead_close(mdata);
+		}
 		//SetOutApplicationLogValidFlag(TRUE);
 	}
 

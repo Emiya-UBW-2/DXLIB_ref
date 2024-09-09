@@ -26,10 +26,10 @@ namespace DXLibRef {
 
 		switch (this->m_Type) {
 		case FontType::MS_Gothic:
-			Str = "Font/MSG_";
+			Str = "CommonData/Font/MSG_";
 			break;
 		case FontType::DIZ_UD_Gothic:
-			Str = "Font/BIZUDG_";
+			Str = "CommonData/Font/BIZUDG_";
 			break;
 		default:
 			break;

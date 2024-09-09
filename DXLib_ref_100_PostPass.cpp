@@ -81,7 +81,7 @@ namespace DXLibRef {
 			SSRNormalScreen = GraphHandle::Make(xsize, ysize, false);
 			SSRDepthScreen = GraphHandle::MakeDepth(xsize, ysize);
 			m_SSRScreenVertex.SetScreenVertex(xsize, ysize);
-			m_Shader.Init("shader/VS_SSR.vso", "shader/PS_SSR.pso");
+			m_Shader.Init("CommonData/shader/VS_SSR.vso", "CommonData/shader/PS_SSR.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
 			SSRScreen.Dispose();
@@ -164,7 +164,7 @@ namespace DXLibRef {
 			auto* DrawParts = DXDraw::Instance();
 			DoFScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
 			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
-			m_Shader.Init("shader/VS_DoF.vso", "shader/PS_DoF.pso");
+			m_Shader.Init("CommonData/shader/VS_DoF.vso", "CommonData/shader/PS_DoF.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
 			DoFScreen.Dispose();
@@ -666,7 +666,7 @@ namespace DXLibRef {
 		}
 		bool IsActive_Sub(void) noexcept override {
 			auto* OptionParts = OPTION::Instance();
-			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect) && OptionParts->GetParamBoolean(EnumSaveParam::Distortion);
+			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect) && OptionParts->GetParamBoolean(EnumProjectSettingParam::Distortion);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
@@ -692,7 +692,7 @@ namespace DXLibRef {
 		void Load_Sub(void) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
-			m_Shader.Init("shader/VS_FXAA.vso", "shader/PS_FXAA.pso");
+			m_Shader.Init("CommonData/shader/VS_FXAA.vso", "CommonData/shader/PS_FXAA.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
 			m_Shader.Dispose();
@@ -737,7 +737,7 @@ namespace DXLibRef {
 		void Load_Sub(void) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
 			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND);
-			m_Shader.Init("shader/VS_GodRay.vso", "shader/PS_GodRay.pso");
+			m_Shader.Init("CommonData/shader/VS_GodRay.vso", "CommonData/shader/PS_GodRay.pso");
 			SSRScreen = GraphHandle::Make(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND, true);
 			SSRDepthScreen = GraphHandle::MakeDepth(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND);
 		}
@@ -748,7 +748,7 @@ namespace DXLibRef {
 		}
 		bool IsActive_Sub(void) noexcept override {
 			auto* OptionParts = OPTION::Instance();
-			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumSaveParam::GodRay);
+			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::GodRay);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
