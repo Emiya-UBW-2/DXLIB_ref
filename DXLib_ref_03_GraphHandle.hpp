@@ -101,6 +101,9 @@ namespace DXLibRef {
 		static GraphHandle LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int* HandleArray, bool NotUse3DFlag = false) noexcept {
 			return { DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum,  XSize, YSize, HandleArray, NotUse3DFlag) };
 		}
+		static GraphHandle DerivationGraph(int x, int y, int xsize, int ysize, const GraphHandle& baseImage) noexcept {
+			return { DxLib::DerivationGraph(x,y,xsize,ysize,baseImage.get()) };
+		}
 
 		static GraphHandle Make(int SizeX, int SizeY, bool trns = false) noexcept {
 			return { DxLib::MakeScreen(SizeX, SizeY, (trns ? TRUE : FALSE)) };
@@ -159,7 +162,7 @@ namespace DXLibRef {
 			}
 		}
 		//
-		void SetDraw_Screen(const bool& Clear = true) noexcept {
+		void SetDraw_Screen(const bool& Clear = true) const noexcept {
 			SetDrawScreen(this->handle_);
 			if (Clear) {
 				ClearDrawScreen();

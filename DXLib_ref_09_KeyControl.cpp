@@ -5,14 +5,11 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
 
-	void PadControl::KeyGuideGraphs::AddGuideXBox(int ID, std::string_view GuideStr) noexcept {
+	void PadControl::KeyGuideGraphs::AddGuideXBox(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		if (0 <= ID && ID < XBoxNum) {
-			std::string Path = "CommonData/key/key_glay/";
-			Path += XBoxGuidePath[ID];
-			Path += ".png";
-			GuideImg = GraphHandle::Load(Path);
-			GuideImg.GetSize(&xsize, &ysize);
+		if (pGuide) {
+			pGuideImg = pGuide;
+			pGuideImg->GetSize(&xsize, &ysize);
 			xsize = xsize * DrawParts->GetUIY(24) / ysize;
 			ysize = ysize * DrawParts->GetUIY(24) / ysize;
 		}
@@ -22,14 +19,11 @@ namespace DXLibRef {
 		}
 		GuideString = GuideStr;
 	}
-	void PadControl::KeyGuideGraphs::AddGuideDS4(int ID, std::string_view GuideStr) noexcept {
+	void PadControl::KeyGuideGraphs::AddGuideDS4(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		if (0 <= ID && ID < DS4Num) {
-			std::string Path = "CommonData/key/key_glay/";
-			Path += DS4GuidePath[ID];
-			Path += ".png";
-			GuideImg = GraphHandle::Load(Path);
-			GuideImg.GetSize(&xsize, &ysize);
+		if (pGuide) {
+			pGuideImg = pGuide;
+			pGuideImg->GetSize(&xsize, &ysize);
 			xsize = xsize * DrawParts->GetUIY(24) / ysize;
 			ysize = ysize * DrawParts->GetUIY(24) / ysize;
 		}
@@ -39,19 +33,11 @@ namespace DXLibRef {
 		}
 		GuideString = GuideStr;
 	}
-	void PadControl::KeyGuideGraphs::AddGuidePC(int ID, std::string_view GuideStr) noexcept {
+	void PadControl::KeyGuideGraphs::AddGuidePC(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		if (0 <= ID && ID < KeyNum) {
-			std::string Path = "CommonData/key/key_glay/";
-			Path += KeyGuidePath[ID];
-			if ((KeyID[ID] & 0xF00) != 0) {
-				Path += ".png";
-			}
-			else {
-				Path += ".jpg";
-			}
-			GuideImg = GraphHandle::Load(Path);
-			GuideImg.GetSize(&xsize, &ysize);
+		if (pGuide) {
+			pGuideImg = pGuide;
+			pGuideImg->GetSize(&xsize, &ysize);
 			if (ysize == 0) {
 				ysize = 1;
 			}
@@ -84,7 +70,7 @@ namespace DXLibRef {
 		int ofs = 0;
 		if (xsize > 0) {
 			WindowSystem::DrawControl::Instance()->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
-				&GuideImg, x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
+				pGuideImg, x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
 			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
 		}
 		WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
@@ -303,7 +289,7 @@ namespace DXLibRef {
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			for (size_t i = 0; i < KeyNum; ++i) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
-					Key.back()->AddGuidePC(static_cast<int>(i), LocalizeParts->Get(9990));
+					Key.back()->AddGuidePC(&GuideRect.at(i), LocalizeParts->Get(9990));
 					break;
 				}
 			}

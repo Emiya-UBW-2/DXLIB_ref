@@ -204,7 +204,7 @@ namespace DXLibRef {
 			特定のエフェクトを描画する。
 			DrawEffekseer3Dとは併用できない。
 		*/
-		void Draw(void) noexcept {
+		void Draw(void) const noexcept {
 			DrawEffekseer3D_Draw(this->handle_);
 		}
 		[[deprecated]] int get(void) const noexcept { return this->handle_; }

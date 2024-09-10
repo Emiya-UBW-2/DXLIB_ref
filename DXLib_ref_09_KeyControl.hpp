@@ -579,7 +579,7 @@ namespace DXLibRef {
 		class KeyGuideGraphs {
 		public:
 			int xsize{ 0 }, ysize{ 0 };
-			GraphHandle GuideImg;
+			GraphHandle* pGuideImg{ nullptr };
 			std::string GuideString;
 		public:
 			KeyGuideGraphs(void) noexcept {}
@@ -590,11 +590,11 @@ namespace DXLibRef {
 
 			~KeyGuideGraphs(void) noexcept {}
 		public:
-			void AddGuideXBox(int ID, std::string_view GuideStr) noexcept;
-			void AddGuideDS4(int ID, std::string_view GuideStr) noexcept;
-			void AddGuidePC(int ID, std::string_view GuideStr) noexcept;
+			void AddGuideXBox(GraphHandle* pGuide, std::string_view GuideStr) noexcept;
+			void AddGuideDS4(GraphHandle* pGuide, std::string_view GuideStr) noexcept;
+			void AddGuidePC(GraphHandle* pGuide, std::string_view GuideStr) noexcept;
 			void Reset(void) noexcept {
-				GuideImg.Dispose();
+				pGuideImg = nullptr;
 				GuideString = "";
 			}
 			int GetDrawSize(void) const noexcept;
@@ -623,6 +623,9 @@ namespace DXLibRef {
 		//
 		std::array<switchs, 26>	m_AtoZKey;
 		std::array<switchs, 10>	m_NumKey;
+		//
+		GraphHandle GuideBase;
+		std::vector<GraphHandle> GuideRect;
 		//ガイド等のコントロール
 		bool		m_IsUpdate{ true };
 		bool		m_MouseMoveEnable{ true };
@@ -730,6 +733,38 @@ namespace DXLibRef {
 			for (auto& k : this->m_NumKey) {
 				k.Set(false);
 			}
+			GuideBase = GraphHandle::Load("CommonData/key/OutputFont.png");
+			{
+				int mdata = INVALID_ID;
+				mdata = FileRead_open("CommonData/key/OutputFont.psf", FALSE);
+				while (true) {
+					if (FileRead_eof(mdata) != 0) {
+						break;
+					}
+					auto ALL = getparams::Getstr(mdata);
+					if (ALL == "") {
+						continue;
+					}
+					auto LEFT = getparams::getleft(ALL);
+					auto RIGHT = getparams::getright(ALL);
+
+					std::vector<int> Args;
+					while (true) {
+						auto div = RIGHT.find(",");
+						if (div != std::string::npos) {
+							Args.emplace_back(std::stoi(RIGHT.substr(0, div)));
+							RIGHT = RIGHT.substr(div + 1);
+						}
+						else {
+							Args.emplace_back(std::stoi(RIGHT));
+							break;
+						}
+					}
+					GuideRect.resize(GuideRect.size() + 1);
+					GuideRect.back() = GraphHandle::DerivationGraph(Args.at(0), Args.at(1), Args.at(2), Args.at(3), GuideBase);
+				}
+				FileRead_close(mdata);
+			}
 			Load();
 		}
 		PadControl(const PadControl&) = delete;
@@ -795,7 +830,7 @@ namespace DXLibRef {
 			case ControlType::XBox:
 				for (size_t i = 0; i < XBoxNum; ++i) {
 					if (XBoxID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-						Key.back()->AddGuideXBox(static_cast<int>(i), GuideStr);
+						Key.back()->AddGuideXBox(&GuideRect.at(i + KeyNum + XBoxNum), GuideStr);
 						return;
 					}
 				}
@@ -803,7 +838,7 @@ namespace DXLibRef {
 			case ControlType::PS4:
 				for (size_t i = 0; i < DS4Num; ++i) {
 					if (DS4ID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-						Key.back()->AddGuideDS4(static_cast<int>(i), GuideStr);
+						Key.back()->AddGuideDS4(&GuideRect.at(i + KeyNum), GuideStr);
 						return;
 					}
 				}
@@ -811,7 +846,7 @@ namespace DXLibRef {
 			case ControlType::PC:
 				for (size_t i = 0; i < KeyNum; ++i) {
 					if (KeyID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
-						Key.back()->AddGuidePC(static_cast<int>(i), GuideStr);
+						Key.back()->AddGuidePC(&GuideRect.at(i), GuideStr);
 						return;
 					}
 				}
@@ -819,7 +854,7 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			Key.back()->AddGuidePC(INVALID_ID, GuideStr);
+			Key.back()->AddGuidePC(nullptr, GuideStr);
 		}
 	public:
 		void Execute(void) noexcept;
