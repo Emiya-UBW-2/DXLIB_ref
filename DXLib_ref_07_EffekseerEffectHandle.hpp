@@ -428,7 +428,7 @@ namespace DXLibRef {
 		}
 		auto		CheckEffectCount(void) const noexcept {
 			int cnt = 0;
-			for (int i = 0; i < EffectNum; ++i) {
+			for (int i : std::views::iota(0, EffectNum)) {
 				for (auto& t : this->m_effect.at(static_cast<size_t>(i)).second) {
 					if (t->GetIsPlaying()) {
 						++cnt;

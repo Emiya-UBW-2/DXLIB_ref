@@ -116,7 +116,7 @@ namespace DXLibRef {
 			break;
 			case DrawType::String:
 				FontPool::Instance()->Get((FontPool::FontType)m_intParam[0], this->m_intParam[1], 3)->DrawString(
-					-1,
+					INVALID_ID,
 					(FontHandle::FontXCenter)m_intParam[2], (FontHandle::FontYCenter)m_intParam[3],
 					m_intParam[4], this->m_intParam[5],
 					m_UintParam[0],
@@ -296,7 +296,7 @@ namespace DXLibRef {
 				int r = LineHeight / 3;
 				int xps = (xmax + xmin) / 2;
 				int yps = yp + LineHeight / 2;
-				for (int loop = 0; loop < valueMax; ++loop) {
+				for (int loop : std::views::iota(0, valueMax)) {
 					int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
 					if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen, false, true)) {
 						auto* SE = SoundPool::Instance();
@@ -521,7 +521,7 @@ namespace DXLibRef {
 		this->m_Name = pJson["Name"];
 		//
 		std::string Type = pJson["Type"];
-		for (size_t i = 0; i < static_cast<size_t>(EnumUIPartsType::Max); ++i) {
+		for (size_t i : std::views::iota(0, static_cast<int>(EnumUIPartsType::Max))) {
 			if (Type == g_UIPartsString[i]) {
 				this->m_EnumUIPartsType = (EnumUIPartsType)i;
 				break;
@@ -539,14 +539,14 @@ namespace DXLibRef {
 		this->m_ZRotate = pJson["ZRotate"];
 		//
 		std::string XCenter = pJson["XCenter"];
-		for (size_t i = 0; i < 3; ++i) {
+		for (size_t i : std::views::iota(0, 3)) {
 			if (XCenter == g_UIXCenterString[i]) {
 				this->m_UIXCenter = (UIXCenter)i;
 				break;
 			}
 		}
 		std::string YCenter = pJson["YCenter"];
-		for (size_t i = 0; i < 3; ++i) {
+		for (size_t i : std::views::iota(0, 3)) {
 			if (YCenter == g_UIYCenterString[i]) {
 				this->m_UIYCenter = (UIYCenter)i;
 				break;
@@ -554,7 +554,7 @@ namespace DXLibRef {
 		}
 		//色関係
 		auto GetColorByPallet = [&](const std::string& ColorStr) {
-			for (size_t i = 0; i < g_UIColorPalletNum; ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(g_UIColorPalletNum))) {
 				if (ColorStr == g_UIColorPalletString[i]) {
 					return g_UIColorPallet[i];
 					break;
@@ -793,7 +793,7 @@ namespace DXLibRef {
 			tmp.m_YOfs = n["YOffset"];
 			tmp.m_ZRotOfs = n["ZRotOfs"];
 			std::string Lerptype = n["LerpType"];
-			for (size_t i = 0; i < static_cast<size_t>(LerpType::Max); ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(LerpType::Max))) {
 				if (Lerptype == g_LerpTypeStr[i]) {
 					tmp.m_LerpType = (LerpType)i;
 					break;
@@ -814,9 +814,9 @@ namespace DXLibRef {
 		//現在のアニメ番号を取得
 		m_NowAnim = INVALID_ID;
 		int tmpFrame = m_Frame;
-		for (auto& a : m_AnimeFrame) {
+		for (size_t index = 0; auto& a : m_AnimeFrame) {
 			if (tmpFrame < a.m_framepoint) {
-				m_NowAnim = static_cast<int>(&a - &m_AnimeFrame.front());
+				m_NowAnim = static_cast<int>(index);
 				FramePer = static_cast<float>(tmpFrame) / static_cast<float>(a.m_framepoint);
 				switch (a.m_LerpType) {
 				case LerpType::linear:
@@ -833,6 +833,7 @@ namespace DXLibRef {
 				break;
 			}
 			tmpFrame -= a.m_framepoint;
+			index++;
 		}
 		if (m_NowAnim == INVALID_ID) {
 			m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
@@ -912,11 +913,12 @@ namespace DXLibRef {
 	}
 	//全体
 	int UISystem::AddUI(const char* path) noexcept {
-		for (auto& l : m_Layer) {
+		for (size_t index = 0; auto& l : m_Layer) {
 			if (!l.IsActive()) {
 				l.Load(path);
-				return static_cast<int>(&l - &m_Layer.front());
+				return static_cast<int>(index);
 			}
+			index++;
 		}
 		return INVALID_ID;
 	}

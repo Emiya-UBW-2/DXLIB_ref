@@ -313,7 +313,7 @@ namespace DXLibRef {
 		public:
 			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
 				auto* DrawParts = DXDraw::Instance();
-				for (int i = 0; i < MAX; ++i) {
+				for (int i : std::views::iota(0, MAX)) {
 					m_screen.at(static_cast<size_t>(i)) = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
 				}
 				m_current = 0;
@@ -326,7 +326,7 @@ namespace DXLibRef {
 				m_notBlendDraw = 0;
 			}
 			void Release() noexcept {
-				for (int i = 0; i < MAX; ++i) {
+				for (int i : std::views::iota(0, MAX)) {
 					m_screen.at(static_cast<size_t>(i)).Dispose();
 				}
 			}

@@ -44,8 +44,7 @@ namespace DXLibRef {
 			}
 			if (this->m_Frames.size() > 0) {
 				int count = 0;
-				int Max = this->m_obj.GetFrameNum();
-				for (int frameNum = 0; frameNum < Max; frameNum++) {
+				for (int frameNum = 0, Max = this->m_obj.GetFrameNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(count)) {
 						//そのフレームを登録
 						this->m_Frames[static_cast<size_t>(count)].first = frameNum;
@@ -73,8 +72,7 @@ namespace DXLibRef {
 			}
 			if (this->m_Materials.size() > 0) {
 				int count = 0;
-				int Max = this->m_obj.GetMaterialNum();
-				for (int frameNum = 0; frameNum < Max; frameNum++) {
+				for (int frameNum = 0, Max = this->m_obj.GetMaterialNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(count)) {
 						//そのフレームを登録
 						this->m_Materials[static_cast<size_t>(count)] = frameNum;
@@ -96,7 +94,7 @@ namespace DXLibRef {
 			if (pBase->GetShapeNum() > 0) {
 				this->m_Shapes.resize(static_cast<size_t>(pBase->GetShapeNum()));
 			}
-			for (int j = 0; j < static_cast<int>(this->m_Shapes.size()); j++) {
+			for (int j : std::views::iota(0, static_cast<int>(this->m_Shapes.size()))) {
 				auto s = this->m_obj.SearchShape(pBase->GetShapeStr(j));
 				if (s >= 0) {
 					this->m_Shapes[static_cast<size_t>(j)].first = s;
@@ -115,21 +113,22 @@ namespace DXLibRef {
 				MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
 				if (!UseToonWhenCreateFile) {
 					obj->SetMaterialTypeAll(DX_MATERIAL_TYPE_NORMAL);
+					if (obj->GetMaterialNum() > 0) {
+						for (int i : std::views::iota(0, obj->GetMaterialNum())) {
+							/*
+							// テクスチャ追加前のテクスチャ数を取得しておく
+							int TexIndex = MV1GetTextureNum(obj->GetHandle());
+							// モデルで使用するテクスチャを追加する
+							MV1AddTexture(obj->GetHandle(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
+							// 指定のマテリアル( ここでは例として3番のマテリアル )で使用する法線マップを設定する
+							MV1SetMaterialNormalMapTexture(obj->GetHandle(), i, TexIndex);
+							//*/
 
-					for (int i = 0, Max = obj->GetMaterialNum(); i < Max; ++i) {
-						/*
-						// テクスチャ追加前のテクスチャ数を取得しておく
-						int TexIndex = MV1GetTextureNum(obj->GetHandle());
-						// モデルで使用するテクスチャを追加する
-						MV1AddTexture(obj->GetHandle(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
-						// 指定のマテリアル( ここでは例として3番のマテリアル )で使用する法線マップを設定する
-						MV1SetMaterialNormalMapTexture(obj->GetHandle(), i, TexIndex);
-						//*/
-
-						obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
-						obj->SetMaterialSpcColor(i, GetColorF(0.f, 0.f, 0.f, 0.f));
-						obj->SetMaterialAmbColor(i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
-						obj->SetMaterialSpcPower(i, 0.1f);
+							obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
+							obj->SetMaterialSpcColor(i, GetColorF(0.f, 0.f, 0.f, 0.f));
+							obj->SetMaterialAmbColor(i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
+							obj->SetMaterialSpcPower(i, 0.1f);
+						}
 					}
 				}
 				obj->SaveModelToMV1File(this->m_FilePath + this->m_ObjFileName + NameAdd + ".mv1");
@@ -170,27 +169,27 @@ namespace DXLibRef {
 		}
 		//フレーム
 		this->m_Frames.resize(pBase->m_Frames.size());
-		for (auto& f : this->m_Frames) {
-			auto index = static_cast<std::size_t>(&f - &this->m_Frames.front());
+		for (size_t index = 0; auto& f : this->m_Frames) {
 			f.first = pBase->m_Frames.at(index).first;
 			if (f.first != INVALID_ID) {
 				f.second = pBase->m_Frames.at(index).second;
 			}
+			index++;
 		}
 		//フレーム
 		this->m_Materials.resize(pBase->m_Materials.size());
-		for (auto& f : this->m_Materials) {
-			auto index = static_cast<std::size_t>(&f - &this->m_Materials.front());
+		for (size_t index = 0; auto& f : this->m_Materials) {
 			f = pBase->m_Materials.at(index);
+			index++;
 		}
 		//シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());
-		for (auto& f : this->m_Shapes) {
-			auto index = static_cast<std::size_t>(&f - &this->m_Shapes.front());
+		for (size_t index = 0; auto& f : this->m_Shapes) {
 			f.first = pBase->m_Shapes.at(index).first;
 			if (f.first != INVALID_ID) {
 				f.second = pBase->m_Shapes.at(index).second;
 			}
+			index++;
 		}
 	}
 	//
@@ -215,11 +214,12 @@ namespace DXLibRef {
 			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
 		//シェイプ更新
-		for (auto& f : this->m_Shapes) {
-			if ((&f - &this->m_Shapes.front()) == 0) {
+		for (size_t index = 0; auto& f : this->m_Shapes) {
+			if (index == 0) {
 				continue;
 			}
 			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes[0].second) * f.second);
+			index++;
 		}
 		//物理更新
 		if (this->m_PHYSICS_SETUP == PHYSICS_SETUP::REALTIME) {
@@ -233,7 +233,7 @@ namespace DXLibRef {
 				if (DrawParts->GetFps() > 120.f) {
 					Max = 1;
 				}
-				for (int i = 0; i < Max; ++i) {
+				for (int i : std::views::iota(0, Max)) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
 					this->GetObj().PhysicsCalculation(1000.0f * 60.f / DrawParts->GetFps() / static_cast<float>(Max));
 				}
@@ -270,7 +270,7 @@ namespace DXLibRef {
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * 12.5f, -0.f * 12.5f, -1.f * 12.5f)).get(),
 				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * 12.5f, 1.f * 12.5f, 1.f * 12.5f)).get()) == FALSE
 				) {
-				for (int i = 0; i < static_cast<int>(this->GetObj().GetMeshNum()); ++i) {
+				for (int i : std::views::iota(0, static_cast<int>(this->GetObj().GetMeshNum()))) {
 					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {
 						this->GetObj().DrawMesh(i);
 					}

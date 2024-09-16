@@ -232,8 +232,8 @@ namespace DXLibRef {
 		}
 		//”äŠr
 		bool operator==(const Matrix4x4DX& obj) const noexcept {
-			for (int x = 0; x < 4; ++x) {
-				for (int y = 0; y < 4; ++y) {
+			for (int x : std::views::iota(0, 4)) {
+				for (int y : std::views::iota(0, 4)) {
 					if (this->get().m[x][y] != obj.get().m[x][y]) {
 						return false;
 					}
@@ -256,15 +256,15 @@ namespace DXLibRef {
 	//‘ŠŒÝ•ÏŠ·
 	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr) {
 		*pTarget = DxLib::MGetIdent();
-		for (int x = 0; x < 3; ++x) {
-			for (int y = 0; y < 3; ++y) {
+		for (int x : std::views::iota(0, 3)) {
+			for (int y : std::views::iota(0, 3)) {
 				pTarget->m[x][y] = pAtr.m[x][y];
 			}
 		}
 	}
 	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr) {
-		for (int x = 0; x < 3; ++x) {
-			for (int y = 0; y < 3; ++y) {
+		for (int x : std::views::iota(0, 3)) {
+			for (int y : std::views::iota(0, 3)) {
 				pTarget->m[x][y] = pAtr.m[x][y];
 			}
 		}
@@ -533,8 +533,8 @@ namespace DXLibRef {
 		}
 		//”äŠr
 		bool operator==(const Matrix3x3DX& obj) const noexcept {
-			for (int x = 0; x < 3; ++x) {
-				for (int y = 0; y < 3; ++y) {
+			for (int x : std::views::iota(0, 3)) {
+				for (int y : std::views::iota(0, 3)) {
 					if (this->get().m[x][y] != obj.get().m[x][y]) {
 						return false;
 					}

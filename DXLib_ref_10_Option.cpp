@@ -96,7 +96,7 @@ namespace DXLibRef {
 				}
 				auto LEFT = getparams::getleft(ALL);
 				auto RIGHT = getparams::getright(ALL);
-				for (size_t loop = 0; loop < static_cast<size_t>(EnumSaveParam::Max); loop++) {
+				for (size_t loop : std::views::iota(0, static_cast<int>(EnumSaveParam::Max))) {
 					if (LEFT != OptionStr[loop]) {
 						continue;
 					}
@@ -117,7 +117,7 @@ namespace DXLibRef {
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
-							for (size_t i = 0; i < 2; ++i) {
+							for (size_t i : std::views::iota(0, 2)) {
 								if (RIGHT == DirectXVerStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -125,7 +125,7 @@ namespace DXLibRef {
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
-							for (size_t i = 1; i < 3; ++i) {
+							for (size_t i : std::views::iota(1, 3)) {
 								if (RIGHT == ControlTypeStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -133,7 +133,7 @@ namespace DXLibRef {
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
-							for (size_t i = 0; i < 2; ++i) {
+							for (size_t i : std::views::iota(0, 2)) {
 								if (RIGHT == LanguageStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
@@ -170,7 +170,7 @@ namespace DXLibRef {
 				}
 				auto LEFT = getparams::getleft(ALL);
 				auto RIGHT = getparams::getright(ALL);
-				for (size_t loop = 0; loop < static_cast<size_t>(EnumProjectSettingParam::Max); loop++) {
+				for (size_t loop : std::views::iota(0, static_cast<int>(EnumProjectSettingParam::Max))) {
 					if (LEFT != ProjectSettingStr[loop]) {
 						continue;
 					}
@@ -205,7 +205,7 @@ namespace DXLibRef {
 	void			OPTION::Save(void) const noexcept {
 		std::ofstream outputfile("Save/Setting.txt");
 
-		for (int loop = 0; loop < static_cast<int>(EnumSaveParam::Max); loop++) {
+		for (int loop : std::views::iota(0, static_cast<int>(EnumSaveParam::Max))) {
 			switch (m_SaveParams.at(static_cast<size_t>(loop)).GetEnumParamType()) {
 			case EnumParamType::Boolean:
 				outputfile << std::string(OptionStr[loop]) + "=" + std::string(GetParamBoolean((EnumSaveParam)loop) ? "true" : "false") + "\n";
@@ -303,7 +303,7 @@ namespace DXLibRef {
 		if (isActive) {
 			xp1 = xpos;
 			yp1 = ypos + LineHeight * 2;
-			for (int i = 0; i < static_cast<int>(m_Elements.size()); ++i) {
+			for (int i : std::views::iota(0, static_cast<int>(m_Elements.size()))) {
 				yp1 += (LineHeight + DrawParts->GetUIY(6));
 				if (IntoMouse(xp1, yp1, xp1 + DrawParts->GetUIY(500), yp1 + (LineHeight + DrawParts->GetUIY(6)))) {
 					*select = i;
@@ -702,7 +702,7 @@ namespace DXLibRef {
 				int ret = 0;
 				//Œ‹‰Ê‚©‚çˆê”Ô‹ß‚¢‚â‚Â‚ÉŽw’è
 				int diff = 10000;
-				for (int i = 0; i < FrameLimitsNum; ++i) {
+				for (int i : std::views::iota(0, FrameLimitsNum)) {
 					int tmp = std::abs(FrameLimits[static_cast<size_t>(i)] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 					if (diff > tmp) {
 						diff = tmp;

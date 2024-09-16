@@ -285,10 +285,11 @@ namespace DXLibRef {
 		~FontPool(void) noexcept {}
 	private:
 		size_t Add(FontType type, int fontSize, int edgeSize) noexcept {
-			for (auto& h : this->m_Pools) {
+			for (size_t index = 0; auto& h : this->m_Pools) {
 				if (h->Equal(type, fontSize, edgeSize)) {
-					return static_cast<size_t>(&h - &this->m_Pools.front());
+					return index;
 				}
+				index++;
 			}
 			this->m_Pools.emplace_back(std::make_unique<Fonthave>());
 			this->m_Pools.back()->Set(type, fontSize, edgeSize);

@@ -810,7 +810,7 @@ namespace DXLibRef {
 					}
 					//DirectX
 					int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
-					for (int loop = 0; loop < 2; loop++) {
+					for (int loop : std::views::iota(0, 2)) {
 						if (GetUseDirect3DVersion() == DirectXVerID[loop]) {
 							NowSet = loop;
 						}

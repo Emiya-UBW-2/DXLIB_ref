@@ -620,6 +620,7 @@ namespace DXLibRef {
 		switchs MouseClick;
 		switchs KeyEsc;
 		switchs KeyBSorDel;
+		int MouseWheelRot{ 0 };
 		//
 		std::array<switchs, 26>	m_AtoZKey;
 		std::array<switchs, 10>	m_NumKey;
@@ -636,21 +637,21 @@ namespace DXLibRef {
 		const std::string	GetIDtoStr(int ID) const noexcept {
 			switch (m_ControlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < XBoxNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(XBoxNum))) {
 					if (XBoxID[i] == ID) {
 						return XBoxStr[i];
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < DS4Num; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(DS4Num))) {
 					if (DS4ID[i] == ID) {
 						return DS4Str[i];
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < KeyNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 					if (KeyID[i] == ID) {
 						return KeyStr[i];
 					}
@@ -665,21 +666,21 @@ namespace DXLibRef {
 		int			GetStrtoID(const char* Str) const noexcept {
 			switch (m_ControlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < XBoxNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(XBoxNum))) {
 					if (strcmpDx(XBoxStr[i], Str) == 0) {
 						return XBoxID[i];
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < DS4Num; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(DS4Num))) {
 					if (strcmpDx(DS4Str[i], Str) == 0) {
 						return DS4ID[i];
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < KeyNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 					if (strcmpDx(KeyStr[i], Str) == 0) {
 						return KeyID[i];
 					}
@@ -782,6 +783,7 @@ namespace DXLibRef {
 		const auto& GetMouseClick(void) const noexcept { return MouseClick; }
 		const auto& GetEsc(void) const noexcept { return KeyEsc; }
 		const auto& GetBSorDel(void) const noexcept { return KeyBSorDel; }
+		const auto& GetMouseWheelRot(void) const noexcept { return MouseWheelRot; }
 
 		const auto& IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
 		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
@@ -828,7 +830,7 @@ namespace DXLibRef {
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			switch (m_ControlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < XBoxNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(XBoxNum))) {
 					if (XBoxID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 						Key.back()->AddGuideXBox(&GuideRect.at(i + KeyNum + XBoxNum), GuideStr);
 						return;
@@ -836,7 +838,7 @@ namespace DXLibRef {
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < DS4Num; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(DS4Num))) {
 					if (DS4ID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 						Key.back()->AddGuideDS4(&GuideRect.at(i + KeyNum), GuideStr);
 						return;
@@ -844,7 +846,7 @@ namespace DXLibRef {
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < KeyNum; ++i) {
+				for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 					if (KeyID[i] == m_PadsInfo.at(static_cast<size_t>(select)).m_assign) {
 						Key.back()->AddGuidePC(&GuideRect.at(i), GuideStr);
 						return;

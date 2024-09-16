@@ -167,7 +167,7 @@ namespace DXLibRef {
 			}
 
 			//既にアサイン済のものがあった場合そいつを無効化
-			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
+			for (size_t p : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
 					P2.m_reserve = INVALID_ID;
@@ -184,7 +184,7 @@ namespace DXLibRef {
 	}
 
 	void PadControl::GetPushAnySwitch(PADS select) noexcept {
-		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
+		for (size_t p : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			if (p == static_cast<size_t>(select)) {
 				continue;
 			}
@@ -193,7 +193,7 @@ namespace DXLibRef {
 				break;
 			}
 		}
-		for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
+		for (size_t p : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			if (p == static_cast<size_t>(select)) {
 				continue;
 			}
@@ -204,21 +204,21 @@ namespace DXLibRef {
 		}
 		switch (m_ControlType) {
 		case ControlType::XBox:
-			for (size_t i = 0; i < XBoxNum; ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(XBoxNum))) {
 				if (GetPushAnySwitchLocal(select, XBoxID[i])) {
 					break;
 				}
 			}
 			break;
 		case ControlType::PS4:
-			for (size_t i = 0; i < DS4Num; ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(DS4Num))) {
 				if (GetPushAnySwitchLocal(select, DS4ID[i])) {
 					break;
 				}
 			}
 			break;
 		case ControlType::PC:
-			for (size_t i = 0; i < KeyNum; ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 				if (GetPushAnySwitchLocal(select, KeyID[i])) {
 					break;
 				}
@@ -248,7 +248,7 @@ namespace DXLibRef {
 			}
 			auto LEFT = getparams::getleft(ALL);
 			auto RIGHT = getparams::getright(ALL);
-			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 				if (LEFT == PADSStr[i]) {
 					this->m_PadsInfo.at(i).m_assign = GetStrtoID(RIGHT.c_str());
 					this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
@@ -260,19 +260,19 @@ namespace DXLibRef {
 	}
 	void PadControl::Save(void) noexcept {
 		std::ofstream outputfile(GetSavePath());
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
+		for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			outputfile << (std::string)PADSStr[i] + "=" + GetIDtoStr(this->m_PadsInfo[i].m_assign) + "\n";
 		}
 		outputfile.close();
 	}
 
 	void PadControl::ResetAssign(void) noexcept {
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
+		for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			this->m_PadsInfo.at(i).m_reserve = this->m_PadsInfo.at(i).m_assign;
 		}
 	}
 	void PadControl::FlipAssign(void) noexcept {
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
+		for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			this->m_PadsInfo.at(i).m_assign = this->m_PadsInfo.at(i).m_reserve;
 		}
 	}
@@ -287,7 +287,7 @@ namespace DXLibRef {
 			Key.resize(Key.size() + 1);
 			//
 			Key.back() = std::make_unique<KeyGuideGraphs>();
-			for (size_t i = 0; i < KeyNum; ++i) {
+			for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
 					Key.back()->AddGuidePC(&GuideRect.at(i), LocalizeParts->Get(9990));
 					break;
@@ -316,8 +316,8 @@ namespace DXLibRef {
 				Load();
 				if (GetJoypadNum() > 0) {
 					auto* ItemLogParts = SideLog::Instance();
-					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizeParts->Get(298));
-					ItemLogParts->Add(10.f, GetColor(255, 255, 255), LocalizeParts->Get(299));
+					ItemLogParts->Add(10.f, White, LocalizeParts->Get(298));
+					ItemLogParts->Add(10.f, White, LocalizeParts->Get(299));
 				}
 			}
 		}
@@ -466,7 +466,7 @@ namespace DXLibRef {
 			break;
 		}
 		//ボタン
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
+		for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
 				case PADS::MOVE_W:
@@ -534,7 +534,7 @@ namespace DXLibRef {
 				KEY_INPUT_Y,
 				KEY_INPUT_Z,
 			};
-			for (int loop = 0; loop < this->m_AtoZKey.size(); loop++) {
+			for (int loop : std::views::iota(0, static_cast<int>(this->m_AtoZKey.size()))) {
 				m_AtoZKey[loop].Execute(CheckHitKeyWithCheck(KEYS[loop]) != 0);
 			}
 			int NUMKEYS[10] = {
@@ -549,13 +549,14 @@ namespace DXLibRef {
 				KEY_INPUT_8,
 				KEY_INPUT_9,
 			};
-			for (int loop = 0; loop < this->m_NumKey.size(); loop++) {
+			for (int loop : std::views::iota(0, static_cast<int>(this->m_NumKey.size()))) {
 				m_NumKey[loop].Execute(CheckHitKeyWithCheck(NUMKEYS[loop]) != 0);
 			}
 		}
 		//
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 		KeyBSorDel.Execute((CheckHitKeyWithCheck(KEY_INPUT_BACK) != 0) || (CheckHitKeyWithCheck(KEY_INPUT_DELETE) != 0));
+		MouseWheelRot = GetMouseWheelRotVolWithCheck();
 	}
 	void PadControl::Draw(void) const noexcept {
 		auto* DrawParts = DXDraw::Instance();

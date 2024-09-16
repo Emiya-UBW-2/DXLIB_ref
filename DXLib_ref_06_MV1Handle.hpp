@@ -108,7 +108,7 @@ namespace DXLibRef {
 			}
 			_ModelHandle->m_AnimControler.resize(static_cast<size_t>(MV1GetAnimNum(_Have_Anim.GetHandle())));
 			if (_ModelHandle->m_AnimControler.size() > 0) {
-				for (int i = 0; i < int(_ModelHandle->m_AnimControler.size()); ++i) {
+				for (int i : std::views::iota(0, int(_ModelHandle->m_AnimControler.size()))) {
 					_ModelHandle->m_AnimControler.at(static_cast<size_t>(i)).Set(_ModelHandle, i, &_Have_Anim);
 				}
 			}

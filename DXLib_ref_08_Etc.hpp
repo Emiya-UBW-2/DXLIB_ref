@@ -511,11 +511,11 @@ namespace DXLibRef {
 		float xmin = 0.f;
 		float xmax = xminpt;
 		int xc = 0;
-		for (int x = 0; x < xtile + 2; ++x) {
+		for (int x : std::views::iota(0, xtile + 2)) {
 			float ymin = 0.f;
 			float ymax = yminpt;
 			int yc = 0;
-			for (int y = 0; y < ytile + 2; ++y) {
+			for (int y : std::views::iota(0, ytile + 2)) {
 				SetUpBox(xmin, ymin, xmax, ymax, xc, yc);
 				//次
 				ymin = ymax;
@@ -552,6 +552,8 @@ namespace DXLibRef {
 
 	//カラー指定
 	static const unsigned int Red{ GetColor(255, 0, 0) };
+	static const unsigned int Red25{ GetColor(192, 0, 0) };
+	static const unsigned int Red50{ GetColor(128, 0, 0) };
 
 	static const unsigned int Green{ GetColor(0, 255, 0) };//GetColor(43, 255, 91)
 	static const unsigned int DarkGreen{ GetColor(0, 64, 0) };//GetColor(21, 128, 45)
@@ -563,6 +565,7 @@ namespace DXLibRef {
 	static const unsigned int WhiteSel{ GetColor(216, 255, 216) };
 
 	static const unsigned int White{ GetColor(255, 255, 255) };
+	static const unsigned int Gray10{ GetColor(230, 230, 230) };
 	static const unsigned int Gray15{ GetColor(216, 216, 216) };
 	static const unsigned int Gray25{ GetColor(192, 192, 192) };
 	static const unsigned int Gray50{ GetColor(128, 128, 128) };
@@ -755,7 +758,7 @@ namespace DXLibRef {
 				//auto* DrawParts = DXDraw::Instance();
 				//auto* Fonts = FontPool::Instance();
 				/*
-				int xSize = Fonts->Get(type, fontSize, 3)->GetStringWidth(-1, Str.c_str(), args...);
+				int xSize = Fonts->Get(type, fontSize, 3)->GetStringWidth(INVALID_ID, Str.c_str(), args...);
 
 				if ((y - fontSize) > DrawParts->GetScreenY(1080) || (y + fontSize) < 0) { return; }				//画面外は表示しない
 
@@ -819,13 +822,14 @@ namespace DXLibRef {
 			//
 		public:
 			void	ClearList() noexcept {
-				for (auto& d : this->m_DrawDatas) {
-					auto& pd = this->m_PrevDrawDatas.at(&d - &this->m_DrawDatas.front());
+				for (size_t index = 0; auto& d : this->m_DrawDatas) {
+					auto& pd = this->m_PrevDrawDatas.at(index);
 					pd.clear();
 					for (auto& d2 : d) {
 						pd.resize(pd.size() + 1);
 						pd.back() = d2;
 					}
+					index++;
 				}
 				for (auto& d : this->m_DrawDatas) {
 					d.clear();
@@ -834,20 +838,22 @@ namespace DXLibRef {
 			void	Draw() noexcept {
 				bool IsHit = false;
 				//同じかどうかチェック
-				for (auto& d : this->m_DrawDatas) {
-					auto& pd = this->m_PrevDrawDatas.at(&d - &this->m_DrawDatas.front());
+				for (size_t index = 0; auto& d : this->m_DrawDatas) {
+					auto& pd = this->m_PrevDrawDatas.at(index);
 					if (pd.size() == d.size()) {
-						for (auto& d2 : d) {
-							auto& pd2 = pd.at(&d2 - &d.front());
+						for (size_t index2 = 0; auto& d2 : d) {
+							auto& pd2 = pd.at(index2);
 							if (!(pd2 == d2)) {
 								IsHit = true;
 								break;
 							}
+							index2++;
 						}
 					}
 					else {
 						IsHit = true;
 					}
+					index++;
 				}
 				//
 				if (IsHit) {
@@ -877,7 +883,7 @@ namespace DXLibRef {
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
 			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::MS_Gothic, ySize, std::min(ySize / 6, 3))->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
+			return Fonts->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
 		}
 
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
@@ -1344,7 +1350,7 @@ namespace DXLibRef {
 		int m_PixelShaderSendDispSizeHandle{ INVALID_ID };
 		std::array<int, 4> m_PixelShadercbhandle{};
 		ImmutableCB WaveData{};
-		int m_VertexShadercbWaveDataHandle{ -1 };
+		int m_VertexShadercbWaveDataHandle{ INVALID_ID };
 	public:
 		ShaderUseClass(void) noexcept {
 			//シェーダーハンドル
@@ -1447,7 +1453,7 @@ namespace DXLibRef {
 		}
 		//
 		void CalcGWave() {
-			for (int i = 0; i < 20; i++)
+			for (int i : std::views::iota(0, 20))
 			{
 				Wave& w = WaveData.waves[i];
 				float randomRad = (float)(GetRand(30) * DX_PI_F * 2 * 0.3f);
@@ -1614,8 +1620,8 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) noexcept {
-			for (int i = 0; i < 6; ++i) {		// 映りこむ環境を描画する面の数だけ繰り返し
-				for (int j = 0; j < MIPLEVEL; ++j) {			// ミップマップの数だけ繰り返し
+			for (int i : std::views::iota(0, 6)) {		// 映りこむ環境を描画する面の数だけ繰り返し
+				for (int j : std::views::iota(0, MIPLEVEL)) {			// ミップマップの数だけ繰り返し
 					SetRenderTargetToShader(0, dynamicCubeTex.get(), i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
 					ClearDrawScreen();										// クリア
 					{
@@ -1883,7 +1889,7 @@ namespace DXLibRef {
 			for (auto& s : *String) {
 				s = "";
 			}
-			for (int i = 0; i < static_cast<int>(strlenDx(Target)); ++i) {
+			for (int i : std::views::iota(0, static_cast<int>(strlenDx(Target)))) {
 				if (!
 					(
 						Target[static_cast<size_t>(i)] == ' ' ||
@@ -2251,27 +2257,27 @@ namespace DXLibRef {
 	/*UDP通信																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class UDPNetWorkDX {
-		int			m_Handle{ -1 };				// ネットワークハンドル
+		int			m_Handle{ INVALID_ID };				// ネットワークハンドル
 		IPDATA		m_SendIP{ 127,0,0,1 };		// 送信用ＩＰアドレスデータ
-		int			m_SendPort{ -1 };				// 通信用ポート
+		int			m_SendPort{ INVALID_ID };				// 通信用ポート
 		IPDATA		m_RecvIp{ 127,0,0,1 };			// 受信用ＩＰアドレスデータ
 		int			m_RecvPort{ 0 };				// 受信用ポート
 	public:
-		auto			IsActive(void) const noexcept { return (m_Handle != -1); }
+		auto			IsActive(void) const noexcept { return (m_Handle != INVALID_ID); }
 	public:
 		void			SetServerIP(const IPDATA& pIP) noexcept { m_SendIP = pIP; }//クライアントは必ず行う
-		bool			Init(bool IsServer, int PORT = -1) noexcept {
+		bool			Init(bool IsServer, int PORT = INVALID_ID) noexcept {
 			if (!IsActive()) {
 				m_SendPort = PORT;
-				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : -1);
+				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : INVALID_ID);
 			}
-			return m_Handle != -1;
+			return m_Handle != INVALID_ID;
 		}
 		void			Dispose(void) noexcept {
 			if (IsActive()) {
 				DeleteUDPSocket(m_Handle);	// ＵＤＰソケットハンドルの削除
-				m_Handle = -1;
-				m_SendPort = -1;
+				m_Handle = INVALID_ID;
+				m_SendPort = INVALID_ID;
 			}
 		}
 	private:
@@ -2280,7 +2286,7 @@ namespace DXLibRef {
 			if (IsActive()) {
 				return NetWorkSendUDP(m_Handle, Ip, SendPort, &Data, sizeof(T));
 			}
-			return -1;
+			return INVALID_ID;
 		}
 	public:
 		//送信
@@ -2289,7 +2295,7 @@ namespace DXLibRef {
 		//受信
 		template<class T>
 		bool			RecvData(T* Data, int* RecvReturn, bool IsPeek) noexcept {
-			*RecvReturn = -1;
+			*RecvReturn = INVALID_ID;
 			if (IsActive()) {
 				switch (CheckNetWorkRecvUDP(m_Handle)) {
 				case TRUE:

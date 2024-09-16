@@ -40,7 +40,7 @@ namespace DXLibRef {
 		auto PMax = PointMax + 1;
 		//ç≈å„ÇÃââéZ
 		SetPoint("-----End-----");
-		for (int index = 0; index < PMax; ++index) {
+		for (int index : std::views::iota(0, PMax)) {
 			if (!(static_cast<int>(m_PointSel) > index)) {
 				m_Point[0][static_cast<std::size_t>(index)] = m_Point[0][m_PointSel - 1];
 			}
@@ -54,7 +54,7 @@ namespace DXLibRef {
 
 			//ïΩãœ
 			m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] = 0.f;
-			for (int j = 0; j < PointFrame; ++j) {
+			for (int j : std::views::iota(0, PointFrame)) {
 				m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] += m_Point[static_cast<std::size_t>(j)][static_cast<std::size_t>(index)];
 			}
 			m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] /= PointFrame;
@@ -120,8 +120,7 @@ namespace DXLibRef {
 							TRUE);
 					}
 					/*
-					for (int index = 0; index < PMax; ++index)
-		{
+					for (int index : std::views::iota(0, PMax)) {
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
 						WindowSystem::DrawControl::Instance()->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
@@ -150,7 +149,7 @@ namespace DXLibRef {
 			++i;
 			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS    :%5.2f fps", GetFPS());
 			++i;
-			for (size_t index = 1; index <= m_PointSel; ++index) {
+			for (size_t index : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
 				WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}

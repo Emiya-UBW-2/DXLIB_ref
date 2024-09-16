@@ -112,7 +112,7 @@ namespace DXLibRef {
 		//”»’è‹N“®
 		void			SetupCol(void) noexcept {
 			if (this->m_col.IsActive()) {
-				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) {
+				for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {
 					this->m_col.SetupCollInfo(8, 8, 8, INVALID_ID, i);
 				}
 			}
@@ -124,7 +124,7 @@ namespace DXLibRef {
 			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.GetPos()) <= pRange) {
 				//”»’è‹N“®
 				this->m_ColActive = true;
-				for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) {
+				for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {
 					this->m_col.RefreshCollInfo(INVALID_ID, i);
 				}
 				return true;
@@ -136,7 +136,7 @@ namespace DXLibRef {
 		auto			GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, INVALID_ID, sel); }
 		void			GetColNearestInAllMesh(const Vector3DX& StartPos, Vector3DX* EndPos) const noexcept {
 			MV1_COLL_RESULT_POLY colres;
-			for (int i = 0; i < static_cast<int>(this->m_col.GetMeshNum()); ++i) {
+			for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {
 				colres = GetColLine(StartPos, *EndPos, i);
 				if (colres.HitFlag == TRUE) {
 					*EndPos = colres.HitPosition;
