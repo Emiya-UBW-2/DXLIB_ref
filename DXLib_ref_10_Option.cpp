@@ -37,6 +37,7 @@ namespace DXLibRef {
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
+		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::CubeMap)).SetEnumParamType(EnumParamType::Boolean);
 
 		//SetOutApplicationLogValidFlag(FALSE);
 		{
@@ -158,6 +159,7 @@ namespace DXLibRef {
 				SetParamBoolean(EnumProjectSettingParam::GodRay, true);
 				SetParamBoolean(EnumProjectSettingParam::PBR, true);
 				SetParamBoolean(EnumProjectSettingParam::Distortion, true);
+				SetParamBoolean(EnumProjectSettingParam::CubeMap, true);
 				return;
 			}
 			while (true) {

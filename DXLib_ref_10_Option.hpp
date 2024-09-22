@@ -61,12 +61,14 @@ namespace DXLibRef {
 		GodRay,
 		Distortion,
 		PBR,
+		CubeMap,
 		Max,
 	};
 	static const char* ProjectSettingStr[static_cast<int>(EnumProjectSettingParam::Max)] = {
 		"GodRay",
 		"Distortion",
 		"PBR",
+		"CubeMap",
 	};
 	enum class EnumParamType {
 		Boolean,

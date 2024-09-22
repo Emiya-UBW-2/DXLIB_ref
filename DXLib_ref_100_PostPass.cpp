@@ -124,11 +124,16 @@ namespace DXLibRef {
 				SetUseTextureToShader(0, SSRColorScreen.get());
 				SetUseTextureToShader(1, SSRNormalScreen.get());
 				SetUseTextureToShader(2, SSRDepthScreen.get());
-				SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
+				if (OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap)) {
+					SetUseTextureToShader(3, DrawParts->GetCubeMapTex().get());
+				}
+				else {
+					SetUseTextureToShader(3, bkScreen2.get());
+				}
 				SetUseTextureToShader(4, bkScreen2.get());
 				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
 				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
-				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), 0.f, 0.f, 0.f);
+				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap) ? 1.f : 0.f, 0.f, 0.f);
 				{
 					m_Shader.Draw(m_SSRScreenVertex);
 				}

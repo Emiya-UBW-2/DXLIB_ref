@@ -618,7 +618,7 @@ namespace DXLibRef {
 	}
 	void			DXDraw::Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
 		auto* OptionParts = OPTION::Instance();
-		if (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) {
+		if ((OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap)) {
 			m_RealTimeCubeMap.ReadyDraw(CenterPos, doing);
 		}
 	}
@@ -906,7 +906,7 @@ namespace DXLibRef {
 		//影生成
 		m_ShadowDraw->SetActive();
 		//キューブマップ
-		m_IsCubeMap = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0);
+		m_IsCubeMap = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap);
 		if (m_IsCubeMap) {
 			m_RealTimeCubeMap.Init();
 		}
@@ -993,7 +993,7 @@ namespace DXLibRef {
 	void			DXDraw::Execute(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		{
-			bool Now = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0);
+			bool Now = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap);
 			if (Now != m_IsCubeMap) {
 				m_IsCubeMap = Now;
 				if (m_IsCubeMap) {
