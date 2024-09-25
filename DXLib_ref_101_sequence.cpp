@@ -118,6 +118,10 @@ namespace DXLibRef {
 						WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal, 
 							FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
 							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8), White, Black, "%5.2f FPS", Avg);
+
+						WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
+							FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+							DrawParts->GetUIY((1920 - 8)), DrawParts->GetUIY(8+20), White, Black, "%d Drawcall", GetDrawCallCount());
 					}
 #ifdef DEBUG
 					DebugParts->DebugWindow(DrawParts->GetUIY(1920 - 350), DrawParts->GetUIY(150));
