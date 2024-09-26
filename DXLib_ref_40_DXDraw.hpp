@@ -13,6 +13,7 @@ namespace DXLibRef {
 			GraphHandle			DepthFarScreenHandle;
 
 			ShaderUseClass		m_Shader;
+			ShaderUseClass		m_ShaderRigid;
 			Vector3DX			m_ShadowVec{ Vector3DX::up() };
 
 			std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
@@ -29,7 +30,7 @@ namespace DXLibRef {
 			void Init(int ShadowMapSize, int dispsizex, int dispsizey) noexcept;
 			void Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
 			void UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
-			void SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
+			void SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
 			void Draw(void) noexcept;
 			void Dispose(void) noexcept;
 		private:
@@ -157,6 +158,7 @@ namespace DXLibRef {
 		void			Execute(void) noexcept;
 		void			Draw(
 			std::function<void()> sky_doing,
+			std::function<void()> setshadowdoing_rigid,
 			std::function<void()> setshadowdoing,
 			std::function<void()> doing,
 			std::function<void()> doingFront,

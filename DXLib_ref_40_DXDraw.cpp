@@ -355,6 +355,7 @@ namespace DXLibRef {
 		DepthScreenHandle = GraphHandle::MakeDepth(size, size);					// 深度バッファの作成
 		DepthFarScreenHandle = GraphHandle::MakeDepth(size, size);				// 深度バッファの作成
 		m_Shader.Init("CommonData/shader/VS_SoftShadow.vso", "CommonData/shader/PS_SoftShadow.pso");
+		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		float Scale_Rate = 12.5f;
@@ -398,8 +399,9 @@ namespace DXLibRef {
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, INVALID_ID);
 	}
-	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing, Camera3DInfo tmp_cam) noexcept {
+	void DXDraw::ShadowDraw::SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept {
 		auto* OptionParts = OPTION::Instance();
+		SetUseTextureToShader(0, BaseShadowHandle.get());				// 影用深度記録画像をテクスチャ１にセット
 		SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
@@ -412,6 +414,10 @@ namespace DXLibRef {
 			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
 			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 			m_Shader.Draw_lamda(doing);
+			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), 0.f, 0.f, 0.f);
+			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
+			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
+			m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
 		SetUseTextureToShader(1, INVALID_ID);				// 使用テクスチャの設定を解除
 		SetUseTextureToShader(2, INVALID_ID);				// 使用テクスチャの設定を解除
@@ -423,7 +429,7 @@ namespace DXLibRef {
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 		BaseShadowHandle.DrawGraph(0, 0, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-		//DepthBaseScreenHandle.DrawExtendGraph(0, 0,1080,1080, true);
+		//DepthScreenHandle.DrawExtendGraph(0, 0,1080,1080, true);
 	}
 	void DXDraw::ShadowDraw::Dispose(void) noexcept {
 		BaseShadowHandle.Dispose();
@@ -431,6 +437,7 @@ namespace DXLibRef {
 		DepthScreenHandle.Dispose();
 		DepthFarScreenHandle.Dispose();
 		m_Shader.Dispose();
+		m_ShaderRigid.Dispose();
 	}
 	void DXDraw::ShadowDraw::SetActive(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
@@ -1029,6 +1036,7 @@ namespace DXLibRef {
 	}
 	void			DXDraw::Draw(
 		std::function<void()> sky_doing,
+		std::function<void()> setshadowdoing_rigid,
 		std::function<void()> setshadowdoing,
 		std::function<void()> doing,
 		std::function<void()> doingFront,
@@ -1042,7 +1050,7 @@ namespace DXLibRef {
 		auto MainDraw = [&](const Camera3DInfo& camInfo) {
 			//影画像の用意
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-				m_ShadowDraw->SetDraw(setshadowdoing, camInfo);
+				m_ShadowDraw->SetDraw(setshadowdoing_rigid, setshadowdoing, camInfo);
 			}
 			m_CamViewMatrix = camInfo.GetViewMatrix();
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
