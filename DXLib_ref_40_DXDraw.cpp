@@ -573,7 +573,6 @@ namespace DXLibRef {
 		FontPool::Create();
 		PadControl::Create();							//キー
 		OptionWindowClass::Create();
-		PadControl::Create();
 		ObjectManager::Create();
 		SideLog::Create();
 		PopUp::Create();

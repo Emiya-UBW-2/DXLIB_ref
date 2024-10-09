@@ -108,6 +108,7 @@ namespace DXLibRef {
 		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
 
+		const auto&		GetLightVec(void) const noexcept { return m_LightVec; }
 		//UI以外のスクリーン空間
 		auto			GetScreenX(int value) const noexcept { return (value * this->m_DispXSize_Max / this->m_DispXSize_Win); }
 		auto			GetScreenY(int value) const noexcept { return (value * this->m_DispYSize_Max / this->m_DispYSize_Win); }

@@ -6,7 +6,7 @@
 #define DEBUG
 //#define _USE_OPENVR_
 //#define _USE_BOX2D_
-//#define _USE_EFFEKSEER_
+#define _USE_EFFEKSEER_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*pragma																																	*/
