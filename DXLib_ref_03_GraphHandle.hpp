@@ -15,19 +15,19 @@ namespace DXLibRef {
 		float		m_near{ 0.1f };
 		float		m_far{ 10.f };	//ニアファー
 	public:
-		const auto& GetCamPos(void)const noexcept { return m_pos; }
-		const auto& GetCamVec(void)const noexcept { return m_vec; }
-		const auto& GetCamUp(void)const noexcept { return m_up; }
-		const auto& GetCamFov(void)const noexcept { return m_fov; }
-		const auto& GetCamNear(void)const noexcept { return m_near; }
-		const auto& GetCamFar(void)const noexcept { return m_far; }
+		const auto&			GetCamPos(void)const noexcept { return m_pos; }
+		const auto&			GetCamVec(void)const noexcept { return m_vec; }
+		const auto&			GetCamUp(void)const noexcept { return m_up; }
+		const auto&			GetCamFov(void)const noexcept { return m_fov; }
+		const auto&			GetCamNear(void)const noexcept { return m_near; }
+		const auto&			GetCamFar(void)const noexcept { return m_far; }
 	public:
 		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) noexcept {
 			m_pos = cam_pos;
 			m_vec = cam_vec;
 			m_up = cam_up;
 		}
-		void			SetNowCamPos() noexcept {
+		void			SetNowCamPos(void) noexcept {
 			m_pos = DxLib::GetCameraPosition();
 			m_vec = DxLib::GetCameraTarget();
 			m_up = DxLib::GetCameraUpVector();

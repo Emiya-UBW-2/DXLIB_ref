@@ -1,4 +1,4 @@
-#include	"DXLib_ref_102_ObjectManager.hpp"
+#include "DXLib_ref_102_ObjectManager.hpp"
 
 namespace DXLibRef {
 	const ObjectManager* SingletonBase<ObjectManager>::m_Singleton = nullptr;

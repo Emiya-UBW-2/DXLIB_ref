@@ -325,7 +325,7 @@ namespace DXLibRef {
 		}
 	public:
 		void Load(const char* Lang) noexcept;
-		void Dispose() noexcept {
+		void Dispose(void) noexcept {
 			this->havehandle.clear();
 			this->havehandle.shrink_to_fit();
 		}

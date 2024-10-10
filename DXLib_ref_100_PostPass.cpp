@@ -18,9 +18,8 @@ namespace DXLibRef {
 		float MAX_DISTANCE = 1500.0f;
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			int xsize = DrawParts->GetScreenY(1920);
-			int ysize = DrawParts->GetScreenY(1080);
+			int xsize = ScreenWidth;
+			int ysize = ScreenHeight;
 			m_ScreenVertex.SetScreenVertex(xsize, ysize);
 			m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
 			m_ShaderBlur.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_BilateralBlur.pso");
@@ -68,15 +67,15 @@ namespace DXLibRef {
 				SetUseTextureToShader(0, ColorGraph->get());
 				SetUseTextureToShader(1, NormalPtr->get());
 				SetUseTextureToShader(2, DepthPtr->get());
-				m_ShaderSSAO.SetPixelDispSize(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
-				m_ShaderSSAO.SetPixelParam(3, 0.0f, 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
+				m_ShaderSSAO.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale_Rate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
 				m_ShaderSSAO.SetPixelParam(4, SCALE, BIAS, SAMPLE_RAD, MAX_DISTANCE);
 
 				m_ShaderSSAO.Draw(m_ScreenVertex);
 
-				SetUseTextureToShader(0, -1);
-				SetUseTextureToShader(1, -1);
-				SetUseTextureToShader(2, -1);
+				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(1, INVALID_ID);
+				SetUseTextureToShader(2, INVALID_ID);
 			}
 			//SSRシェーダーにぼかしを入れる
 			SSRScreen.SetDraw_Screen(false);
@@ -84,20 +83,20 @@ namespace DXLibRef {
 				SetUseTextureToShader(0, SSRScreen2.get());	//使用するテクスチャをセット
 				SetUseTextureToShader(1, ColorGraph->get());	//使用するテクスチャをセット
 
-				m_ShaderBlur.SetPixelDispSize(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+				m_ShaderBlur.SetPixelDispSize(ScreenWidth, ScreenHeight);
 				m_ShaderBlur.Draw(m_ScreenVertex);
 
-				SetUseTextureToShader(0, -1);
-				SetUseTextureToShader(1, -1);
+				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(1, INVALID_ID);
 			}
 			//
 			TargetGraph->SetDraw_Screen(false);
 			{
 				TargetGraph->DrawGraph(0, 0, true);
 				SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
-				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				//SSRScreen2.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				//SSRScreen2.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
 			}
 		}
 	};
@@ -116,7 +115,7 @@ namespace DXLibRef {
 
 		static const int EXTEND = 4;
 	public:
-		PostPassSSR() noexcept {}
+		PostPassSSR(void) noexcept {}
 		PostPassSSR(const PostPassSSR&) = delete;
 		PostPassSSR(PostPassSSR&& o) = delete;
 		PostPassSSR& operator=(const PostPassSSR&) = delete;
@@ -125,9 +124,8 @@ namespace DXLibRef {
 		virtual ~PostPassSSR(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			int xsize = DrawParts->GetScreenY(1920) / EXTEND;
-			int ysize = DrawParts->GetScreenY(1080) / EXTEND;
+			int xsize = ScreenWidth / EXTEND;
+			int ysize = ScreenHeight / EXTEND;
 			SSRScreen = GraphHandle::Make(xsize, ysize, true);
 			{
 				bkScreen2 = GraphHandle::Make(xsize, ysize, false);
@@ -203,7 +201,7 @@ namespace DXLibRef {
 					SetUseTextureToShader(3, bkScreen2.get());
 				}
 				SetUseTextureToShader(4, bkScreen2.get());
-				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), 12.5f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
+				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), Scale_Rate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
 				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
 				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap) ? 1.f : 0.f, 0.f, 0.f);
 				{
@@ -219,7 +217,7 @@ namespace DXLibRef {
 			TargetGraph->SetDraw_Screen(false);
 			{
 				TargetGraph->DrawGraph(0, 0, true);
-				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
 			}
 		}
 	};
@@ -229,7 +227,7 @@ namespace DXLibRef {
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderUseClass		m_Shader;			// シェーダー
 	public:
-		PostPassDoF() noexcept {}
+		PostPassDoF(void) noexcept {}
 		PostPassDoF(const PostPassDoF&) = delete;
 		PostPassDoF(PostPassDoF&& o) = delete;
 		PostPassDoF& operator=(const PostPassDoF&) = delete;
@@ -238,9 +236,8 @@ namespace DXLibRef {
 		virtual ~PostPassDoF(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			DoFScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
-			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+			DoFScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
+			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
 			m_Shader.Init("CommonData/shader/VS_DoF.vso", "CommonData/shader/PS_DoF.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -253,7 +250,6 @@ namespace DXLibRef {
 		}
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 			GraphFilterBlt(TargetGraph->get(), DoFScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 2000);
 			TargetGraph->SetDraw_Screen();
@@ -261,7 +257,7 @@ namespace DXLibRef {
 				SetUseTextureToShader(0, ColorGraph->get());
 				SetUseTextureToShader(1, DoFScreen.get());
 				SetUseTextureToShader(2, DepthPtr->get());
-				m_Shader.SetPixelDispSize(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
 				m_Shader.SetPixelParam(3, PostPassParts->Get_near_DoF(), PostPassParts->Get_far_DoF(), PostPassParts->Get_near_DoFMax(), PostPassParts->Get_far_DoFMin());
 				{
 					m_Shader.Draw(m_ScreenVertex);
@@ -279,7 +275,7 @@ namespace DXLibRef {
 		GraphHandle GaussScreen_;	//描画スクリーン
 		GraphHandle	BufScreen;
 	public:
-		PostPassBloom() noexcept {}
+		PostPassBloom(void) noexcept {}
 		PostPassBloom(const PostPassBloom&) = delete;
 		PostPassBloom(PostPassBloom&& o) = delete;
 		PostPassBloom& operator=(const PostPassBloom&) = delete;
@@ -288,9 +284,8 @@ namespace DXLibRef {
 		virtual ~PostPassBloom(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			GaussScreen_ = GraphHandle::Make(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND, true);
-			BufScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+			GaussScreen_ = GraphHandle::Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
+			BufScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			GaussScreen_.Dispose();
@@ -301,7 +296,6 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::bloom);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			GraphFilterBlt(TargetGraph->get(), BufScreen.get(), DX_GRAPH_FILTER_TWO_COLOR, 250, Black, 255, Gray50, 255);
 			GraphFilterBlt(BufScreen.get(), GaussScreen_.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GraphFilter(GaussScreen_.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
@@ -310,8 +304,8 @@ namespace DXLibRef {
 				auto Prev = GetDrawMode();
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
-				GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				GaussScreen_.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				GaussScreen_.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 				SetDrawMode(Prev);
 			}
@@ -321,7 +315,7 @@ namespace DXLibRef {
 	private:
 		std::array<GraphHandle, 3>		BufScreen;
 	public:
-		PostPassAberration() noexcept {}
+		PostPassAberration(void) noexcept {}
 		PostPassAberration(const PostPassAberration&) = delete;
 		PostPassAberration(PostPassAberration&& o) = delete;
 		PostPassAberration& operator=(const PostPassAberration&) = delete;
@@ -330,9 +324,8 @@ namespace DXLibRef {
 		virtual ~PostPassAberration(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			for (auto& buf : BufScreen) {
-				buf = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				buf = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
 			}
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -362,9 +355,9 @@ namespace DXLibRef {
 			{
 				FillGraph(TargetGraph->get(), 0, 0, 0);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				BufScreen[0].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
-				BufScreen[1].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f, 0.f, true);
-				BufScreen[2].DrawRotaGraph(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen[0].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen[1].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f, 0.f, true);
+				BufScreen[2].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -380,7 +373,7 @@ namespace DXLibRef {
 			int m_offsetX1{ 0 }, m_offsetX2{ 0 }, m_offsetY1{ 0 }, offsetY2{ 0 };
 			int m_notBlendDraw{ 0 };
 		public:
-			BlurScreen() noexcept {}
+			BlurScreen(void) noexcept {}
 			BlurScreen(const BlurScreen&) = delete;
 			BlurScreen(BlurScreen&& o) = delete;
 			BlurScreen& operator=(const BlurScreen&) = delete;
@@ -389,9 +382,8 @@ namespace DXLibRef {
 			~BlurScreen(void) noexcept {}
 		public:
 			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
-				auto* DrawParts = DXDraw::Instance();
 				for (int i : std::views::iota(0, MAX)) {
-					m_screen.at(static_cast<size_t>(i)) = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+					m_screen.at(static_cast<size_t>(i)) = GraphHandle::Make(ScreenWidth, ScreenHeight);
 				}
 				m_current = 0;
 				m_alpha = t_alpha;
@@ -402,14 +394,13 @@ namespace DXLibRef {
 
 				m_notBlendDraw = 0;
 			}
-			void Release() noexcept {
+			void Release(void) noexcept {
 				for (int i : std::views::iota(0, MAX)) {
 					m_screen.at(static_cast<size_t>(i)).Dispose();
 				}
 			}
 		public:
 			auto* PostRenderBlurScreen(std::function<void()> doing) noexcept {
-				auto* DrawParts = DXDraw::Instance();
 				auto next = (m_current != 0) ? (m_current - 1) : MAX - 1;
 				m_screen[static_cast<size_t>(m_current)].SetDraw_Screen();
 				{
@@ -418,7 +409,7 @@ namespace DXLibRef {
 						int drawMode = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
-						m_screen[static_cast<size_t>(next)].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->GetScreenY(1920) + m_offsetX2, DrawParts->GetScreenY(1080) + offsetY2, false);
+						m_screen[static_cast<size_t>(next)].DrawExtendGraph(m_offsetX1, m_offsetY1, ScreenWidth + m_offsetX2, ScreenHeight + offsetY2, false);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 						SetDrawMode(drawMode);
 					}
@@ -431,7 +422,7 @@ namespace DXLibRef {
 	private:
 		BlurScreen				m_BlurScreen;
 	public:
-		PostPassMotionBlur() noexcept {}
+		PostPassMotionBlur(void) noexcept {}
 		PostPassMotionBlur(const PostPassMotionBlur&) = delete;
 		PostPassMotionBlur(PostPassMotionBlur&& o) = delete;
 		PostPassMotionBlur& operator=(const PostPassMotionBlur&) = delete;
@@ -468,7 +459,7 @@ namespace DXLibRef {
 		GraphHandle bkScreen2;
 		GraphHandle	BufScreen;
 	public:
-		PostPassCornerBlur() noexcept {}
+		PostPassCornerBlur(void) noexcept {}
 		PostPassCornerBlur(const PostPassCornerBlur&) = delete;
 		PostPassCornerBlur(PostPassCornerBlur&& o) = delete;
 		PostPassCornerBlur& operator=(const PostPassCornerBlur&) = delete;
@@ -477,17 +468,16 @@ namespace DXLibRef {
 		virtual ~PostPassCornerBlur(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			AberrationScreen = GraphHandle::Make(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND, true);
+			AberrationScreen = GraphHandle::Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
 			{
-				bkScreen2 = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
+				bkScreen2 = GraphHandle::Make(ScreenWidth, ScreenHeight, false);
 				bkScreen2.SetDraw_Screen(false);
 				{
 					FillGraph(bkScreen2.get(), 0, 0, 0);
-					int xr = DrawParts->GetScreenY(1920) * 60 / 100;
-					int yr = DrawParts->GetScreenY(1080) * 70 / 100;
+					int xr = ScreenWidth * 60 / 100;
+					int yr = ScreenHeight * 70 / 100;
 
-					DrawOval(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, xr, yr, White, TRUE);
+					DrawOval(ScreenWidth / 2, ScreenHeight / 2, xr, yr, White, TRUE);
 
 					int r = 0, c = 0, p = 2;
 
@@ -495,11 +485,11 @@ namespace DXLibRef {
 					for (r = 0; r < 255; r += p) {
 						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f) * 255.f);
 
-						DrawOval(DrawParts->GetScreenY(1920) / 2, DrawParts->GetScreenY(1080) / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(ScreenWidth / 2, ScreenHeight / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
 					}
 				}
 			}
-			BufScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+			BufScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			AberrationScreen.Dispose();
@@ -511,14 +501,13 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			GraphFilterBlt(TargetGraph->get(), AberrationScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GraphFilter(AberrationScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 1000);
 			GraphBlendBlt(TargetGraph->get(), bkScreen2.get(), BufScreen.get(), 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
-				AberrationScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
+				AberrationScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, false);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
@@ -528,7 +517,7 @@ namespace DXLibRef {
 		GraphHandle bkScreen;
 		GraphHandle	BufScreen;
 	public:
-		PostPassVignette() noexcept {}
+		PostPassVignette(void) noexcept {}
 		PostPassVignette(const PostPassVignette&) = delete;
 		PostPassVignette(PostPassVignette&& o) = delete;
 		PostPassVignette& operator=(const PostPassVignette&) = delete;
@@ -537,9 +526,8 @@ namespace DXLibRef {
 		virtual ~PostPassVignette(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			{
-				bkScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
+				bkScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, false);
 				bkScreen.SetDraw_Screen(true);
 				FillGraph(bkScreen.get(), 255, 255, 255);
 				{
@@ -547,16 +535,16 @@ namespace DXLibRef {
 					p = 1;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 64.f);
-						DrawLine_2D(0, y / p, DrawParts->GetScreenY(1920), y / p, GetColor(c, c, c));
+						DrawLine_2D(0, y / p, ScreenWidth, y / p, GetColor(c, c, c));
 					}
 					p = 2;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 128.f);
-						DrawLine_2D(0, DrawParts->GetScreenY(1080) - y / p, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080) - y / p, GetColor(c, c, c));
+						DrawLine_2D(0, ScreenHeight - y / p, ScreenWidth, ScreenHeight - y / p, GetColor(c, c, c));
 					}
 				}
 			}
-			BufScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+			BufScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			bkScreen.Dispose();
@@ -580,7 +568,7 @@ namespace DXLibRef {
 	private:
 		GraphHandle	BufScreen;
 	public:
-		PostPassDistortion() noexcept {}
+		PostPassDistortion(void) noexcept {}
 		PostPassDistortion(const PostPassDistortion&) = delete;
 		PostPassDistortion(PostPassDistortion&& o) = delete;
 		PostPassDistortion& operator=(const PostPassDistortion&) = delete;
@@ -596,7 +584,6 @@ namespace DXLibRef {
 			float Absorption,		// 内側の円に引き込まれるドット数
 			const GraphHandle& ScreenHandle// 画面グラフィックハンドル
 		) {
-			auto* DrawParts = DXDraw::Instance();
 			const int CIRCLE_ANGLE_VERTEX_NUM = 16;			// 円周の頂点数
 			const int CIRCLE_RADIUS_VERTEX_NUM = 8;			// 半径の頂点数
 
@@ -686,8 +673,8 @@ namespace DXLibRef {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(DrawParts->GetScreenY(1920));
-					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(DrawParts->GetScreenY(1080));
+					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(ScreenWidth);
+					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(ScreenHeight);
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -721,8 +708,8 @@ namespace DXLibRef {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(DrawParts->GetScreenY(1920));
-					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(DrawParts->GetScreenY(1080));
+					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(ScreenWidth);
+					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(ScreenHeight);
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -735,8 +722,7 @@ namespace DXLibRef {
 		}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			BufScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+			BufScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			BufScreen.Dispose();
@@ -746,7 +732,6 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect) && OptionParts->GetParamBoolean(EnumProjectSettingParam::Distortion);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			BufScreen.SetDraw_Screen();
 			{
 				TargetGraph->DrawGraph(0, 0, true);
@@ -756,8 +741,8 @@ namespace DXLibRef {
 			{
 				// 画面を歪ませて描画
 				DrawCircleScreen(
-					DrawParts->GetScreenY(1920 / 2), DrawParts->GetScreenY(1080 / 2),
-					static_cast<float>(DrawParts->GetScreenY(1920 * 2 / 3)), 120.0f, BufScreen);
+					ScreenWidth / 2, ScreenHeight / 2,
+					static_cast<float>(ScreenWidth * 2 / 3), 120.0f, BufScreen);
 			}
 		}
 	};
@@ -767,8 +752,7 @@ namespace DXLibRef {
 		ShaderUseClass		m_Shader;
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
 			m_Shader.Init("CommonData/shader/VS_FXAA.vso", "CommonData/shader/PS_FXAA.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -779,11 +763,10 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::AA);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
 			TargetGraph->SetDraw_Screen();
 			{
 				SetUseTextureToShader(0, ColorGraph->get());
-				m_Shader.SetPixelDispSize(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
@@ -803,7 +786,7 @@ namespace DXLibRef {
 
 		static const int EXTEND = 4;
 	public:
-		PostPassGodRay() noexcept {}
+		PostPassGodRay(void) noexcept {}
 		PostPassGodRay(const PostPassGodRay&) = delete;
 		PostPassGodRay(PostPassGodRay&& o) = delete;
 		PostPassGodRay& operator=(const PostPassGodRay&) = delete;
@@ -812,11 +795,10 @@ namespace DXLibRef {
 		virtual ~PostPassGodRay(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			auto* DrawParts = DXDraw::Instance();
-			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND);
+			m_ScreenVertex.SetScreenVertex(ScreenWidth / EXTEND, ScreenHeight / EXTEND);
 			m_Shader.Init("CommonData/shader/VS_GodRay.vso", "CommonData/shader/PS_GodRay.pso");
-			SSRScreen = GraphHandle::Make(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND, true);
-			SSRDepthScreen = GraphHandle::MakeDepth(DrawParts->GetScreenY(1920) / EXTEND, DrawParts->GetScreenY(1080) / EXTEND);
+			SSRScreen = GraphHandle::Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
+			SSRDepthScreen = GraphHandle::MakeDepth(ScreenWidth / EXTEND, ScreenHeight / EXTEND);
 		}
 		void Dispose_Sub(void) noexcept override {
 			SSRScreen.Dispose();
@@ -867,7 +849,7 @@ namespace DXLibRef {
 			{
 				ColorGraph->DrawGraph(0, 0, true);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255 / 2);
-				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
+				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -878,11 +860,10 @@ namespace DXLibRef {
 	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	//
 	PostPassEffect::PostPassEffect(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 		SetCreateDrawValidGraphZBufferBitDepth(24);
-		BufferScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), true);
-		ColorScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
+		BufferScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);
+		ColorScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, false);
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		//ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
@@ -998,7 +979,7 @@ namespace DXLibRef {
 		}
 		BufferScreen.SetDraw_Screen(false);
 	}
-	void PostPassEffect::Draw() noexcept {
+	void PostPassEffect::Draw(void) noexcept {
 		//色味補正
 		GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), 0, 255);
 		//ポストパスエフェクトのbufに描画
@@ -1030,11 +1011,10 @@ namespace DXLibRef {
 		}
 	}
 	void PostPassEffect::LoadGBuffer(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 		SetCreateDrawValidGraphZBufferBitDepth(24);
-		NormalScreen = GraphHandle::Make(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080), false);
-		DepthScreen = GraphHandle::MakeDepth(DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+		NormalScreen = GraphHandle::Make(ScreenWidth, ScreenHeight, false);
+		DepthScreen = GraphHandle::MakeDepth(ScreenWidth, ScreenHeight);
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 	}
 	void PostPassEffect::DisposeGBuffer(void) noexcept {

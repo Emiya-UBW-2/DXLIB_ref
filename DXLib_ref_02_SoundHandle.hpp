@@ -22,7 +22,7 @@ namespace DXLibRef {
 		constexpr SoundHandle(int h) noexcept : handle_(h) {}
 		static constexpr int invalid_handle = INVALID_ID;
 	public:
-		constexpr SoundHandle() noexcept : handle_(invalid_handle) {}
+		constexpr SoundHandle(void) noexcept : handle_(invalid_handle) {}
 		SoundHandle(const SoundHandle&) = delete;
 		SoundHandle(SoundHandle&& o) noexcept : handle_(o.handle_) {
 			o.handle_ = invalid_handle;
@@ -59,7 +59,7 @@ namespace DXLibRef {
 		LONGLONG GetTotalTIme(void) const noexcept { return DxLib::GetSoundTotalTime(handle_); }
 
 		bool vol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), handle_) == 0); }
-		auto vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
+		int vol(void) const noexcept { return GetVolumeSoundMem2(handle_); }
 		bool SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), handle_) == 0); }
 		bool Radius(float radius) const noexcept { return (Set3DRadiusSoundMem(radius, handle_) == 0); }
 		void play_3D(const Vector3DX& pos, float radius, int type_t = DX_PLAYTYPE_BACK)const {
@@ -96,8 +96,8 @@ namespace DXLibRef {
 			int Set_vol = 255;
 			float vol_rate = 1.f;
 		public:
-			const auto& GetHandles(void)const noexcept { return shandle; }
-			const auto& Get_ID(void)const noexcept { return ID; }
+			const auto&			GetHandles(void)const noexcept { return shandle; }
+			const auto&			Get_ID(void)const noexcept { return ID; }
 			void			Set(int ID_t, size_t buffersize, std::string path_t, bool is3Dsound = true) noexcept {
 				if (path_t == "") {
 					return;
@@ -128,7 +128,7 @@ namespace DXLibRef {
 				}
 
 			}
-			void			Delete() noexcept {
+			void			Delete(void) noexcept {
 				for (auto& h : shandle) {
 					h->handle.clear();
 					h.reset();
@@ -141,7 +141,7 @@ namespace DXLibRef {
 				}
 			}
 			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = INVALID_ID, int panpal = -256) noexcept {
-				auto ans = now;
+				size_t ans = now;
 				shandle.at(static_cast<size_t>(Sel_t))->handle[now].play(type_t, Flag_t);
 				if (vol_t != INVALID_ID) {
 					Set_vol = vol_t;
@@ -161,7 +161,7 @@ namespace DXLibRef {
 					//isplay = (dist < radius);
 				}
 				if (isplay) {
-					auto ans = now;
+					size_t ans = now;
 					shandle.at(static_cast<size_t>(Sel_t))->handle[now].play_3D(pos_t, radius, type_t);
 					if (vol_t != INVALID_ID) {
 						Set_vol = vol_t;
@@ -216,7 +216,7 @@ namespace DXLibRef {
 		}
 	public:
 		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) noexcept {
-			for (size_t index = 0; auto & h : this->havehandle) {
+			for (size_t index = 0; auto& h : this->havehandle) {
 				if (h.Get_ID() == ID_t) {
 					h.Set(ID_t, buffersize, path_t, is3Dsound);
 					return index;
@@ -262,7 +262,7 @@ namespace DXLibRef {
 			BGMhave& operator=(BGMhave&& o) = delete;
 		public:
 			//const auto&		GetHandles(void)const noexcept { return shandle; }
-			const auto& Get_ID(void)const noexcept { return ID; }
+			const auto&			Get_ID(void)const noexcept { return ID; }
 			void			Set(int ID_t, std::string path_t, bool is3Dsound = false) noexcept {
 				if (path_t == "") {
 					return;
@@ -276,13 +276,13 @@ namespace DXLibRef {
 				this->handle = SoundHandle::Load(this->path);
 				SetCreate3DSoundFlag(FALSE);
 			}
-			bool			Check() noexcept {
+			bool			Check(void) noexcept {
 				return this->handle.check();
 			}
-			void			Delete() noexcept {
+			void			Delete(void) noexcept {
 				this->handle.Dispose();
 			}
-			void			Stop() noexcept {
+			void			Stop(void) noexcept {
 				this->handle.stop();
 			}
 			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) noexcept {
@@ -337,7 +337,7 @@ namespace DXLibRef {
 			this->havehandle.back()->Set(ID_t, path_t, is3Dsound);
 			return this->havehandle.size() - 1;
 		}
-		auto& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
+		auto&			Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
 		void						Delete(int ID_t) noexcept {
 			for (int i = 0, Max = static_cast<int>(this->havehandle.size()); i < Max; i++) {
 				auto& h = this->havehandle.at(static_cast<size_t>(i));
@@ -352,7 +352,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void						StopAll() noexcept {
+		void						StopAll(void) noexcept {
 			for (auto& h : this->havehandle) {
 				h->Stop();
 			}

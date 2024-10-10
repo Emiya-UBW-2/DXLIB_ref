@@ -17,7 +17,7 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
 		case EasingType::OutExpo:
-			return (1.f - std::powf(ratio, 60.f / DrawParts->GetFps()));
+			return (1.f - std::powf(ratio, Frame_Rate / DrawParts->GetFps()));
 		default:
 			return 1.f;
 		}
@@ -29,7 +29,6 @@ namespace DXLibRef {
 		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		// ビュー行列と射影行列の取得
 		MATRIX mat_view;					// ビュー行列
 		VECTOR vec_from = campos.get();		// カメラの位置
@@ -40,8 +39,8 @@ namespace DXLibRef {
 		SetupCamera_Perspective(fov);
 		MATRIX proj = GetCameraProjectionMatrix();
 		// ビューポート行列（スクリーン行列）の作成
-		float w = static_cast<float>(DrawParts->GetScreenY(1920)) / 2.0f;
-		float h = static_cast<float>(DrawParts->GetScreenY(1080)) / 2.0f;
+		float w = static_cast<float>(ScreenWidth) / 2.0f;
+		float h = static_cast<float>(ScreenHeight) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,
@@ -65,7 +64,7 @@ namespace DXLibRef {
 	//
 	namespace WindowSystem {
 		void DrawData::Output() const noexcept {
-			Rect2D Widow; Widow.Set(DXDraw::Instance()->GetUIY(0), DXDraw::Instance()->GetUIY(0), DXDraw::Instance()->GetUIY(1920), DXDraw::Instance()->GetUIY(1080));
+			Rect2D Widow; Widow.Set(0, 0, UIWidth, UIHeight);
 
 			switch (m_type) {
 			case DrawType::Alpha:
@@ -158,17 +157,14 @@ namespace DXLibRef {
 				break;
 			}
 		}
-		DrawControl::DrawControl() noexcept {
+		DrawControl::DrawControl(void) noexcept {
 			this->m_DrawDatas.resize((int)DrawLayer::Max);
 			this->m_PrevDrawDatas.resize((int)DrawLayer::Max);
 
-			m_BufferScreen = GraphHandle::Make(DXDraw::Instance()->GetUIY(1920), DXDraw::Instance()->GetUIY(1080), true);
+			m_BufferScreen = GraphHandle::Make(UIWidth, UIHeight, true);
 		}
-		void	DrawControl::SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) {
-			auto* DrawParts = DXDraw::Instance();
-			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= DrawParts->GetScreenX(1920) && 0 <= std::max(y1, y2) && std::min(y1, y2) <= DrawParts->GetScreenY(1080))) { return; }				//画面外は表示しない
-
-
+		void	DrawControl::SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept {
+			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= ScreenWidth && 0 <= std::max(y1, y2) && std::min(y1, y2) <= ScreenHeight)) { return; }				//画面外は表示しない
 			DrawData* Back = GetBack(Layer);
 			Back->InputType(DrawType::Box);
 			Back->InputintParam(0, x1);
@@ -178,8 +174,7 @@ namespace DXLibRef {
 			Back->InputUintParam(0, color1);
 			Back->InputboolParam(0, IsFill);
 		}
-		void DrawControl::SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill)
-		{
+		void DrawControl::SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept {
 			DrawData* Back = GetBack(Layer);
 			Back->InputType(DrawType::Quadrangle);
 			Back->InputintParam(0, x1);
@@ -193,9 +188,8 @@ namespace DXLibRef {
 			Back->InputUintParam(0, color1);
 			Back->InputboolParam(0, IsFill);
 		}
-		void	DrawControl::SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness) {
-			auto* DrawParts = DXDraw::Instance();
-			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= DrawParts->GetScreenX(1920) && 0 <= std::max(y1, y2) && std::min(y1, y2) <= DrawParts->GetScreenY(1080))) { return; }				//画面外は表示しない
+		void	DrawControl::SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness) noexcept {
+			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= ScreenWidth && 0 <= std::max(y1, y2) && std::min(y1, y2) <= ScreenHeight)) { return; }				//画面外は表示しない
 
 
 			DrawData* Back = GetBack(Layer);
@@ -225,16 +219,16 @@ namespace DXLibRef {
 				*xp1 = *xp1 + DrawParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1), (*yp1 - ySize / 2), (*xp1 + xSize), (*yp1 + ySize / 2),
-					0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
+					0, 0, UIWidth, UIHeight);
 			case FontHandle::FontXCenter::MIDDLE:
 				return HitRectangleToRectangle(
 					(*xp1 - xSize / 2), (*yp1 - ySize / 2), (*xp1 + xSize / 2), (*yp1 + ySize),
-					0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
+					0, 0, UIWidth, UIHeight);
 			case FontHandle::FontXCenter::RIGHT:
 				*xp1 = *xp1 - DrawParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1 - xSize), (*yp1 - ySize / 2), (*xp1), (*yp1 + ySize / 2),
-					0, 0, DrawParts->GetUIY(1920), DrawParts->GetUIY(1080));
+					0, 0, UIWidth, UIHeight);
 			default:
 				return false;
 			}
@@ -255,9 +249,10 @@ namespace DXLibRef {
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			SetBox(xp3 + DrawParts->GetUIY(5), yp3 + DrawParts->GetUIY(5), xp4 - DrawParts->GetUIY(5), yp4 - DrawParts->GetUIY(5), Black);
+			int Edge = DrawParts->GetUIY(5);
+			SetBox(xp3 + Edge, yp3 + Edge, xp4 - Edge, yp4 - Edge, Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + DrawParts->GetUIY(5), yp3 + DrawParts->GetUIY(5), xp4 + DrawParts->GetUIY(5), yp4 - DrawParts->GetUIY(5), Gray50);
+			SetBox(xp3 + Edge, yp3 + Edge, xp4 + Edge, yp4 - Edge, Gray50);
 			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
 			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
 			SetBox(xp3, yp3, xp4, yp4, color);
@@ -317,7 +312,7 @@ namespace DXLibRef {
 			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
 
 			m_repeat = trigger();
-			m_repeatcount -= 60.f / DrawParts->GetFps();
+			m_repeatcount -= Frame_Rate / DrawParts->GetFps();
 			if (m_repeatcount <= 0.f) {
 				m_repeatcount += 2.f;
 				m_repeat = true;
@@ -351,26 +346,23 @@ namespace DXLibRef {
 	}
 	void SideLog::Draw(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		auto* Fonts = FontPool::Instance();
-
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		int xp1, yp1;
 		xp1 = DrawParts->GetUIY(64);
 		yp1 = DrawParts->GetUIY(256);
 
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
-				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
+				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
 				int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
-					xp1 - DrawParts->GetUIY(6), yp + DrawParts->GetUIY(18),
-					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(Fonts->Get(FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), 0)->GetStringWidth(INVALID_ID, d.GetMsg()), DrawParts->GetUIY(200))) * d.ActivePer()), yp + DrawParts->GetUIY(18) + DrawParts->GetUIY(5),
+					xp1 - DrawParts->GetUIY(6), yp + LineHeight,
+					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), DrawParts->GetUIY(200))) * d.ActivePer()), yp + LineHeight + DrawParts->GetUIY(5),
 					Black);
-				WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
-					FontPool::FontType::MS_Gothic, DrawParts->GetUIY(18), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-					static_cast<int>(xp1), static_cast<int>(yp), d.GetMsgColor(), Black, d.GetMsg());
+				WindowSystem::SetMsg(static_cast<int>(xp1), static_cast<int>(yp) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
-		WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 	}
 	//
 	void PopUp::PopUpDrawClass::Start(void) noexcept {
@@ -380,9 +372,9 @@ namespace DXLibRef {
 		Pad->SetGuideUpdate();
 		Pad->ChangeGuide(
 			[&]() {
-				auto* KeyGuide = PadControl::Instance();
+				auto* Pad = PadControl::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
-				KeyGuide->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
+				Pad->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
 				if (m_GuideDoing) {
 					m_GuideDoing();
 				}
@@ -418,56 +410,47 @@ namespace DXLibRef {
 		}
 	}
 	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
+		if (m_ActivePer < 1.f / 255.f) { return; }
+
 		auto* DrawParts = DXDraw::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 
-		int xm1, ym1;
-		int xm2, ym2;
+		int xm1 = xcenter - DrawParts->GetUIY(WinSizeX) / 2;
+		int ym1 = ycenter - DrawParts->GetUIY(WinSizeY) / 2;
+		int xm2 = xcenter + DrawParts->GetUIY(WinSizeX) / 2;
+		int ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
 
-		int xp1, yp1;
-		int xp2, yp2;
+		//背景
+		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
+		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
+		WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
+		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 
-		if (m_ActivePer > 1.f / 255.f) {
-			xm1 = xcenter - DrawParts->GetUIY(WinSizeX) / 2;
-			ym1 = ycenter - DrawParts->GetUIY(WinSizeY) / 2;
-			xm2 = xcenter + DrawParts->GetUIY(WinSizeX) / 2;
-			ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
-
-			//背景
-			auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
-			WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-
-			//タイトル
-			{
-				xp1 = xm1 + DrawParts->GetUIY(32);
-				yp1 = ym1 + LineHeight / 4;
-				WindowSystem::SetMsg(xp1, yp1 + LineHeight, LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+		//タイトル
+		WindowSystem::SetMsg(
+			xm1 + DrawParts->GetUIY(32), ym1 + LineHeight / 4 + LineHeight,
+			LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+		//
+		if (m_Active) {
+			int xp1 = xm2 - DrawParts->GetUIY(140);
+			int yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
+				End();
 			}
-			//
-			if (m_Active) {
-				xp1 = xm2 - DrawParts->GetUIY(140);
-				yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-				if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
-					End();
-				}
-			}
-			xp1 = xm1 + DrawParts->GetUIY(24);
-			yp1 = ym1 + LineHeight * 3;
-			xp2 = xm2 - DrawParts->GetUIY(24);
-			yp2 = ym2 - LineHeight;
-			//背景
-			{
-				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-				WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
-				WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-			}
-			//
+		}
+		//背景
+		{
+			int xp1 = xm1 + DrawParts->GetUIY(24);
+			int yp1 = ym1 + LineHeight * 3;
+			int xp2 = xm2 - DrawParts->GetUIY(24);
+			int yp2 = ym2 - LineHeight;
+			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
+			WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
+			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 			if (m_Doing) {
 				m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
 			}
-			//
 		}
 	}
 
@@ -645,8 +628,9 @@ namespace DXLibRef {
 		if (this->m_FrameInfo.m_Alpha == 0.f) {
 			return;
 		}
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		if (1.f > this->m_FrameInfo.m_Alpha) {
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
+			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
 		}
 		auto* LocalizeParts = LocalizePool::Instance();
 
@@ -765,7 +749,7 @@ namespace DXLibRef {
 			break;
 		}
 		if (1.f > this->m_FrameInfo.m_Alpha) {
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 		}
 	}
 	//

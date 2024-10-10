@@ -17,14 +17,14 @@ namespace DXLibRef {
 		float			m_ShadowScale{ 1.f };
 	public:
 		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
-		auto& Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
+		auto&			Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
 		void SetShadowScale(float value) noexcept { m_ShadowScale = value; }
 	public://ゲッター
-		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
-		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
-		const auto& GetShadowScale(void) const noexcept { return m_ShadowScale; }
+		const auto&			GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
+		const auto&			Get3DActive(void) const noexcept { return m_Is3DActive; }
+		const auto&			GetShadowScale(void) const noexcept { return m_ShadowScale; }
 	public://コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;
@@ -100,6 +100,7 @@ namespace DXLibRef {
 		std::shared_ptr<TEMPSCENE> m_NowScenesPtr;
 		std::array<float, 60> FPSAvgs{};
 		int m_FPSAvg = 0;
+		float						m_PauseFlashCount{ 0.f };
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;
@@ -112,8 +113,10 @@ namespace DXLibRef {
 				s->Dispose();
 			}
 		}
+	private:
+		void 	DrawFrontCommon(void) noexcept;
 	public:
-		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
+		const auto&			GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
 	public:
 		void AddList(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
 			this->m_ScenesPtr.emplace_back(ptr);

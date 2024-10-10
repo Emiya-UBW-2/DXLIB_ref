@@ -20,7 +20,7 @@ namespace DXLibRef {
 			Vector3DX					m_TouchPadPoint{ Vector3DX::zero() };
 			moves						m_move;
 		public:
-			const auto& GetID(void) const noexcept { return m_ID; }
+			const auto&			GetID(void) const noexcept { return m_ID; }
 			auto			IsActive(void) const noexcept { return m_isInitialized && m_isActive; }
 			bool			PadPress(VR_PAD ID) const noexcept {
 				switch (ID) {
@@ -54,8 +54,8 @@ namespace DXLibRef {
 					return false;
 				}
 			}
-			const auto& GetTouchPadPoint(void) const noexcept { return m_TouchPadPoint; }
-			const auto& GetMove(void) const noexcept { return m_move; }
+			const auto&			GetTouchPadPoint(void) const noexcept { return m_TouchPadPoint; }
+			const auto&			GetMove(void) const noexcept { return m_move; }
 		public:
 			void Init(int ID, char Num, vr::ETrackedDeviceClass Type) noexcept {
 				this->m_ID = ID;
@@ -358,7 +358,6 @@ namespace DXLibRef {
 		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
-		float Scale_Rate = 12.5f;
 		ClearDrawScreen();
 		SetupCamera_Ortho(30.f * scale * Scale_Rate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
 		SetCameraNearFar(0.05f * scale * Scale_Rate, 60.f * scale * Scale_Rate);		// 描画する奥行き範囲をセット
@@ -405,7 +404,6 @@ namespace DXLibRef {
 		SetUseTextureToShader(1, DepthScreenHandle.get());				// 影用深度記録画像をテクスチャ１にセット
 		SetUseTextureToShader(2, DepthFarScreenHandle.get());			// 影用深度記録画像をテクスチャ１にセット
 		// 影の結果を出力
-		float Scale_Rate = 12.5f;
 		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.1f * Scale_Rate, 100.f * Scale_Rate);
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
@@ -440,19 +438,17 @@ namespace DXLibRef {
 		m_ShaderRigid.Dispose();
 	}
 	void DXDraw::ShadowDraw::SetActive(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
-		Init(11, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+		Init(11, ScreenWidth, ScreenHeight);
 	}
 	bool DXDraw::ShadowDraw::UpdateActive(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
 			if (shadow) {
-				Init(11, DrawParts->GetScreenY(1920), DrawParts->GetScreenY(1080));
+				Init(11, ScreenWidth, ScreenHeight);
 				return true;
 			}
 			else {
@@ -679,6 +675,7 @@ namespace DXLibRef {
 		//初期設定画面
 		OptionWindowParts->SetActive();
 		while (ProcessMessage() == 0) {
+			WindowSystem::DrawControl::Instance()->ClearList();
 			int xBase = GetUIY(1366);
 			int yBase = GetUIY(768);
 			SetWindowPosition((deskx - xBase) / 2, (desky - yBase) / 2);
@@ -693,12 +690,16 @@ namespace DXLibRef {
 			//
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{
-				PopUpParts->Draw(GetUIY(720 / 2 + 16), GetUIY(720 / 2 + 16));
-				WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal, 
-					FontPool::FontType::MS_Gothic, GetUIY(12), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, GetUIY(32), GetUIY(720 + 16 + 32 / 2), Green, Black, LocalizeParts->Get(109));
+				int Width = GetUIY(720);
+				int Height = GetUIY(720);
+				int Edge = GetUIY(16);
 
-				int xp = GetUIY(720 + 16 + 16);
-				int yp = GetUIY(16);
+				PopUpParts->Draw(Width / 2 + Edge, Height / 2 + Edge);
+
+				WindowSystem::SetMsg(Edge + Edge, Height + Edge + Edge, GetUIY(12), FontHandle::FontXCenter::LEFT, Green, Black, LocalizeParts->Get(109));
+
+				int xp = Width + Edge + Edge;
+				int yp = Edge;
 				if (WindowSystem::SetMsgClickBox(xp, yp, xp + GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
 					m_CheckPCSpec.StartSearch();
 				}
@@ -722,7 +723,7 @@ namespace DXLibRef {
 							Color = Red;
 							TextID = 2004;
 						}
-						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 2)) {
+						if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
 							switch (TextID) {
 							case 2002:
 								MouseOverID = 2040;
@@ -737,9 +738,9 @@ namespace DXLibRef {
 								break;
 							}
 						}
-						WindowSystem::SetMsg(xp + GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						WindowSystem::SetMsg(xp + Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 						yp += LineHeight;
 					}
 					if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
@@ -748,7 +749,7 @@ namespace DXLibRef {
 					//Mem
 					{
 						WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
 						int TextID = 0;
 						unsigned int Color = White;
 						if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {//
@@ -759,7 +760,7 @@ namespace DXLibRef {
 							Color = Yellow;
 							TextID = 2013;
 						}
-						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 1)) {
+						if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 1)) {
 							switch (TextID) {
 							case 2012:
 								MouseOverID = 2043;
@@ -771,7 +772,7 @@ namespace DXLibRef {
 								break;
 							}
 						}
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
 						yp += LineHeight;
 					}
 					//GPU
@@ -791,7 +792,7 @@ namespace DXLibRef {
 							Color = Red;
 							TextID = 2024;
 						}
-						if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 2)) {
+						if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
 							switch (TextID) {
 							case 2022:
 								MouseOverID = 2045;
@@ -806,9 +807,9 @@ namespace DXLibRef {
 								break;
 							}
 						}
-						WindowSystem::SetMsg(xp + GetUIY(16), yp + LineHeight / 2, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-						WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+						WindowSystem::SetMsg(xp + Edge, yp + LineHeight / 2, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 						yp += LineHeight;
 					}
 					if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
@@ -821,11 +822,11 @@ namespace DXLibRef {
 							NowSet = loop;
 						}
 					}
-					if (IntoMouse(xp + GetUIY(16), yp, xBase - GetUIY(16), yp + LineHeight * 2)) {
+					if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
 						MouseOverID = 2048;
 					}
 					WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
-					WindowSystem::SetMsg(xBase - GetUIY(16), yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
+					WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
 					if (MouseOverID != INVALID_ID) {
 						xp = Pad->GetMS_X();
 						yp = Pad->GetMS_Y();
@@ -833,28 +834,17 @@ namespace DXLibRef {
 					}
 				}
 
-				xp = GetUIY(720 + 16 + 32);
-				yp = GetUIY(720);
-				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - GetUIY(32), yp + GetUIY(32), LineHeight, Green, false, true, "Start Game!")) {
+				xp = Width + Edge + Edge + Edge;
+				yp = Height;
+				if (WindowSystem::SetMsgClickBox(xp, yp, xBase - Edge + Edge, yp + Edge + Edge, LineHeight, Green, false, true, "Start Game!")) {
 					PopUpParts->EndAll();
 				}
+
+				WindowSystem::DrawControl::Instance()->Draw();
 			}
 			Screen_Flip();
 		}
 		OptionParts->Save();
-	}
-	void DXDraw::PauseDraw(void) const noexcept {
-		if (IsPause()) {
-			//
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-			WindowSystem::DrawControl::Instance()->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, GetUIY(1920), GetUIY(1080), Black, TRUE);
-			WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-			//
-			if (m_PauseFlashCount > 0.5f) {
-				WindowSystem::DrawControl::Instance()->SetString(WindowSystem::DrawLayer::Normal,
-					FontPool::FontType::MS_Gothic, GetUIY(36), FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, GetUIY(16), GetUIY(16), Green, Black, "Pause");
-			}
-		}
 	}
 	void DXDraw::GetMousePosition(int* MouseX, int* MouseY) const noexcept {
 		auto y_UIMs = [&](int p1) {
@@ -897,7 +887,7 @@ namespace DXLibRef {
 		//Init
 		m_PauseActive.Set(false);
 		//シェーダー
-		this->m_ScreenVertex.SetScreenVertex(GetScreenY(1920), GetScreenY(1080));// 頂点データの準備
+		this->m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);// 頂点データの準備
 		this->m_Shader2D[0].Init("CommonData/shader/VS_lens.vso", "CommonData/shader/PS_lens.pso");//レンズ
 		this->m_Shader2D[1].Init("CommonData/shader/VS_BlackOut.vso", "CommonData/shader/PS_BlackOut.pso");//ブラックアウト
 		m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
@@ -907,7 +897,7 @@ namespace DXLibRef {
 		//シェーダー
 		PostPassEffect::Create();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			UI_Screen = GraphHandle::Make(GetScreenY(1920), GetScreenY(1080), true);	//UI
+			UI_Screen = GraphHandle::Make(ScreenWidth, ScreenHeight, true);	//UI
 		}
 		//影生成
 		m_ShadowDraw->SetActive();
@@ -1015,11 +1005,6 @@ namespace DXLibRef {
 		Set3DSoundListenerPosAndFrontPosAndUpVec(SetMainCamera().GetCamPos().get(), SetMainCamera().GetCamVec().get(), SetMainCamera().GetCamUp().get());		//音位置指定
 		this->GetVRControl()->Execute();		//VR空間に適用
 		//
-		m_PauseFlashCount += 1.f / GetFps();
-		if (m_PauseFlashCount > 1.f) {
-			m_PauseFlashCount -= 1.f;
-		}
-		//
 		m_PauseActive.Execute(Pad->GetKey(PADS::INVENTORY).press() && !OptionWindowParts->IsActive());
 		if (m_PauseActive.trigger()) {
 			Pad->SetGuideUpdate();
@@ -1044,7 +1029,6 @@ namespace DXLibRef {
 	) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-		auto* Pad = PadControl::Instance();
 		//描画
 		auto MainDraw = [&](const Camera3DInfo& camInfo) {
 			//影画像の用意
@@ -1075,7 +1059,7 @@ namespace DXLibRef {
 			if (this->m_ShaderParam[0].use) {
 				//レンズ
 				PostPassParts->Plus_Draw([&]() {
-					this->m_Shader2D[0].SetPixelDispSize(GetScreenY(1920), GetScreenY(1080));
+					this->m_Shader2D[0].SetPixelDispSize(ScreenWidth, ScreenHeight);
 					this->m_Shader2D[0].SetPixelParam(3, this->m_ShaderParam[0].param[0], this->m_ShaderParam[0].param[1], this->m_ShaderParam[0].param[2], this->m_ShaderParam[0].param[3]);
 					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[0].Draw(this->m_ScreenVertex);
@@ -1085,7 +1069,7 @@ namespace DXLibRef {
 			if (this->m_ShaderParam[1].use) {
 				//ブラックアウト
 				PostPassParts->Plus_Draw([&]() {
-					this->m_Shader2D[1].SetPixelDispSize(GetScreenY(1920), GetScreenY(1080));
+					this->m_Shader2D[1].SetPixelDispSize(ScreenWidth, ScreenHeight);
 					this->m_Shader2D[1].SetPixelParam(3, this->m_ShaderParam[1].param[0], 0, 0, 0);
 					SetUseTextureToShader(0, PostPassParts->Get_MAINBuffer_Screen().get());	//使用するテクスチャをセット
 					this->m_Shader2D[1].Draw(this->m_ScreenVertex);
@@ -1098,9 +1082,6 @@ namespace DXLibRef {
 			UI_Screen.SetDraw_Screen();
 			{
 				doingUI();
-				PauseDraw();
-				UISystem::Instance()->Draw();
-				Pad->Draw();
 			}
 			//VRに移す
 			for (char i = 0; i < 2; ++i) {
@@ -1113,7 +1094,7 @@ namespace DXLibRef {
 			{
 				FillGraph(GetDrawScreen(), 0, 0, 0);
 				if (this->GetVRControl()->GetOutBuffer()) {
-					this->GetVRControl()->GetOutBuffer()->DrawRotaGraph(GetScreenY(1920) / 2, GetScreenY(1080) / 2, 0.5f, 0, false);
+					this->GetVRControl()->GetOutBuffer()->DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 0.5f, 0, false);
 				}
 			}
 		}
@@ -1122,27 +1103,21 @@ namespace DXLibRef {
 			//ディスプレイ描画
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{
-				auto Prev = GetDrawMode();
+				int Prev = GetDrawMode();
 				//SetDrawMode(DX_DRAWMODE_NEAREST);
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->m_DispXSize, this->m_DispYSize, false);
 				SetDrawMode(Prev);
 				doingUI();
-				PauseDraw();
-				UISystem::Instance()->Draw();
-				Pad->Draw();
 				doingUI2();										//UI2
-				WindowSystem::DrawControl::Instance()->Draw();
 			}
 		}
 	}
 	void			DXDraw::Draw2D(
 		std::function<void()> doing,
-		std::function<void()> doingUI,
-		std::function<void()> doingUI2
+		std::function<void()> doingUI
 	) noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
-		auto* Pad = PadControl::Instance();
 		//描画
 		PostPassParts->Draw2D(doing);
 		//
@@ -1150,17 +1125,12 @@ namespace DXLibRef {
 		//ディスプレイ描画
 		GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 		{
-			auto Prev = GetDrawMode();
+			int Prev = GetDrawMode();
 			//SetDrawMode(DX_DRAWMODE_NEAREST);
 			SetDrawMode(DX_DRAWMODE_BILINEAR);
 			PostPassParts->Get_MAIN_Screen().DrawExtendGraph(0, 0, this->m_DispXSize, this->m_DispYSize, false);
 			SetDrawMode(Prev);
 			doingUI();
-			PauseDraw();
-			UISystem::Instance()->Draw();
-			Pad->Draw();
-			doingUI2();										//UI2
-			WindowSystem::DrawControl::Instance()->Draw();
 		}
 	}
 	bool					DXDraw::Screen_Flip(void) noexcept {

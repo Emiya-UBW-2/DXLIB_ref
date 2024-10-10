@@ -79,7 +79,7 @@ namespace DXLibRef {
 		~LightPool(void) noexcept {}
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
-			auto prev = now;
+			int prev = now;
 			if (handles[static_cast<size_t>(now)].get() != INVALID_ID) {
 				handles[static_cast<size_t>(now)].Dispose();
 			}

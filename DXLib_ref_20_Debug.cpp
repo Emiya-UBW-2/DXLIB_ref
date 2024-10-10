@@ -9,7 +9,7 @@ namespace DXLibRef {
 
 
 	DebugClass::DebugClass(void) noexcept {
-		m_Point.resize(PointFrame + 1);
+		m_Point.resize(static_cast<size_t>(PointFrame + 1));
 		m_Switch.Set(true);
 	}
 
@@ -69,6 +69,7 @@ namespace DXLibRef {
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		if (!m_Switch.on()) {
 			return;
 		}
@@ -112,7 +113,7 @@ namespace DXLibRef {
 					for (size_t index = static_cast<size_t>(PMax - 1); index > 0; --index) {
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[j][index] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[j + 1][index] * ys));
-						WindowSystem::DrawControl::Instance()->SetDrawQuadrangle(
+						DrawCtrls->SetDrawQuadrangle(
 							WindowSystem::DrawLayer::Normal,
 							xnow, ynow, xnext, ynext,
 							xnext, ye, xnow, ye,
@@ -123,18 +124,17 @@ namespace DXLibRef {
 					for (int index : std::views::iota(0, PMax)) {
 						int ynow = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
 						int ynext = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
-						WindowSystem::DrawControl::Instance()->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
+						DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
 					}
 					//*/
 				}
-				WindowSystem::DrawControl::Instance()->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);//Šî€ü
+				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);//Šî€ü
 			}
 			ypos += height;
 		}
 		{
-			const int FontSize = DrawParts->GetUIY(18);
 			const int wide = DrawParts->GetUIY(350);
-			const int height = static_cast<int>(m_PointSel + 3 + 1) * FontSize + DrawParts->GetUIY(10);
+			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + DrawParts->GetUIY(10);
 			//”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
@@ -143,19 +143,19 @@ namespace DXLibRef {
 			ypos += DrawParts->GetUIY(2);
 			int i = 0;
 			//“à—e
-			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());
+			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());
 			++i;
-			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount());
+			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount());
 			++i;
-			WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, White, Black, "FPS    :%5.2f fps", GetFPS());
+			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "FPS    :%5.2f fps", GetFPS());
 			++i;
 			for (size_t index : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
-				WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
+				WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}
 			{
 				size_t index = static_cast<size_t>(PointMax);
-				WindowSystem::SetMsg(xpos, ypos + (i * FontSize) + FontSize / 2, FontSize, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
+				WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}
 		}

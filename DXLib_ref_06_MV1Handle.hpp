@@ -18,8 +18,8 @@ namespace DXLibRef {
 			float	per_prev{ -1.f };
 			float	time_prev{ -1.f };
 		public:
-			auto& GetPer(void) noexcept { return this->m_per; }
-			auto& GetTime(void) noexcept { return this->m_time; }
+			auto&			GetPer(void) noexcept { return this->m_per; }
+			auto&			GetTime(void) noexcept { return this->m_time; }
 			auto			GetTimePer(void) const noexcept { return (this->m_AllTime > 0) ? this->m_time / this->m_AllTime : 1.f; }
 			auto			TimeStart(void) const noexcept { return m_time <= 0; }
 			auto			TimeEnd(void) const noexcept { return m_time >= m_AllTime; }
@@ -183,8 +183,8 @@ namespace DXLibRef {
 		void			SaveModelToMV1File(std::basic_string_view<TCHAR> FileName) const noexcept { MV1SaveModelToMV1FileWithStrLen(GetHandle(), FileName.data(), FileName.length()); }
 
 		/*アニメーション*/
-		auto& SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
-		auto& GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		auto&			SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		auto&			GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
 		auto			GetAnimNum(void) const noexcept { return this->m_AnimControler.size(); }
 		int				AttachAnim(int AnimIndex, const MV1* model_haveanim = nullptr) noexcept {
 			if (model_haveanim && (this->GetHandle() != model_haveanim->GetHandle())) {

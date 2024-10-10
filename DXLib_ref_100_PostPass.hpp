@@ -16,7 +16,7 @@ namespace DXLibRef {
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*, GraphHandle*, GraphHandle*) noexcept {}
 	public:
 		bool IsActive(void) noexcept { return IsActive_Sub(); }
-		void Init()noexcept {
+		void Init(void) noexcept {
 			m_PrevActive = IsActive_Sub();
 			if (m_PrevActive) {
 				Load_Sub();
@@ -68,13 +68,13 @@ namespace DXLibRef {
 		int InColorPerMax = 255;
 		float InColorGamma = 1.1f;
 	public:
-		auto& Get_MAIN_Screen(void) noexcept { return BufferScreen; }
-		auto& Get_MAINBuffer_Screen(void) noexcept { return ColorScreen; }
+		auto&			Get_MAIN_Screen(void) noexcept { return BufferScreen; }
+		auto&			Get_MAINBuffer_Screen(void) noexcept { return ColorScreen; }
 
-		auto& Get_near_DoF(void) noexcept { return near_DoF; }
-		auto& Get_far_DoF(void) noexcept { return far_DoF; }
-		auto& Get_near_DoFMax(void) noexcept { return near_DoFMax; }
-		auto& Get_far_DoFMin(void) noexcept { return far_DoFMin; }
+		auto&			Get_near_DoF(void) noexcept { return near_DoF; }
+		auto&			Get_far_DoF(void) noexcept { return far_DoF; }
+		auto&			Get_near_DoFMax(void) noexcept { return near_DoFMax; }
+		auto&			Get_far_DoFMin(void) noexcept { return far_DoFMin; }
 	public:
 		//ボケ始める場所を指定(完全にボケるのはニアファーの限度)
 		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
@@ -100,7 +100,7 @@ namespace DXLibRef {
 		void Update(void) noexcept;
 		void DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& cams) noexcept;
 		void Draw2D(std::function<void()> doing) noexcept;
-		void Draw() noexcept;
+		void Draw(void) noexcept;
 		void Plus_Draw(std::function<void()> doing) noexcept {
 			GraphFilterBlt(BufferScreen.get(), ColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, 1);
 			BufferScreen.SetDraw_Screen(false);

@@ -775,19 +775,19 @@ namespace DXLibRef {
 
 		~PadControl(void) noexcept {}
 	public:
-		const auto& GetLS_X(void) const noexcept { return Look_XradAdd; }
-		const auto& GetLS_Y(void) const noexcept { return Look_YradAdd; }
+		const auto&			GetLS_X(void) const noexcept { return Look_XradAdd; }
+		const auto&			GetLS_Y(void) const noexcept { return Look_YradAdd; }
 
-		const auto& GetMS_X(void) const noexcept { return MouseX; }
-		const auto& GetMS_Y(void) const noexcept { return MouseY; }
-		const auto& GetMouseClick(void) const noexcept { return MouseClick; }
-		const auto& GetEsc(void) const noexcept { return KeyEsc; }
-		const auto& GetBSorDel(void) const noexcept { return KeyBSorDel; }
-		const auto& GetMouseWheelRot(void) const noexcept { return MouseWheelRot; }
+		const auto&			GetMS_X(void) const noexcept { return MouseX; }
+		const auto&			GetMS_Y(void) const noexcept { return MouseY; }
+		const auto&			GetMouseClick(void) const noexcept { return MouseClick; }
+		const auto&			GetEsc(void) const noexcept { return KeyEsc; }
+		const auto&			GetBSorDel(void) const noexcept { return KeyBSorDel; }
+		const auto&			GetMouseWheelRot(void) const noexcept { return MouseWheelRot; }
 
-		const auto& IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
-		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
-		const auto& GetAtoZKey(char AtoZ) const noexcept {
+		const auto&			IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
+		const auto&			GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
+		const auto&			GetAtoZKey(char AtoZ) const noexcept {
 			if ('A' <= AtoZ && AtoZ <= 'Z') {
 				return this->m_AtoZKey.at(static_cast<size_t>(AtoZ - 'A'));
 			}
@@ -796,15 +796,15 @@ namespace DXLibRef {
 			}
 			return this->m_AtoZKey.at(0);
 		}
-		const auto& GetNumKey(int Num) const noexcept {
+		const auto&			GetNumKey(int Num) const noexcept {
 			if (0 <= Num && Num <= 9) {
 				return this->m_NumKey.at(Num);
 			}
 			return this->m_NumKey.at(0);
 		}
-		const auto& GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
+		const auto&			GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
 		const auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
-		const auto& GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
+		const auto&			GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
 
 		void SetIsUseButton(PADS select, bool value) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse = value; }
 		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_reserve = assign; }
@@ -906,10 +906,10 @@ namespace DXLibRef {
 		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetKeyInputFlags(const InputControl& o) noexcept { this->m_Flags = o.m_Flags; }
 
-		const auto& GetAddxRad(void) const noexcept { return this->m_AddxRad; }
-		const auto& GetAddyRad(void) const noexcept { return this->m_AddyRad; }
-		const auto& GetxRad(void) const noexcept { return this->m_xRad; }
-		const auto& GetyRad(void) const noexcept { return this->m_yRad; }
+		const auto&			GetAddxRad(void) const noexcept { return this->m_AddxRad; }
+		const auto&			GetAddyRad(void) const noexcept { return this->m_AddyRad; }
+		const auto&			GetxRad(void) const noexcept { return this->m_xRad; }
+		const auto&			GetyRad(void) const noexcept { return this->m_yRad; }
 
 		auto		GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
 

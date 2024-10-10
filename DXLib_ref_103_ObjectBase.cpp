@@ -235,7 +235,7 @@ namespace DXLibRef {
 				}
 				for (int i : std::views::iota(0, Max)) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f * 60.f / DrawParts->GetFps() / static_cast<float>(Max));
+					this->GetObj().PhysicsCalculation(1000.0f * Frame_Rate / DrawParts->GetFps() / static_cast<float>(Max));
 				}
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();
@@ -253,8 +253,8 @@ namespace DXLibRef {
 		this->m_IsDraw = false;
 		this->m_DistanceToCam = (this->GetObj().GetMatrix().pos() - GetScreenPosition()).magnitude();
 		if (CheckCameraViewClip_Box(
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * 12.5f, -0.f * 12.5f, -1.f * 12.5f)).get(),
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * 12.5f, 1.f * 12.5f, 1.f * 12.5f)).get()) == FALSE
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale_Rate, -0.f * Scale_Rate, -1.f * Scale_Rate)).get(),
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale_Rate, 1.f * Scale_Rate, 1.f * Scale_Rate)).get()) == FALSE
 			) {
 			this->m_IsDraw |= true;
 		}
@@ -267,8 +267,8 @@ namespace DXLibRef {
 	void			ObjectBaseClass::Draw(bool isDrawSemiTrans) noexcept {
 		if (this->m_IsActive && this->m_IsDraw) {
 			if (CheckCameraViewClip_Box(
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * 12.5f, -0.f * 12.5f, -1.f * 12.5f)).get(),
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * 12.5f, 1.f * 12.5f, 1.f * 12.5f)).get()) == FALSE
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale_Rate, -0.f * Scale_Rate, -1.f * Scale_Rate)).get(),
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale_Rate, 1.f * Scale_Rate, 1.f * Scale_Rate)).get()) == FALSE
 				) {
 				for (int i : std::views::iota(0, static_cast<int>(this->GetObj().GetMeshNum()))) {
 					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {

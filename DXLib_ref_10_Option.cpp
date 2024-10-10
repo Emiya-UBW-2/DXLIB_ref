@@ -1510,18 +1510,18 @@ namespace DXLibRef {
 				},
 				[&]() {m_Active = false; },
 				[&]() {
-					auto* KeyGuide = PadControl::Instance();
+					auto* Pad = PadControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 
-					KeyGuide->AddGuide(PADS::INTERACT, LocalizeParts->Get(9992));
+					Pad->AddGuide(PADS::INTERACT, LocalizeParts->Get(9992));
 
-					KeyGuide->AddGuide(PADS::LEAN_L, "");
-					KeyGuide->AddGuide(PADS::LEAN_R, LocalizeParts->Get(9994));
-					KeyGuide->AddGuide(PADS::MOVE_W, "");
-					KeyGuide->AddGuide(PADS::MOVE_A, "");
-					KeyGuide->AddGuide(PADS::MOVE_S, "");
-					KeyGuide->AddGuide(PADS::MOVE_D, "");
-					KeyGuide->AddGuide(PADS::MOVE_STICK, LocalizeParts->Get(9993));
+					Pad->AddGuide(PADS::LEAN_L, "");
+					Pad->AddGuide(PADS::LEAN_R, LocalizeParts->Get(9994));
+					Pad->AddGuide(PADS::MOVE_W, "");
+					Pad->AddGuide(PADS::MOVE_A, "");
+					Pad->AddGuide(PADS::MOVE_S, "");
+					Pad->AddGuide(PADS::MOVE_D, "");
+					Pad->AddGuide(PADS::MOVE_STICK, LocalizeParts->Get(9993));
 				},
 				true
 			);

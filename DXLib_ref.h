@@ -36,9 +36,11 @@
 #pragma warning(disable:5045)
 //*/
 #pragma warning(disable:4505)
+/*
 #pragma warning(disable:4514)
 #pragma warning(disable:4820)
 #pragma warning(disable:5259)
+//*/
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include																																	*/
@@ -53,7 +55,7 @@
 #endif // _USE_BOX2D_
 
 //共通
-#pragma warning( push, 3 )
+//#pragma warning( push, 3 )
 
 #include <stdint.h>
 #include <array>
@@ -78,20 +80,20 @@
 //追加物
 #include "json.hpp"
 
-#pragma warning( pop )
+//#pragma warning( pop )
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-constexpr float M_GR{ -122.5f };				/*重力加速度*/
-//constexpr float M_GR{ -9.8f };				/*重力加速度*/
-constexpr int INVALID_ID = -1;
+constexpr float Frame_Rate{ 60.f };
+constexpr float Scale_Rate{ 12.5f };
+constexpr float M_GR{ -9.8f* Scale_Rate };				/*重力加速度*/
+constexpr int INVALID_ID{ -1 };
 
 //DPIを反映するデスクトップサイズ
-//const int deskx{ static_cast<int>(640) / 1 };
-//const int desky{ static_cast<int>(640 * 9 / 16) / 1 };
 const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) / 1};
 const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) / 1};
 
+//UI描画などの基準となる解像度
 const int basex{ 1920 / 1 };
 const int basey{ 1080 / 1 };
 

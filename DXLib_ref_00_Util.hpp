@@ -19,7 +19,7 @@ namespace DXLibRef {
 		static T* Instance(void) noexcept {
 			if (m_Singleton == nullptr) {
 				MessageBox(NULL, "Failed Instance Create", "", MB_OK);
-				exit(-1);
+				exit(INVALID_ID);
 			}
 			//if (m_Singleton == nullptr) { m_Singleton = new T(); }
 			return (T*)m_Singleton;

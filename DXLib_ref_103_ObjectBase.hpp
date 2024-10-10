@@ -61,48 +61,48 @@ namespace DXLibRef {
 		float										m_CameraSize{ 0.f };
 		ShaderUseClass* m_UseShader{ nullptr };
 	public:
-		auto& GetObj(void) noexcept { return this->m_obj; }
-		const auto& GetObj_const(void) const noexcept { return this->m_obj; }
+		auto&				GetObj(void) noexcept { return this->m_obj; }
+		const auto&			GetObj_const(void) const noexcept { return this->m_obj; }
 		//
-		bool		HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
-		const auto& GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
-		const auto& GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
+		bool				HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
+		const auto&			GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
+		const auto&			GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 
-		bool		HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != INVALID_ID; }
-		const auto& GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
+		bool				HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != INVALID_ID; }
+		const auto&			GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
 		
 
-		const auto& GetFilePath(void) const noexcept { return this->m_FilePath; }
-		auto& SetMove(void) noexcept { return this->m_move; }
+		const auto&			GetFilePath(void) const noexcept { return this->m_FilePath; }
+		auto&				SetMove(void) noexcept { return this->m_move; }
 		//
-		void			SetAnimOnce(int ID, float speed) noexcept;
-		void			SetAnimLoop(int ID, float speed) noexcept;
+		void				SetAnimOnce(int ID, float speed) noexcept;
+		void				SetAnimLoop(int ID, float speed) noexcept;
 	public:
-		const auto& GetObjectID(void) const noexcept { return this->m_ObjectID; }
-		const auto& GetobjType(void) const noexcept { return this->m_objType; }
-		const auto& GetScreenPosition(void) const noexcept { return this->m_ScreenPosition; }
-		const auto& GetCameraSize(void) const noexcept { return this->m_CameraSize; }
-		const auto& GetMove(void) const noexcept { return this->m_move; }
-		const auto& IsActive(void) const noexcept { return this->m_IsActive; }
-		const auto& GetIsDelete(void) const noexcept { return this->m_IsDelete; }
+		const auto&			GetObjectID(void) const noexcept { return this->m_ObjectID; }
+		const auto&			GetobjType(void) const noexcept { return this->m_objType; }
+		const auto&			GetScreenPosition(void) const noexcept { return this->m_ScreenPosition; }
+		const auto&			GetCameraSize(void) const noexcept { return this->m_CameraSize; }
+		const auto&			GetMove(void) const noexcept { return this->m_move; }
+		const auto&			IsActive(void) const noexcept { return this->m_IsActive; }
+		const auto&			GetIsDelete(void) const noexcept { return this->m_IsDelete; }
 	public:
-		void			SetObjectID(int value) noexcept { this->m_ObjectID = value; }
-		void			SetActive(bool value) noexcept { this->m_IsActive = value; }
-		void			SetDelete(void) noexcept { this->m_IsDelete = true; }
-		void			SetResetP(bool value) noexcept { this->m_IsResetPhysics = value; }
-		void			SetScreenPosition(const Vector3DX& value, float size) noexcept {
+		void				SetObjectID(int value) noexcept { this->m_ObjectID = value; }
+		void				SetActive(bool value) noexcept { this->m_IsActive = value; }
+		void				SetDelete(void) noexcept { this->m_IsDelete = true; }
+		void				SetResetP(bool value) noexcept { this->m_IsResetPhysics = value; }
+		void				SetScreenPosition(const Vector3DX& value, float size) noexcept {
 			this->m_ScreenPosition = value;
 			this->m_CameraSize = size;
 		}
-		void			SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
-		void			ResetMove(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
+		void				SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
+		void				ResetMove(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
 			this->m_move.SetVec(Vector3DX::zero());
 			this->m_move.SetMat(RotMat);
 			this->m_move.SetPos(pos);
 			this->m_move.Update(0.f, 0.f);
 			UpdateObjMatrix(this->m_move.GetMat(), this->m_move.GetPos());
 		}
-		void			UpdateObjMatrix(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
+		void				UpdateObjMatrix(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
 			this->GetObj().SetMatrix(RotMat.Get44DX() * Matrix4x4DX::Mtrans(pos));
 			if (this->m_col.IsActive()) {
 				this->m_col.SetMatrix(RotMat.Get44DX() * Matrix4x4DX::Mtrans(pos));

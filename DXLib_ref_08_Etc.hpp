@@ -4,6 +4,12 @@
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
 
+#define UIWidth		DXDraw::Instance()->GetUIY(basex)
+#define UIHeight	DXDraw::Instance()->GetUIY(basey)
+
+#define ScreenWidth		DXDraw::Instance()->GetScreenY(basex)
+#define ScreenHeight	DXDraw::Instance()->GetScreenY(basey)
+
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	// 補完
@@ -581,8 +587,8 @@ namespace DXLibRef {
 			int			m_SizeX{ 0 };
 			int			m_SizeY{ 0 };
 		public:
-			const auto& GetPosX() const noexcept { return this->m_PosX; }
-			const auto& GetPosY() const noexcept { return this->m_PosY; }
+			const auto&			GetPosX() const noexcept { return this->m_PosX; }
+			const auto&			GetPosY() const noexcept { return this->m_PosY; }
 			void			Set(int posx, int posy, int sizex, int sizey) noexcept {
 				m_PosX = posx;
 				m_PosY = posy;
@@ -673,8 +679,8 @@ namespace DXLibRef {
 
 			GraphHandle				m_BufferScreen;
 		private:
-			DrawControl() noexcept;
-			~DrawControl() noexcept {
+			DrawControl(void) noexcept;
+			~DrawControl(void) noexcept {
 				for (auto& d : this->m_DrawDatas) {
 					d.clear();
 				}
@@ -693,19 +699,19 @@ namespace DXLibRef {
 			}
 		public:
 			//
-			void	SetAlpha(DrawLayer Layer, int Alpha) {
+			void	SetAlpha(DrawLayer Layer, int Alpha) noexcept {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Alpha);
 				Back->InputintParam(0, Alpha);
 			}
 			//
-			void	SetAdd(DrawLayer Layer, int Add) {
+			void	SetAdd(DrawLayer Layer, int Add) noexcept {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Add);
 				Back->InputintParam(0, Add);
 			}
 			//
-			void	SetBright(DrawLayer Layer, int valueR, int valueG, int valueB) {
+			void	SetBright(DrawLayer Layer, int valueR, int valueG, int valueB) noexcept {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Bright);
 				Back->InputintParam(0, valueR);
@@ -713,9 +719,9 @@ namespace DXLibRef {
 				Back->InputintParam(2, valueB);
 			}
 			//
-			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill);
+			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept;
 			//
-			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill);
+			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept;
 			//
 			void	SetDrawCircle(DrawLayer Layer, int x1, int y1, int radius, unsigned int color1, bool IsFill = true, int LineThickness = 1) {
 				DrawData* Back = GetBack(Layer);
@@ -728,7 +734,7 @@ namespace DXLibRef {
 				Back->InputintParam(3, LineThickness);
 			}
 			//
-			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1);
+			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1) noexcept;
 			//
 			void SetDrawRotaGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int posx, int posy, float Exrate, float rad, bool trns) noexcept {
 				DrawData* Back = GetBack(Layer);
@@ -755,22 +761,21 @@ namespace DXLibRef {
 			template <typename... Args>
 			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
 				if (Str == "") { return; }
-				//auto* DrawParts = DXDraw::Instance();
-				//auto* Fonts = FontPool::Instance();
 				/*
-				int xSize = Fonts->Get(type, fontSize, 3)->GetStringWidth(INVALID_ID, Str.c_str(), args...);
+				auto* DrawParts = DXDraw::Instance();
+				int xSize = WindowSystem::GetMsgLen(fontSize, Str.c_str(), args...);
 
-				if ((y - fontSize) > DrawParts->GetScreenY(1080) || (y + fontSize) < 0) { return; }				//画面外は表示しない
+				if ((y - fontSize) > ScreenHeight || (y + fontSize) < 0) { return; }				//画面外は表示しない
 
 				switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
-					if ((x) > DrawParts->GetScreenX(1920) || (x + xSize) < 0) { return; }						//画面外は表示しない
+					if ((x) > ScreenWidth || (x + xSize) < 0) { return; }						//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::MIDDLE:
-					if ((x - xSize / 2) > DrawParts->GetScreenX(1920) || (x + xSize / 2) < 0) { return; }		//画面外は表示しない
+					if ((x - xSize / 2) > ScreenWidth || (x + xSize / 2) < 0) { return; }		//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::RIGHT:
-					if ((x - xSize) > DrawParts->GetScreenX(1920) || (x) < 0) { return; }						//画面外は表示しない
+					if ((x - xSize) > ScreenWidth || (x) < 0) { return; }						//画面外は表示しない
 					break;
 				default:
 					break;
@@ -812,8 +817,8 @@ namespace DXLibRef {
 				Back->InputStringParam(Str);
 
 				return FontPool::Instance()->Get((FontPool::FontType)type, fontSize, 3)->DrawStringAutoFit(
-					x1 + 1920, y1 + 1080,
-					x2 + 1920, y2 + 1080,
+					x1 + basex, y1 + basey,
+					x2 + basex, y2 + basey,
 					Color,
 					EdgeColor,
 					Str
@@ -821,7 +826,7 @@ namespace DXLibRef {
 			}
 			//
 		public:
-			void	ClearList() noexcept {
+			void	ClearList(void) noexcept {
 				for (size_t index = 0; auto& d : this->m_DrawDatas) {
 					auto& pd = this->m_PrevDrawDatas.at(index);
 					pd.clear();
@@ -835,7 +840,8 @@ namespace DXLibRef {
 					d.clear();
 				}
 			}
-			void	Draw() noexcept {
+			void	Draw(void) noexcept {
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 				bool IsHit = false;
 				//同じかどうかチェック
 				for (size_t index = 0; auto& d : this->m_DrawDatas) {
@@ -865,7 +871,7 @@ namespace DXLibRef {
 								for (auto& d2 : d) {
 									d2.Output();
 								}
-								WindowSystem::DrawControl::Instance()->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+								DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 								SetDrawBright(255, 255, 255);
 							}
 						}
@@ -882,8 +888,7 @@ namespace DXLibRef {
 		//文字
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
-			auto* Fonts = FontPool::Instance();
-			return Fonts->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
+			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
 		}
 
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
@@ -1072,9 +1077,9 @@ namespace DXLibRef {
 				m_LocalPos = obj.GetFrameLocalWorldMatrix(i);//
 			}
 		}
-		const auto& GetFrameID(void) const noexcept { return m_FrameID; }
-		const auto& GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
-		const auto& GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
+		const auto&			GetFrameID(void) const noexcept { return m_FrameID; }
+		const auto&			GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
+		const auto&			GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
 	};
 
 	//位置情報
@@ -1086,13 +1091,13 @@ namespace DXLibRef {
 		Matrix3x3DX mat;	//回転
 		Matrix3x3DX matbuf;	//回転
 	public:
-		const auto& GetPos(void) const noexcept { return pos; }
-		const auto& GetRePos(void) const noexcept { return repos; }
-		const auto& GetVec(void) const noexcept { return vec; }
-		const auto& GetMat(void) const noexcept { return mat; }
+		const auto&			GetPos(void) const noexcept { return pos; }
+		const auto&			GetRePos(void) const noexcept { return repos; }
+		const auto&			GetVec(void) const noexcept { return vec; }
+		const auto&			GetMat(void) const noexcept { return mat; }
 
-		const auto& GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
-		const auto& GetMatBuf(void) const noexcept { return matbuf; }//演算以外では使うな
+		const auto&			GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
+		const auto&			GetMatBuf(void) const noexcept { return matbuf; }//演算以外では使うな
 	public:
 		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
 		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
@@ -1156,15 +1161,15 @@ namespace DXLibRef {
 		Vector3DX rot;		//回転
 		Vector3DX rotbuf;	//回転
 	public:
-		const auto& GetPos(void) const noexcept { return pos; }
-		const auto& GetRePos(void) const noexcept { return repos; }
-		const auto& GetVec(void) const noexcept { return vec; }
+		const auto&			GetPos(void) const noexcept { return pos; }
+		const auto&			GetRePos(void) const noexcept { return repos; }
+		const auto&			GetVec(void) const noexcept { return vec; }
 		Matrix3x3DX GetMat(void) const noexcept {
 			Matrix3x3DX Ret; Ret.SetRadian(rot.x, rot.y, rot.z);
 			return Ret;
 		}
 
-		const auto& GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
+		const auto&			GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
 		auto		GetMatBuf(void) const noexcept {
 			Matrix3x3DX Ret; Ret.SetRadian(rotbuf.x, rotbuf.y, rotbuf.z);
 			return Ret;
@@ -1459,12 +1464,12 @@ namespace DXLibRef {
 				float randomRad = (float)(GetRand(30) * DX_PI_F * 2 * 0.3f);
 				w.dir[0] = sinf(randomRad);
 				w.dir[1] = cosf(randomRad);
-				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f*12.5f;
+				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f* Scale_Rate;
 				w.waveLength = 1.0f + powf(2.f, 1.f + (float)GetRand(3)) * 10.f;
 			}
 		}
 		//頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetVertexWave() noexcept {
+		void			SetVertexWave(void) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			ImmutableCB* f4 = (ImmutableCB*)GetBufferShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			*f4 = WaveData;
@@ -1626,7 +1631,7 @@ namespace DXLibRef {
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
-						SetCameraNearFar(0.5f * 12.5f, 1000.0f * 12.5f);									// Nearクリップ面とFarクリップ面の距離を設定
+						SetCameraNearFar(0.5f * Scale_Rate, 1000.0f * Scale_Rate);									// Nearクリップ面とFarクリップ面の距離を設定
 						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[static_cast<size_t>(i)]).get(), up[static_cast<size_t>(i)]);	// カメラの位置と注視点、カメラの上方向を設定
 						Doing();
 					}
@@ -1638,7 +1643,7 @@ namespace DXLibRef {
 			dynamicCubeTex.Dispose();
 		}
 
-		const auto& GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
+		const auto&			GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
 	};
 
 
@@ -2019,8 +2024,8 @@ namespace DXLibRef {
 	public:
 		const auto* GetCPUDatas(void) const noexcept { return IsEnd ? &CPUResult : nullptr; }
 		const auto* GetGPUDatas(void) const noexcept { return IsEnd ? &GPUResult : nullptr; }
-		const auto& GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
-		const auto& GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
+		const auto&			GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
+		const auto&			GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
 	public:
 		void Set(void) noexcept {
 			GetPcInfo(NULL, NULL, CPUString, NULL, &FreeMemorySize, &TotalMemorySize, NULL, GPUString, NULL, NULL);
@@ -2158,11 +2163,11 @@ namespace DXLibRef {
 			FrameInfo					m_FrameInfo{};
 			std::array<std::string, 3>	m_TextEX0{};
 		public:
-			const auto& GetUniqueID(void) const noexcept { return m_UniqueID; }
-			const auto& GetName(void) const noexcept { return m_Name; }
-			const auto& GetLayer(void) const noexcept { return m_Layer; }
+			const auto&			GetUniqueID(void) const noexcept { return m_UniqueID; }
+			const auto&			GetName(void) const noexcept { return m_Name; }
+			const auto&			GetLayer(void) const noexcept { return m_Layer; }
 
-			const auto& GetMousePress(void) const noexcept { return m_MousePress; }
+			const auto&			GetMousePress(void) const noexcept { return m_MousePress; }
 		public:
 			void SetUniqueID(int value) noexcept { m_UniqueID = value; }
 			void SetFrameInfo(const FrameInfo& value) noexcept { m_FrameInfo = value; }
@@ -2228,7 +2233,7 @@ namespace DXLibRef {
 		Vector3DX					m_CamShake1;
 		Vector3DX					m_CamShake2;
 	public:
-		const auto& GetCamShake(void) const noexcept { return m_CamShake2; }
+		const auto&			GetCamShake(void) const noexcept { return m_CamShake2; }
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -2250,7 +2255,7 @@ namespace DXLibRef {
 	//ファイルが存在するか
 	static bool IsFileExist(const char* Path) noexcept {
 		FILEINFO FileInfo;
-		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)-1);
+		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)INVALID_ID);
 	}
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/

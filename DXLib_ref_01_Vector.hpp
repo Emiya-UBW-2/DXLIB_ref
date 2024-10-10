@@ -39,10 +39,7 @@ namespace DXLibRef {
 		}
 		//
 		static float			Angle(const Vector3DX& A, const Vector3DX& B) noexcept { return std::acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
-		static Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept {
-			auto Len = A.magnitude();
-			return A.normalized() * std::clamp(Len, 0.f, Limit);
-		}
+		static Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept { return A.normalized() * std::clamp(A.magnitude(), 0.f, Limit); }
 		static Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VCross(A.get(), B.get()); }
 		static float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
 		static float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
@@ -110,10 +107,7 @@ namespace DXLibRef {
 		}
 		//
 		static float			Angle(const Vector2DX& A, const Vector2DX& B) noexcept { return std::acos(Vector2DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
-		static Vector2DX		ClampMagnitude(const Vector2DX& A, float Limit) noexcept {
-			auto Len = A.magnitude();
-			return A.normalized() * std::clamp(Len, 0.f, Limit);
-		}
+		static Vector2DX		ClampMagnitude(const Vector2DX& A, float Limit) noexcept { return A.normalized() * std::clamp(A.magnitude(), 0.f, Limit); }
 		static float			Cross(const Vector2DX& A, const Vector2DX& B) noexcept { return DxLib::VCross(A.get(), B.get()).z; }
 		static float			Distance(const Vector2DX& A, const Vector2DX& B) noexcept { return (A - B).magnitude(); }
 		static float			Dot(const Vector2DX& A, const Vector2DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
@@ -240,6 +234,8 @@ namespace DXLibRef {
 				}
 			}
 			return true;
+
+			
 		}
 		bool operator!=(const Matrix4x4DX& obj) const noexcept { return !(*this == obj); }
 		//乗算
@@ -254,7 +250,7 @@ namespace DXLibRef {
 		float					m[3][3];
 	};
 	//相互変換
-	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr) {
+	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr) noexcept {
 		*pTarget = DxLib::MGetIdent();
 		for (int x : std::views::iota(0, 3)) {
 			for (int y : std::views::iota(0, 3)) {
@@ -262,7 +258,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr) {
+	static void MATRIXtoM33(MATRIX33* pTarget, const MATRIX& pAtr) noexcept {
 		for (int x : std::views::iota(0, 3)) {
 			for (int y : std::views::iota(0, 3)) {
 				pTarget->m[x][y] = pAtr.m[x][y];
@@ -271,7 +267,7 @@ namespace DXLibRef {
 	}
 
 	// 単位行列を得る
-	static MATRIX33 M33GetIdent(void) {
+	static MATRIX33 M33GetIdent(void) noexcept {
 		static MATRIX33 Result =
 		{
 			{
@@ -286,7 +282,7 @@ namespace DXLibRef {
 	// x' = XAxis.x * x + YAixs.x * y + ZAxis.z * z + Pos.x
 	// y' = XAxis.y * x + YAixs.y * y + ZAxis.y * z + Pos.y
 	// z' = XAxis.z * x + YAixs.z * y + ZAxis.z * z + Pos.z
-	static MATRIX33 M33GetAxis1(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) {
+	static MATRIX33 M33GetAxis1(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) noexcept {
 		MATRIX33 Result =
 		{
 			{
@@ -301,7 +297,7 @@ namespace DXLibRef {
 	// x' = XAxis.x * ( x - Pos.x ) + XAxis.y * ( x - Pos.x ) + XAxis.z * ( x - Pos.x )
 	// y' = YAxis.x * ( x - Pos.x ) + YAxis.y * ( x - Pos.x ) + YAxis.z * ( x - Pos.x )
 	// z' = ZAxis.x * ( x - Pos.x ) + ZAxis.y * ( x - Pos.x ) + ZAxis.z * ( x - Pos.x )
-	static MATRIX33 M33GetAxis2(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) {
+	static MATRIX33 M33GetAxis2(VECTOR XAxis, VECTOR YAxis, VECTOR ZAxis) noexcept {
 		MATRIX33 Result =
 		{
 			{
@@ -313,7 +309,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 指定軸で指定角度回転する行列を得る
-	static MATRIX33 M33GetRotAxis(VECTOR RotateAxis, float Rotate) {
+	static MATRIX33 M33GetRotAxis(VECTOR RotateAxis, float Rotate) noexcept {
 		MATRIX33 Result{};
 		VECTOR xv = { 1.0f, 0.0f, 0.0f }, yv = { 0.0f, 1.0f, 0.0f }, zv = { 0.0f, 0.0f, 1.0f };
 		VECTOR xv2{}, yv2{}, zv2{}, xv3{}, yv3{}, zv3{};
@@ -381,7 +377,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// In1 の向きから In2 の向きへ変換する回転行列を得る
-	static MATRIX33 M33GetRotVec2(VECTOR In1, VECTOR In2) {
+	static MATRIX33 M33GetRotVec2(VECTOR In1, VECTOR In2) noexcept {
 		VECTOR av;
 		float rad;
 
@@ -392,7 +388,7 @@ namespace DXLibRef {
 		return M33GetRotAxis(av, rad);
 	}
 	// 逆行列を得る
-	static MATRIX33 M33Inverse(MATRIX33 InM) {
+	static MATRIX33 M33Inverse(MATRIX33 InM) noexcept {
 		MATRIX In;
 		MATRIX33 Result;
 		M33toMATRIX(&In, InM);
@@ -401,7 +397,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 転置行列を得る
-	static MATRIX33 M33Transpose(MATRIX33 InM) {
+	static MATRIX33 M33Transpose(MATRIX33 InM) noexcept {
 		MATRIX33 Result =
 		{
 			{
@@ -413,7 +409,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 行列の乗算を行う
-	static MATRIX33 M33Mult(MATRIX33 In1, MATRIX33 In2) {
+	static MATRIX33 M33Mult(MATRIX33 In1, MATRIX33 In2) noexcept {
 		MATRIX33 Result =
 		{
 			{
@@ -437,7 +433,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// 行列を使った座標変換
-	static VECTOR		V33Transform(const VECTOR& InV, const MATRIX33& InM) {
+	static VECTOR		V33Transform(const VECTOR& InV, const MATRIX33& InM) noexcept {
 		VECTOR Result{};
 		Result.x = InV.x * InM.m[0][0] + InV.y * InM.m[1][0] + InV.z * InM.m[2][0];
 		Result.y = InV.x * InM.m[0][1] + InV.y * InM.m[1][1] + InV.z * InM.m[2][1];
