@@ -413,7 +413,7 @@ namespace DXLibRef {
 					break;
 				case 2:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
@@ -423,7 +423,7 @@ namespace DXLibRef {
 					break;
 				case 3:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
@@ -433,7 +433,7 @@ namespace DXLibRef {
 					break;
 				case 4:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
@@ -471,7 +471,7 @@ namespace DXLibRef {
 					break;
 				case 2:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
@@ -481,7 +481,7 @@ namespace DXLibRef {
 					break;
 				case 3:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
@@ -491,7 +491,7 @@ namespace DXLibRef {
 					break;
 				case 4:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
@@ -532,7 +532,7 @@ namespace DXLibRef {
 						break;
 					case 2:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
@@ -542,7 +542,7 @@ namespace DXLibRef {
 						break;
 					case 3:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
@@ -552,7 +552,7 @@ namespace DXLibRef {
 						break;
 					case 4:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
-						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
+						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
