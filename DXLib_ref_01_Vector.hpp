@@ -13,68 +13,90 @@ namespace DXLibRef {
 	public:
 		Vector3DX(void) noexcept : x(0), y(0), z(0) {}
 		Vector3DX(VECTOR value) noexcept { this->Set(value.x, value.y, value.z); }
-		VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					//ïœä∑
-		static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	//ì¸óÕ
+		inline VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					//ïœä∑
+		inline static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	//ì¸óÕ
 		//
-		static const Vector3DX back(void) noexcept { return vget(0.f, 0.f, -1.f); }
-		static const Vector3DX down(void) noexcept { return vget(0.f, -1.f, 0.f); }
-		static const Vector3DX forward(void) noexcept { return vget(0.f, 0.f, 1.f); }
-		static const Vector3DX left(void) noexcept { return vget(-1.f, 0.f, 0.f); }
+		inline static const Vector3DX back(void) noexcept { return vget(0.f, 0.f, -1.f); }
+		inline static const Vector3DX down(void) noexcept { return vget(0.f, -1.f, 0.f); }
+		inline static const Vector3DX forward(void) noexcept { return vget(0.f, 0.f, 1.f); }
+		inline static const Vector3DX left(void) noexcept { return vget(-1.f, 0.f, 0.f); }
 
-		static const Vector3DX one(void) noexcept { return vget(1.f, 1.f, 1.f); }
+		inline static const Vector3DX one(void) noexcept { return vget(1.f, 1.f, 1.f); }
 
-		static const Vector3DX right(void) noexcept { return vget(1.f, 0.f, 0.f); }
-		static const Vector3DX up(void) noexcept { return vget(0.f, 1.f, 0.f); }
-		static const Vector3DX zero(void) noexcept { return vget(0.f, 0.f, 0.f); }
+		inline static const Vector3DX right(void) noexcept { return vget(1.f, 0.f, 0.f); }
+		inline static const Vector3DX up(void) noexcept { return vget(0.f, 1.f, 0.f); }
+		inline static const Vector3DX zero(void) noexcept { return vget(0.f, 0.f, 0.f); }
 		//
-		float magnitude(void) const noexcept { return DxLib::VSize(this->get()); }				//ÉTÉCÉY
-		Vector3DX normalized(void) const noexcept { return DxLib::VNorm(this->get()); }		//ê≥ãKâª
-		float sqrMagnitude(void) const noexcept { return DxLib::VSquareSize(this->get()); }		//ÉTÉCÉY
+		inline float magnitude(void) const noexcept {
+			float Square = sqrMagnitude();
+			return Square < 0.0000001f ? 0.0f : std::sqrtf(Square);
+		}//ÉTÉCÉY
+		inline Vector3DX normalized(void) const noexcept {
+			float Size = magnitude();
+			if (Size <= 0.0f)
+			{
+				return vget(-1.0f, -1.0f, -1.0f);
+			}
+			return *this / Size;
+		}		//ê≥ãKâª
+		inline float sqrMagnitude(void) const noexcept { return this->x * this->x + this->y * this->y + this->z * this->z; }		//ÉTÉCÉY
 		//
-		bool Equals(const Vector3DX& obj) const noexcept { return *this == obj; }
-		void Set(float x1, float y1, float z1) noexcept {
+		inline bool Equals(const Vector3DX& obj) const noexcept { return *this == obj; }
+		inline void Set(float x1, float y1, float z1) noexcept {
 			this->x = x1;
 			this->y = y1;
 			this->z = z1;
 		}
 		//
-		static float			Angle(const Vector3DX& A, const Vector3DX& B) noexcept { return std::acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); }
-		static Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept { return A.normalized() * std::clamp(A.magnitude(), 0.f, Limit); }
-		static Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VCross(A.get(), B.get()); }
-		static float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
-		static float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return DxLib::VDot(A.get(), B.get()); }
+		inline static float			Angle(const Vector3DX& A, const Vector3DX& B) noexcept { return std::acos(Dot(A, B) / (A.magnitude() * B.magnitude())); }
+		inline static Vector3DX		ClampMagnitude(const Vector3DX& A, float Limit) noexcept { return A.normalized() * std::clamp(A.magnitude(), 0.f, Limit); }
+		inline static Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
+		inline static float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
+		inline static float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return A.x * B.x + A.y * B.y + A.z * B.z; }
 		//static Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
 		//LerpUnclamped
-		static Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
-		static Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
+		inline static Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
+		inline static Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
 		//MoveTowards
-		static Vector3DX		Normalize(const Vector3DX& A) noexcept { return A.normalized(); }
+		inline static Vector3DX		Normalize(const Vector3DX& A) noexcept { return A.normalized(); }
 		//OrthoNormalize
 		//Project
 		//ProjectOnPlane
-		static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Vector3DX::Dot(inNormal, inDirection * -1.f)) * 2.f; }
+		inline static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Dot(inNormal, inDirection * -1.f)) * 2.f; }
 		//RotateTowards
-		static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
+		inline static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
 		//SignedAngle
 		//Slerp
 		//SlerpUnclamped
 		//SmoothDamp
 
 		//î‰är
-		bool operator==(const Vector3DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
-		bool operator!=(const Vector3DX& obj) const noexcept { return !(*this == obj); }
+		inline bool operator==(const Vector3DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
+		inline bool operator!=(const Vector3DX& obj) const noexcept { return !(*this == obj); }
 		//â¡éZ
-		Vector3DX operator+(const Vector3DX& obj) const noexcept { return DxLib::VAdd(this->get(), obj.get()); }
-		void operator+=(const Vector3DX& obj) noexcept { *this = *this + obj; }
+		inline Vector3DX operator+(const Vector3DX& obj) const noexcept { return vget(this->x + obj.x, this->y + obj.y, this->z + obj.z); }
+		inline void operator+=(const Vector3DX& obj) noexcept {
+			this->x += obj.x;
+			this->y += obj.y;
+			this->z += obj.z;
+		}
 		//å∏éZ
-		Vector3DX operator-(const Vector3DX& obj) const noexcept { return DxLib::VSub(this->get(), obj.get()); }
-		void operator-=(const Vector3DX& obj) noexcept { *this = *this - obj; }
+		inline Vector3DX operator-(const Vector3DX& obj) const noexcept { return vget(this->x - obj.x, this->y - obj.y, this->z - obj.z); }
+		inline void operator-=(const Vector3DX& obj) noexcept {
+			this->x -= obj.x;
+			this->y -= obj.y;
+			this->z -= obj.z;
+		}
 		//èÊéZ
-		Vector3DX operator*(float p1) const noexcept { return DxLib::VScale(this->get(), p1); }
-		void operator*=(float p1) noexcept { *this = *this * p1; }
+		inline Vector3DX operator*(float p1) const noexcept { return vget(this->x * p1, this->y * p1, this->z * p1); }
+		inline void operator*=(float p1) noexcept {
+			this->x *= p1;
+			this->y *= p1;
+			this->z *= p1;
+		}
 		//èúéZ
-		Vector3DX operator/(float p1) const noexcept { return DxLib::VScale(this->get(), 1.f / p1); }
-		void operator/=(float p1) noexcept { *this = *this / p1; }
+		inline Vector3DX operator/(float p1) const noexcept { return *this * (1.f / p1); }
+		inline void operator/=(float p1) noexcept { *this *= (1.f / p1); }
 	};
 	//---------------------------------------------------------------------------------------------
 	//Vector3

@@ -524,7 +524,13 @@ namespace DXLibRef {
 		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									//
-		SetWaitVSyncFlag(FALSE);									//垂直同期
+		//垂直同期
+		if (DXVer != DX_DIRECT3D_11) {
+			SetWaitVSyncFlag(FALSE);									
+		}
+		else {
+			SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));
+		}
 		SetZBufferBitDepth(32);										//デフォのZバッファ精度を32bitに
 		DxLib_Init();												//初期化
 		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			//画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
@@ -1148,7 +1154,9 @@ namespace DXLibRef {
 			}
 		}
 		else {
-			WaitVSync(1);
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				WaitVSync(1);
+			}
 		}
 		this->GetVRControl()->WaitSync();
 		return true;

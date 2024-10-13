@@ -621,6 +621,7 @@ namespace DXLibRef {
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
+				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//‚’¼“¯Šú
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			},
 			[&]() {
@@ -630,6 +631,7 @@ namespace DXLibRef {
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
+				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//‚’¼“¯Šú
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			},
 			[&]() {},
@@ -645,6 +647,7 @@ namespace DXLibRef {
 					if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 						OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 					}
+					SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//‚’¼“¯Šú
 				}
 			}
 		);
