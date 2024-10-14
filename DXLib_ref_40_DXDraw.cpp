@@ -369,12 +369,13 @@ namespace DXLibRef {
 		SetCameraPositionAndTarget_UpVecY((Center - Vec.normalized() * (30.f * scale * Scale_Rate)).get(), Center.get());
 	}
 	void DXDraw::ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
+		m_Scale = Scale;
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthScreenHandle.get());
 		{
-			SetupCam(Center, Scale);
+			SetupCam(Center, m_Scale);
 			m_CamViewMatrix[0] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -384,12 +385,13 @@ namespace DXLibRef {
 		SetRenderTargetToShader(2, INVALID_ID);
 	}
 	void DXDraw::ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
+		m_ScaleFar = Scale;
 		// 影用の深度記録画像の準備を行う
 		SetRenderTargetToShader(0, DepthBaseScreenHandle.get());
 		SetRenderTargetToShader(1, INVALID_ID);
 		SetRenderTargetToShader(2, DepthFarScreenHandle.get());
 		{
-			SetupCam(Center, Scale);
+			SetupCam(Center, m_ScaleFar);
 			m_CamViewMatrix[1] = GetCameraViewMatrix();
 			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
@@ -408,11 +410,11 @@ namespace DXLibRef {
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
-			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), 0.f, 0.f, 0.f);
+			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
 			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
 			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 			m_Shader.Draw_lamda(doing);
-			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), 0.f, 0.f, 0.f);
+			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
 			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
 			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
 			m_ShaderRigid.Draw_lamda(doing_rigid);

@@ -81,13 +81,11 @@ namespace DXLibRef {
 			SSRScreen.SetDraw_Screen(false);
 			{
 				SetUseTextureToShader(0, SSRScreen2.get());	//使用するテクスチャをセット
-				SetUseTextureToShader(1, ColorGraph->get());	//使用するテクスチャをセット
 
 				m_ShaderBlur.SetPixelDispSize(ScreenWidth, ScreenHeight);
 				m_ShaderBlur.Draw(m_ScreenVertex);
 
 				SetUseTextureToShader(0, INVALID_ID);
-				SetUseTextureToShader(1, INVALID_ID);
 			}
 			//
 			TargetGraph->SetDraw_Screen(false);

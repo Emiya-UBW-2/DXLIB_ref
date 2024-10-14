@@ -15,6 +15,8 @@ namespace DXLibRef {
 			ShaderUseClass		m_Shader;
 			ShaderUseClass		m_ShaderRigid;
 			Vector3DX			m_ShadowVec{ Vector3DX::up() };
+			float				m_Scale{ 1.f };
+			float				m_ScaleFar{ 1.f };
 
 			std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
 			std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
