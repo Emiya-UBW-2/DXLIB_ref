@@ -68,8 +68,6 @@ namespace DXLibRef {
 #ifdef DEBUG
 		DebugParts->DebugWindow(UIWidth - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
 #endif // DEBUG
-
-		WindowSystem::DrawControl::Instance()->Draw();
 	}
 
 
@@ -145,7 +143,10 @@ namespace DXLibRef {
 					GetNowScene()->DrawUI_Base();
 					DrawFrontCommon();
 				},
-				[&]() { GetNowScene()->DrawUI_In(); }
+				[&]() {
+					GetNowScene()->DrawUI_In();
+					WindowSystem::DrawControl::Instance()->Draw();
+				}
 			);
 		}
 		else {
@@ -156,6 +157,8 @@ namespace DXLibRef {
 				[&]() {
 					GetNowScene()->DrawUI_Base();
 					DrawFrontCommon();
+					GetNowScene()->DrawUI_In();
+					WindowSystem::DrawControl::Instance()->Draw();
 				}
 			);
 		}
