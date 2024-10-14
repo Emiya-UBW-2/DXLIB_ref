@@ -1039,10 +1039,6 @@ namespace DXLibRef {
 		auto* PostPassParts = PostPassEffect::Instance();
 		//描画
 		auto MainDraw = [&](const Camera3DInfo& camInfo) {
-			//影画像の用意
-			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-				m_ShadowDraw->SetDraw(setshadowdoing_rigid, setshadowdoing, camInfo);
-			}
 			m_CamViewMatrix = camInfo.GetViewMatrix();
 			m_CamProjectionMatrix = camInfo.GetProjectionMatrix();
 			PostPassParts->DrawDoF(sky_doing, [&]() {
@@ -1058,8 +1054,10 @@ namespace DXLibRef {
 					doing();
 				}
 				}, doingFront, camInfo);
-			//ソフトシャドウ重ね
 			if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
+				//影画像の用意
+				m_ShadowDraw->SetDraw(setshadowdoing_rigid, setshadowdoing, camInfo);
+				//ソフトシャドウ重ね
 				PostPassParts->Plus_Draw([&]() { m_ShadowDraw->Draw(); });
 			}
 			PostPassParts->Draw();

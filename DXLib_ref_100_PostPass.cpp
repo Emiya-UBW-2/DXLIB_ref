@@ -782,7 +782,7 @@ namespace DXLibRef {
 		ShaderUseClass		m_Shader;			// シェーダー
 		float range = 1.f;
 
-		static const int EXTEND = 4;
+		static const int EXTEND = 8;
 	public:
 		PostPassGodRay(void) noexcept {}
 		PostPassGodRay(const PostPassGodRay&) = delete;
@@ -814,23 +814,23 @@ namespace DXLibRef {
 
 			m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix().inverse(), DrawParts->GetCamProjectionMatrix().inverse());
 			m_Shader.SetPixelCameraMatrix(5, DrawParts->GetShadowDraw()->GetCamViewMatrix(false), DrawParts->GetShadowDraw()->GetCamProjectionMatrix(false));
-			m_Shader.SetPixelCameraMatrix(6, DrawParts->GetShadowDraw()->GetCamViewMatrix(true), DrawParts->GetShadowDraw()->GetCamProjectionMatrix(true));
+			//m_Shader.SetPixelCameraMatrix(6, DrawParts->GetShadowDraw()->GetCamViewMatrix(true), DrawParts->GetShadowDraw()->GetCamProjectionMatrix(true));
 			SSRScreen.SetDraw_Screen();
 			{
 				SetUseTextureToShader(0, SSRDepthScreen.get());
 				SetUseTextureToShader(1, DrawParts->GetShadowDraw()->GetDepthScreen().get());
-				SetUseTextureToShader(2, DrawParts->GetShadowDraw()->GetDepthFarScreen().get());
+				//SetUseTextureToShader(2, DrawParts->GetShadowDraw()->GetDepthFarScreen().get());
 				{
 					float Power = 1.f;
 					switch (OptionParts->GetParamInt(EnumSaveParam::shadow)) {
 					case 1:
-						Power = 20.f;
+						Power = 15.f;
 						break;
 					case 2:
-						Power = 35.f;
+						Power = 20.f;
 						break;
 					case 3:
-						Power = 50.f;
+						Power = 35.f;
 						break;
 					default:
 						break;
@@ -840,7 +840,7 @@ namespace DXLibRef {
 				}
 				SetUseTextureToShader(0, INVALID_ID);
 				SetUseTextureToShader(1, INVALID_ID);
-				SetUseTextureToShader(2, INVALID_ID);
+				//SetUseTextureToShader(2, INVALID_ID);
 			}
 			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 300);
 			TargetGraph->SetDraw_Screen();
