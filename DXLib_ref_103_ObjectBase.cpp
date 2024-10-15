@@ -8,7 +8,7 @@ namespace DXLibRef {
 		this->m_FilePath = filepath;
 		this->m_ObjFileName = objfilename;
 		this->m_ColFileName = colfilename;
-		auto Load = [&](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
+		auto Load = [](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
 			if (IsFileExist((Path + NameAdd + ".mv1").c_str())) {
 				//MV1::Load(Path + ".pmx", obj, PHYSICS_TYPE);
 				MV1::Load((Path + NameAdd + ".mv1").c_str(), obj, PHYSICS_TYPE);
@@ -40,7 +40,7 @@ namespace DXLibRef {
 				this->m_Frames.resize(static_cast<std::size_t>(pBase->GetFrameNum()));
 			}
 			for (auto& f : this->m_Frames) {
-				f.first = INVALID_ID;
+				f.first = InvalidID;
 			}
 			if (this->m_Frames.size() > 0) {
 				int count = 0;
@@ -68,7 +68,7 @@ namespace DXLibRef {
 				this->m_Materials.resize(static_cast<std::size_t>(pBase->GetMaterialNum()));
 			}
 			for (auto& f : this->m_Materials) {
-				f = INVALID_ID;
+				f = InvalidID;
 			}
 			if (this->m_Materials.size() > 0) {
 				int count = 0;
@@ -101,7 +101,7 @@ namespace DXLibRef {
 					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
 				}
 				else {
-					this->m_Shapes[static_cast<size_t>(j)].first = INVALID_ID;
+					this->m_Shapes[static_cast<size_t>(j)].first = InvalidID;
 					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
 				}
 			}
@@ -171,7 +171,7 @@ namespace DXLibRef {
 		this->m_Frames.resize(pBase->m_Frames.size());
 		for (size_t index = 0; auto& f : this->m_Frames) {
 			f.first = pBase->m_Frames.at(index).first;
-			if (f.first != INVALID_ID) {
+			if (f.first != InvalidID) {
 				f.second = pBase->m_Frames.at(index).second;
 			}
 			index++;
@@ -186,7 +186,7 @@ namespace DXLibRef {
 		this->m_Shapes.resize(pBase->m_Shapes.size());
 		for (size_t index = 0; auto& f : this->m_Shapes) {
 			f.first = pBase->m_Shapes.at(index).first;
-			if (f.first != INVALID_ID) {
+			if (f.first != InvalidID) {
 				f.second = pBase->m_Shapes.at(index).second;
 			}
 			index++;
@@ -235,7 +235,7 @@ namespace DXLibRef {
 				}
 				for (int i : std::views::iota(0, Max)) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f * Frame_Rate / DrawParts->GetFps() / static_cast<float>(Max));
+					this->GetObj().PhysicsCalculation(1000.0f * FrameRate / DrawParts->GetFps() / static_cast<float>(Max));
 				}
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();
@@ -253,8 +253,8 @@ namespace DXLibRef {
 		this->m_IsDraw = false;
 		this->m_DistanceToCam = (this->GetObj().GetMatrix().pos() - GetScreenPosition()).magnitude();
 		if (CheckCameraViewClip_Box(
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale_Rate, -0.f * Scale_Rate, -1.f * Scale_Rate)).get(),
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale_Rate, 1.f * Scale_Rate, 1.f * Scale_Rate)).get()) == FALSE
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate)).get(),
+			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale3DRate, 1.f * Scale3DRate, 1.f * Scale3DRate)).get()) == FALSE
 			) {
 			this->m_IsDraw |= true;
 		}
@@ -267,8 +267,8 @@ namespace DXLibRef {
 	void			ObjectBaseClass::Draw(bool isDrawSemiTrans) noexcept {
 		if (this->m_IsActive && this->m_IsDraw) {
 			if (CheckCameraViewClip_Box(
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale_Rate, -0.f * Scale_Rate, -1.f * Scale_Rate)).get(),
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale_Rate, 1.f * Scale_Rate, 1.f * Scale_Rate)).get()) == FALSE
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate)).get(),
+				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale3DRate, 1.f * Scale3DRate, 1.f * Scale3DRate)).get()) == FALSE
 				) {
 				for (int i : std::views::iota(0, static_cast<int>(this->GetObj().GetMeshNum()))) {
 					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {

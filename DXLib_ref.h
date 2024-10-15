@@ -84,26 +84,16 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-constexpr float Frame_Rate{ 60.f };
-constexpr float Scale_Rate{ 12.5f };
-constexpr float M_GR{ -9.8f* Scale_Rate };				/*重力加速度*/
-constexpr int INVALID_ID{ -1 };
+constexpr float		FrameRate{ 60.f };								/*処理の基準になるフレームレート*/
+constexpr float		Scale3DRate{ 12.5f };							/*1mに相当する3D空間上の長さ*/
+constexpr float		GravityRate{ -9.8f * Scale3DRate };				/*重力加速度*/
+constexpr int		InvalidID{ -1 };								/*共通の無効値*/
+constexpr int		BaseScreenWidth{ 1920 };						/*UI描画などの基準となる解像度*/
+constexpr int		BaseScreenHeight{ 1080 };						/*UI描画などの基準となる解像度*/
 
 //DPIを反映するデスクトップサイズ
-const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) / 1};
-const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) / 1};
-
-//UI描画などの基準となる解像度
-const int basex{ 1920 / 1 };
-const int basey{ 1080 / 1 };
-
-enum class VR_PAD {
-	TRIGGER,
-	SIDEBUTTON,
-	TOUCHPAD,
-	TOPBUTTON1,
-	TOPBUTTON2,
-};
+const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) };
+const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) };
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include DXLIB																																*/
@@ -138,6 +128,13 @@ namespace DXLibRef {
 	class DXLib_ref : public SingletonBase<DXLib_ref> {
 	private:
 		friend class SingletonBase<DXLib_ref>;
+	private:
+		std::array<float, 60>		FPSAvgs{};
+		int							m_FPSAvgCount = 0;
+		float						m_FPSAvg{ 0.f };
+		float						m_PauseFlashCount{ 0.f };
+		bool						m_IsEnd{ false };
+		bool						m_IsFirstBoot{ false };
 	private://コンストラクタ
 		DXLib_ref(void) noexcept;
 		DXLib_ref(const DXLib_ref&) = delete;
@@ -146,8 +143,23 @@ namespace DXLibRef {
 		DXLib_ref& operator=(DXLib_ref&& o) = delete;
 
 		~DXLib_ref(void) noexcept {}
+	private:
+		void	UpdatePause(void) noexcept;
+		void	DrawPause(void) const noexcept;
+		//
+		void	InitFPSCounter(void) noexcept {
+			//FPS表示
+			for (auto& f : FPSAvgs) {
+				f = FrameRate;
+			}
+			m_FPSAvgCount = 0;
+		}
+		void	UpdateFPSCounter(void) noexcept;
+		void	DrawFPSCounter(void) const noexcept;
+
+		void	DrawUICommon(void) const noexcept;
 	public:
-		bool StartLogic(void) noexcept;
+		bool StartLogic(void) const noexcept;
 		bool MainLogic(void) noexcept;
 	};
 };

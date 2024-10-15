@@ -401,6 +401,6 @@ namespace DXLibRef {
 		~OptionWindowClass(void) noexcept {}
 	public:
 		void Init(void) noexcept;
-		void Execute(void)noexcept;
+		void Update(void)noexcept;
 	};
 }

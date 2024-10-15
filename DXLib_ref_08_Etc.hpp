@@ -4,11 +4,11 @@
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
 
-#define UIWidth		DXDraw::Instance()->GetUIY(basex)
-#define UIHeight	DXDraw::Instance()->GetUIY(basey)
+#define UIWidth		DXDraw::Instance()->GetUIY(BaseScreenWidth)
+#define UIHeight	DXDraw::Instance()->GetUIY(BaseScreenHeight)
 
-#define ScreenWidth		DXDraw::Instance()->GetScreenY(basex)
-#define ScreenHeight	DXDraw::Instance()->GetScreenY(basey)
+#define ScreenWidth		DXDraw::Instance()->GetScreenY(BaseScreenWidth)
+#define ScreenHeight	DXDraw::Instance()->GetScreenY(BaseScreenHeight)
 
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ namespace DXLibRef {
 		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
 
 		auto GetFramePosition = [&](int frame) { return Vector3DX(MV1GetFramePosition(pObj->GetHandle(), frame)); };
-		auto AngleOf2Vector = [&](Vector3DX A, Vector3DX B) { return acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); };			//２つのベクトルABのなす角度θを求める
+		auto AngleOf2Vector = [](Vector3DX A, Vector3DX B) { return acos(Vector3DX::Dot(A, B) / (A.magnitude() * B.magnitude())); };			//２つのベクトルABのなす角度θを求める
 
 		pObj->ResetFrameUserLocalMatrix(Arm);
 		pObj->ResetFrameUserLocalMatrix(Arm2);
@@ -817,8 +817,8 @@ namespace DXLibRef {
 				Back->InputStringParam(Str);
 
 				return FontPool::Instance()->Get((FontPool::FontType)type, fontSize, 3)->DrawStringAutoFit(
-					x1 + basex, y1 + basey,
-					x2 + basex, y2 + basey,
+					x1 + BaseScreenWidth, y1 + BaseScreenHeight,
+					x2 + BaseScreenWidth, y2 + BaseScreenHeight,
 					Color,
 					EdgeColor,
 					Str
@@ -888,7 +888,7 @@ namespace DXLibRef {
 		//文字
 		template <typename... Args>
 		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
-			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(INVALID_ID, ((std::string)String).c_str(), args...);
+			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(InvalidID, ((std::string)String).c_str(), args...);
 		}
 
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
@@ -1058,7 +1058,7 @@ namespace DXLibRef {
 	};
 	//モデルのフレーム情報保持
 	class frames {
-		int			m_FrameID{ INVALID_ID };
+		int			m_FrameID{ InvalidID };
 		Matrix4x4DX	m_WorldPos;
 		Matrix4x4DX	m_LocalPos;
 	public:
@@ -1345,31 +1345,31 @@ namespace DXLibRef {
 		};
 	private:
 		//シェーダーハンドル
-		int m_VertexShaderhandle{ INVALID_ID };
-		int m_GeometryShaderhandle{ INVALID_ID };
-		int m_PixelShaderhandle{ INVALID_ID };
+		int m_VertexShaderhandle{ InvalidID };
+		int m_GeometryShaderhandle{ InvalidID };
+		int m_PixelShaderhandle{ InvalidID };
 		//シェーダーに渡す追加パラメーターを配するハンドル
 		std::array<int, 4> LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
 		std::array<int, 4> m_VertexShadercbhandle{};
-		int m_GeometryShaderMatcbhandle{ INVALID_ID };
-		int m_PixelShaderSendDispSizeHandle{ INVALID_ID };
+		int m_GeometryShaderMatcbhandle{ InvalidID };
+		int m_PixelShaderSendDispSizeHandle{ InvalidID };
 		std::array<int, 4> m_PixelShadercbhandle{};
 		ImmutableCB WaveData{};
-		int m_VertexShadercbWaveDataHandle{ INVALID_ID };
+		int m_VertexShadercbWaveDataHandle{ InvalidID };
 	public:
 		ShaderUseClass(void) noexcept {
 			//シェーダーハンドル
-			m_VertexShaderhandle = INVALID_ID;
-			m_GeometryShaderhandle = INVALID_ID;
-			m_PixelShaderhandle = INVALID_ID;
+			m_VertexShaderhandle = InvalidID;
+			m_GeometryShaderhandle = InvalidID;
+			m_PixelShaderhandle = InvalidID;
 			//シェーダーに渡す追加パラメーターを配するハンドル
 			for (auto& h : m_VertexShadercbhandle) {
-				h = INVALID_ID;
+				h = InvalidID;
 			}
-			m_GeometryShaderMatcbhandle = INVALID_ID;
-			m_PixelShaderSendDispSizeHandle = INVALID_ID;
+			m_GeometryShaderMatcbhandle = InvalidID;
+			m_PixelShaderSendDispSizeHandle = InvalidID;
 			for (auto& h : m_PixelShadercbhandle) {
-				h = INVALID_ID;
+				h = InvalidID;
 			}
 		}
 		~ShaderUseClass(void) noexcept {
@@ -1464,7 +1464,7 @@ namespace DXLibRef {
 				float randomRad = (float)(GetRand(30) * DX_PI_F * 2 * 0.3f);
 				w.dir[0] = sinf(randomRad);
 				w.dir[1] = cosf(randomRad);
-				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f* Scale_Rate;
+				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f* Scale3DRate;
 				w.waveLength = 1.0f + powf(2.f, 1.f + (float)GetRand(3)) * 10.f;
 			}
 		}
@@ -1481,7 +1481,7 @@ namespace DXLibRef {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
 				return;
 			}
-			if (this->m_GeometryShaderhandle == INVALID_ID) {
+			if (this->m_GeometryShaderhandle == InvalidID) {
 				return;
 			}
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
@@ -1569,9 +1569,9 @@ namespace DXLibRef {
 			MV1SetUseOrigShader(TRUE);
 			doing();
 			MV1SetUseOrigShader(FALSE);
-			SetUseVertexShader(INVALID_ID);
-			SetUsePixelShader(INVALID_ID);
-			SetUseGeometryShader(INVALID_ID);
+			SetUseVertexShader(InvalidID);
+			SetUsePixelShader(InvalidID);
+			SetUseGeometryShader(InvalidID);
 		}
 		//2D画像に適用する場合の関数
 		void			Draw(ScreenVertex& Screenvertex) const noexcept {
@@ -1631,7 +1631,7 @@ namespace DXLibRef {
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
-						SetCameraNearFar(0.5f * Scale_Rate, 1000.0f * Scale_Rate);									// Nearクリップ面とFarクリップ面の距離を設定
+						SetCameraNearFar(0.5f * Scale3DRate, 1000.0f * Scale3DRate);									// Nearクリップ面とFarクリップ面の距離を設定
 						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[static_cast<size_t>(i)]).get(), up[static_cast<size_t>(i)]);	// カメラの位置と注視点、カメラの上方向を設定
 						Doing();
 					}
@@ -1690,7 +1690,7 @@ namespace DXLibRef {
 			if (Data) {
 				return Data->second;
 			}
-			return (int64_t)INVALID_ID;
+			return (int64_t)InvalidID;
 		}
 	public:
 		void Save(void) noexcept {
@@ -2194,10 +2194,10 @@ namespace DXLibRef {
 		private:
 			std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
 			std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
-			int UniqueIDNum{ INVALID_ID };
+			int UniqueIDNum{ InvalidID };
 			bool m_IsEnd{ false };//アニメーション側からの終了命令
 		public:
-			auto IsActive(void) const noexcept { return UniqueIDNum != INVALID_ID; }
+			auto IsActive(void) const noexcept { return UniqueIDNum != InvalidID; }
 		public:
 			void Load(const char* path) noexcept;
 			void Update(void) noexcept;
@@ -2255,34 +2255,34 @@ namespace DXLibRef {
 	//ファイルが存在するか
 	static bool IsFileExist(const char* Path) noexcept {
 		FILEINFO FileInfo;
-		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)INVALID_ID);
+		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
 	}
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*UDP通信																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class UDPNetWorkDX {
-		int			m_Handle{ INVALID_ID };				// ネットワークハンドル
+		int			m_Handle{ InvalidID };				// ネットワークハンドル
 		IPDATA		m_SendIP{ 127,0,0,1 };		// 送信用ＩＰアドレスデータ
-		int			m_SendPort{ INVALID_ID };				// 通信用ポート
+		int			m_SendPort{ InvalidID };				// 通信用ポート
 		IPDATA		m_RecvIp{ 127,0,0,1 };			// 受信用ＩＰアドレスデータ
 		int			m_RecvPort{ 0 };				// 受信用ポート
 	public:
-		auto			IsActive(void) const noexcept { return (m_Handle != INVALID_ID); }
+		auto			IsActive(void) const noexcept { return (m_Handle != InvalidID); }
 	public:
 		void			SetServerIP(const IPDATA& pIP) noexcept { m_SendIP = pIP; }//クライアントは必ず行う
-		bool			Init(bool IsServer, int PORT = INVALID_ID) noexcept {
+		bool			Init(bool IsServer, int PORT = InvalidID) noexcept {
 			if (!IsActive()) {
 				m_SendPort = PORT;
-				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : INVALID_ID);
+				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : InvalidID);
 			}
-			return m_Handle != INVALID_ID;
+			return m_Handle != InvalidID;
 		}
 		void			Dispose(void) noexcept {
 			if (IsActive()) {
 				DeleteUDPSocket(m_Handle);	// ＵＤＰソケットハンドルの削除
-				m_Handle = INVALID_ID;
-				m_SendPort = INVALID_ID;
+				m_Handle = InvalidID;
+				m_SendPort = InvalidID;
 			}
 		}
 	private:
@@ -2291,7 +2291,7 @@ namespace DXLibRef {
 			if (IsActive()) {
 				return NetWorkSendUDP(m_Handle, Ip, SendPort, &Data, sizeof(T));
 			}
-			return INVALID_ID;
+			return InvalidID;
 		}
 	public:
 		//送信
@@ -2300,7 +2300,7 @@ namespace DXLibRef {
 		//受信
 		template<class T>
 		bool			RecvData(T* Data, int* RecvReturn, bool IsPeek) noexcept {
-			*RecvReturn = INVALID_ID;
+			*RecvReturn = InvalidID;
 			if (IsActive()) {
 				switch (CheckNetWorkRecvUDP(m_Handle)) {
 				case TRUE:

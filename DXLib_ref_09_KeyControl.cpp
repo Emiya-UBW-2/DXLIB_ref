@@ -159,7 +159,7 @@ namespace DXLibRef {
 			if (P.m_assign != ID) {
 			}
 			else if (P.m_Key.trigger()) {
-				ID = (P.m_reserve == INVALID_ID) ? P.m_assign : INVALID_ID;
+				ID = (P.m_reserve == InvalidID) ? P.m_assign : InvalidID;
 			}
 			else {
 				return true;
@@ -169,7 +169,7 @@ namespace DXLibRef {
 			for (size_t p : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
-					P2.m_reserve = INVALID_ID;
+					P2.m_reserve = InvalidID;
 					break;
 				}
 			}
@@ -230,7 +230,7 @@ namespace DXLibRef {
 
 
 	void PadControl::Load(void) noexcept {
-		int mdata = INVALID_ID;
+		int mdata = InvalidID;
 		if (std::filesystem::is_regular_file(GetSavePath())) {
 			mdata = FileRead_open(GetSavePath(), FALSE);
 		}
@@ -298,7 +298,7 @@ namespace DXLibRef {
 		}
 	}
 
-	void PadControl::Execute(void) noexcept {
+	void PadControl::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		//コントロールタイプ決定

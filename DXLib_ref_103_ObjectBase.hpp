@@ -46,7 +46,7 @@ namespace DXLibRef {
 
 	class ObjectBaseClass : public ModelBaseClass {
 	protected:
-		int											m_ObjectID{ INVALID_ID };
+		int											m_ObjectID{ InvalidID };
 		bool										m_ColActive{ false };
 		moves										m_move;
 		Matrix4x4DX									m_PrevMat;//•¨—XV‚Ì‚½‚ß
@@ -64,11 +64,11 @@ namespace DXLibRef {
 		auto&				GetObj(void) noexcept { return this->m_obj; }
 		const auto&			GetObj_const(void) const noexcept { return this->m_obj; }
 		//
-		bool				HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != INVALID_ID; }
+		bool				HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != InvalidID; }
 		const auto&			GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto&			GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
 
-		bool				HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != INVALID_ID; }
+		bool				HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != InvalidID; }
 		const auto&			GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
 		
 
@@ -113,7 +113,7 @@ namespace DXLibRef {
 		void			SetupCol(void) noexcept {
 			if (this->m_col.IsActive()) {
 				for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {
-					this->m_col.SetupCollInfo(8, 8, 8, INVALID_ID, i);
+					this->m_col.SetupCollInfo(8, 8, 8, InvalidID, i);
 				}
 			}
 		}
@@ -125,15 +125,15 @@ namespace DXLibRef {
 				//”»’è‹N“®
 				this->m_ColActive = true;
 				for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {
-					this->m_col.RefreshCollInfo(INVALID_ID, i);
+					this->m_col.RefreshCollInfo(InvalidID, i);
 				}
 				return true;
 			}
 			return false;
 		}
 		//”»’èŽæ“¾
-		auto			GetColCapsule(const Vector3DX& StartPos, const Vector3DX& EndPos, float range, const int sel = 0) const noexcept { return this->m_col.CollCheck_Capsule(StartPos, EndPos, range, INVALID_ID, sel); }
-		auto			GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, INVALID_ID, sel); }
+		auto			GetColCapsule(const Vector3DX& StartPos, const Vector3DX& EndPos, float range, const int sel = 0) const noexcept { return this->m_col.CollCheck_Capsule(StartPos, EndPos, range, InvalidID, sel); }
+		auto			GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return this->m_col.CollCheck_Line(StartPos, EndPos, InvalidID, sel); }
 		void			GetColNearestInAllMesh(const Vector3DX& StartPos, Vector3DX* EndPos) const noexcept {
 			MV1_COLL_RESULT_POLY colres;
 			for (int i : std::views::iota(0, static_cast<int>(this->m_col.GetMeshNum()))) {

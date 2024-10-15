@@ -15,7 +15,7 @@ namespace DXLibRef {
 		int handle_;
 		constexpr Effekseer2DPlayingHandle(int h) noexcept : handle_(h) {}
 		friend EffekseerEffectHandle;
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 
 	public:
 		constexpr Effekseer2DPlayingHandle(void) noexcept : handle_(invalid_handle) {}
@@ -30,7 +30,7 @@ namespace DXLibRef {
 			return *this;
 		}
 		~Effekseer2DPlayingHandle(void) noexcept {
-			if (INVALID_ID != this->handle_)
+			if (InvalidID != this->handle_)
 		{
 				this->Stop();
 			}
@@ -84,10 +84,10 @@ namespace DXLibRef {
 		}
 		// * @brief ハンドルを破棄する
 		void Dispose(void) noexcept {
-			if (INVALID_ID != this->handle_)
+			if (InvalidID != this->handle_)
 		{
 				this->Stop();
-				this->handle_ = INVALID_ID;
+				this->handle_ = InvalidID;
 			}
 		}
 		//  @brief	指定されたEffekseerにより再生中の2Dエフェクトを描画する。
@@ -106,7 +106,7 @@ namespace DXLibRef {
 		int handle_;
 		constexpr Effekseer3DPlayingHandle(int h) noexcept : handle_(h) {}
 		friend EffekseerEffectHandle;
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 
 	public:
 		constexpr Effekseer3DPlayingHandle(void) noexcept : handle_(invalid_handle) {}
@@ -121,7 +121,7 @@ namespace DXLibRef {
 			return *this;
 		}
 		~Effekseer3DPlayingHandle(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (InvalidID != this->handle_) {
 				this->Stop();
 			}
 		}
@@ -192,9 +192,9 @@ namespace DXLibRef {
 		 * @brief ハンドルを破棄する
 		 */
 		void Dispose(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (InvalidID != this->handle_) {
 				this->Stop();
-				this->handle_ = INVALID_ID;
+				this->handle_ = InvalidID;
 			}
 		}
 		/**
@@ -214,7 +214,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr EffekseerEffectHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 
 	public:
 		constexpr EffekseerEffectHandle(void) noexcept : handle_(invalid_handle) {}
@@ -229,14 +229,14 @@ namespace DXLibRef {
 			return *this;
 		}
 		~EffekseerEffectHandle(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (InvalidID != this->handle_) {
 				DeleteEffekseerEffect(this->handle_);
 			}
 		}
 		void Dispose(void) noexcept {
-			if (INVALID_ID != this->handle_) {
+			if (InvalidID != this->handle_) {
 				DeleteEffekseerEffect(this->handle_);
-				this->handle_ = INVALID_ID;
+				this->handle_ = InvalidID;
 			}
 		}
 		/*
@@ -254,7 +254,7 @@ namespace DXLibRef {
 			return { PlayEffekseer3DEffect(this->handle_) };
 		}
 		[[deprecated]] int get(void) const noexcept { return this->handle_; }
-		constexpr explicit operator bool(void) noexcept { return INVALID_ID != this->handle_; }
+		constexpr explicit operator bool(void) noexcept { return InvalidID != this->handle_; }
 		// LoadEffekseerEffectはfileNameをstd::wstringに必ず格納する、オーバーロード必要
 		static EffekseerEffectHandle load(const char* fileName, float magnification = 1.0f) noexcept { return { LoadEffekseerEffect(fileName, magnification) }; }
 		static EffekseerEffectHandle load(const wchar_t* fileName, float magnification = 1.0f) noexcept { return { LoadEffekseerEffect(fileName, magnification) }; }

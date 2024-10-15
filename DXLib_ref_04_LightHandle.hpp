@@ -11,7 +11,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr LightHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 
 	public:
 		constexpr LightHandle(void) noexcept : handle_(invalid_handle) {}
@@ -80,7 +80,7 @@ namespace DXLibRef {
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			int prev = now;
-			if (handles[static_cast<size_t>(now)].get() != INVALID_ID) {
+			if (handles[static_cast<size_t>(now)].get() != InvalidID) {
 				handles[static_cast<size_t>(now)].Dispose();
 			}
 			//handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
@@ -104,7 +104,7 @@ namespace DXLibRef {
 			/*
 			for (auto& h : handles)
 			{
-				if (h.get() != INVALID_ID)
+				if (h.get() != InvalidID)
 				{
 					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30)
 					{

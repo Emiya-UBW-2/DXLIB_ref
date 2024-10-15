@@ -17,7 +17,7 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
 		case EasingType::OutExpo:
-			return (1.f - std::powf(ratio, Frame_Rate / DrawParts->GetFps()));
+			return (1.f - std::powf(ratio, FrameRate / DrawParts->GetFps()));
 		default:
 			return 1.f;
 		}
@@ -115,7 +115,7 @@ namespace DXLibRef {
 			break;
 			case DrawType::String:
 				FontPool::Instance()->Get((FontPool::FontType)m_intParam[0], this->m_intParam[1], 3)->DrawString(
-					INVALID_ID,
+					InvalidID,
 					(FontHandle::FontXCenter)m_intParam[2], (FontHandle::FontYCenter)m_intParam[3],
 					m_intParam[4], this->m_intParam[5],
 					m_UintParam[0],
@@ -312,7 +312,7 @@ namespace DXLibRef {
 			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
 
 			m_repeat = trigger();
-			m_repeatcount -= Frame_Rate / DrawParts->GetFps();
+			m_repeatcount -= FrameRate / DrawParts->GetFps();
 			if (m_repeatcount <= 0.f) {
 				m_repeatcount += 2.f;
 				m_repeat = true;
@@ -371,7 +371,7 @@ namespace DXLibRef {
 
 		Pad->SetGuideUpdate();
 		Pad->ChangeGuide(
-			[&]() {
+			[this]() {
 				auto* Pad = PadControl::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
 				Pad->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
@@ -536,7 +536,7 @@ namespace DXLibRef {
 			}
 		}
 		//色関係
-		auto GetColorByPallet = [&](const std::string& ColorStr) {
+		auto GetColorByPallet = [this](const std::string& ColorStr) {
 			for (size_t i : std::views::iota(0, static_cast<int>(g_UIColorPalletNum))) {
 				if (ColorStr == g_UIColorPalletString[i]) {
 					return g_UIColorPallet[i];
@@ -796,7 +796,7 @@ namespace DXLibRef {
 		}
 		float FramePer = 0.f;
 		//現在のアニメ番号を取得
-		m_NowAnim = INVALID_ID;
+		m_NowAnim = InvalidID;
 		int tmpFrame = m_Frame;
 		for (size_t index = 0; auto& a : m_AnimeFrame) {
 			if (tmpFrame < a.m_framepoint) {
@@ -819,7 +819,7 @@ namespace DXLibRef {
 			tmpFrame -= a.m_framepoint;
 			index++;
 		}
-		if (m_NowAnim == INVALID_ID) {
+		if (m_NowAnim == InvalidID) {
 			m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
 			FramePer = 1.f;
 		}
@@ -864,11 +864,11 @@ namespace DXLibRef {
 			m_CommonAnimes.emplace_back(std::make_unique<UI_CommonAnimes>());
 			m_CommonAnimes.back()->SetParts(j, m_CommonParts);
 		}
-		std::sort(m_CommonParts.begin(), m_CommonParts.end(), [&](const std::unique_ptr<UI_CommonParts>& A, const std::unique_ptr<UI_CommonParts>& B) {
+		std::sort(m_CommonParts.begin(), m_CommonParts.end(), [this](const std::unique_ptr<UI_CommonParts>& A, const std::unique_ptr<UI_CommonParts>& B) {
 			return (A->GetLayer() != B->GetLayer()) ? (A->GetLayer() < B->GetLayer()) : (A->GetUniqueID() < B->GetUniqueID());
 			});
 		if (UniqueIDNum == 0) {
-			UniqueIDNum = INVALID_ID;
+			UniqueIDNum = InvalidID;
 		}
 	}
 	void UISystem::UI_OneLayer::Update(void) noexcept {
@@ -893,7 +893,7 @@ namespace DXLibRef {
 			p.reset();
 		}
 		m_CommonParts.clear();
-		UniqueIDNum = INVALID_ID;
+		UniqueIDNum = InvalidID;
 	}
 	//全体
 	int UISystem::AddUI(const char* path) noexcept {
@@ -904,7 +904,7 @@ namespace DXLibRef {
 			}
 			index++;
 		}
-		return INVALID_ID;
+		return InvalidID;
 	}
 	void UISystem::DelUI(int layer) noexcept {
 		auto& l = m_Layer.at(static_cast<size_t>(layer));

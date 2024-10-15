@@ -2,6 +2,14 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
+	enum class VR_PAD {
+		TRIGGER,
+		SIDEBUTTON,
+		TOUCHPAD,
+		TOPBUTTON1,
+		TOPBUTTON2,
+	};
+
 	class DXDraw : public SingletonBase<DXDraw> {
 	private:
 		friend class SingletonBase<DXDraw>;
@@ -21,11 +29,11 @@ namespace DXLibRef {
 			std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
 			std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
 		public:
-			const auto&			GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
-			const auto&			GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }
+			const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
+			const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }
 
-			const auto&			GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
-			const auto&			GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+			const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+			const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
 
 			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 
@@ -51,6 +59,15 @@ namespace DXLibRef {
 			void SetActive(void) noexcept;
 			bool UpdateActive(void) noexcept;
 		};
+		struct AddShaders {
+			ShaderUseClass	m_Shader;
+			shaderparam		m_ShaderParam;
+
+			void	SetCommonParam(void) noexcept {
+				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_Shader.SetPixelParam(3, m_ShaderParam.param[0], m_ShaderParam.param[1], m_ShaderParam.param[2], m_ShaderParam.param[3]);
+			}
+		};
 	private:
 		int							m_DispXSize{ deskx };
 		int							m_DispYSize{ desky };
@@ -64,17 +81,15 @@ namespace DXLibRef {
 		int							m_DispXSize_Max{ deskx };
 		int							m_DispYSize_Max{ desky };
 
-		float						m_FPS{ Frame_Rate };
+		float						m_FPS{ FrameRate };
 
 		switchs						m_PauseActive;
 		LONGLONG					m_StartTime{ 0 };
-		bool						m_IsEnd{ false };
 
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
 
 		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{ GetColorF(0, 0, 0, 0) };
-		GraphHandle					UI_Screen;								//UI
 		Camera3DInfo				m_MainCamera;							//カメラ
 		//カメラシェイク
 		//
@@ -84,60 +99,56 @@ namespace DXLibRef {
 		bool						m_IsRestartSelect{ false };
 
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;						// 頂点データ
-		std::array<ShaderUseClass, 2>	m_Shader2D;
-		std::array<shaderparam, 2>		m_ShaderParam;						//シェーダーパラメーター
-
+		std::array<AddShaders, 2>	m_Shader2D;
 		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
-		bool						m_IsFirstBoot{ false };
 
 		bool						m_IsCubeMap{ true };
 		RealTimeCubeMap				m_RealTimeCubeMap;
 
 		CheckPCSpec					m_CheckPCSpec;
 		ShaderUseClass				m_PBR_Shader;
-
-		Matrix4x4DX					m_CamViewMatrix{};
-		Matrix4x4DX					m_CamProjectionMatrix{};
 	public://ゲッター
-		const auto&			is_lens(void) const noexcept { return m_ShaderParam[0].use; }
-		const auto&			zoom_lens(void) const noexcept { return m_ShaderParam[0].param[3]; }
-		void			Set_is_lens(bool value) noexcept { m_ShaderParam[0].use = value; }
-		void			Set_xp_lens(float value) noexcept { m_ShaderParam[0].param[0] = value; }
-		void			Set_yp_lens(float value) noexcept { m_ShaderParam[0].param[1] = value; }
-		void			Set_size_lens(float value) noexcept { m_ShaderParam[0].param[2] = value; }
-		void			Set_zoom_lens(float value) noexcept { m_ShaderParam[0].param[3] = value; }
-		void			Set_is_Blackout(bool value) noexcept { m_ShaderParam[1].use = value; }
-		void			Set_Per_Blackout(float value) noexcept { m_ShaderParam[1].param[0] = value; }
+		const auto& is_lens(void) const noexcept { return m_Shader2D[0].m_ShaderParam.use; }
+		const auto& zoom_lens(void) const noexcept { return m_Shader2D[0].m_ShaderParam.param[3]; }
+		void			Set_is_lens(bool value) noexcept { m_Shader2D[0].m_ShaderParam.use = value; }
+		void			Set_xp_lens(float value) noexcept { m_Shader2D[0].m_ShaderParam.param[0] = value; }
+		void			Set_yp_lens(float value) noexcept { m_Shader2D[0].m_ShaderParam.param[1] = value; }
+		void			Set_size_lens(float value) noexcept { m_Shader2D[0].m_ShaderParam.param[2] = value; }
+		void			Set_zoom_lens(float value) noexcept { m_Shader2D[0].m_ShaderParam.param[3] = value; }
+		void			Set_is_Blackout(bool value) noexcept { m_Shader2D[1].m_ShaderParam.use = value; }
+		void			Set_Per_Blackout(float value) noexcept { m_Shader2D[1].m_ShaderParam.param[0] = value; }
 
-		const auto&		GetLightVec(void) const noexcept { return m_LightVec; }
+		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		//UI以外のスクリーン空間
 		auto			GetScreenX(int value) const noexcept { return (value * this->m_DispXSize_Max / this->m_DispXSize_Win); }
 		auto			GetScreenY(int value) const noexcept { return (value * this->m_DispYSize_Max / this->m_DispYSize_Win); }
 		//UI用
-		int				GetUIX(int value) const noexcept { return (value * m_DispXSize / basex); }
-		int				GetUIY(int value) const noexcept { return (value * m_DispYSize / basey); }
+		int				GetUIX(int value) const noexcept { return (value * m_DispXSize / BaseScreenWidth); }
+		int				GetUIY(int value) const noexcept { return (value * m_DispYSize / BaseScreenHeight); }
 		//
 		void			GetMousePosition(int* MouseX, int* MouseY) const noexcept;
-		const auto&			GetFps(void) const noexcept { return m_FPS; }
-		const auto&			GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
-		const auto&			GetCamViewMatrix(void) const noexcept { return m_CamViewMatrix; }
-		const auto&			GetCamProjectionMatrix(void) const noexcept { return m_CamProjectionMatrix; }
-		const auto&			IsExit(void) const noexcept { return m_IsExitSelect; }
-		const auto&			IsRestart(void) const noexcept { return m_IsRestartSelect; }
+		const auto& GetFps(void) const noexcept { return m_FPS; }
+		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
+		const auto& IsExit(void) const noexcept { return m_IsExitSelect; }
+		const auto& IsRestart(void) const noexcept { return m_IsRestartSelect; }
 		auto			IsPause(void) const noexcept { return m_PauseActive.on(); }
-		const auto&			GetMainCamera(void) const noexcept { return m_MainCamera; }
-		const auto&			GetAberrationPower(void) const noexcept { return m_AberrationPower; }
-		const auto&			GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
+		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
+		const auto& GetAberrationPower(void) const noexcept { return m_AberrationPower; }
+		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 	public:
+		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
+		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
+		void			DrawShader(int select) noexcept;
 		void			SetPause(bool value) noexcept;
-		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
+		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;
+		bool			UpdateShadowActive(void) noexcept;
 	private:
-		void			FirstBootSetting(void) noexcept;
+		void			DrawByPBR(std::function<void()> doing) noexcept;
 	private://コンストラクタ
 		DXDraw(void) noexcept;
 		DXDraw(const DXDraw&) = delete;
@@ -148,16 +159,10 @@ namespace DXLibRef {
 		~DXDraw(void) noexcept;
 	public:
 		void			Init(void) noexcept;
-		auto			IsFirstBoot(void) noexcept {
-			if (m_IsFirstBoot) {
-				FirstBootSetting();
-			}
-			return m_IsFirstBoot;
-		}
-		bool			FirstExecute(void) noexcept;
-		bool			UpdateShadowActive(void) noexcept;
-		void			Execute(void) noexcept;
-		void			Draw(
+		void			FirstBootSetting(void) noexcept;
+		void			FirstExecute(void) noexcept;
+		void			Update(void) noexcept;
+		void			Draw3DVR(
 			std::function<void()> sky_doing,
 			std::function<void()> setshadowdoing_rigid,
 			std::function<void()> setshadowdoing,
@@ -166,12 +171,17 @@ namespace DXLibRef {
 			std::function<void()> doingUI,
 			std::function<void()> doingUI2
 		) noexcept;
-		void			Draw2D(
+		void			Draw3DMain(
+			std::function<void()> sky_doing,
+			std::function<void()> setshadowdoing_rigid,
+			std::function<void()> setshadowdoing,
 			std::function<void()> doing,
-			std::function<void()> doingUI
+			std::function<void()> doingFront,
+			const Camera3DInfo& camInfo
 		) noexcept;
+		void			Draw2DMain(std::function<void()> doing) noexcept;
+		void			DrawFlipDisplay(std::function<void()> doingUI) const noexcept;
 		bool			Screen_Flip(void) noexcept;
-
 		//VR
 	private:
 		class VRControl;

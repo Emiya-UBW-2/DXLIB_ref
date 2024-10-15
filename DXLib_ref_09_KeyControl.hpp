@@ -689,7 +689,7 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			return INVALID_ID;
+			return InvalidID;
 		}
 		const char* GetSavePath(void) const noexcept {
 			switch (m_ControlType) {
@@ -736,7 +736,7 @@ namespace DXLibRef {
 			}
 			GuideBase = GraphHandle::Load("CommonData/key/OutputFont.png");
 			{
-				int mdata = INVALID_ID;
+				int mdata = InvalidID;
 				mdata = FileRead_open("CommonData/key/OutputFont.psf", FALSE);
 				while (true) {
 					if (FileRead_eof(mdata) != 0) {
@@ -859,7 +859,7 @@ namespace DXLibRef {
 			Key.back()->AddGuidePC(nullptr, GuideStr);
 		}
 	public:
-		void Execute(void) noexcept;
+		void Update(void) noexcept;
 		void Draw(void) const noexcept;
 		void Dispose(void) noexcept;
 	};

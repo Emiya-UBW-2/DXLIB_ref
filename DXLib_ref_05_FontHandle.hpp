@@ -98,7 +98,7 @@ namespace DXLibRef {
 		};
 	private:
 		int m_handle;
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 	private:
 		constexpr FontHandle(int h) noexcept : m_handle(h) {}
 	public:
@@ -118,10 +118,10 @@ namespace DXLibRef {
 		}
 	public:
 		//ハンドル作成
-		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) noexcept {
+		static FontHandle Create(std::basic_string_view<TCHAR> FontName, int Size, int FontType = InvalidID, int CharSet = InvalidID, int EdgeSize = InvalidID, bool Italic = false) noexcept {
 			return { DxLib::CreateFontToHandleWithStrLen(FontName.data(), FontName.length(), Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
-		static FontHandle Create(int Size, int FontType = INVALID_ID, int CharSet = INVALID_ID, int EdgeSize = INVALID_ID, bool Italic = false) noexcept {
+		static FontHandle Create(int Size, int FontType = InvalidID, int CharSet = InvalidID, int EdgeSize = InvalidID, bool Italic = false) noexcept {
 			return { DxLib::CreateFontToHandle(nullptr, Size, Size / 3, FontType, CharSet, EdgeSize, Italic) };
 		}
 		//DXフォント用ハンドル作成
@@ -219,7 +219,7 @@ namespace DXLibRef {
 		class Fonthave {
 			//カスタム項目
 			FontType		m_Type{ 0 };
-			int				m_EdgeSize{ INVALID_ID };//エッジサイズ
+			int				m_EdgeSize{ InvalidID };//エッジサイズ
 			int				m_CustomSize{ 0 };//フォントハンドル固有のサイズ
 			//
 			int				m_scaleType{ DX_DRAWMODE_BILINEAR };
@@ -240,7 +240,7 @@ namespace DXLibRef {
 		public:
 			template <typename... Args>
 			void			DrawString(int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& String, Args&&... args) const noexcept {
-				if (fontSize == INVALID_ID) {
+				if (fontSize == InvalidID) {
 					fontSize = this->m_CustomSize;
 				}
 				if (fontSize == this->m_commonsize) {
@@ -260,7 +260,7 @@ namespace DXLibRef {
 
 			template <typename... Args>
 			auto			GetStringWidth(int fontSize, const std::string& String, Args&&... args) const noexcept {
-				if (fontSize == INVALID_ID) {
+				if (fontSize == InvalidID) {
 					fontSize = this->m_CustomSize;
 				}
 				if (fontSize == this->m_commonsize) {

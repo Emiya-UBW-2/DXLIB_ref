@@ -68,14 +68,14 @@ namespace DXLibRef {
 				SetUseTextureToShader(1, NormalPtr->get());
 				SetUseTextureToShader(2, DepthPtr->get());
 				m_ShaderSSAO.SetPixelDispSize(ScreenWidth, ScreenHeight);
-				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale_Rate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
+				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
 				m_ShaderSSAO.SetPixelParam(4, SCALE, BIAS, SAMPLE_RAD, MAX_DISTANCE);
 
 				m_ShaderSSAO.Draw(m_ScreenVertex);
 
-				SetUseTextureToShader(0, INVALID_ID);
-				SetUseTextureToShader(1, INVALID_ID);
-				SetUseTextureToShader(2, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
+				SetUseTextureToShader(1, InvalidID);
+				SetUseTextureToShader(2, InvalidID);
 			}
 			//SSRシェーダーにぼかしを入れる
 			SSRScreen.SetDraw_Screen(false);
@@ -85,7 +85,7 @@ namespace DXLibRef {
 				m_ShaderBlur.SetPixelDispSize(ScreenWidth, ScreenHeight);
 				m_ShaderBlur.Draw(m_ScreenVertex);
 
-				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
 			}
 			//
 			TargetGraph->SetDraw_Screen(false);
@@ -166,6 +166,7 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
+			auto* PostPassParts = PostPassEffect::Instance();
 
 			GraphFilterBlt(ColorGraph->get(), SSRColorScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GraphFilterBlt(NormalPtr->get(), SSRNormalScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
@@ -199,17 +200,17 @@ namespace DXLibRef {
 					SetUseTextureToShader(3, bkScreen2.get());
 				}
 				SetUseTextureToShader(4, bkScreen2.get());
-				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), Scale_Rate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
-				m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix(), DrawParts->GetCamProjectionMatrix());
+				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), Scale3DRate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
+				m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat(), PostPassParts->GetCamProjectionMat());
 				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap) ? 1.f : 0.f, 0.f, 0.f);
 				{
 					m_Shader.Draw(m_SSRScreenVertex);
 				}
-				SetUseTextureToShader(0, INVALID_ID);
-				SetUseTextureToShader(1, INVALID_ID);
-				SetUseTextureToShader(2, INVALID_ID);
-				SetUseTextureToShader(3, INVALID_ID);
-				SetUseTextureToShader(4, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
+				SetUseTextureToShader(1, InvalidID);
+				SetUseTextureToShader(2, InvalidID);
+				SetUseTextureToShader(3, InvalidID);
+				SetUseTextureToShader(4, InvalidID);
 			}
 			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 8, 200);
 			TargetGraph->SetDraw_Screen(false);
@@ -260,9 +261,9 @@ namespace DXLibRef {
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, INVALID_ID);
-				SetUseTextureToShader(1, INVALID_ID);
-				SetUseTextureToShader(2, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
+				SetUseTextureToShader(1, InvalidID);
+				SetUseTextureToShader(2, InvalidID);
 			}
 		}
 	};
@@ -768,7 +769,7 @@ namespace DXLibRef {
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
 			}
 		}
 	};
@@ -810,9 +811,10 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
 			auto* DrawParts = DXDraw::Instance();
+			auto* PostPassParts = PostPassEffect::Instance();
 			GraphFilterBlt(DepthPtr->get(), SSRDepthScreen.get(), DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 
-			m_Shader.SetPixelCameraMatrix(4, DrawParts->GetCamViewMatrix().inverse(), DrawParts->GetCamProjectionMatrix().inverse());
+			m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat().inverse(), PostPassParts->GetCamProjectionMat().inverse());
 			m_Shader.SetPixelCameraMatrix(5, DrawParts->GetShadowDraw()->GetCamViewMatrix(false), DrawParts->GetShadowDraw()->GetCamProjectionMatrix(false));
 			//m_Shader.SetPixelCameraMatrix(6, DrawParts->GetShadowDraw()->GetCamViewMatrix(true), DrawParts->GetShadowDraw()->GetCamProjectionMatrix(true));
 			SSRScreen.SetDraw_Screen();
@@ -838,9 +840,9 @@ namespace DXLibRef {
 					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 					m_Shader.Draw(m_ScreenVertex);
 				}
-				SetUseTextureToShader(0, INVALID_ID);
-				SetUseTextureToShader(1, INVALID_ID);
-				//SetUseTextureToShader(2, INVALID_ID);
+				SetUseTextureToShader(0, InvalidID);
+				SetUseTextureToShader(1, InvalidID);
+				//SetUseTextureToShader(2, InvalidID);
 			}
 			GraphFilter(SSRScreen.get(), DX_GRAPH_FILTER_GAUSS, 16, 300);
 			TargetGraph->SetDraw_Screen();
@@ -923,6 +925,8 @@ namespace DXLibRef {
 		}
 	}
 	void PostPassEffect::DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& camInfo) noexcept {
+		m_CamViewMat = camInfo.GetViewMatrix();
+		m_CamProjectionMat = camInfo.GetProjectionMatrix();
 		//全ての画面を初期化
 		if (m_IsActiveGBuffer) {
 			//リセット替わり
@@ -931,7 +935,7 @@ namespace DXLibRef {
 			DepthScreen.SetDraw_Screen();
 		}
 		//空
-		DrawGBuffer(1000.0f, 50000.0f, [&]() { sky_doing(); }, camInfo);
+		DrawGBuffer(1000.0f, 50000.0f, sky_doing, camInfo);
 		//遠距離
 		DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [&]() {
 			doing();
@@ -977,7 +981,7 @@ namespace DXLibRef {
 		}
 		BufferScreen.SetDraw_Screen(false);
 	}
-	void PostPassEffect::Draw(void) noexcept {
+	void PostPassEffect::DrawPostProcess(void) noexcept {
 		//色味補正
 		GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), 0, 255);
 		//ポストパスエフェクトのbufに描画
@@ -1002,10 +1006,10 @@ namespace DXLibRef {
 		{
 			done();
 		}
-		SetRenderTargetToShader(0, INVALID_ID);
+		SetRenderTargetToShader(0, InvalidID);
 		if (m_IsActiveGBuffer) {
-			SetRenderTargetToShader(1, INVALID_ID);
-			SetRenderTargetToShader(2, INVALID_ID);
+			SetRenderTargetToShader(1, InvalidID);
+			SetRenderTargetToShader(2, InvalidID);
 		}
 	}
 	void PostPassEffect::LoadGBuffer(void) noexcept {

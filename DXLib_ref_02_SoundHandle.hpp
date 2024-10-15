@@ -20,7 +20,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr SoundHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 	public:
 		constexpr SoundHandle(void) noexcept : handle_(invalid_handle) {}
 		SoundHandle(const SoundHandle&) = delete;
@@ -140,10 +140,10 @@ namespace DXLibRef {
 					h.stop();
 				}
 			}
-			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = INVALID_ID, int panpal = -256) noexcept {
+			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = InvalidID, int panpal = -256) noexcept {
 				size_t ans = now;
 				shandle.at(static_cast<size_t>(Sel_t))->handle[now].play(type_t, Flag_t);
-				if (vol_t != INVALID_ID) {
+				if (vol_t != InvalidID) {
 					Set_vol = vol_t;
 					shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 				}
@@ -153,7 +153,7 @@ namespace DXLibRef {
 				++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
 				return static_cast<int>(ans);
 			}
-			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = INVALID_ID, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = InvalidID, int type_t = DX_PLAYTYPE_BACK) noexcept {
 				bool isplay = true;
 				{
 					//距離内にいない場合鳴らさない
@@ -163,14 +163,14 @@ namespace DXLibRef {
 				if (isplay) {
 					size_t ans = now;
 					shandle.at(static_cast<size_t>(Sel_t))->handle[now].play_3D(pos_t, radius, type_t);
-					if (vol_t != INVALID_ID) {
+					if (vol_t != InvalidID) {
 						Set_vol = vol_t;
 						shandle.at(static_cast<size_t>(Sel_t))->handle[now].vol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
 					}
 					++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
 					return static_cast<int>(ans);
 				}
-				return INVALID_ID;
+				return InvalidID;
 			}
 			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) noexcept {
 				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].vol(static_cast<int>(vol_rate * static_cast<float>(std::clamp(vol, 0, 255))));

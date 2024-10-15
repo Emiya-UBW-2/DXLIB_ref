@@ -51,16 +51,13 @@ namespace DXLibRef {
 			return ans;
 		}
 
-		void CubeMapDraw(void) noexcept { CubeMap_Sub(); }
-		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
-		void SetShadowDraw_Rigid(void) noexcept { SetShadowDraw_Rigid_Sub(); }
-		void SetShadowDraw(void) noexcept { SetShadowDraw_Sub(); }
-		void MainDraw(void) noexcept { MainDraw_Sub(); }
-		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
-		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
-		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
-		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
-		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
+		void CubeMapDraw(void) noexcept;
+		void ShadowDraw_Far(void) noexcept;
+		void ShadowDraw(void) noexcept;
+
+		void Draw3DVR(std::function<void()> doingUI) noexcept;
+		void Draw3D(std::function<void()> doingUI) noexcept;
+		void Draw2D(std::function<void()> doingUI) noexcept;
 
 		void Dispose(void) noexcept { Dispose_Sub(); }
 		void Dispose_Load(void) noexcept {
@@ -97,10 +94,7 @@ namespace DXLibRef {
 		friend class SingletonBase<SceneControl>;
 	private:
 		std::vector<std::shared_ptr<TEMPSCENE>> m_ScenesPtr{};
-		std::shared_ptr<TEMPSCENE> m_NowScenesPtr;
-		std::array<float, 60> FPSAvgs{};
-		int m_FPSAvg = 0;
-		float						m_PauseFlashCount{ 0.f };
+		std::shared_ptr<TEMPSCENE>	m_NowScenesPtr;
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;
@@ -113,20 +107,22 @@ namespace DXLibRef {
 				s->Dispose();
 			}
 		}
-	private:
-		void 	DrawFrontCommon(void) noexcept;
 	public:
 		const auto&			GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
 	public:
-		void AddList(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
+		void	AddList(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
 			this->m_ScenesPtr.emplace_back(ptr);
 			if (this->m_ScenesPtr.size() == 1) {
 				this->m_NowScenesPtr = this->m_ScenesPtr.back();
 			}
 		}
-		void StartScene(void) noexcept;
-		bool FirstExecute(void) noexcept;
-		bool Execute(void) noexcept;
-		void NextScene(void) noexcept;
+	public:
+		void	NextScene(void) noexcept {
+			GetNowScene()->Dispose();							//‰ð•ú
+			if (GetNowScene() != GetNowScene()->Get_Next()) {
+				GetNowScene()->Dispose_Load();
+			}
+			this->m_NowScenesPtr = GetNowScene()->Get_Next();		//‘JˆÚ
+		}
 	};
 };

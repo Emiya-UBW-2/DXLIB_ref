@@ -66,7 +66,7 @@ namespace DXLibRef {
 	private:
 		int handle_;
 		constexpr GraphHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 
 	public:
 		constexpr GraphHandle(void) noexcept : handle_(invalid_handle) {}

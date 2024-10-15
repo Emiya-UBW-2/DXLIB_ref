@@ -54,7 +54,7 @@ namespace DXLibRef {
 	private:
 		int							m_handle;
 		std::vector<AnimControler>	m_AnimControler;
-		static constexpr int invalid_handle = INVALID_ID;
+		static constexpr int invalid_handle = InvalidID;
 	public:
 		/*コンストラクタ*/
 		MV1(void) noexcept { m_handle = invalid_handle; }
@@ -74,16 +74,16 @@ namespace DXLibRef {
 		}
 	public:
 		/*読み込み*/
-		static void		Load(std::basic_string_view<TCHAR> FileName, MV1* _ModelHandle, int mode = DX_LOADMODEL_PHYSICS_LOADCALC, float Grav = M_GR) noexcept {
+		static void		Load(std::basic_string_view<TCHAR> FileName, MV1* _ModelHandle, int mode = DX_LOADMODEL_PHYSICS_LOADCALC, float Grav = GravityRate) noexcept {
 			if (mode != DX_LOADMODEL_PHYSICS_LOADCALC) {
 				MV1SetLoadModelUsePhysicsMode(mode);
 			}
-			if (Grav != M_GR) {
+			if (Grav != GravityRate) {
 				//MV1SetLoadModelPhysicsWorldGravity(Grav);
 			}
 			*_ModelHandle = DxLib::MV1LoadModelWithStrLen(FileName.data(), FileName.length());
-			if (Grav != M_GR) {
-				//MV1SetLoadModelPhysicsWorldGravity(M_GR);
+			if (Grav != GravityRate) {
+				//MV1SetLoadModelPhysicsWorldGravity(GravityRate);
 			}
 			if (mode != DX_LOADMODEL_PHYSICS_LOADCALC) {
 				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
@@ -204,19 +204,19 @@ namespace DXLibRef {
 		auto			PhysicsResetState(void) const noexcept { return MV1PhysicsResetState(GetHandle()) == TRUE; }
 		auto			PhysicsCalculation(float p1) const noexcept { return MV1PhysicsCalculation(GetHandle(), p1) == TRUE; }
 		/*当たり判定*/
-		auto			SetupCollInfo(int x = 32, int y = 8, int z = 32, int frame = INVALID_ID, int mesh = INVALID_ID) const noexcept {
+		auto			SetupCollInfo(int x = 32, int y = 8, int z = 32, int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1SetupCollInfo(GetHandle(), frame, x, y, z, mesh) == 0;
 		}
-		auto			RefreshCollInfo(int frame = INVALID_ID, int mesh = INVALID_ID) const noexcept {
+		auto			RefreshCollInfo(int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1RefreshCollInfo(GetHandle(), frame, mesh) == 0;
 		}
-		auto			CollCheck_Line(const Vector3DX& start, const Vector3DX& end, int frame = INVALID_ID, int mesh = INVALID_ID) const noexcept {
+		auto			CollCheck_Line(const Vector3DX& start, const Vector3DX& end, int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1CollCheck_Line(GetHandle(), frame, start.get(), end.get(), mesh);
 		}
-		auto			CollCheck_Sphere(const Vector3DX& startpos, float range, int frame = INVALID_ID, int mesh = INVALID_ID) const noexcept {
+		auto			CollCheck_Sphere(const Vector3DX& startpos, float range, int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1CollCheck_Sphere(GetHandle(), frame, startpos.get(), range, mesh);
 		}
-		auto			CollCheck_Capsule(const Vector3DX& startpos, const Vector3DX& endpos, float range, int frame = INVALID_ID, int mesh = INVALID_ID) const noexcept {
+		auto			CollCheck_Capsule(const Vector3DX& startpos, const Vector3DX& endpos, float range, int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1CollCheck_Capsule(GetHandle(), frame, startpos.get(), endpos.get(), range, mesh);
 		}
 	};
