@@ -534,12 +534,12 @@ namespace DXLibRef {
 					p = 1;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 64.f);
-						DrawLine_2D(0, y / p, ScreenWidth, y / p, GetColor(c, c, c));
+						DxLib::DrawLine(0, y / p, ScreenWidth, y / p, GetColor(c, c, c));
 					}
 					p = 2;
 					for (y = 0; y < 255; y += p) {
 						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 128.f);
-						DrawLine_2D(0, ScreenHeight - y / p, ScreenWidth, ScreenHeight - y / p, GetColor(c, c, c));
+						DxLib::DrawLine(0, ScreenHeight - y / p, ScreenWidth, ScreenHeight - y / p, GetColor(c, c, c));
 					}
 				}
 			}
@@ -854,6 +854,74 @@ namespace DXLibRef {
 			}
 		}
 	};
+	class PostPassScope : public PostPassBase {
+	private:
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderUseClass		m_Shader;			// シェーダー
+	public:
+		PostPassScope(void) noexcept {}
+		PostPassScope(const PostPassScope&) = delete;
+		PostPassScope(PostPassScope&& o) = delete;
+		PostPassScope& operator=(const PostPassScope&) = delete;
+		PostPassScope& operator=(PostPassScope&& o) = delete;
+
+		virtual ~PostPassScope(void) noexcept {}
+	public:
+		void Load_Sub(void) noexcept override {
+			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			m_Shader.Init("CommonData/shader/VS_lens.vso", "CommonData/shader/PS_lens.pso");
+		}
+		void Dispose_Sub(void) noexcept override {
+			m_Shader.Dispose();
+		}
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
+			if (!DrawParts->GetLensParam().use) { return; }
+			//レンズ
+			TargetGraph->SetDraw_Screen(false);
+			{
+				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_Shader.SetPixelParam(3, DrawParts->GetLensParam().param[0], DrawParts->GetLensParam().param[1], DrawParts->GetLensParam().param[2], DrawParts->GetLensParam().param[3]);
+				SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
+				m_Shader.Draw(this->m_ScreenVertex);
+				SetUseTextureToShader(0, InvalidID);
+			}
+		}
+	};
+	class PostPassBlackout : public PostPassBase {
+	private:
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderUseClass		m_Shader;			// シェーダー
+	public:
+		PostPassBlackout(void) noexcept {}
+		PostPassBlackout(const PostPassBlackout&) = delete;
+		PostPassBlackout(PostPassBlackout&& o) = delete;
+		PostPassBlackout& operator=(const PostPassBlackout&) = delete;
+		PostPassBlackout& operator=(PostPassBlackout&& o) = delete;
+
+		virtual ~PostPassBlackout(void) noexcept {}
+	public:
+		void Load_Sub(void) noexcept override {
+			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			m_Shader.Init("CommonData/shader/VS_BlackOut.vso", "CommonData/shader/PS_BlackOut.pso");
+		}
+		void Dispose_Sub(void) noexcept override {
+			m_Shader.Dispose();
+		}
+		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
+			if (!DrawParts->GetBlackoutParam().use) { return; }
+			//レンズ
+			TargetGraph->SetDraw_Screen(false);
+			{
+				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_Shader.SetPixelParam(3, DrawParts->GetBlackoutParam().param[0], DrawParts->GetBlackoutParam().param[1], DrawParts->GetBlackoutParam().param[2], DrawParts->GetBlackoutParam().param[3]);
+				SetUseTextureToShader(0, ColorGraph->get());	//使用するテクスチャをセット
+				m_Shader.Draw(this->m_ScreenVertex);
+				SetUseTextureToShader(0, InvalidID);
+			}
+		}
+	};
 	//--------------------------------------------------------------------------------------------------
 	//
 	//--------------------------------------------------------------------------------------------------
@@ -877,6 +945,8 @@ namespace DXLibRef {
 		m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
 		m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
 		m_PostPass.emplace_back(std::make_unique<PostPassFXAA>());
+		m_PostPass.emplace_back(std::make_unique<PostPassScope>());
+		m_PostPass.emplace_back(std::make_unique<PostPassBlackout>());
 		for (auto& P : m_PostPass) {
 			P->Init();
 		}
@@ -924,49 +994,12 @@ namespace DXLibRef {
 			P->UpdateActive();
 		}
 	}
-	void PostPassEffect::DrawDoF(std::function<void()> sky_doing, std::function<void()> doing, std::function<void()> doingFront, const Camera3DInfo& camInfo) noexcept {
-		m_CamViewMat = camInfo.GetViewMatrix();
-		m_CamProjectionMat = camInfo.GetProjectionMatrix();
-		//全ての画面を初期化
-		if (m_IsActiveGBuffer) {
-			//リセット替わり
-			ColorScreen.SetDraw_Screen();
-			NormalScreen.SetDraw_Screen();
-			DepthScreen.SetDraw_Screen();
-		}
-		//空
-		DrawGBuffer(1000.0f, 50000.0f, sky_doing, camInfo);
-		//遠距離
-		DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [&]() {
-			doing();
-			doingFront();
-			}, camInfo);
-		//中間
-		DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [&]() {
-#ifdef _USE_EFFEKSEER_
-			Effekseer_Sync3DSetting();
-#endif
-			doing();
-#ifdef _USE_EFFEKSEER_
-			DrawEffekseer3D();
-#endif
-			doingFront();
-			}, camInfo);
-		//至近
-		DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [&]() {
-#ifdef _USE_EFFEKSEER_
-			Effekseer_Sync3DSetting();
-#endif
-			doing();
-#ifdef _USE_EFFEKSEER_
-			DrawEffekseer3D();
-#endif
-			doingFront();
-			}, camInfo);
-		BufferScreen.SetDraw_Screen(false);
+	void PostPassEffect::SetCamMat(const Camera3DInfo& camInfo) noexcept {
+		m_CamInfo = camInfo;
+		m_CamViewMat = m_CamInfo.GetViewMatrix();
+		m_CamProjectionMat = m_CamInfo.GetProjectionMatrix();
 	}
-	void PostPassEffect::Draw2D(std::function<void()> doing) noexcept {
-		//全ての画面を初期化
+	void PostPassEffect::ResetBuffer(void) noexcept {
 		if (m_IsActiveGBuffer) {
 			//リセット替わり
 			ColorScreen.SetDraw_Screen();
@@ -975,13 +1008,28 @@ namespace DXLibRef {
 			DepthScreen.SetDraw_Screen();
 			FillGraph(DepthScreen.get(), 255, 0, 0);
 		}
-		BufferScreen.SetDraw_Screen();
-		{
-			doing();
+	}
+	void PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done) noexcept {
+		// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
+		SetRenderTargetToShader(0, BufferScreen.get());
+		if (m_IsActiveGBuffer) {
+			SetRenderTargetToShader(1, NormalScreen.get());
+			SetRenderTargetToShader(2, DepthScreen.get());
 		}
-		BufferScreen.SetDraw_Screen(false);
+		ClearDrawScreenZBuffer();
+		m_CamInfo.FlipCamInfo();
+		SetCameraNearFar(near_len, far_len);
+		{
+			done();
+		}
+		SetRenderTargetToShader(0, InvalidID);
+		if (m_IsActiveGBuffer) {
+			SetRenderTargetToShader(1, InvalidID);
+			SetRenderTargetToShader(2, InvalidID);
+		}
 	}
 	void PostPassEffect::DrawPostProcess(void) noexcept {
+		BufferScreen.SetDraw_Screen(false);
 		//色味補正
 		GraphFilter(BufferScreen.get(), DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), 0, 255);
 		//ポストパスエフェクトのbufに描画
@@ -993,25 +1041,6 @@ namespace DXLibRef {
 		}
 	}
 	//
-	void PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done, const Camera3DInfo& camInfo) noexcept {
-		// カラーバッファを描画対象0に、法線バッファを描画対象1に設定
-		SetRenderTargetToShader(0, BufferScreen.get());
-		if (m_IsActiveGBuffer) {
-			SetRenderTargetToShader(1, NormalScreen.get());
-			SetRenderTargetToShader(2, DepthScreen.get());
-		}
-		ClearDrawScreenZBuffer();
-		camInfo.FlipCamInfo();
-		SetCameraNearFar(near_len, far_len);
-		{
-			done();
-		}
-		SetRenderTargetToShader(0, InvalidID);
-		if (m_IsActiveGBuffer) {
-			SetRenderTargetToShader(1, InvalidID);
-			SetRenderTargetToShader(2, InvalidID);
-		}
-	}
 	void PostPassEffect::LoadGBuffer(void) noexcept {
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 		SetCreateDrawValidGraphZBufferBitDepth(24);

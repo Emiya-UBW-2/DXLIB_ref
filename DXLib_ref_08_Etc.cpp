@@ -163,43 +163,8 @@ namespace DXLibRef {
 
 			m_BufferScreen = GraphHandle::Make(UIWidth, UIHeight, true);
 		}
-		void	DrawControl::SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept {
-			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= ScreenWidth && 0 <= std::max(y1, y2) && std::min(y1, y2) <= ScreenHeight)) { return; }				//画面外は表示しない
-			DrawData* Back = GetBack(Layer);
-			Back->InputType(DrawType::Box);
-			Back->InputintParam(0, x1);
-			Back->InputintParam(1, y1);
-			Back->InputintParam(2, x2);
-			Back->InputintParam(3, y2);
-			Back->InputUintParam(0, color1);
-			Back->InputboolParam(0, IsFill);
-		}
-		void DrawControl::SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept {
-			DrawData* Back = GetBack(Layer);
-			Back->InputType(DrawType::Quadrangle);
-			Back->InputintParam(0, x1);
-			Back->InputintParam(1, y1);
-			Back->InputintParam(2, x2);
-			Back->InputintParam(3, y2);
-			Back->InputintParam(4, x3);
-			Back->InputintParam(5, y3);
-			Back->InputintParam(6, x4);
-			Back->InputintParam(7, y4);
-			Back->InputUintParam(0, color1);
-			Back->InputboolParam(0, IsFill);
-		}
-		void	DrawControl::SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness) noexcept {
-			if (!(0 <= std::max(x1, x2) && std::min(x1, x2) <= ScreenWidth && 0 <= std::max(y1, y2) && std::min(y1, y2) <= ScreenHeight)) { return; }				//画面外は表示しない
-
-
-			DrawData* Back = GetBack(Layer);
-			Back->InputType(DrawType::Line);
-			Back->InputintParam(0, x1);
-			Back->InputintParam(1, y1);
-			Back->InputintParam(2, x2);
-			Back->InputintParam(3, y2);
-			Back->InputUintParam(0, color1);
-			Back->InputintParam(4, Thickness);
+		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
+			return HitRectangleToRectangle(0, 0, ScreenWidth, ScreenHeight, std::max(x1, x2), std::max(y1, y2), std::min(x1, x2), std::min(y1, y2));
 		}
 		//箱
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {

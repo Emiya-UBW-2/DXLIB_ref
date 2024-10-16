@@ -4,11 +4,11 @@
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
 
-#define UIWidth		DXDraw::Instance()->GetUIY(BaseScreenWidth)
-#define UIHeight	DXDraw::Instance()->GetUIY(BaseScreenHeight)
+#define UIWidth		DXDraw::Instance()->GetUIXMax()
+#define UIHeight	DXDraw::Instance()->GetUIYMax()
 
-#define ScreenWidth		DXDraw::Instance()->GetScreenY(BaseScreenWidth)
-#define ScreenHeight	DXDraw::Instance()->GetScreenY(BaseScreenHeight)
+#define ScreenWidth		DXDraw::Instance()->GetScreenXMax()
+#define ScreenHeight	DXDraw::Instance()->GetScreenYMax()
 
 namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
@@ -306,20 +306,16 @@ namespace DXLibRef {
 	//--------------------------------------------------------------------------------------------------
 	// 描画
 	//--------------------------------------------------------------------------------------------------
-	//線の描画
-	static bool DrawLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
-		return DxLib::DrawLine(p1x, p1y, p2x, p2y, color, thickness) == TRUE;
-	}
 	//縁ぬき四角
 	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
 		if (thickness == 1) {
-			DrawBox(p1x, p1y, p2x, p2y, color, FALSE);
+			DxLib::DrawBox(p1x, p1y, p2x, p2y, color, FALSE);
 		}
 		else {
-			DrawLine_2D(p1x, p1y, p1x, p2y, color, thickness);
-			DrawLine_2D(p1x, p1y, p2x, p1y, color, thickness);
-			DrawLine_2D(p1x, p2y, p2x, p2y, color, thickness);
-			DrawLine_2D(p2x, p1y, p2x, p2y, color, thickness);
+			DxLib::DrawLine(p1x, p1y, p1x, p2y, color, thickness);
+			DxLib::DrawLine(p1x, p1y, p2x, p1y, color, thickness);
+			DxLib::DrawLine(p1x, p2y, p2x, p2y, color, thickness);
+			DxLib::DrawLine(p2x, p1y, p2x, p2y, color, thickness);
 		}
 	}
 	//グラデーションのある矩形を描画
@@ -669,6 +665,11 @@ namespace DXLibRef {
 
 			Max,
 		};
+		//文字
+		template <typename... Args>
+		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
+			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(InvalidID, ((std::string)String).c_str(), args...);
+		}
 		//
 		class DrawControl : public SingletonBase<DrawControl> {
 		private:
@@ -698,6 +699,7 @@ namespace DXLibRef {
 				return &this->m_DrawDatas.at((int)Layer).back();
 			}
 		public:
+			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept;
 			//
 			void	SetAlpha(DrawLayer Layer, int Alpha) noexcept {
 				DrawData* Back = GetBack(Layer);
@@ -719,9 +721,32 @@ namespace DXLibRef {
 				Back->InputintParam(2, valueB);
 			}
 			//
-			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept;
+			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept {
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				//画面外は表示しない
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Box);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, x2);
+				Back->InputintParam(3, y2);
+				Back->InputUintParam(0, color1);
+				Back->InputboolParam(0, IsFill);
+			}
 			//
-			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept;
+			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Quadrangle);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, x2);
+				Back->InputintParam(3, y2);
+				Back->InputintParam(4, x3);
+				Back->InputintParam(5, y3);
+				Back->InputintParam(6, x4);
+				Back->InputintParam(7, y4);
+				Back->InputUintParam(0, color1);
+				Back->InputboolParam(0, IsFill);
+			}
 			//
 			void	SetDrawCircle(DrawLayer Layer, int x1, int y1, int radius, unsigned int color1, bool IsFill = true, int LineThickness = 1) {
 				DrawData* Back = GetBack(Layer);
@@ -734,7 +759,17 @@ namespace DXLibRef {
 				Back->InputintParam(3, LineThickness);
 			}
 			//
-			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1) noexcept;
+			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1) noexcept {
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				//画面外は表示しない
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::Line);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, x2);
+				Back->InputintParam(3, y2);
+				Back->InputUintParam(0, color1);
+				Back->InputintParam(4, Thickness);
+			}
 			//
 			void SetDrawRotaGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int posx, int posy, float Exrate, float rad, bool trns) noexcept {
 				DrawData* Back = GetBack(Layer);
@@ -747,41 +782,35 @@ namespace DXLibRef {
 				Back->InputboolParam(0, trns);
 			}
 			//
-			void SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int pos1x, int pos1y, int pos2x, int pos2y, bool trns) noexcept {
+			void SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int x1, int y1, int x2, int y2, bool trns) noexcept {
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				//画面外は表示しない
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::ExtendGraph);
 				Back->InputGraphHandleParam(0, pGraphHandle);
-				Back->InputintParam(0, pos1x);
-				Back->InputintParam(1, pos1y);
-				Back->InputintParam(2, pos2x);
-				Back->InputintParam(3, pos2y);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, x2);
+				Back->InputintParam(3, y2);
 				Back->InputboolParam(0, trns);
 			}
 			//
 			template <typename... Args>
 			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
 				if (Str == "") { return; }
-				/*
-				auto* DrawParts = DXDraw::Instance();
 				int xSize = WindowSystem::GetMsgLen(fontSize, Str.c_str(), args...);
-
-				if ((y - fontSize) > ScreenHeight || (y + fontSize) < 0) { return; }				//画面外は表示しない
-
 				switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
-					if ((x) > ScreenWidth || (x + xSize) < 0) { return; }						//画面外は表示しない
+					if (!IsDrawOnWindow((x), (y - fontSize), (x + xSize), (y + fontSize))) { return; }				//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::MIDDLE:
-					if ((x - xSize / 2) > ScreenWidth || (x + xSize / 2) < 0) { return; }		//画面外は表示しない
+					if (!IsDrawOnWindow((x - xSize / 2), (y - fontSize), (x + xSize / 2), (y + fontSize))) { return; }				//画面外は表示しない
 					break;
 				case FontHandle::FontXCenter::RIGHT:
-					if ((x - xSize) > ScreenWidth || (x) < 0) { return; }						//画面外は表示しない
+					if (!IsDrawOnWindow((x - xSize), (y - fontSize), (x), (y + fontSize))) { return; }				//画面外は表示しない
 					break;
 				default:
 					break;
 				}
-				//*/
-
 
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::String);
@@ -886,11 +915,6 @@ namespace DXLibRef {
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
 		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
 		//文字
-		template <typename... Args>
-		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
-			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(InvalidID, ((std::string)String).c_str(), args...);
-		}
-
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
 
 		template <typename... Args>

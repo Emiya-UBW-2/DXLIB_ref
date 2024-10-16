@@ -126,7 +126,6 @@ namespace DXLibRef {
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
-		auto* PostPassParts = PostPassEffect::Instance();
 #ifdef DEBUG
 		auto* DebugParts = DebugClass::Instance();		//デバッグ
 #endif // DEBUG
@@ -221,7 +220,6 @@ namespace DXLibRef {
 						true
 					);
 				}
-				PostPassParts->Update();
 				if (m_IsEnd) {
 					return false;
 				}
