@@ -92,8 +92,8 @@ constexpr int		BaseScreenWidth{ 1920 };						/*UI描画などの基準となる解像度*/
 constexpr int		BaseScreenHeight{ 1080 };						/*UI描画などの基準となる解像度*/
 
 //DPIを反映するデスクトップサイズ
-const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) };
-const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) };
+static int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) };
+static int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) };
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include DXLIB																																*/

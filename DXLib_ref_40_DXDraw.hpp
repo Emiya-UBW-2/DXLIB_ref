@@ -147,6 +147,18 @@ namespace DXLibRef {
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;
 		bool			UpdateShadowActive(void) noexcept;
+		void			UpdateWindowSize(void)noexcept {
+			//DPI設定
+			int DPI = 96;
+			GetMonitorDpi(NULL, &DPI);
+			/*
+			if (SetProcessDPIAware() != 0) {
+				auto hdc = GetDC(nullptr);         // カレントのスクリーン全体のデバイスコンテキスト取得.
+				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
+			}
+			//*/
+			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
+		}
 	private:
 		void			DrawByPBR(std::function<void()> doing) noexcept;
 	private://コンストラクタ

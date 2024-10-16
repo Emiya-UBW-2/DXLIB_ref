@@ -502,16 +502,6 @@ namespace DXLibRef {
 			}
 			this->m_DispXSize = dx;
 			this->m_DispYSize = dy;
-			//DPI設定
-			int DPI = 96;
-			//GetMonitorDpi(NULL,&DPI);
-			if (SetProcessDPIAware() != 0) {
-				auto hdc = GetDC(nullptr);         // カレントのスクリーン全体のデバイスコンテキスト取得.
-				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
-			}
-			this->m_DispXSize = this->m_DispXSize * DPI / 96;
-			this->m_DispYSize = this->m_DispYSize * DPI / 96;
-			//
 		}
 		this->GetVRControl()->SetupBuffer(this->m_DispXSize, this->m_DispYSize);
 		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
@@ -521,7 +511,7 @@ namespace DXLibRef {
 		SetUseDirect3DVersion(DXVer);								//directX ver
 		SetUseDirectInputFlag(TRUE);								//
 		SetDirectInputMouseMode(TRUE);								//
-		SetGraphMode(this->m_DispXSize, this->m_DispYSize, 32);		//解像度
+		SetGraphMode(this->m_DispXSize * 5 / 4, this->m_DispYSize * 5 / 4, 32);		//解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				//ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									//
 		SetWaitVSyncFlag((DXVer == DX_DIRECT3D_11) && OptionParts->GetParamBoolean(EnumSaveParam::vsync));		//垂直同期
@@ -546,7 +536,7 @@ namespace DXLibRef {
 
 			int x1, y1, x2, y2;
 			GetWindowEdgeWidth(&x1, &y1, &x2, &y2);
-			SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+			UpdateWindowSize();
 			this->m_DispXSize_Win = this->m_DispXSize - 72 * 16 / 9;
 			this->m_DispYSize_Win = this->m_DispYSize - 72;
 			this->m_DispXSize_Border = this->m_DispXSize;
@@ -602,7 +592,7 @@ namespace DXLibRef {
 				this->m_DispYSize = this->m_DispYSize_Win;
 				SetWindowStyleMode(0);
 				SetWindowPosition(0, 0);
-				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+				UpdateWindowSize();
 				ChangeWindowMode(TRUE);
 				break;
 			case WindowType::Borderless:
@@ -610,7 +600,7 @@ namespace DXLibRef {
 				this->m_DispYSize = this->m_DispYSize_Border;
 				SetWindowStyleMode(2);
 				SetWindowPosition(0, 0);
-				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+				UpdateWindowSize();
 				ChangeWindowMode(TRUE);
 				break;
 			case WindowType::FullScreen:
@@ -618,7 +608,7 @@ namespace DXLibRef {
 				this->m_DispYSize = this->m_DispYSize_Border;
 				SetWindowStyleMode(2);
 				SetWindowPosition(0, 0);
-				SetWindowSize(this->m_DispXSize, this->m_DispYSize);
+				UpdateWindowSize();
 				SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_NATIVE);
 				SetFullScreenScalingMode(DX_FSSCALINGMODE_NEAREST);
 				ChangeWindowMode(FALSE);
