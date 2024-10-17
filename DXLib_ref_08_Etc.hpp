@@ -11,9 +11,9 @@
 #define ScreenHeight	DXDraw::Instance()->GetScreenYMax()
 
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 補完
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	//イージング
 	enum class EasingType {
 		OutExpo,
@@ -89,24 +89,17 @@ namespace DXLibRef {
 		*RetHandle = graphhandle;
 		return true;
 	}
-	//矩形と点との2D判定
+
+	//点と矩形との2D判定
 	static bool HitPointToRectangle(int xp, int yp, int x1, int y1, int x2, int y2) noexcept { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
-
+	//矩形と矩形との2D判定
 	static bool HitRectangleToRectangle(int xp1, int yp1, int xp2, int yp2, int x1, int y1, int x2, int y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
-
+	//点と四角形との2D判定
 	static bool HitPointToSquare(int xp, int yp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) noexcept {
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.f), VGet(static_cast<float>(xp - x1), static_cast<float>(yp - y1), 0.f)).z) {
-			return false;
-		}
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2), 0.f), VGet(static_cast<float>(xp - x2), static_cast<float>(yp - y2), 0.f)).z) {
-			return false;
-		}
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3), 0.f), VGet(static_cast<float>(xp - x3), static_cast<float>(yp - y3), 0.f)).z) {
-			return false;
-		}
-		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x1 - x4), static_cast<float>(y1 - y4), 0.f), VGet(static_cast<float>(xp - x4), static_cast<float>(yp - y4), 0.f)).z) {
-			return false;
-		}
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1), 0.f), VGet(static_cast<float>(xp - x1), static_cast<float>(yp - y1), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2), 0.f), VGet(static_cast<float>(xp - x2), static_cast<float>(yp - y2), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3), 0.f), VGet(static_cast<float>(xp - x3), static_cast<float>(yp - y3), 0.f)).z) { return false; }
+		if (0 > Vector3DX::Cross(VGet(static_cast<float>(x1 - x4), static_cast<float>(y1 - y4), 0.f), VGet(static_cast<float>(xp - x4), static_cast<float>(yp - y4), 0.f)).z) { return false; }
 		return true;
 	}
 
@@ -115,14 +108,13 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 演算補助
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	//球と三角との判定
 	static bool GetHitSphereToTriangle(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Sphere_Triangle(pos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
-
 	//三角とカプセルとの判定
 	static bool GetHitCapsuleToTriangle(const Vector3DX& startpos, const Vector3DX& endpos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
@@ -147,7 +139,6 @@ namespace DXLibRef {
 	static Vector3DX GetMinPosSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) noexcept {
 		return Plane_Point_MinLength_Position(startpos.get(), endpos.get(), tgt.get());
 	}
-
 	//ランダム
 	static float GetRandf(float m_arg) noexcept { return -m_arg + static_cast<float>(GetRand(static_cast<int>(m_arg * 2.f * 10000.f))) / 10000.f; }
 	//線分同士の交差判定
@@ -161,7 +152,7 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->SegA_SegB_MinDist_Square <= (len * len));
 	}
-
+	//線分と三角との交差判定
 	static bool GetSegmenttoTriangle(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, const Vector3DX& SegmentBPos3, SEGMENT_TRIANGLE_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
@@ -173,7 +164,7 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->Seg_Tri_MinDist_Square <= (len * len));
 	}
-	//線分と点の最接近点情報を解析する
+	//線分と点との交差判定
 	static bool GetSegmenttoPoint(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& PointPos, SEGMENT_POINT_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
@@ -183,9 +174,15 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->Seg_Point_MinDist_Square <= (len * len));
 	}
-	//--------------------------------------------------------------------------------------------------
+	//ファイルが存在するかチェック
+	static bool IsFileExist(const char* Path) noexcept {
+		FILEINFO FileInfo;
+		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
+	}
+
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// IK
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	static void			IK_move_Arm(
 		const Vector3DX& Localyvec,
 		const Vector3DX& Localzvec,
@@ -271,13 +268,13 @@ namespace DXLibRef {
 			FrameBaseLocalMatWrist,
 			DirPos, Diryvec, Dirzvec);
 	}
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// カメラから画面上の座標を取得
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept;
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// ウィンドウアクティブチェック付きキー操作
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	static int CheckHitKeyWithCheck(int KeyCode) noexcept {
 		if (GetWindowActiveFlag()) {
 			return CheckHitKey(KeyCode);
@@ -303,9 +300,9 @@ namespace DXLibRef {
 			return 0;
 		}
 	}
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 描画
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	//縁ぬき四角
 	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
 		if (thickness == 1) {
@@ -913,40 +910,36 @@ namespace DXLibRef {
 		};
 		//箱
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
+		//マウスでクリックできるボタン
 		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
 		//文字
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
-
+		//文字の長さを取得
 		template <typename... Args>
 		extern void SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
-			if (String == "") {
-				return;
-			}
-			int xSize = (FontX == FontHandle::FontXCenter::LEFT) ? 0 : GetMsgLen(ySize, String, args...);//左揃えでは計算の必要がない
-			if (!GetMsgPosOn(&xp1, &yp1, ySize, xSize, FontX)) {
-				return;
-			}
-			// std::min(ySize / 6, 3)
+			if (String == "") { return; }
+			if (!GetMsgPosOn(&xp1, &yp1, ySize, GetMsgLen(ySize, String, args...), FontX)) { return; }
 			DrawControl::Instance()->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, ySize,
 				FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		};
-		//
+		//クリックできる文字付のボックス
 		template <typename... Args>
 		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, bool IsActive, std::string_view String, Args&&... args) noexcept {
 			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor, IsRepeat, IsActive);
 			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 			return ret;
 		};
+		//文字付のボックス
 		template <typename... Args>
 		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
 			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
 			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
 		};
-
+		//オンオフできるボタン
 		extern bool CheckBox(int xp1, int yp1, bool switchturn) noexcept;
-
+		//スライダー
 		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept;
-
+		// 0~valueMaxの選択制ボタン集
 		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) noexcept;
 		//
 		/*
@@ -1176,99 +1169,18 @@ namespace DXLibRef {
 			this->matbuf = MatBuf_t;
 		}
 	};
-	//軽量版
-	class movesLight {
-		Vector3DX pos;		//反映用座標
-		Vector3DX posbuf;	//演算用座標
-		Vector3DX repos;	//前フレームの座標
-		Vector3DX vec;		//加速
-		Vector3DX rot;		//回転
-		Vector3DX rotbuf;	//回転
-	public:
-		const auto&			GetPos(void) const noexcept { return pos; }
-		const auto&			GetRePos(void) const noexcept { return repos; }
-		const auto&			GetVec(void) const noexcept { return vec; }
-		Matrix3x3DX GetMat(void) const noexcept {
-			Matrix3x3DX Ret; Ret.SetRadian(rot.x, rot.y, rot.z);
-			return Ret;
-		}
-
-		const auto&			GetPosBuf(void) const noexcept { return posbuf; }//演算以外では使うな
-		auto		GetMatBuf(void) const noexcept {
-			Matrix3x3DX Ret; Ret.SetRadian(rotbuf.x, rotbuf.y, rotbuf.z);
-			return Ret;
-		}//演算以外では使うな
-	public:
-		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
-		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
-		void			SetMat(const Matrix3x3DX& tgt) noexcept { tgt.GetRadian(&this->rotbuf.x, &this->rotbuf.y, &this->rotbuf.z); }
-	public:
-		movesLight(void) noexcept {}
-		movesLight(const movesLight& tgt) noexcept { *this = tgt; }
-		movesLight(movesLight&& tgt) noexcept { *this = tgt; }
-		//movesLight& operator=(const movesLight&) = delete;
-		//movesLight& operator=(movesLight&& o) = delete;
-		~movesLight(void) noexcept {}
-
-		void			operator=(const movesLight& tgt) noexcept {
-			this->pos = tgt.pos;
-			this->posbuf = tgt.posbuf;
-			this->repos = tgt.repos;
-			this->vec = tgt.vec;
-			this->rot = tgt.rot;
-			this->rotbuf = tgt.rotbuf;
-		}
-		moves			GetMoves(void) const noexcept {
-			moves Ret;
-			Ret.SetAll(pos, posbuf, repos, vec, GetMat(), GetMatBuf());
-			return Ret;
-		}
-		void			SetByMoves(const moves& o) noexcept {
-			this->pos = o.GetPos();
-			this->posbuf = o.GetPosBuf();
-			this->repos = o.GetRePos();
-			this->vec = o.GetVec();
-			o.GetMat().GetRadian(&this->rot.x, &this->rot.y, &this->rot.z);
-			o.GetMatBuf().GetRadian(&this->rotbuf.x, &this->rotbuf.y, &this->rotbuf.z);
-		}
-	public:
-		auto LerpMove(const movesLight& o, float Per) const noexcept {
-			movesLight tmp;
-			tmp.pos = Lerp(this->pos, o.pos, Per);
-			tmp.posbuf = Lerp(this->posbuf, o.posbuf, Per);
-			tmp.repos = Lerp(this->repos, o.repos, Per);
-			tmp.vec = Lerp(this->vec, o.vec, Per);
-			tmp.rot = Lerp(this->rot, o.rot, Per);
-			tmp.rotbuf = Lerp(this->rotbuf, o.rotbuf, Per);
-			return tmp;
-		}
-	public:
-		void			Init(const Vector3DX& Pos_t, const Vector3DX& Vec_t, const Matrix3x3DX& Mat_t) noexcept {
-			this->pos = Pos_t;
-			this->posbuf = Pos_t;
-			this->repos = Pos_t;
-			this->vec = Vec_t;
-			Mat_t.GetRadian(&this->rot.x, &this->rot.y, &this->rot.z);
-			this->rotbuf = this->rot;
-		}
-		void			Update(float posper, float matper) noexcept {
-			Easing(&this->pos, this->posbuf, posper, EasingType::OutExpo);
-			this->repos = this->posbuf;
-			Easing(&this->rot, this->rotbuf, matper, EasingType::OutExpo);
-		}
-	};
 	//キー押し判定
 	class switchs {
 		bool		m_on{ false };//オンオフ判定
 		bool		m_press{ false };//オンオフ判定
 		bool		m_repeat{ false };//オンオフ判定
 		int8_t		m_presscount{ 0 };//プッシュ判定
-		float		m_repeatcount{ 30.f };//プッシュ判定
+		float		m_repeatcount{ FrameRate / 2.f };//プッシュ判定
 	public:
 		switchs(void) noexcept {
 			Set(false);
 			m_presscount = 0;
-			m_repeatcount = 30.f;
+			m_repeatcount = FrameRate / 2.f;
 			m_press = false;
 		};
 		~switchs(void) noexcept {}
@@ -1277,17 +1189,17 @@ namespace DXLibRef {
 		//更新
 		void			Execute(bool key) noexcept;
 		//オンオフの取得
-		bool on(void) const noexcept { return m_on; }
+		bool			on(void) const noexcept { return m_on; }
 		//押した瞬間
-		bool trigger(void) const noexcept { return m_press && (m_presscount == 1); }
+		bool			trigger(void) const noexcept { return m_press && (m_presscount == 1); }
 		//押している間
-		bool press(void) const noexcept { return m_press; }
-		//押している間
-		bool repeat(void) const noexcept { return m_repeat; }
+		bool			press(void) const noexcept { return m_press; }
+		//押している間(30F+2F毎)
+		bool			repeat(void) const noexcept { return m_repeat; }
 		//離した瞬間
-		bool release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
+		bool			release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
 		//離している間
-		bool release(void) const noexcept { return !m_press; }
+		bool			release(void) const noexcept { return !m_press; }
 	};
 	// 2次元振り子演算
 	class Pendulum2D {
@@ -1605,11 +1517,6 @@ namespace DXLibRef {
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
 	};
-	//シェーダーパラメーター
-	struct shaderparam {
-		bool			use{ false };
-		float			param[4]{ 0,0,0,0 };
-	};
 	//キューブマップ生成
 	class RealTimeCubeMap {
 	private:
@@ -1670,10 +1577,9 @@ namespace DXLibRef {
 		const auto&			GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
 	};
 
-
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 汎用セーブデータ
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	typedef std::pair<std::string, int64_t> SaveParam;
 	class SaveDataClass : public SingletonBase<SaveDataClass> {
 	private:
@@ -1747,10 +1653,9 @@ namespace DXLibRef {
 		}
 	};
 
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// サイドログ
-	//--------------------------------------------------------------------------------------------------
-
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class SideLog : public SingletonBase<SideLog> {
 	private:
 		friend class SingletonBase<SideLog>;
@@ -1811,9 +1716,9 @@ namespace DXLibRef {
 		void Draw(void) noexcept;
 	};
 
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// ポップアップ
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class PopUp : public SingletonBase<PopUp> {
 	private:
 		friend class SingletonBase<PopUp>;
@@ -1890,9 +1795,9 @@ namespace DXLibRef {
 		}
 	};
 
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// PCの情報を走査
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class CheckPCSpec {
 		struct MatchScore {
 			std::string		m_Name;
@@ -2065,187 +1970,191 @@ namespace DXLibRef {
 		}
 	};
 
-	//--------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 統一UI
-	//--------------------------------------------------------------------------------------------------
-	enum class EnumUIPartsType :int {
-		Zero = 0,
-		Box = Zero,
-		Msg,
-		Max,
-	};
-	static const char* g_UIPartsString[static_cast<int>(EnumUIPartsType::Max)] = {
-		"Box",
-		"Msg",
-	};
-	enum class LerpType : size_t {
-		linear,
-		pow2,
-		Max
-	};
-	static const char* g_LerpTypeStr[static_cast<int>(LerpType::Max)] = {
-		"linear",
-		"pow2",
-	};
-
-	static const int g_UIColorPalletNum = 13;
-	static const unsigned int g_UIColorPallet[g_UIColorPalletNum] = {
-		Red,
-		Green,
-		DarkGreen,
-		Blue,
-		Yellow,
-		WhiteSel,
-		White,
-		Gray15,
-		Gray25,
-		Gray50,
-		Gray65,
-		Gray75,
-		Black,
-	};
-	static const char* g_UIColorPalletString[g_UIColorPalletNum] = {
-		"Red",
-		"Green",
-		"DarkGreen",
-		"Blue",
-		"Yellow",
-		"WhiteSel",
-		"White",
-		"Gray15",
-		"Gray25",
-		"Gray50",
-		"Gray65",
-		"Gray75",
-		"Black",
-	};
-	enum class UIXCenter : int {
-		LEFT,
-		MIDDLE,
-		RIGHT,
-	};
-	static const char* g_UIXCenterString[] = {
-		"Left",
-		"Middle",
-		"Right",
-	};
-	enum class UIYCenter : int {
-		TOP,
-		MIDDLE,
-		BOTTOM,
-	};
-	static const char* g_UIYCenterString[] = {
-		"Top",
-		"Middle",
-		"Bottom",
-	};
-
-	class UISystem : public SingletonBase<UISystem> {
-	private:
-		friend class SingletonBase<UISystem>;
-	private:
-		struct FrameInfo {
-			int			m_framepoint{ 0 };	//前回～現在のフレーム数
-			float		m_Alpha{ 1.f };		//上記のフレーム数の段階でのXXX
-			float		m_XScale{ 1.f };
-			float		m_YScale{ 1.f };
-			float		m_XOfs{ 0.f };
-			float		m_YOfs{ 0.f };
-			float		m_ZRotOfs{ 0.f };
-			LerpType	m_LerpType{ LerpType::linear };//前フレームとのつなぎ方
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	namespace UniversalUI {
+		enum class EnumUIPartsType :int {
+			Zero = 0,
+			Box = Zero,
+			Msg,
+			Max,
 		};
-		class UI_CommonParts {
-		private://固定のパラメーター類
-			int				m_UniqueID{ 0 };
-			std::string		m_Name{};
-
-			EnumUIPartsType	m_EnumUIPartsType{ EnumUIPartsType::Zero };
-			int				m_Layer{ 0 };
-			//
-			bool			m_IsMouseClickActive{ false };
-			//
-			int				m_XPos{ 0 };
-			int				m_YPos{ 0 };
-			int				m_XSize{ 0 };
-			int				m_YSize{ 0 };
-			float			m_ZRotate{ 0.f };
-			UIXCenter		m_UIXCenter{ UIXCenter::LEFT };
-			UIYCenter		m_UIYCenter{ UIYCenter::TOP };
-			//
-			unsigned int	m_PressColor{ Gray25 };
-			unsigned int	m_IntoColor{ White };
-			unsigned int	m_BaseColor{ Black };
-			unsigned int	m_EdgeColor{ Gray75 };
-			//
-			int				m_TextID{ 0 };
-		private://変動する値
-			bool			m_MouseOver{ false };
-			bool			m_MousePress{ false };
-			int				m_DrawXCenter{ 0 };
-			int				m_DrawYCenter{ 0 };
-		public://外からいじられるもの
-			FrameInfo					m_FrameInfo{};
-			std::array<std::string, 3>	m_TextEX0{};
-		public:
-			const auto&			GetUniqueID(void) const noexcept { return m_UniqueID; }
-			const auto&			GetName(void) const noexcept { return m_Name; }
-			const auto&			GetLayer(void) const noexcept { return m_Layer; }
-
-			const auto&			GetMousePress(void) const noexcept { return m_MousePress; }
-		public:
-			void SetUniqueID(int value) noexcept { m_UniqueID = value; }
-			void SetFrameInfo(const FrameInfo& value) noexcept { m_FrameInfo = value; }
-		public:
-			void SetParts(const nlohmann::json& pJson) noexcept;
-			void Update(void) noexcept;
-			void Draw(void) noexcept;
+		static const char* g_UIPartsString[static_cast<int>(EnumUIPartsType::Max)] = {
+			"Box",
+			"Msg",
 		};
-		class UI_CommonAnimes {
-		private://固定のパラメーター類
-			std::vector<int> m_TargetID{};//対照のパーツ
-			std::vector<FrameInfo> m_AnimeFrame{};
-		private://変動する値
-			int m_NowAnim{ 0 };
-		public://外からいじられるもの
-			int m_Frame{ 0 };
-		public:
-		public:
-			void SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept;
-			void Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept;
+		enum class LerpType : size_t {
+			linear,
+			pow2,
+			Max
+		};
+		static const char* g_LerpTypeStr[static_cast<int>(LerpType::Max)] = {
+			"linear",
+			"pow2",
 		};
 
-		class UI_OneLayer {
+		static const int g_UIColorPalletNum = 13;
+		static const unsigned int g_UIColorPallet[g_UIColorPalletNum] = {
+			Red,
+			Green,
+			DarkGreen,
+			Blue,
+			Yellow,
+			WhiteSel,
+			White,
+			Gray15,
+			Gray25,
+			Gray50,
+			Gray65,
+			Gray75,
+			Black,
+		};
+		static const char* g_UIColorPalletString[g_UIColorPalletNum] = {
+			"Red",
+			"Green",
+			"DarkGreen",
+			"Blue",
+			"Yellow",
+			"WhiteSel",
+			"White",
+			"Gray15",
+			"Gray25",
+			"Gray50",
+			"Gray65",
+			"Gray75",
+			"Black",
+		};
+		enum class UIXCenter : int {
+			LEFT,
+			MIDDLE,
+			RIGHT,
+		};
+		static const char* g_UIXCenterString[] = {
+			"Left",
+			"Middle",
+			"Right",
+		};
+		enum class UIYCenter : int {
+			TOP,
+			MIDDLE,
+			BOTTOM,
+		};
+		static const char* g_UIYCenterString[] = {
+			"Top",
+			"Middle",
+			"Bottom",
+		};
+
+		class UISystem : public SingletonBase<UISystem> {
 		private:
-			std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
-			std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
-			int UniqueIDNum{ InvalidID };
-			bool m_IsEnd{ false };//アニメーション側からの終了命令
+			friend class SingletonBase<UISystem>;
+		private:
+			struct FrameInfo {
+				int			m_framepoint{ 0 };	//前回～現在のフレーム数
+				float		m_Alpha{ 1.f };		//上記のフレーム数の段階でのXXX
+				float		m_XScale{ 1.f };
+				float		m_YScale{ 1.f };
+				float		m_XOfs{ 0.f };
+				float		m_YOfs{ 0.f };
+				float		m_ZRotOfs{ 0.f };
+				LerpType	m_LerpType{ LerpType::linear };//前フレームとのつなぎ方
+			};
+			class UI_CommonParts {
+			private://固定のパラメーター類
+				int				m_UniqueID{ 0 };
+				std::string		m_Name{};
+
+				EnumUIPartsType	m_EnumUIPartsType{ EnumUIPartsType::Zero };
+				int				m_Layer{ 0 };
+				//
+				bool			m_IsMouseClickActive{ false };
+				//
+				int				m_XPos{ 0 };
+				int				m_YPos{ 0 };
+				int				m_XSize{ 0 };
+				int				m_YSize{ 0 };
+				float			m_ZRotate{ 0.f };
+				UIXCenter		m_UIXCenter{ UIXCenter::LEFT };
+				UIYCenter		m_UIYCenter{ UIYCenter::TOP };
+				//
+				unsigned int	m_PressColor{ Gray25 };
+				unsigned int	m_IntoColor{ White };
+				unsigned int	m_BaseColor{ Black };
+				unsigned int	m_EdgeColor{ Gray75 };
+				//
+				int				m_TextID{ 0 };
+			private://変動する値
+				bool			m_MouseOver{ false };
+				bool			m_MousePress{ false };
+				int				m_DrawXCenter{ 0 };
+				int				m_DrawYCenter{ 0 };
+			public://外からいじられるもの
+				FrameInfo					m_FrameInfo{};
+				std::array<std::string, 3>	m_TextEX0{};
+			public:
+				const auto& GetUniqueID(void) const noexcept { return m_UniqueID; }
+				const auto& GetName(void) const noexcept { return m_Name; }
+				const auto& GetLayer(void) const noexcept { return m_Layer; }
+
+				const auto& GetMousePress(void) const noexcept { return m_MousePress; }
+			public:
+				void SetUniqueID(int value) noexcept { m_UniqueID = value; }
+				void SetFrameInfo(const FrameInfo& value) noexcept { m_FrameInfo = value; }
+			public:
+				void SetParts(const nlohmann::json& pJson) noexcept;
+				void Update(void) noexcept;
+				void Draw(void) noexcept;
+			};
+			class UI_CommonAnimes {
+			private://固定のパラメーター類
+				std::vector<int> m_TargetID{};//対照のパーツ
+				std::vector<FrameInfo> m_AnimeFrame{};
+			private://変動する値
+				int m_NowAnim{ 0 };
+			public://外からいじられるもの
+				int m_Frame{ 0 };
+			public:
+			public:
+				void SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept;
+				void Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept;
+			};
+
+			class UI_OneLayer {
+			private:
+				std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
+				std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
+				int UniqueIDNum{ InvalidID };
+				bool m_IsEnd{ false };//アニメーション側からの終了命令
+			public:
+				auto IsActive(void) const noexcept { return UniqueIDNum != InvalidID; }
+			public:
+				void Load(const char* path) noexcept;
+				void Update(void) noexcept;
+				void Draw(void) noexcept;
+				void Dispose(void) noexcept;
+			};
+		private:
+			std::array<UI_OneLayer, 5> m_Layer;
 		public:
-			auto IsActive(void) const noexcept { return UniqueIDNum != InvalidID; }
+			UISystem(void) noexcept {}
+			UISystem(const UISystem&) = delete;
+			UISystem(UISystem&& o) = delete;
+			UISystem& operator=(const UISystem&) = delete;
+			UISystem& operator=(UISystem&& o) = delete;
+			~UISystem(void) noexcept {}
 		public:
-			void Load(const char* path) noexcept;
+			int AddUI(const char* path) noexcept;
+			void DelUI(int layer) noexcept;
+
 			void Update(void) noexcept;
 			void Draw(void) noexcept;
-			void Dispose(void) noexcept;
+			void DisposeAll(void) noexcept;
 		};
-	private:
-		std::array<UI_OneLayer, 5> m_Layer;
-	public:
-		UISystem(void) noexcept {}
-		UISystem(const UISystem&) = delete;
-		UISystem(UISystem&& o) = delete;
-		UISystem& operator=(const UISystem&) = delete;
-		UISystem& operator=(UISystem&& o) = delete;
-		~UISystem(void) noexcept {}
-	public:
-		int AddUI(const char* path) noexcept;
-		void DelUI(int layer) noexcept;
-
-		void Update(void) noexcept;
-		void Draw(void) noexcept;
-		void DisposeAll(void) noexcept;
-	};
-	//
+	}
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	// カメラシェイク
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class CameraShake : public SingletonBase<CameraShake> {
 	private:
 		friend class SingletonBase<CameraShake>;
@@ -2275,12 +2184,6 @@ namespace DXLibRef {
 	public:
 		void Update(void) noexcept;
 	};
-
-	//ファイルが存在するか
-	static bool IsFileExist(const char* Path) noexcept {
-		FILEINFO FileInfo;
-		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
-	}
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*UDP通信																																	*/

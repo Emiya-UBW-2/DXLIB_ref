@@ -32,7 +32,7 @@ namespace DXLibRef {
 		ObjectManager::Create();
 		SideLog::Create();
 		PopUp::Create();
-		UISystem::Create();
+		UniversalUI::UISystem::Create();
 		CameraShake::Create();
 
 		auto* SE = SoundPool::Instance();
@@ -95,7 +95,7 @@ namespace DXLibRef {
 	void DXLib_ref::DrawUICommon(void) const noexcept {
 		DrawPause();
 		DrawFPSCounter();
-		UISystem::Instance()->Draw();
+		UniversalUI::UISystem::Instance()->Draw();
 		PadControl::Instance()->Draw();
 		SideLog::Instance()->Draw();
 		PopUp::Instance()->Draw(UIWidth / 2, UIHeight / 2);
@@ -227,7 +227,7 @@ namespace DXLibRef {
 				DebugParts->SetStartPoint();
 #endif // DEBUG
 				Pad->Update();
-				UISystem::Instance()->Update();
+				UniversalUI::UISystem::Instance()->Update();
 				auto SelEnd = !NowScene->Update();		//更新
 				OptionWindowParts->Update();
 				DrawParts->Update();

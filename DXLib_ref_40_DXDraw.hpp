@@ -59,6 +59,10 @@ namespace DXLibRef {
 			void SetActive(void) noexcept;
 			bool UpdateActive(void) noexcept;
 		};
+		struct shaderparam {
+			bool			use{ false };
+			float			param[4]{ 0,0,0,0 };
+		};
 	private:
 		int							m_DispXSize{ deskx };
 		int							m_DispYSize{ desky };
@@ -147,12 +151,6 @@ namespace DXLibRef {
 			//DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
-			/*
-			if (SetProcessDPIAware() != 0) {
-				auto hdc = GetDC(nullptr);         // カレントのスクリーン全体のデバイスコンテキスト取得.
-				DPI = GetDeviceCaps(hdc, LOGPIXELSY);
-			}
-			//*/
 			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
 		}
 	private:
