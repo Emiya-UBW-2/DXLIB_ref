@@ -45,7 +45,8 @@ namespace DXLibRef {
 				m_Point[0][static_cast<std::size_t>(index)] = m_Point[0][m_PointSel - 1];
 			}
 			if (index == PointMax) {
-				m_Point[0][static_cast<std::size_t>(index)] = 1000.0f / GetFPS();
+				auto* DrawParts = DXDraw::Instance();
+				m_Point[0][static_cast<std::size_t>(index)] = 1000.0f / DrawParts->GetFps();
 			}
 
 			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {

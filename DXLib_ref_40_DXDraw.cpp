@@ -873,7 +873,7 @@ namespace DXLibRef {
 		Update_effect_was = GetNowHiPerformanceCount();
 	}
 	void			DXDraw::FirstExecute(void) noexcept {
-		m_FPS = std::max(GetFPS(), 30.f);
+		m_FPS = std::max((1000.f * 1000.f) / static_cast<float>(GetNowHiPerformanceCount() - m_StartTime), 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
 	}
 	void			DXDraw::Update(void) noexcept {
