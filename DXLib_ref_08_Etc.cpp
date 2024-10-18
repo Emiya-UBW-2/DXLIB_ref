@@ -159,7 +159,7 @@ namespace DXLibRef {
 			m_BufferScreen.Make(UIWidth, UIHeight, true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
-			return HitRectangleToRectangle(0, 0, ScreenWidth, ScreenHeight, std::max(x1, x2), std::max(y1, y2), std::min(x1, x2), std::min(y1, y2));
+			return HitRectangleToRectangle(0, 0, ScreenWidth, ScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
 		}
 		// ” 
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {

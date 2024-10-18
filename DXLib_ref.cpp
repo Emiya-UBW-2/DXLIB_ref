@@ -111,6 +111,7 @@ namespace DXLibRef {
 		if (m_IsFirstBoot) {
 			DrawParts->FirstBootSetting();
 			StartMe();
+			return false;
 		}
 		else {
 			DrawParts->Init();
