@@ -410,7 +410,7 @@ namespace DXLibRef {
 		if (av.sqrMagnitude() < 0.0000001f) {
 			av = Vector3DX::right();
 		}
-		float rad = Vector3DX::Angle(In1, In2);
+		float rad = VRad(In1.get(), In2.get());
 		return M33GetRotAxis(av, rad);
 	}
 	// ‹ts—ñ‚ð“¾‚é

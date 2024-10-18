@@ -152,6 +152,7 @@ namespace DXLibRef {
 		void			SetMaterialSpcColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialSpcColor(DXHandle::get(), p1, color); }
 		void			SetMaterialAmbColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialAmbColor(DXHandle::get(), p1, color); }
 		void			SetMaterialSpcPower(int p1, float power) const noexcept { MV1SetMaterialSpcPower(DXHandle::get(), p1, power); }
+		void			SetMaterialDrawAddColorAll(int r, int g, int b) const noexcept { MV1SetMaterialDrawAddColorAll(DXHandle::get(), r, g, b); }
 		void			SaveModelToMV1File(std::basic_string_view<TCHAR> FileName) const noexcept { MV1SaveModelToMV1FileWithStrLen(DXHandle::get(), FileName.data(), FileName.length()); }
 		void			SetPrioritizePhysicsOverAnimFlag(bool p1) const noexcept { MV1SetPrioritizePhysicsOverAnimFlag(DXHandle::get(), p1 ? TRUE : FALSE); }
 
@@ -180,6 +181,10 @@ namespace DXLibRef {
 		auto			SetupCollInfo(int x = 32, int y = 8, int z = 32, int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1SetupCollInfo(DXHandle::get(), frame, x, y, z, mesh) == 0;
 		}
+		auto			TerminateCollInfo(int frame = InvalidID, int mesh = InvalidID) const noexcept {
+			return MV1TerminateCollInfo(DXHandle::get(),frame, mesh) == 0;
+		}
+
 		auto			RefreshCollInfo(int frame = InvalidID, int mesh = InvalidID) const noexcept {
 			return MV1RefreshCollInfo(DXHandle::get(), frame, mesh) == 0;
 		}
