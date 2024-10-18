@@ -2,9 +2,9 @@
 
 namespace DXLibRef {
 	const SceneControl* SingletonBase<SceneControl>::m_Singleton = nullptr;
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 
 	void TEMPSCENE::CubeMapDraw(void) noexcept {
 		if (!Get3DActive()) { return; }
@@ -28,7 +28,7 @@ namespace DXLibRef {
 	}
 
 	void TEMPSCENE::Draw3DVR(std::function<void()> doingUI) noexcept {
-		//‰æ–Ê‚É”½‰f
+		// ‰æ–Ê‚É”½‰f
 		auto* DrawParts = DXDraw::Instance();
 		DrawParts->Draw3DVR(
 			[this]() { BG_Draw_Sub(); },
@@ -38,7 +38,7 @@ namespace DXLibRef {
 			[this]() { MainDrawFront_Sub(); },
 			[&]() {
 				DrawUI_Base_Sub();
-				//’Ç‰Á‚Ì•`‰æ•¨
+				// ’Ç‰Á‚Ì•`‰æ•¨
 				doingUI();
 			},
 			[this]() {
@@ -49,9 +49,9 @@ namespace DXLibRef {
 	}
 
 	void TEMPSCENE::Draw3D(std::function<void()> doingUI) noexcept {
-		//‰æ–Ê‚É”½‰f
+		// ‰æ–Ê‚É”½‰f
 		auto* DrawParts = DXDraw::Instance();
-		//•`‰æ
+		// •`‰æ
 		DrawParts->Draw3DMain(
 			[this]() { BG_Draw_Sub(); },
 			[this]() { SetShadowDraw_Rigid_Sub(); },
@@ -59,10 +59,10 @@ namespace DXLibRef {
 			[this]() { MainDraw_Sub(); },
 			[this]() { MainDrawFront_Sub(); },
 			DrawParts->GetMainCamera());
-		//ƒfƒBƒXƒvƒŒƒC•`‰æ
+		// ƒfƒBƒXƒvƒŒƒC•`‰æ
 		DrawParts->DrawFlipDisplay([&]() {
 			DrawUI_Base_Sub();
-			//’Ç‰Á‚Ì•`‰æ•¨
+			// ’Ç‰Á‚Ì•`‰æ•¨
 			doingUI();
 			DrawUI_In_Sub();
 			WindowSystem::DrawControl::Instance()->Draw();
@@ -71,12 +71,12 @@ namespace DXLibRef {
 
 	void TEMPSCENE::Draw2D(std::function<void()> doingUI) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		//•`‰æ
+		// •`‰æ
 		DrawParts->Draw2DMain([this]() { MainDraw_Sub(); });
-		//ƒfƒBƒXƒvƒŒƒC•`‰æ
+		// ƒfƒBƒXƒvƒŒƒC•`‰æ
 		DrawParts->DrawFlipDisplay([&]() {
 			DrawUI_Base_Sub();
-			//’Ç‰Á‚Ì•`‰æ•¨
+			// ’Ç‰Á‚Ì•`‰æ•¨
 			doingUI();
 			DrawUI_In_Sub();
 			WindowSystem::DrawControl::Instance()->Draw();
@@ -87,7 +87,7 @@ namespace DXLibRef {
 		FillGraph(GetDrawScreen(), 192, 192, 192);
 	}
 
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 };

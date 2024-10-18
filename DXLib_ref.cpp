@@ -9,25 +9,25 @@ namespace DXLibRef {
 		SaveDataClass::Create();
 		auto* SaveDataParts = SaveDataClass::Instance();
 		auto* OptionParts = OPTION::Instance();
-		//ロード
+		// ロード
 		m_IsFirstBoot = !SaveDataParts->Load();
 		if (m_IsFirstBoot) {
-			//初回データ作成
+			// 初回データ作成
 			SaveDataParts->Save();
 			OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 		}
-		DXDraw::Create();						//汎用
-		//
-#ifdef DEBUG
+		DXDraw::Create();						// 汎用
+		// 
+#if defined(DEBUG)
 		DebugClass::Create();
 #endif // DEBUG
-#ifdef _USE_EFFEKSEER_
-		EffectResource::Create();						//エフェクト
+#if defined(_USE_EFFEKSEER_)
+		EffectResource::Create();						// エフェクト
 #endif
-		SoundPool::Create();							//サウンド
+		SoundPool::Create();							// サウンド
 		BGMPool::Create();
 		FontPool::Create();
-		PadControl::Create();							//キー
+		PadControl::Create();							// キー
 		OptionWindowClass::Create();
 		ObjectManager::Create();
 		SideLog::Create();
@@ -42,7 +42,7 @@ namespace DXLibRef {
 		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 	}
-	//
+	// 
 	void DXLib_ref::UpdatePause(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		m_PauseFlashCount += 1.f / DrawParts->GetFps();
@@ -56,11 +56,11 @@ namespace DXLibRef {
 			return;
 		}
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		//
+		// 
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
 		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, UIWidth, UIHeight, Black, TRUE);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-		//
+		// 
 		if (m_PauseFlashCount > 0.5f) {
 			WindowSystem::SetMsg(DrawParts->GetUIY(16), DrawParts->GetUIY(16) + DrawParts->GetUIY(36) / 2, DrawParts->GetUIY(36), FontHandle::FontXCenter::LEFT, Green, Black, "Pause");
 		}
@@ -79,7 +79,7 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		auto color = White;
-		//十分！
+		// 十分！
 		if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
 			color = Green;
 		}
@@ -99,12 +99,12 @@ namespace DXLibRef {
 		PadControl::Instance()->Draw();
 		SideLog::Instance()->Draw();
 		PopUp::Instance()->Draw(UIWidth / 2, UIHeight / 2);
-#ifdef DEBUG
+#if defined(DEBUG)
 		auto* DrawParts = DXDraw::Instance();
 		DebugClass::Instance()->DebugWindow(UIWidth - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
 #endif // DEBUG
 	}
-	//
+	// 
 	bool DXLib_ref::StartLogic(void) const noexcept {
 		WindowSystem::DrawControl::Create();
 		auto* DrawParts = DXDraw::Instance();
@@ -126,19 +126,19 @@ namespace DXLibRef {
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
-#ifdef DEBUG
-		auto* DebugParts = DebugClass::Instance();		//デバッグ
+#if defined(DEBUG)
+		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
-		//最初の読み込み
+		// 最初の読み込み
 		auto& NowScene = SceneParts->GetNowScene();
-		//繰り返し
+		// 繰り返し
 		while (true) {
 			NowScene->Load();
 			{
-				SetUseMaskScreenFlag(FALSE);//←一部画面でエフェクトが出なくなるため入れる
-				//カメラの初期設定
+				SetUseMaskScreenFlag(FALSE);// ←一部画面でエフェクトが出なくなるため入れる
+				// カメラの初期設定
 				DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
-				//環境光と影の初期化
+				// 環境光と影の初期化
 				DrawParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
 				NowScene->Set();
 				Pad->SetGuideUpdate();
@@ -146,7 +146,7 @@ namespace DXLibRef {
 			InitFPSCounter();
 			while (true) {
 				if (!(ProcessMessage() == 0)) { return false; }
-#ifdef DEBUG
+#if defined(DEBUG)
 				clsDx();
 #endif // DEBUG
 				WindowSystem::DrawControl::Instance()->ClearList();
@@ -158,14 +158,14 @@ namespace DXLibRef {
 							auto* DrawParts = DXDraw::Instance();
 							auto* LocalizeParts = LocalizePool::Instance();
 							int xp1, yp1;
-							//タイトル
+							// タイトル
 							{
 								xp1 = xmin + DrawParts->GetUIY(24);
 								yp1 = ymin + LineHeight;
 
 								WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 							}
-							//
+							// 
 							{
 								xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
 								yp1 = ymax - LineHeight * 3;
@@ -192,14 +192,14 @@ namespace DXLibRef {
 							auto* DrawParts = DXDraw::Instance();
 							auto* LocalizeParts = LocalizePool::Instance();
 							int xp1, yp1;
-							//タイトル
+							// タイトル
 							{
 								xp1 = xmin + DrawParts->GetUIY(24);
 								yp1 = ymin + LineHeight;
 
 								WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 							}
-							//
+							// 
 							{
 								xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
 								yp1 = ymax - LineHeight * 3;
@@ -223,12 +223,12 @@ namespace DXLibRef {
 				if (m_IsEnd) {
 					return false;
 				}
-#ifdef DEBUG
+#if defined(DEBUG)
 				DebugParts->SetStartPoint();
 #endif // DEBUG
 				Pad->Update();
 				UniversalUI::UISystem::Instance()->Update();
-				auto SelEnd = !NowScene->Update();		//更新
+				auto SelEnd = !NowScene->Update();		// 更新
 				OptionWindowParts->Update();
 				DrawParts->Update();
 				CameraShake::Instance()->Update();
@@ -236,16 +236,16 @@ namespace DXLibRef {
 				PopUpParts->Update();
 				UpdatePause();
 				UpdateFPSCounter();
-				//キューブマップをセット
+				// キューブマップをセット
 				NowScene->CubeMapDraw();
-				//影をセット
+				// 影をセット
 				NowScene->ShadowDraw_Far();
 				NowScene->ShadowDraw();
-				//描画
-#ifdef DEBUG
+				// 描画
+#if defined(DEBUG)
 				DebugParts->SetPoint("-----DrawStart-----");
 #endif // DEBUG
-				//画面に反映
+				// 画面に反映
 				if (NowScene->Get3DActive()) {
 					if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 						NowScene->Draw3DVR([this]() {DrawUICommon(); });
@@ -257,17 +257,17 @@ namespace DXLibRef {
 				else {
 					NowScene->Draw2D([this]() {DrawUICommon(); });
 				}
-				//デバッグ
-#ifdef DEBUG
+				// デバッグ
+#if defined(DEBUG)
 				DebugParts->SetEndPoint();
 #endif // DEBUG
-				//画面の反映
+				// 画面の反映
 				DrawParts->Screen_Flip();
 				if (SelEnd) {
 					break;
 				}
 			}
-			//次のシーンへ移行
+			// 次のシーンへ移行
 			SceneParts->NextScene();
 			Pad->Dispose();
 		}

@@ -76,7 +76,7 @@ namespace DXLibRef {
 		Float,
 		Else,
 	};
-	//
+	// 
 	static const int DirectXVerID[] = {
 		DX_DIRECT3D_9EX,
 		DX_DIRECT3D_11,
@@ -275,8 +275,8 @@ namespace DXLibRef {
 		public:
 			float selanim{ 0.f };
 		public:
-			const auto&			GetName(void) const noexcept { return m_Name; }
-			const auto&			GetInfoTextID(void) const noexcept { return m_Info; }
+			const auto& GetName(void) const noexcept { return m_Name; }
+			const auto& GetInfoTextID(void) const noexcept { return m_Info; }
 
 			void GetLeftPush(void) const noexcept { m_LeftPush(); }
 			void GetRightPush(void) const noexcept { m_RightPush(); }
@@ -307,7 +307,7 @@ namespace DXLibRef {
 		protected:
 			virtual void Init_Sub(void) noexcept {}
 		public:
-			const auto&			GetID(void) const noexcept { return m_id; }
+			const auto& GetID(void) const noexcept { return m_id; }
 		public:
 			OptionTabsInfo(void) noexcept {}
 			virtual ~OptionTabsInfo(void) noexcept {}
@@ -390,7 +390,7 @@ namespace DXLibRef {
 			}
 			return false;
 		}
-		const auto&			IsActive(void) const noexcept { return m_Active; }
+		const auto& IsActive(void) const noexcept { return m_Active; }
 	private:
 		OptionWindowClass(void) noexcept {}
 		OptionWindowClass(const OptionWindowClass&) = delete;

@@ -84,25 +84,25 @@ namespace DXLibRef {
 
 		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{ GetColorF(0, 0, 0, 0) };
-		Camera3DInfo				m_MainCamera;							//カメラ
-		//カメラシェイク
-		//
+		Camera3DInfo				m_MainCamera;							// カメラ
+		// カメラシェイク
+		// 
 		float						m_AberrationPower{ 1.f };
-		//
+		// 
 		bool						m_IsExitSelect{ false };
 		bool						m_IsRestartSelect{ false };
 
 		std::array<shaderparam, 2>	m_Shader2D;
-		LONGLONG					Update_effect_was = 0;					//エフェクトのアップデートタイミングタイマー
+		LONGLONG					Update_effect_was = 0;					// エフェクトのアップデートタイミングタイマー
 
 		bool						m_IsCubeMap{ true };
 		RealTimeCubeMap				m_RealTimeCubeMap;
 
 		CheckPCSpec					m_CheckPCSpec;
 		ShaderUseClass				m_PBR_Shader;
-	public://ゲッター
-		const auto&		is_lens(void) const noexcept { return m_Shader2D[0].use; }
-		const auto&		zoom_lens(void) const noexcept { return m_Shader2D[0].param[3]; }
+	public:// ゲッター
+		const auto& is_lens(void) const noexcept { return m_Shader2D[0].use; }
+		const auto& zoom_lens(void) const noexcept { return m_Shader2D[0].param[3]; }
 		void			Set_is_lens(bool value) noexcept { m_Shader2D[0].use = value; }
 		void			Set_xp_lens(float value) noexcept { m_Shader2D[0].param[0] = value; }
 		void			Set_yp_lens(float value) noexcept { m_Shader2D[0].param[1] = value; }
@@ -110,37 +110,37 @@ namespace DXLibRef {
 		void			Set_zoom_lens(float value) noexcept { m_Shader2D[0].param[3] = value; }
 		void			Set_is_Blackout(bool value) noexcept { m_Shader2D[1].use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_Shader2D[1].param[0] = value; }
-		const auto&		GetLensParam(void) const noexcept { return m_Shader2D[0]; }
-		const auto&		GetBlackoutParam(void) const noexcept { return m_Shader2D[1]; }
+		const auto& GetLensParam(void) const noexcept { return m_Shader2D[0]; }
+		const auto& GetBlackoutParam(void) const noexcept { return m_Shader2D[1]; }
 
-		const auto&		GetLightVec(void) const noexcept { return m_LightVec; }
-		//UI以外のスクリーン空間
+		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
+		// UI以外のスクリーン空間
 		const auto		GetScreenX(int value) const noexcept { return value * this->m_ScreenXSize / BaseScreenWidth; }
 		const auto		GetScreenY(int value) const noexcept { return value * this->m_ScreenYSize / BaseScreenHeight; }
-		//UI以外のスクリーン空間(1920,1080の場合)
-		const auto&		GetScreenXMax(void) const noexcept { return this->m_ScreenXSize; }
-		const auto&		GetScreenYMax(void) const noexcept { return this->m_ScreenYSize; }
-		//UI用
+		// UI以外のスクリーン空間(1920,1080の場合)
+		const auto& GetScreenXMax(void) const noexcept { return this->m_ScreenXSize; }
+		const auto& GetScreenYMax(void) const noexcept { return this->m_ScreenYSize; }
+		// UI用
 		const auto		GetUIX(int value) const noexcept { return value * this->m_DispXSize / BaseScreenWidth; }
 		const auto		GetUIY(int value) const noexcept { return value * this->m_DispYSize / BaseScreenHeight; }
-		//UI用(1920,1080の場合)
-		const auto&		GetUIXMax(void) const noexcept { return this->m_DispXSize; }
-		const auto&		GetUIYMax(void) const noexcept { return this->m_DispYSize; }
-		//
+		// UI用(1920,1080の場合)
+		const auto& GetUIXMax(void) const noexcept { return this->m_DispXSize; }
+		const auto& GetUIYMax(void) const noexcept { return this->m_DispYSize; }
+		// 
 		void			GetMousePosition(int* MouseX, int* MouseY) const noexcept;
-		const auto&		GetFps(void) const noexcept { return m_FPS; }
-		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
-		const auto&		IsExit(void) const noexcept { return m_IsExitSelect; }
-		const auto&		IsRestart(void) const noexcept { return m_IsRestartSelect; }
+		const auto& GetFps(void) const noexcept { return m_FPS; }
+		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
+		const auto& IsExit(void) const noexcept { return m_IsExitSelect; }
+		const auto& IsRestart(void) const noexcept { return m_IsRestartSelect; }
 		const auto		IsPause(void) const noexcept { return m_PauseActive.on(); }
-		const auto&		GetMainCamera(void) const noexcept { return m_MainCamera; }
-		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
-		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
+		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
+		const auto& GetAberrationPower(void) const noexcept { return m_AberrationPower; }
+		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 	public:
 		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
 		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
 		void			SetPause(bool value) noexcept;
-		auto&			SetMainCamera(void) noexcept { return m_MainCamera; }
+		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
@@ -148,14 +148,14 @@ namespace DXLibRef {
 		void			SetWindowOrBorderless(void) noexcept;
 		bool			UpdateShadowActive(void) noexcept;
 		void			UpdateWindowSize(void)noexcept {
-			//DPI設定
+			// DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
 			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
 		}
 	private:
 		void			DrawByPBR(std::function<void()> doing) noexcept;
-	private://コンストラクタ
+	private:// コンストラクタ
 		DXDraw(void) noexcept;
 		DXDraw(const DXDraw&) = delete;
 		DXDraw(DXDraw&& o) = delete;
@@ -188,12 +188,12 @@ namespace DXLibRef {
 		void			Draw2DMain(std::function<void()> doing) noexcept;
 		void			DrawFlipDisplay(std::function<void()> doingUI) const noexcept;
 		bool			Screen_Flip(void) noexcept;
-		//VR
+		// VR
 	private:
 		class VRControl;
-		VRControl*			m_VRControl{ nullptr };
-		VRControl*			GetVRControl(void) noexcept { return m_VRControl; }
-		const VRControl*	GetVRControl(void) const noexcept { return m_VRControl; }
+		VRControl* m_VRControl{ nullptr };
+		VRControl* GetVRControl(void) noexcept { return m_VRControl; }
+		const VRControl* GetVRControl(void) const noexcept { return m_VRControl; }
 	public:
 		void				Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX* mat) noexcept;
 		void				Reset_VR_HMD(void) noexcept;
@@ -203,6 +203,6 @@ namespace DXLibRef {
 		bool				Get_VR_Hand2PadPress(VR_PAD) const noexcept;
 		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
 		Vector3DX			Get_VR_Hand2TouchPadPoint(void) const noexcept;
-		void				VR_Haptic(char id_, unsigned short times) noexcept;	//VRコントローラー振動
+		void				VR_Haptic(char id_, unsigned short times) noexcept;	// VRコントローラー振動
 	};
 };

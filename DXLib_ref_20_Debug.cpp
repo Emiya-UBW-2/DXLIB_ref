@@ -1,10 +1,10 @@
 #include "DXLib_ref_20_Debug.hpp"
 
 namespace DXLibRef {
-#ifdef DEBUG
-	//--------------------------------------------------------------------------------------------------
-	//ÉVÉìÉOÉãÉgÉì
-	//--------------------------------------------------------------------------------------------------
+#if defined(DEBUG)
+	// --------------------------------------------------------------------------------------------------
+	// ÉVÉìÉOÉãÉgÉì
+	// --------------------------------------------------------------------------------------------------
 	const DebugClass* SingletonBase<DebugClass>::m_Singleton = nullptr;
 
 
@@ -38,7 +38,7 @@ namespace DXLibRef {
 			return;
 		}
 		auto PMax = PointMax + 1;
-		//ç≈å„ÇÃââéZ
+		// ç≈å„ÇÃââéZ
 		SetPoint("-----End-----");
 		for (int index : std::views::iota(0, PMax)) {
 			if (!(static_cast<int>(m_PointSel) > index)) {
@@ -53,7 +53,7 @@ namespace DXLibRef {
 				m_Point[static_cast<std::size_t>(j)][static_cast<std::size_t>(index)] = m_Point[static_cast<std::size_t>(j - 1)][static_cast<std::size_t>(index)];
 			}
 
-			//ïΩãœ
+			// ïΩãœ
 			m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] = 0.f;
 			for (int j : std::views::iota(0, PointFrame)) {
 				m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] += m_Point[static_cast<std::size_t>(j)][static_cast<std::size_t>(index)];
@@ -94,14 +94,14 @@ namespace DXLibRef {
 			const int wide = DrawParts->GetUIY(340);
 			const int height = DrawParts->GetUIY(360);
 			const int border = height * 2 / 3;
-			//îwåi
+			// îwåi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
 			{
 				const int xp = xpos;
 				const int yp = ypos;
-				//ì‡óe
+				// ì‡óe
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 				const float xs = static_cast<float>(wide) / PointFrame;
 				const float ys = static_cast<float>(border) / (1000.0f / static_cast<float>(value));
@@ -129,21 +129,21 @@ namespace DXLibRef {
 					}
 					//*/
 				}
-				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);//äÓèÄê¸
+				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);// äÓèÄê¸
 			}
 			ypos += height;
 		}
 		{
 			const int wide = DrawParts->GetUIY(350);
 			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + DrawParts->GetUIY(10);
-			//îwåi
+			// îwåi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
 			xpos += DrawParts->GetUIY(2);
 			ypos += DrawParts->GetUIY(2);
 			int i = 0;
-			//ì‡óe
+			// ì‡óe
 			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());
 			++i;
 			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount());

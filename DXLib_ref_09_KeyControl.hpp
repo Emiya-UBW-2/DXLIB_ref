@@ -2,9 +2,9 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 
 	enum class ControlType :int {
 		XBox,
@@ -568,9 +568,9 @@ namespace DXLibRef {
 		"right",
 		"down",
 	};
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 
 	class PadControl : public SingletonBase<PadControl> {
 	private:
@@ -609,25 +609,25 @@ namespace DXLibRef {
 			bool	m_IsUse{ true };
 		};
 	private:
-		//ボタン
+		// ボタン
 		std::array<PadsInfo, static_cast<int>(PADS::MAX)> m_PadsInfo;
-		//右スティック
+		// 右スティック
 		float Look_XradAdd{ 0.f };
 		float Look_YradAdd{ 0.f };
-		//
+		// 
 		int MouseX{ 0 };
 		int MouseY{ 0 };
 		switchs MouseClick;
 		switchs KeyEsc;
 		switchs KeyBSorDel;
 		int MouseWheelRot{ 0 };
-		//
+		// 
 		std::array<switchs, 26>	m_AtoZKey;
 		std::array<switchs, 10>	m_NumKey;
-		//
+		// 
 		GraphHandle GuideBase;
 		std::vector<GraphHandle> GuideRect;
-		//ガイド等のコントロール
+		// ガイド等のコントロール
 		bool		m_IsUpdate{ true };
 		bool		m_MouseMoveEnable{ true };
 		ControlType	m_ControlType{ ControlType::PC };
@@ -734,7 +734,7 @@ namespace DXLibRef {
 			for (auto& k : this->m_NumKey) {
 				k.Set(false);
 			}
-			GuideBase = GraphHandle::Load("CommonData/key/OutputFont.png");
+			GuideBase.Load("CommonData/key/OutputFont.png");
 			{
 				int mdata = InvalidID;
 				mdata = FileRead_open("CommonData/key/OutputFont.psf", FALSE);
@@ -762,7 +762,7 @@ namespace DXLibRef {
 						}
 					}
 					GuideRect.resize(GuideRect.size() + 1);
-					GuideRect.back() = GraphHandle::DerivationGraph(Args.at(0), Args.at(1), Args.at(2), Args.at(3), GuideBase);
+					GuideRect.back().DerivationGraph(Args.at(0), Args.at(1), Args.at(2), Args.at(3), GuideBase);
 				}
 				FileRead_close(mdata);
 			}
@@ -775,19 +775,19 @@ namespace DXLibRef {
 
 		~PadControl(void) noexcept {}
 	public:
-		const auto&			GetLS_X(void) const noexcept { return Look_XradAdd; }
-		const auto&			GetLS_Y(void) const noexcept { return Look_YradAdd; }
+		const auto& GetLS_X(void) const noexcept { return Look_XradAdd; }
+		const auto& GetLS_Y(void) const noexcept { return Look_YradAdd; }
 
-		const auto&			GetMS_X(void) const noexcept { return MouseX; }
-		const auto&			GetMS_Y(void) const noexcept { return MouseY; }
-		const auto&			GetMouseClick(void) const noexcept { return MouseClick; }
-		const auto&			GetEsc(void) const noexcept { return KeyEsc; }
-		const auto&			GetBSorDel(void) const noexcept { return KeyBSorDel; }
-		const auto&			GetMouseWheelRot(void) const noexcept { return MouseWheelRot; }
+		const auto& GetMS_X(void) const noexcept { return MouseX; }
+		const auto& GetMS_Y(void) const noexcept { return MouseY; }
+		const auto& GetMouseClick(void) const noexcept { return MouseClick; }
+		const auto& GetEsc(void) const noexcept { return KeyEsc; }
+		const auto& GetBSorDel(void) const noexcept { return KeyBSorDel; }
+		const auto& GetMouseWheelRot(void) const noexcept { return MouseWheelRot; }
 
-		const auto&			IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
-		const auto&			GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
-		const auto&			GetAtoZKey(char AtoZ) const noexcept {
+		const auto& IsUseButton(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse; }
+		const auto& GetKey(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_Key; }
+		const auto& GetAtoZKey(char AtoZ) const noexcept {
 			if ('A' <= AtoZ && AtoZ <= 'Z') {
 				return this->m_AtoZKey.at(static_cast<size_t>(AtoZ - 'A'));
 			}
@@ -796,15 +796,15 @@ namespace DXLibRef {
 			}
 			return this->m_AtoZKey.at(0);
 		}
-		const auto&			GetNumKey(int Num) const noexcept {
+		const auto& GetNumKey(int Num) const noexcept {
 			if (0 <= Num && Num <= 9) {
 				return this->m_NumKey.at(Num);
 			}
 			return this->m_NumKey.at(0);
 		}
-		const auto&			GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
+		const auto& GetKeyassign(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_assign; }
 		const auto GetKeyStr(PADS select) const noexcept { return GetIDtoStr(m_PadsInfo.at(static_cast<size_t>(select)).m_assign); }
-		const auto&			GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
+		const auto& GetKeyReserve(PADS select) const noexcept { return m_PadsInfo.at(static_cast<size_t>(select)).m_reserve; }
 
 		void SetIsUseButton(PADS select, bool value) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_IsUse = value; }
 		void SetKeyReserve(PADS select, int assign) noexcept { m_PadsInfo.at(static_cast<size_t>(select)).m_reserve = assign; }
@@ -864,7 +864,7 @@ namespace DXLibRef {
 		void Dispose(void) noexcept;
 	};
 
-	//入力
+	// 入力
 	class InputControl {
 	private:
 		float			m_AddxRad{ 0.f };
@@ -876,8 +876,8 @@ namespace DXLibRef {
 		InputControl(void) noexcept {}
 		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
 		InputControl(InputControl&& tgt) noexcept { *this = tgt; }
-		//InputControl& operator=(const InputControl&) = delete;
-		//InputControl& operator=(InputControl&& o) = delete;
+		// InputControl& operator=(const InputControl&) = delete;
+		// InputControl& operator=(InputControl&& o) = delete;
 
 		virtual ~InputControl(void) noexcept {}
 	public:
@@ -906,10 +906,10 @@ namespace DXLibRef {
 		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetKeyInputFlags(const InputControl& o) noexcept { this->m_Flags = o.m_Flags; }
 
-		const auto&			GetAddxRad(void) const noexcept { return this->m_AddxRad; }
-		const auto&			GetAddyRad(void) const noexcept { return this->m_AddyRad; }
-		const auto&			GetxRad(void) const noexcept { return this->m_xRad; }
-		const auto&			GetyRad(void) const noexcept { return this->m_yRad; }
+		const auto& GetAddxRad(void) const noexcept { return this->m_AddxRad; }
+		const auto& GetAddyRad(void) const noexcept { return this->m_AddyRad; }
+		const auto& GetxRad(void) const noexcept { return this->m_xRad; }
+		const auto& GetyRad(void) const noexcept { return this->m_yRad; }
 
 		auto		GetPADSPress(PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
 

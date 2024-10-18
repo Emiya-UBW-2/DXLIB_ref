@@ -4,23 +4,23 @@
 /*ビルド設定																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 #define DEBUG
-//#define _USE_OPENVR_
-//#define _USE_BOX2D_
+// #define _USE_OPENVR_
+// #define _USE_BOX2D_
 #define _USE_EFFEKSEER_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*pragma																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-#ifdef _USE_OPENVR_
+#if defined(_USE_OPENVR_)
 
 #pragma comment(lib,"..\\..\\..\\openvr\\openvr_api.lib")
 
 #endif // _USE_OPENVR_
 
-#ifdef _USE_BOX2D_
+#if defined(_USE_BOX2D_)
 
-#ifdef _DEBUG
+#if defined(DEBUG)
 #pragma comment(lib,"..\\..\\..\\Box2D\\Debug\\Box2D.lib")
 #else
 #pragma comment(lib,"..\\..\\..\\Box2D\\Release\\Box2D.lib")
@@ -28,7 +28,7 @@
 
 #endif // _USE_BOX2D_
 
-//エラー,警告取り
+// エラー,警告取り
 #define NOMINMAX
 /*
 #pragma warning(disable:4710)
@@ -45,17 +45,17 @@
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-//VR
-#ifdef _USE_OPENVR_
+// VR
+#if defined(_USE_OPENVR_)
 #include <openvr.h>
 #endif // _USE_OPENVR_
-//Box2D
-#ifdef _USE_BOX2D_
+// Box2D
+#if defined(_USE_BOX2D_)
 #include "Box2D/Box2D.h"
 #endif // _USE_BOX2D_
 
-//共通
-//#pragma warning( push, 3 )
+// 共通
+// #pragma warning( push, 3 )
 
 #include <stdint.h>
 #include <array>
@@ -77,10 +77,10 @@
 #include <shlwapi.h>
 #include <thread>
 #pragma comment(lib, "shlwapi.lib")
-//追加物
+// 追加物
 #include "json.hpp"
 
-//#pragma warning( pop )
+// #pragma warning( pop )
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -91,19 +91,19 @@ constexpr int		InvalidID{ -1 };								/*共通の無効値*/
 constexpr int		BaseScreenWidth{ 1920 };						/*UI描画などの基準となる解像度*/
 constexpr int		BaseScreenHeight{ 1080 };						/*UI描画などの基準となる解像度*/
 
-//DPIを反映するデスクトップサイズ
+// DPIを反映するデスクトップサイズ
 const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) };
 const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) };
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include DXLIB																																*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-//DXLIB
+// DXLIB
 #include "DxLib.h"
-#ifdef _USE_EFFEKSEER_
+#if defined(_USE_EFFEKSEER_)
 #include "EffekseerForDXLib.h"
 #endif
-//追加
+// 追加
 #include "DXLib_ref_00_Util.hpp"
 #include "DXLib_ref_01_Vector.hpp"
 #include "DXLib_ref_02_SoundHandle.hpp"
@@ -135,7 +135,7 @@ namespace DXLibRef {
 		float						m_PauseFlashCount{ 0.f };
 		bool						m_IsEnd{ false };
 		bool						m_IsFirstBoot{ false };
-	private://コンストラクタ
+	private:// コンストラクタ
 		DXLib_ref(void) noexcept;
 		DXLib_ref(const DXLib_ref&) = delete;
 		DXLib_ref(DXLib_ref&& o) = delete;
@@ -146,9 +146,9 @@ namespace DXLibRef {
 	private:
 		void	UpdatePause(void) noexcept;
 		void	DrawPause(void) const noexcept;
-		//
+		// 
 		void	InitFPSCounter(void) noexcept {
-			//FPS表示
+			// FPS表示
 			for (auto& f : FPSAvgs) {
 				f = FrameRate;
 			}

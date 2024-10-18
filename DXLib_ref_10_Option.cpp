@@ -2,14 +2,14 @@
 #include "DXLib_ref_10_Option.hpp"
 
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 	const OPTION* SingletonBase<OPTION>::m_Singleton = nullptr;
 
 	void			OPTION::Load(void) noexcept {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GraphicsPreset)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);//DirectXVer
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);// DirectXVer
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::usevr)).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ObjLevel)).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DoF)).SetEnumParamType(EnumParamType::Boolean);
@@ -29,8 +29,8 @@ namespace DXLibRef {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Xsensing)).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Ysensing)).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::HeadBobbing)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ControlType)).SetEnumParamType(EnumParamType::Else);//ControlType
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);//Language
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ControlType)).SetEnumParamType(EnumParamType::Else);// ControlType
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);// Language
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
 
@@ -39,7 +39,7 @@ namespace DXLibRef {
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::CubeMap)).SetEnumParamType(EnumParamType::Boolean);
 
-		//SetOutApplicationLogValidFlag(FALSE);
+		// SetOutApplicationLogValidFlag(FALSE);
 		{
 			int mdata = InvalidID;
 			bool NewData = true;
@@ -54,12 +54,12 @@ namespace DXLibRef {
 				if (retVal > 0) {
 					SetParamInt(EnumSaveParam::Language, (StrCmpW(localeName, L"ja-JP") == 0) ? 0 : 1);
 				}
-				//共通設定項目
+				// 共通設定項目
 				if (std::filesystem::is_regular_file("data/Setting.txt")) {
 					mdata = FileRead_open("data/Setting.txt", FALSE);
 				}
 				else {
-					//デフォ値
+					// デフォ値
 					SetParamInt(EnumSaveParam::GraphicsPreset, 3);
 					SetParamInt(EnumSaveParam::DirectXVer, 1);
 					SetParamBoolean(EnumSaveParam::usevr, false);
@@ -114,7 +114,7 @@ namespace DXLibRef {
 						}
 						break;
 					case EnumParamType::Float:
-						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));//todo 小数か確認
+						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));// todo 小数か確認
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
@@ -189,7 +189,7 @@ namespace DXLibRef {
 						}
 						break;
 					case EnumParamType::Float:
-						SetParamFloat((EnumProjectSettingParam)loop, std::stof(RIGHT));//todo 小数か確認
+						SetParamFloat((EnumProjectSettingParam)loop, std::stof(RIGHT));// todo 小数か確認
 						break;
 					case EnumParamType::Else:
 						break;
@@ -201,7 +201,7 @@ namespace DXLibRef {
 			}
 			FileRead_close(mdata);
 		}
-		//SetOutApplicationLogValidFlag(TRUE);
+		// SetOutApplicationLogValidFlag(TRUE);
 	}
 
 	void			OPTION::Save(void) const noexcept {
@@ -237,18 +237,18 @@ namespace DXLibRef {
 		outputfile.close();
 	}
 
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 	const OptionWindowClass* SingletonBase<OptionWindowClass>::m_Singleton = nullptr;
-	//
+	// 
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		ypos += DrawParts->GetUIY(static_cast<int>(selanim));
 		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
 		m_Draw(xpos + DrawParts->GetUIY(720 - 324), ypos, isMine);
 	}
-	//
+	// 
 	void OptionWindowClass::OptionTabsInfo::Execute(int* select, bool CanPress) noexcept {
 		if ((*select) < 0) {
 			return;
@@ -290,7 +290,7 @@ namespace DXLibRef {
 	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int* select) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		int xp1, yp1;
-		//タブ
+		// タブ
 		{
 			xp1 = xpos + (DrawParts->GetUIY(140) + DrawParts->GetUIY(12)) * m_id;
 			yp1 = ypos;
@@ -301,7 +301,7 @@ namespace DXLibRef {
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 		}
-		//内容
+		// 内容
 		if (isActive) {
 			xp1 = xpos;
 			yp1 = ypos + LineHeight * 2;
@@ -318,7 +318,7 @@ namespace DXLibRef {
 		auto* LocalizeParts = LocalizePool::Instance();
 		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
 	}
-	//
+	// 
 	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("BGM", 1110,
@@ -602,7 +602,7 @@ namespace DXLibRef {
 					Type = LocalizeParts->Get(1136);
 					break;
 				case WindowType::FullScreen:
-					Type = "フルスクリーン";//LocalizeParts->Get(1137)
+					Type = "フルスクリーン";// LocalizeParts->Get(1137)
 					break;
 				case WindowType::Max:
 				default:
@@ -621,7 +621,7 @@ namespace DXLibRef {
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
-				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//垂直同期
+				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									// 垂直同期
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			},
 			[this]() {
@@ -631,7 +631,7 @@ namespace DXLibRef {
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
-				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//垂直同期
+				SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									// 垂直同期
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
@@ -647,7 +647,7 @@ namespace DXLibRef {
 					if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 						OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 					}
-					SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									//垂直同期
+					SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));									// 垂直同期
 				}
 			}
 		);
@@ -705,7 +705,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* DrawParts = DXDraw::Instance();
 				int ret = 0;
-				//結果から一番近いやつに指定
+				// 結果から一番近いやつに指定
 				int diff = 10000;
 				for (int i : std::views::iota(0, FrameLimitsNum)) {
 					int tmp = std::abs(FrameLimits[static_cast<size_t>(i)] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
@@ -1446,9 +1446,9 @@ namespace DXLibRef {
 			}
 		);
 	}
-	//
+	// 
 	void OptionWindowClass::Init(void) noexcept {
-		//
+		// 
 		m_Tabs.at(0) = std::make_unique<SoundTabsInfo>();
 		m_Tabs.at(0)->Init(0, "Sound");
 		m_Tabs.at(1) = std::make_unique<GraphicTabsInfo>();
@@ -1457,7 +1457,7 @@ namespace DXLibRef {
 		m_Tabs.at(2)->Init(2, "Else");
 		m_Tabs.at(3) = std::make_unique<ControlTabsInfo>();
 		m_Tabs.at(3)->Init(3, "Control");
-		//
+		// 
 	}
 	void OptionWindowClass::Update(void) noexcept {
 		if (m_ActiveSwitch) {
@@ -1478,12 +1478,12 @@ namespace DXLibRef {
 					for (auto& t : m_Tabs) {
 						t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
 					}
-					//ガイド
+					// ガイド
 					xp1 = xmin + DrawParts->GetUIY(24);
 					yp1 = ymax - LineHeight * 3 / 2;
 					m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
 
-					//
+					// 
 					if (Pad->GetKey(PADS::LEAN_L).trigger() && (m_tabsel != 3)) {
 						--m_tabsel;
 						if (m_tabsel < 0) {
@@ -1502,7 +1502,7 @@ namespace DXLibRef {
 					}
 
 					m_Tabs.at(static_cast<size_t>(m_tabsel))->Execute(&m_select, (m_tabsel != 3));
-					//
+					// 
 					if (EndSwitch) {
 						Pad->SetGuideUpdate();
 						OptionParts->Save();

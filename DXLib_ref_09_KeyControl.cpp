@@ -1,8 +1,8 @@
 #include "DXLib_ref_09_KeyControl.hpp"
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
 
 	void PadControl::KeyGuideGraphs::AddGuideXBox(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
@@ -83,7 +83,7 @@ namespace DXLibRef {
 		{
 			XINPUT_STATE input;
 			GetJoypadXInputState(DX_INPUT_PAD1, &input);
-			//ボタン
+			// ボタン
 			if (ID >= 0xF100) {
 				switch (ID) {
 				case 0xF100:
@@ -103,9 +103,9 @@ namespace DXLibRef {
 		{
 			DINPUT_JOYSTATE input;
 			GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-			//ボタン
+			// ボタン
 			if (ID >= 0xF010) {
-				//十字キー
+				// 十字キー
 				float deg = static_cast<float>(input.POV[0]) / 100.f;
 				bool w_key = false;
 				bool s_key = false;
@@ -136,7 +136,7 @@ namespace DXLibRef {
 		}
 		break;
 		case ControlType::PC:
-			//ボタン
+			// ボタン
 			if (0 <= ID) {
 				if ((ID & 0xF00) != 0) {
 					return ((GetMouseInputWithCheck() & (ID & 0xFF)) != 0);
@@ -165,7 +165,7 @@ namespace DXLibRef {
 				return true;
 			}
 
-			//既にアサイン済のものがあった場合そいつを無効化
+			// 既にアサイン済のものがあった場合そいつを無効化
 			for (size_t p : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 				auto& P2 = m_PadsInfo.at(p);
 				if ((select != (PADS)p) && (P2.m_reserve == ID || P2.m_assign == ID)) {
@@ -282,9 +282,9 @@ namespace DXLibRef {
 		if (m_IsUpdate) {
 			m_IsUpdate = false;
 			Reset();
-			//
+			// 
 			Key.resize(Key.size() + 1);
-			//
+			// 
 			Key.back() = std::make_unique<KeyGuideGraphs>();
 			for (size_t i : std::views::iota(0, static_cast<int>(KeyNum))) {
 				if (strcmpDx(KeyStr[i], "ESCAPE") == 0) {
@@ -293,7 +293,7 @@ namespace DXLibRef {
 				}
 			}
 			AddGuide(PADS::INVENTORY, LocalizeParts->Get(9913));
-			//
+			// 
 			Guide_Pad();
 		}
 	}
@@ -301,7 +301,7 @@ namespace DXLibRef {
 	void PadControl::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
-		//コントロールタイプ決定
+		// コントロールタイプ決定
 		{
 			ControlType NextControlType = ControlType::PC;
 			if (GetJoypadNum() > 0) {
@@ -320,13 +320,13 @@ namespace DXLibRef {
 				}
 			}
 		}
-		//タイプに合わせた操作
+		// タイプに合わせた操作
 		switch (m_ControlType) {
 		case ControlType::XBox:
 		{
 			XINPUT_STATE input;
 			GetJoypadXInputState(DX_INPUT_PAD1, &input);
-			//左スティック
+			// 左スティック
 			{
 				int LS_X = input.ThumbLX;
 				int LS_Y = -input.ThumbLY;
@@ -360,7 +360,7 @@ namespace DXLibRef {
 				this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
 				this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
 			}
-			//右スティック
+			// 右スティック
 			{
 				DrawParts->GetMousePosition(&MouseX, &MouseY);
 				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
@@ -390,7 +390,7 @@ namespace DXLibRef {
 		{
 			DINPUT_JOYSTATE input;
 			GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-			//左スティック
+			// 左スティック
 			{
 				int LS_X = input.X;
 				int LS_Y = input.Y;
@@ -415,7 +415,7 @@ namespace DXLibRef {
 				this->m_PadsInfo[static_cast<int>(PADS::MOVE_A)].m_Key.Execute(a_key);
 				this->m_PadsInfo[static_cast<int>(PADS::MOVE_D)].m_Key.Execute(d_key);
 			}
-			//右スティック
+			// 右スティック
 			{
 				DrawParts->GetMousePosition(&MouseX, &MouseY);
 				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
@@ -434,13 +434,13 @@ namespace DXLibRef {
 		}
 		break;
 		case ControlType::PC:
-			//右スティック
+			// 右スティック
 		{
 			DrawParts->GetMousePosition(&MouseX, &MouseY);
 			MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 			if (m_MouseMoveEnable) {
-				if (GetMainWindowHandle() != GetForegroundWindow()) {//次画面が最前ではないよん
+				if (GetMainWindowHandle() != GetForegroundWindow()) {// 次画面が最前ではないよん
 					SetMouseDispFlag(TRUE);
 				}
 				else {
@@ -464,7 +464,7 @@ namespace DXLibRef {
 		default:
 			break;
 		}
-		//ボタン
+		// ボタン
 		for (size_t i : std::views::iota(0, static_cast<int>(PADS::MAX))) {
 			if (m_ControlType != ControlType::PC) {
 				switch ((PADS)i) {
@@ -503,7 +503,7 @@ namespace DXLibRef {
 			}
 			this->m_PadsInfo.at(i).m_Key.Execute(GetButtonPress(this->m_PadsInfo.at(i).m_assign));
 		}
-		//
+		// 
 		{
 			int KEYS[26] = {
 				KEY_INPUT_A,
@@ -552,7 +552,7 @@ namespace DXLibRef {
 				m_NumKey[loop].Execute(CheckHitKeyWithCheck(NUMKEYS[loop]) != 0);
 			}
 		}
-		//
+		// 
 		KeyEsc.Execute(CheckHitKeyWithCheck(KEY_INPUT_ESCAPE) != 0);
 		KeyBSorDel.Execute((CheckHitKeyWithCheck(KEY_INPUT_BACK) != 0) || (CheckHitKeyWithCheck(KEY_INPUT_DELETE) != 0));
 		MouseWheelRot = GetMouseWheelRotVolWithCheck();

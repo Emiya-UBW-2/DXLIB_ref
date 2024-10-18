@@ -10,14 +10,14 @@ namespace DXLibRef {
 		this->m_ColFileName = colfilename;
 		auto Load = [](MV1* obj, std::string Path, std::string NameAdd, int PHYSICS_TYPE) {
 			if (IsFileExist((Path + NameAdd + ".mv1").c_str())) {
-				//MV1::Load(Path + ".pmx", obj, PHYSICS_TYPE);
+				// MV1::Load(Path + ".pmx", obj, PHYSICS_TYPE);
 				MV1::Load((Path + NameAdd + ".mv1").c_str(), obj, PHYSICS_TYPE);
 			}
 			else if (IsFileExist((Path + ".pmx").c_str())) {
 				MV1::Load(Path + ".pmx", obj, PHYSICS_TYPE);
 			}
 			};
-		//model
+		// model
 		switch (this->m_PHYSICS_SETUP) {
 		case PHYSICS_SETUP::DISABLE:
 			Load(&this->m_obj, this->m_FilePath + this->m_ObjFileName, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
@@ -31,9 +31,9 @@ namespace DXLibRef {
 		default:
 			break;
 		}
-		//col
+		// col
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
-		//フレーム
+		// フレーム
 		{
 			this->m_Frames.clear();
 			if (pBase->GetFrameNum() > 0) {
@@ -46,12 +46,12 @@ namespace DXLibRef {
 				int count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetFrameNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(count)) {
-						//そのフレームを登録
+						// そのフレームを登録
 						this->m_Frames[static_cast<size_t>(count)].first = frameNum;
 						this->m_Frames[static_cast<size_t>(count)].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[static_cast<size_t>(count)].first).pos());
 					}
 					else if (frameNum < Max - 1) {
-						continue;//飛ばす
+						continue;// 飛ばす
 					}
 					count++;
 					frameNum = 0;
@@ -61,7 +61,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		//フレーム
+		// フレーム
 		{
 			this->m_Materials.clear();
 			if (pBase->GetMaterialNum() > 0) {
@@ -74,11 +74,11 @@ namespace DXLibRef {
 				int count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetMaterialNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(count)) {
-						//そのフレームを登録
+						// そのフレームを登録
 						this->m_Materials[static_cast<size_t>(count)] = frameNum;
 					}
 					else if (frameNum < Max - 1) {
-						continue;//飛ばす
+						continue;// 飛ばす
 					}
 					count++;
 					frameNum = 0;
@@ -88,7 +88,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		//シェイプ
+		// シェイプ
 		{
 			this->m_Shapes.clear();
 			if (pBase->GetShapeNum() > 0) {
@@ -117,11 +117,11 @@ namespace DXLibRef {
 						for (int i : std::views::iota(0, obj->GetMaterialNum())) {
 							/*
 							// テクスチャ追加前のテクスチャ数を取得しておく
-							int TexIndex = MV1GetTextureNum(obj->GetHandle());
+							int TexIndex = MV1GetTextureNum(obj->get()());
 							// モデルで使用するテクスチャを追加する
-							MV1AddTexture(obj->GetHandle(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
+							MV1AddTexture(obj->get()(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
 							// 指定のマテリアル( ここでは例として3番のマテリアル )で使用する法線マップを設定する
-							MV1SetMaterialNormalMapTexture(obj->GetHandle(), i, TexIndex);
+							MV1SetMaterialNormalMapTexture(obj->get()(), i, TexIndex);
 							//*/
 
 							obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
@@ -135,7 +135,7 @@ namespace DXLibRef {
 				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
 			}
 			};
-		//model
+		// model
 		switch (this->m_PHYSICS_SETUP) {
 		case PHYSICS_SETUP::DISABLE:
 			Save(&this->m_obj, "_DISABLE", DX_LOADMODEL_PHYSICS_DISABLE);
@@ -149,7 +149,7 @@ namespace DXLibRef {
 		default:
 			break;
 		}
-		//col
+		// col
 		Save(&this->m_col, "", DX_LOADMODEL_PHYSICS_DISABLE);
 	}
 	void			ModelBaseClass::DisposeModel(void) noexcept {
@@ -161,30 +161,30 @@ namespace DXLibRef {
 		this->m_FilePath = pBase->m_FilePath;
 		this->m_ObjFileName = pBase->m_ObjFileName;
 		this->m_ColFileName = pBase->m_ColFileName;
-		//model
-		this->m_obj = pBase->m_obj.Duplicate();
-		//col
+		// model
+		this->m_obj.Duplicate(pBase->m_obj);
+		// col
 		if (pBase->m_col.IsActive()) {
-			this->m_col = pBase->m_col.Duplicate();
+			this->m_col.Duplicate(pBase->m_col);
 		}
-		//フレーム
+		// フレーム
 		this->m_Frames.resize(pBase->m_Frames.size());
-		for (size_t index = 0; auto& f : this->m_Frames) {
+		for (size_t index = 0; auto & f : this->m_Frames) {
 			f.first = pBase->m_Frames.at(index).first;
 			if (f.first != InvalidID) {
 				f.second = pBase->m_Frames.at(index).second;
 			}
 			index++;
 		}
-		//フレーム
+		// フレーム
 		this->m_Materials.resize(pBase->m_Materials.size());
-		for (size_t index = 0; auto& f : this->m_Materials) {
+		for (size_t index = 0; auto & f : this->m_Materials) {
 			f = pBase->m_Materials.at(index);
 			index++;
 		}
-		//シェイプ
+		// シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());
-		for (size_t index = 0; auto& f : this->m_Shapes) {
+		for (size_t index = 0; auto & f : this->m_Shapes) {
 			f.first = pBase->m_Shapes.at(index).first;
 			if (f.first != InvalidID) {
 				f.second = pBase->m_Shapes.at(index).second;
@@ -192,14 +192,14 @@ namespace DXLibRef {
 			index++;
 		}
 	}
-	//
+	// 
 	void			ObjectBaseClass::SetAnimOnce(int ID, float speed) noexcept {
 		this->GetObj().SetAnim(ID).Update(false, speed);
 	}
 	void			ObjectBaseClass::SetAnimLoop(int ID, float speed) noexcept {
 		this->GetObj().SetAnim(ID).Update(true, speed);
 	}
-	//
+	// 
 	void			ObjectBaseClass::Init(void) noexcept {
 		this->m_IsActive = true;
 		this->m_IsResetPhysics = true;
@@ -207,21 +207,21 @@ namespace DXLibRef {
 		this->m_IsDraw = false;
 		Init_Sub();
 	}
-	//
+	// 
 	void			ObjectBaseClass::ExecuteCommon(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
-		//シェイプ更新
-		for (size_t index = 0; auto& f : this->m_Shapes) {
+		// シェイプ更新
+		for (size_t index = 0; auto & f : this->m_Shapes) {
 			if (index == 0) {
 				continue;
 			}
 			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes[0].second) * f.second);
 			index++;
 		}
-		//物理更新
+		// 物理更新
 		if (this->m_PHYSICS_SETUP == PHYSICS_SETUP::REALTIME) {
 			if (this->m_IsResetPhysics) {
 				this->m_IsResetPhysics = false;
@@ -240,7 +240,7 @@ namespace DXLibRef {
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
-		//最初のループ終わり
+		// 最初のループ終わり
 		this->m_IsFirstLoop = false;
 	}
 
@@ -278,7 +278,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	//
+	// 
 	void			ObjectBaseClass::Dispose(void) noexcept {
 		DisposeModel();
 		Dispose_Sub();

@@ -1,7 +1,7 @@
 ﻿/*=============================================================================
  Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
  Distributed under the Boost Software License, Version 1.0.
- (See https://www.boost.org/LICENSE_1_0.txt)
+ (See https:// www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #pragma once
 #include "DXLib_ref.h"
@@ -10,17 +10,17 @@ namespace DXLibRef {
 	class Camera3DInfo {
 		Vector3DX	m_pos;
 		Vector3DX	m_vec;
-		Vector3DX	m_up{ Vector3DX::up() };	//カメラ
-		float		m_fov{ DX_PI_F / 2 };		//カメラ
+		Vector3DX	m_up{ Vector3DX::up() };	// カメラ
+		float		m_fov{ DX_PI_F / 2 };		// カメラ
 		float		m_near{ 0.1f };
-		float		m_far{ 10.f };	//ニアファー
+		float		m_far{ 10.f };	// ニアファー
 	public:
-		const auto&			GetCamPos(void)const noexcept { return m_pos; }
-		const auto&			GetCamVec(void)const noexcept { return m_vec; }
-		const auto&			GetCamUp(void)const noexcept { return m_up; }
-		const auto&			GetCamFov(void)const noexcept { return m_fov; }
-		const auto&			GetCamNear(void)const noexcept { return m_near; }
-		const auto&			GetCamFar(void)const noexcept { return m_far; }
+		const auto& GetCamPos(void)const noexcept { return m_pos; }
+		const auto& GetCamVec(void)const noexcept { return m_vec; }
+		const auto& GetCamUp(void)const noexcept { return m_up; }
+		const auto& GetCamFov(void)const noexcept { return m_fov; }
+		const auto& GetCamNear(void)const noexcept { return m_near; }
+		const auto& GetCamFar(void)const noexcept { return m_far; }
 	public:
 		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) noexcept {
 			m_pos = cam_pos;
@@ -41,7 +41,7 @@ namespace DXLibRef {
 			SetUpCamInfo(this->m_pos, this->m_vec, this->m_up, this->m_fov, this->m_near, this->m_far);
 		}
 
-		const MATRIX GetViewMatrix(void) const noexcept {
+		const Matrix4x4DX GetViewMatrix(void) const noexcept {
 			MATRIX mat_view;					// ビュー行列
 			VECTOR vec_from = m_pos.get();		// カメラの位置
 			VECTOR vec_lookat = m_vec.get();  // カメラの注視点
@@ -50,7 +50,7 @@ namespace DXLibRef {
 			return mat_view;
 		}
 
-		const MATRIX GetProjectionMatrix(void) const noexcept {
+		const Matrix4x4DX GetProjectionMatrix(void) const noexcept {
 			MATRIX mat_view;					// プロジェクション行列
 			CreatePerspectiveFovMatrix(&mat_view, m_fov, m_near, m_far);
 			return mat_view;
@@ -62,54 +62,28 @@ namespace DXLibRef {
 			SetCameraPositionAndTargetAndUpVec(campos.get(), camvec.get(), camup.get());
 		}
 	};
-	class GraphHandle {
-	private:
-		int handle_;
-		constexpr GraphHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = InvalidID;
-
+	class GraphHandle : public DXHandle {
 	public:
-		constexpr GraphHandle(void) noexcept : handle_(invalid_handle) {}
-		GraphHandle(const GraphHandle&) = delete;
-		GraphHandle(GraphHandle&& o) noexcept : handle_(o.handle_) { o.handle_ = invalid_handle; }
-		GraphHandle& operator=(const GraphHandle&) = delete;
-		GraphHandle& operator=(GraphHandle&& o) noexcept {
-			this->handle_ = o.handle_;
-			o.handle_ = invalid_handle;
-			return *this;
+		void	Dispose_Sub(void) noexcept override {
+			DeleteGraph(DXHandle::get());
 		}
-		void operator=(int& hand) noexcept { this->handle_ = hand; }
-
-		~GraphHandle(void) noexcept {
-			Dispose();
+	public:
+		void Load_Tex(std::basic_string_view<TCHAR> FileName) noexcept {
+			DXHandle::SetHandleDirect(DxLib::MV1LoadTextureWithStrLen(FileName.data(), FileName.length()));
 		}
-		bool IsActive(void) const noexcept { return this->handle_ != invalid_handle; }
-		void Dispose(void) noexcept {
-			if (IsActive()) {
-				DeleteGraph(this->handle_);
-				this->handle_ = invalid_handle;
-			}
+		void Load(std::basic_string_view<TCHAR> FileName, bool NotUse3DFlag = false) noexcept {
+			DXHandle::SetHandleDirect(DxLib::LoadGraphWithStrLen(FileName.data(), FileName.length(), NotUse3DFlag));
 		}
-		int get(void) const noexcept { return handle_; }
-
-		static GraphHandle Load_Tex(std::basic_string_view<TCHAR> FileName) noexcept {
-			return { DxLib::MV1LoadTextureWithStrLen(FileName.data(), FileName.length()) };
+		void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int* HandleArray, bool NotUse3DFlag = false) noexcept {
+			DXHandle::SetHandleDirect(DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag));
 		}
-		static GraphHandle Load(std::basic_string_view<TCHAR> FileName, bool NotUse3DFlag = false) noexcept {
-			return { DxLib::LoadGraphWithStrLen(FileName.data(), FileName.length(), NotUse3DFlag) };
+		void DerivationGraph(int x, int y, int xsize, int ysize, const GraphHandle& baseImage) noexcept {
+			DXHandle::SetHandleDirect(DxLib::DerivationGraph(x, y, xsize, ysize, baseImage.get()));
 		}
-		static GraphHandle LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int XSize, int YSize, int* HandleArray, bool NotUse3DFlag = false) noexcept {
-			return { DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum,  XSize, YSize, HandleArray, NotUse3DFlag) };
+		void Make(int SizeX, int SizeY, bool trns = false) noexcept {
+			DXHandle::SetHandleDirect(DxLib::MakeScreen(SizeX, SizeY, (trns ? TRUE : FALSE)));
 		}
-		static GraphHandle DerivationGraph(int x, int y, int xsize, int ysize, const GraphHandle& baseImage) noexcept {
-			return { DxLib::DerivationGraph(x,y,xsize,ysize,baseImage.get()) };
-		}
-
-		static GraphHandle Make(int SizeX, int SizeY, bool trns = false) noexcept {
-			return { DxLib::MakeScreen(SizeX, SizeY, (trns ? TRUE : FALSE)) };
-		}
-
-		static GraphHandle MakeDepth(int SizeX, int SizeY) noexcept {
+		void MakeDepth(int SizeX, int SizeY) noexcept {
 			// 深度を描画するテクスチャの作成( 2チャンネル浮動小数点32ビットテクスチャ )
 			auto prevMip = GetCreateDrawValidGraphChannelNum();
 			auto prevFloatType = GetDrawValidFloatTypeGraphCreateFlag();
@@ -117,66 +91,105 @@ namespace DXLibRef {
 			SetCreateDrawValidGraphChannelNum(2);
 			SetDrawValidFloatTypeGraphCreateFlag(TRUE);
 			SetCreateGraphChannelBitDepth(32);
-			auto ret = DxLib::MakeScreen(SizeX, SizeY, FALSE);
+			DXHandle::SetHandleDirect(DxLib::MakeScreen(SizeX, SizeY, FALSE));
 			SetCreateDrawValidGraphChannelNum(prevMip);
 			SetDrawValidFloatTypeGraphCreateFlag(prevFloatType);
 			SetCreateGraphChannelBitDepth(prevBit);
-			return ret;
 		}
-
+		void CreateGraphFromBmp(const BITMAPINFO* RGBBmpInfo, const void* RGBBmpImage, const BITMAPINFO* AlphaBmpInfo = nullptr, const void* AlphaBmpImage = nullptr, bool TextureFlag = true, bool ReverseFlag = false) noexcept {
+			DXHandle::SetHandleDirect(DxLib::CreateGraphFromBmp(RGBBmpInfo, RGBBmpImage, AlphaBmpInfo, AlphaBmpImage, TextureFlag ? TRUE : FALSE, ReverseFlag ? TRUE : FALSE));
+		}
+	public:
 		void DrawGraph(int posx, int posy, bool trns) const noexcept {
-			if (IsActive()) {
-				DxLib::DrawGraph(posx, posy, this->handle_, (trns ? TRUE : FALSE));
-			}
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::DrawGraph(posx, posy, DXHandle::get(), (trns ? TRUE : FALSE));
 		}
 
 		void DrawRotaGraph(int posx, int posy, float Exrate, float rad, bool trns) const noexcept {
-			if (IsActive()) {
-				DxLib::DrawRotaGraph(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
-			}
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::DrawRotaGraph(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), DXHandle::get(), (trns ? TRUE : FALSE));
 		}
 
 		void DrawRotaGraphF(float posx, float posy, float Exrate, float rad, bool trns) const noexcept {
-			if (IsActive()) {
-				DxLib::DrawRotaGraphF(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
-			}
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::DrawRotaGraphF(posx, posy, static_cast<double>(Exrate), static_cast<double>(rad), DXHandle::get(), (trns ? TRUE : FALSE));
 		}
 
 		void DrawRotaGraph3(int posx, int posy,
 			int cx, int cy,
 			float ExtRateX, float ExtRateY, float rad, bool trns) const noexcept {
-			if (IsActive()) {
-				DxLib::DrawRotaGraph3(posx, posy, cx, cy, static_cast<double>(ExtRateX), static_cast<double>(ExtRateY), static_cast<double>(rad), this->handle_, (trns ? TRUE : FALSE));
-			}
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::DrawRotaGraph3(posx, posy, cx, cy, static_cast<double>(ExtRateX), static_cast<double>(ExtRateY), static_cast<double>(rad), DXHandle::get(), (trns ? TRUE : FALSE));
 		}
 
 		void DrawExtendGraph(int posx1, int posy1, int posx2, int posy2, bool trns) const noexcept {
-			if (IsActive()) {
-				DxLib::DrawExtendGraph(posx1, posy1, posx2, posy2, this->handle_, (trns ? TRUE : FALSE));
-			}
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::DrawExtendGraph(posx1, posy1, posx2, posy2, DXHandle::get(), (trns ? TRUE : FALSE));
 		}
-		//GetGraphSize
+		void FillGraph(int r, int g, int b) const noexcept {
+			if (!DXHandle::IsActive()) { return; }
+			DxLib::FillGraph(DXHandle::get(), r, g, b);
+		}
+
+		template <typename... Args>
+		void GraphFilter(int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) noexcept {
+			DxLib::GraphFilter(DXHandle::get(), FilterType, args...);
+		}
+
+		template <typename... Args>
+		void GraphFilterBlt(const GraphHandle& targetImage, int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) noexcept {
+			DxLib::GraphFilterBlt(targetImage.get(), DXHandle::get(), FilterType, args...);
+		}
+
+		template <typename... Args>
+		void GraphBlend(const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) noexcept {
+			DxLib::GraphBlend(DXHandle::get(), BlendImage.get(), BlendRatio, BlendType, args...);
+		}
+
+		template <typename... Args>
+		void GraphBlendBlt(const GraphHandle& BaseImage, const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) noexcept {
+			DxLib::GraphBlendBlt(BaseImage.get(), BlendImage.get(), DXHandle::get(), BlendRatio, BlendType, args...);
+		}
+
+
+		// GetGraphSize
 		void GetSize(int* xsize, int* ysize) const noexcept {
-			if (IsActive()) {
-				GetGraphSize(this->handle_, xsize, ysize);
-			}
+			if (!DXHandle::IsActive()) { return; }
+			GetGraphSize(DXHandle::get(), xsize, ysize);
 		}
-		//
+		// 
 		void SetDraw_Screen(const bool& Clear = true) const noexcept {
-			SetDrawScreen(this->handle_);
+			SetDrawScreen(DXHandle::get());
 			if (Clear) {
 				ClearDrawScreen();
 			}
 		}
-		//
+		// 
+		void SetUseTextureToShader(int ID) const noexcept {
+			DxLib::SetUseTextureToShader(ID, DXHandle::get());
+		}
+		void SetRenderTargetToShader(int ID, int SurfaceIndex = 0, int MipLevel = 0) const noexcept {
+			DxLib::SetRenderTargetToShader(ID, DXHandle::get(), SurfaceIndex, MipLevel);
+		}
+	public:
+		// 
 		static void SetDraw_Screen(int handle, const bool& Clear = true) noexcept {
 			SetDrawScreen(handle);
 			if (Clear) {
 				ClearDrawScreen();
 			}
 		}
+		// 
+		/*
+		static void SetUseTextureToShader(int ID, int handle) noexcept {
+			DxLib::SetUseTextureToShader(ID, handle);
+		}
+		//
+		static void SetRenderTargetToShader(int ID, int handle, int SurfaceIndex = 0, int MipLevel = 0) noexcept {
+			DxLib::SetRenderTargetToShader(ID, handle, SurfaceIndex, MipLevel);
+		}
+		//*/
 
-		auto getp(void) noexcept { return &handle_; }
 		static void LoadDiv(std::basic_string_view<TCHAR> FileName, int AllNum, int XNum, int YNum, int  XSize, int  YSize, std::vector<GraphHandle>* Handles, bool NotUse3DFlag = false) noexcept {
 			int* HandleArray = new int[static_cast<size_t>(AllNum)];
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
@@ -184,7 +197,7 @@ namespace DXLibRef {
 			Handles->clear();
 			for (int i : std::views::iota(0, AllNum)) {
 				Handles->resize(Handles->size() + 1);
-				Handles->back() = HandleArray[static_cast<size_t>(i)];
+				Handles->back().SetHandleDirect(HandleArray[static_cast<size_t>(i)]);
 			}
 			delete[] HandleArray;
 

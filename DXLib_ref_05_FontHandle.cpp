@@ -1,10 +1,10 @@
 ﻿#include "DXLib_ref.h"
-//#include "DXLib_ref_05_FontHandle.hpp"
+// #include "DXLib_ref_05_FontHandle.hpp"
 
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 	const FontPool* SingletonBase<FontPool>::m_Singleton = nullptr;
 	const LocalizePool* SingletonBase<LocalizePool>::m_Singleton = nullptr;
 
@@ -37,7 +37,7 @@ namespace DXLibRef {
 		Str += std::to_string(this->m_commonsize);
 		Str += ".dft";
 		this->m_scaleType = DX_DRAWMODE_BILINEAR;
-		this->m_Handle = FontHandle::Load(Str, this->m_EdgeSize);
+		this->m_Handle.Load(Str, this->m_EdgeSize);
 	}
 
 	LocalizePool::LocalizePool(void) noexcept {
@@ -65,7 +65,7 @@ namespace DXLibRef {
 			for (auto& h : this->havehandle) {
 				if (h.m_ID == ID) {
 					std::string Before = h.m_Str;
-					sprintfDx(h.m_Str, "%s\n%s", Before.c_str(), RIGHT.c_str());//改行して同じテキストとする
+					sprintfDx(h.m_Str, "%s\n%s", Before.c_str(), RIGHT.c_str());// 改行して同じテキストとする
 					IsHit = true;
 					break;
 				}

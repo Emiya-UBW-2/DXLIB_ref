@@ -1,9 +1,9 @@
 #pragma once
 #include "DXLib_ref.h"
 
-#ifdef _USE_BOX2D_
+#if defined(_USE_BOX2D_)
 
-//Box2D拡張
+// Box2D拡張
 namespace std {
 	template <>
 	struct default_delete<b2Body> {
@@ -12,9 +12,9 @@ namespace std {
 		}
 	};
 }; // namespace std
-//
+// 
 namespace DXLibRef {
-	//BOX2D
+	// BOX2D
 	static auto* CreateB2Body(std::shared_ptr<b2World>& world, b2BodyType type, float32 x_, float32 y_, float angle = 0) noexcept {
 		b2BodyDef f_bodyDef;
 		f_bodyDef.type = type;
@@ -24,18 +24,18 @@ namespace DXLibRef {
 	}
 	class b2Pats {
 	private:
-		b2FixtureDef				fixtureDef;				//動的ボディフィクスチャを定義します
-		std::unique_ptr<b2Body>		body;					//
-		b2Fixture* playerfix{ nullptr };	//
+		b2FixtureDef				fixtureDef;				// 動的ボディフィクスチャを定義します
+		std::unique_ptr<b2Body>		body;					// 
+		b2Fixture* playerfix{ nullptr };	// 
 	public:
-		Vector3DX					pos;//仮
+		Vector3DX					pos;// 仮
 	public:
 		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) noexcept {
-			fixtureDef.shape = dynamicBox;								//
-			fixtureDef.density = 1.0f;									//ボックス密度をゼロ以外に設定すると、動的になる
-			fixtureDef.friction = 0.3f;									//デフォルトの摩擦をオーバーライド
-			this->body.reset(body_ptr);									//
-			this->playerfix = this->body->CreateFixture(&fixtureDef);	//シェイプをボディに追加
+			fixtureDef.shape = dynamicBox;								// 
+			fixtureDef.density = 1.0f;									// ボックス密度をゼロ以外に設定すると、動的になる
+			fixtureDef.friction = 0.3f;									// デフォルトの摩擦をオーバーライド
+			this->body.reset(body_ptr);									// 
+			this->playerfix = this->body->CreateFixture(&fixtureDef);	// シェイプをボディに追加
 		}
 
 		void		SetLinearVelocity(const b2Vec2& position) noexcept {

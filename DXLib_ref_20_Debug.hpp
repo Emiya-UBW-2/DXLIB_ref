@@ -2,7 +2,7 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-#ifdef DEBUG
+#if defined(DEBUG)
 	class DebugClass : public SingletonBase<DebugClass> {
 	private:
 		friend class SingletonBase<DebugClass>;

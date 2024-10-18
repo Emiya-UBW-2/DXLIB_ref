@@ -2,7 +2,7 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-	//ベース
+	// ベース
 	class PostPassBase {
 	protected:
 		bool m_PrevActive{ false };
@@ -45,7 +45,7 @@ namespace DXLibRef {
 			}
 		}
 	};
-	//
+	// 
 	class PostPassEffect : public SingletonBase<PostPassEffect> {
 	private:
 		friend class SingletonBase<PostPassEffect>;
@@ -53,17 +53,17 @@ namespace DXLibRef {
 
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
 		bool										m_IsActiveGBuffer{ true };
-		GraphHandle BufferScreen;	//描画スクリーン
+		GraphHandle BufferScreen;	// 描画スクリーン
 
-		GraphHandle ColorScreen;	//そのまま透過なしにしたスクリーン
-		GraphHandle NormalScreen;	//法線のGバッファ
-		GraphHandle	DepthScreen;	//深度のGバッファ
-		//
+		GraphHandle ColorScreen;	// そのまま透過なしにしたスクリーン
+		GraphHandle NormalScreen;	// 法線のGバッファ
+		GraphHandle	DepthScreen;	// 深度のGバッファ
+		// 
 		float near_DoF = 0.f;
 		float far_DoF = 0.f;
 		float near_DoFMax = 0.f;
 		float far_DoFMin = 0.f;
-		//
+		// 
 		int InColorPerMin = 20;
 		int InColorPerMax = 255;
 		float InColorGamma = 1.1f;
@@ -82,7 +82,7 @@ namespace DXLibRef {
 		auto& Get_near_DoFMax(void) noexcept { return near_DoFMax; }
 		auto& Get_far_DoFMin(void) noexcept { return far_DoFMin; }
 	public:
-		//ボケ始める場所を指定(完全にボケるのはニアファーの限度)
+		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
 		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
 			near_DoF = near_d;
 			far_DoF = far_d;

@@ -7,62 +7,29 @@ namespace DXLibRef {
 		SPOT = DX_LIGHTTYPE_SPOT,
 		DIRECTIONAL = DX_LIGHTTYPE_DIRECTIONAL,
 	};
-	class LightHandle {
-	private:
-		int handle_;
-		constexpr LightHandle(int h) noexcept : handle_(h) {}
-		static constexpr int invalid_handle = InvalidID;
-
+	class LightHandle : public DXHandle {
+	protected:
+		void	Dispose_Sub(void) noexcept override {
+			DeleteLightHandle(DXHandle::get());
+		}
 	public:
-		constexpr LightHandle(void) noexcept : handle_(invalid_handle) {}
-		LightHandle(const LightHandle&) = delete;
-		LightHandle(LightHandle&& o) noexcept : handle_(o.handle_) {
-			o.handle_ = invalid_handle;
-		}
-		LightHandle& operator=(const LightHandle&) = delete;
-		LightHandle& operator=(LightHandle&& o) noexcept {
-			this->handle_ = o.handle_;
-			o.handle_ = invalid_handle;
-			return *this;
-		}
-		LightHandle& operator=(int handle) noexcept {
-			this->handle_ = handle;
-			return *this;
-		}
-
-		~LightHandle(void) noexcept {
-			Dispose();
-		}
-		void Dispose(void) noexcept {
-			if (this->handle_ != invalid_handle) {
-				DeleteLightHandle(this->handle_);
-				this->handle_ = invalid_handle;
-			}
-		}
-		int get(void) const noexcept { return handle_; }
-
-		LightHandle Duplicate(void) const noexcept { return this->handle_; }
-		void SetPos(const Vector3DX& Position) noexcept {
-			SetLightPositionHandle(this->handle_, Position.get());
-		}
+		void	SetPos(const Vector3DX& Position) noexcept { SetLightPositionHandle(DXHandle::get(), Position.get()); }
 		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) noexcept {
-			SetLightPositionHandle(this->handle_, Position.get());
-			SetLightDirectionHandle(this->handle_, Direction.get());
+			SetPos(Position);
+			SetLightDirectionHandle(DXHandle::get(), Direction.get());
 		}
-
-		static LightHandle CreateSpot(const Vector3DX& Position, const Vector3DX& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) noexcept {
-			return { DxLib::CreateSpotLightHandle(Position.get(), Direction.get(), OutAngle, InAngle, Range, Atten0, Atten1, Atten2) };
+	public:
+		void CreateSpot(const Vector3DX& Position, const Vector3DX& Direction, float OutAngle, float InAngle, float Range, float Atten0, float Atten1, float Atten2) noexcept {
+			DXHandle::SetHandleDirect(DxLib::CreateSpotLightHandle(Position.get(), Direction.get(), OutAngle, InAngle, Range, Atten0, Atten1, Atten2));
 		}
-
-		static LightHandle CreatePoint(const Vector3DX& Position, float Range, float Atten0, float Atten1, float Atten2) noexcept {
-			return { DxLib::CreatePointLightHandle(Position.get(), Range, Atten0, Atten1, Atten2) };
+		void CreatePoint(const Vector3DX& Position, float Range, float Atten0, float Atten1, float Atten2) noexcept {
+			DXHandle::SetHandleDirect(DxLib::CreatePointLightHandle(Position.get(), Range, Atten0, Atten1, Atten2));
 		}
-
-		static LightHandle CreateDir(const Vector3DX& Directional) noexcept {
-			return { DxLib::CreateDirLightHandle(Directional.get()) };
+		void CreateDir(const Vector3DX& Directional) noexcept {
+			DXHandle::SetHandleDirect(DxLib::CreateDirLightHandle(Directional.get()));
 		}
 	};
-	//ライトプール
+	// ライトプール
 	class LightPool : public SingletonBase<LightPool> {
 	private:
 		friend class SingletonBase<LightPool>;
@@ -80,19 +47,17 @@ namespace DXLibRef {
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			int prev = now;
-			if (handles[static_cast<size_t>(now)].get() != InvalidID) {
-				handles[static_cast<size_t>(now)].Dispose();
-			}
-			//handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
+			handles[static_cast<size_t>(now)].Dispose();
+			// handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
 			switch (Lighttype) {
 			case LightType::POINT:
-				handles[static_cast<size_t>(now)] = LightHandle::CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
+				handles[static_cast<size_t>(now)].CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
 				break;
 			case LightType::SPOT:
-				handles[static_cast<size_t>(now)] = LightHandle::CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
+				handles[static_cast<size_t>(now)].CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
 				break;
 			case LightType::DIRECTIONAL:
-				handles[static_cast<size_t>(now)] = LightHandle::CreateDir(pos);
+				handles[static_cast<size_t>(now)].CreateDir(pos);
 				break;
 			default:
 				break;
@@ -104,7 +69,7 @@ namespace DXLibRef {
 			/*
 			for (auto& h : handles)
 			{
-				if (h.get() != InvalidID)
+				if (h.IsActive())
 				{
 					if ((GetNowHiPerformanceCount() - h.time) >= 1000000 / 30)
 					{

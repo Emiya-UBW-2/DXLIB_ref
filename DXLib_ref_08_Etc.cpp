@@ -1,5 +1,5 @@
 #include "DXLib_ref.h"
-//#include "DXLib_ref_08_Etc.hpp"
+// #include "DXLib_ref_08_Etc.hpp"
 
 namespace DXLibRef {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
@@ -9,9 +9,9 @@ namespace DXLibRef {
 	const CameraShake* SingletonBase<CameraShake>::m_Singleton = nullptr;
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
 
-	//--------------------------------------------------------------------------------------------------
-	//
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
 	float GetEasingRatio(EasingType EasingType, float ratio) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
@@ -29,14 +29,9 @@ namespace DXLibRef {
 	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
 		// ビュー行列と射影行列の取得
-		MATRIX mat_view;					// ビュー行列
-		VECTOR vec_from = campos.get();		// カメラの位置
-		VECTOR vec_lookat = camvec.get();  // カメラの注視点
-		VECTOR vec_up = camup.get();    // カメラの上方向
-		CreateLookAtMatrix(&mat_view, &vec_from, &vec_lookat, &vec_up);
-		SetCameraNearFar(near_t, far_t);
-		SetupCamera_Perspective(fov);
-		MATRIX proj = GetCameraProjectionMatrix();
+		Camera3DInfo tmpcam;
+		tmpcam.SetCamPos(campos, camvec, camup);
+		tmpcam.SetCamInfo(fov, near_t, far_t);
 		// ビューポート行列（スクリーン行列）の作成
 		float w = static_cast<float>(ScreenWidth) / 2.0f;
 		float h = static_cast<float>(ScreenHeight) / 2.0f;
@@ -46,21 +41,22 @@ namespace DXLibRef {
 			0 , 0 , 1 , 0 ,
 			w , h , 0 , 1
 		};
-		VECTOR screenPos, tmp = worldpos.get();
 		// ビュー変換とプロジェクション変換
-		tmp = VTransform(tmp, mat_view);
-		tmp = VTransform(tmp, proj);
+		Vector3DX tmp = Matrix4x4DX::Vtrans(Matrix4x4DX::Vtrans(worldpos, tmpcam.GetViewMatrix()), tmpcam.GetProjectionMatrix());
 		// zで割って-1~1の範囲に収める
-		tmp.x /= tmp.z; tmp.y /= tmp.z; tmp.z /= tmp.z;
+		tmp /= tmp.z;
 		// スクリーン変換
-		screenPos = VTransform(tmp, viewport);
-		screenPos.z = -1.f;
+		Vector3DX screenPos = Matrix4x4DX::Vtrans(tmp, viewport);
+		// 深度チェックを簡素に追加
 		if (Vector3DX::Dot(camvec - campos, worldpos - campos) > 0.f) {
 			screenPos.z = 0.5f;
 		}
+		else {
+			screenPos.z = -1.f;
+		}
 		return screenPos;
 	}
-	//
+	// 
 	namespace WindowSystem {
 		void DrawData::Output() const noexcept {
 			Rect2D Widow; Widow.Set(0, 0, UIWidth, UIHeight);
@@ -160,23 +156,23 @@ namespace DXLibRef {
 			this->m_DrawDatas.resize((int)DrawLayer::Max);
 			this->m_PrevDrawDatas.resize((int)DrawLayer::Max);
 
-			m_BufferScreen = GraphHandle::Make(UIWidth, UIHeight, true);
+			m_BufferScreen.Make(UIWidth, UIHeight, true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
 			return HitRectangleToRectangle(0, 0, ScreenWidth, ScreenHeight, std::max(x1, x2), std::max(y1, y2), std::min(x1, x2), std::min(y1, y2));
 		}
-		//箱
+		// 箱
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
 			DrawControl::Instance()->SetDrawBox(DrawLayer::Normal, xp1, yp1, xp2, yp2, colorSet, true);
 		}
-		//マウスでクリックできるボタン
+		// マウスでクリックできるボタン
 		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept {
 			auto* Pad = PadControl::Instance();
 			bool MouseOver = IsActive && IntoMouse(xp1, yp1, xp2, yp2);
 			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
 		};
-		//文字
+		// 文字
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			switch (FontX) {
@@ -198,7 +194,7 @@ namespace DXLibRef {
 				return false;
 			}
 		};
-		//オンオフできるボタン
+		// オンオフできるボタン
 		bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
 			auto* DrawParts = DXDraw::Instance();
 			int xp3 = xp1 + EdgeSize;
@@ -223,7 +219,7 @@ namespace DXLibRef {
 			SetBox(xp3, yp3, xp4, yp4, color);
 			return switchturn;
 		}
-		//スライダー
+		// スライダー
 		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept {
 			int xpmin = xmin + 1;
 			int xpmax = xmax - 1;
@@ -263,7 +259,7 @@ namespace DXLibRef {
 			return value;
 		}
 	};
-	//
+	// 
 	void			switchs::Execute(bool key) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		m_press = key;
@@ -287,13 +283,13 @@ namespace DXLibRef {
 			m_on ^= 1;
 		}
 	}
-	//
+	// 
 	void			Pendulum2D::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / DrawParts->GetFps();
 		m_rad += this->m_vel / DrawParts->GetFps();
 	}
-	//
+	// 
 	void SideLog::SideLogData::UpdateActive(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (m_Time > 0.f) {
@@ -324,7 +320,7 @@ namespace DXLibRef {
 		}
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 	}
-	//
+	// 
 	void PopUp::PopUpDrawClass::Start(void) noexcept {
 		auto* SE = SoundPool::Instance();
 		auto* Pad = PadControl::Instance();
@@ -381,17 +377,17 @@ namespace DXLibRef {
 		int xm2 = xcenter + DrawParts->GetUIY(WinSizeX) / 2;
 		int ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
 
-		//背景
+		// 背景
 		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
 		WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 
-		//タイトル
+		// タイトル
 		WindowSystem::SetMsg(
 			xm1 + DrawParts->GetUIY(32), ym1 + LineHeight / 4 + LineHeight,
 			LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
-		//
+		// 
 		if (m_Active) {
 			int xp1 = xm2 - DrawParts->GetUIY(140);
 			int yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
@@ -399,7 +395,7 @@ namespace DXLibRef {
 				End();
 			}
 		}
-		//背景
+		// 背景
 		{
 			int xp1 = xm1 + DrawParts->GetUIY(24);
 			int yp1 = ym1 + LineHeight * 3;
@@ -459,11 +455,11 @@ namespace DXLibRef {
 			}
 		}
 	}
-	//
+	// 
 	namespace UniversalUI {
 		void UISystem::UI_CommonParts::SetParts(const nlohmann::json& pJson) noexcept {
 			this->m_Name = pJson["Name"];
-			//
+			// 
 			std::string Type = pJson["Type"];
 			for (size_t i : std::views::iota(0, static_cast<int>(EnumUIPartsType::Max))) {
 				if (Type == g_UIPartsString[i]) {
@@ -471,17 +467,17 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			//
+			// 
 			this->m_Layer = pJson["Layer"];
-			//
+			// 
 			this->m_IsMouseClickActive = pJson["MouseClickActive"];
-			//
+			// 
 			this->m_XPos = pJson["XPos"];
 			this->m_YPos = pJson["YPos"];
 			this->m_XSize = pJson["XSize"];
 			this->m_YSize = pJson["YSize"];
 			this->m_ZRotate = pJson["ZRotate"];
-			//
+			// 
 			std::string XCenter = pJson["XCenter"];
 			for (size_t i : std::views::iota(0, 3)) {
 				if (XCenter == g_UIXCenterString[i]) {
@@ -496,7 +492,7 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			//色関係
+			// 色関係
 			auto GetColorByPallet = [this](const std::string& ColorStr) {
 				for (size_t i : std::views::iota(0, static_cast<int>(g_UIColorPalletNum))) {
 					if (ColorStr == g_UIColorPalletString[i]) {
@@ -510,9 +506,9 @@ namespace DXLibRef {
 			this->m_IntoColor = GetColorByPallet(pJson["IntoColor"]);
 			this->m_BaseColor = GetColorByPallet(pJson["BaseColor"]);
 			this->m_EdgeColor = GetColorByPallet(pJson["EdgeColor"]);
-			//テキスト
+			// テキスト
 			this->m_TextID = pJson["TextID"];
-			//描画位置を決定
+			// 描画位置を決定
 			switch (this->m_UIXCenter) {
 			case UIXCenter::LEFT:
 				this->m_DrawXCenter = this->m_XPos + this->m_XSize / 2;
@@ -713,9 +709,9 @@ namespace DXLibRef {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 			}
 		}
-		//
+		// 
 		void UISystem::UI_CommonAnimes::SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept {
-			//
+			// 
 			m_TargetID.clear();
 			for (auto& n : pJson["Target"]) {
 				std::string S = n;
@@ -726,7 +722,7 @@ namespace DXLibRef {
 					}
 				}
 			}
-			//
+			// 
 			m_AnimeFrame.clear();
 			for (auto& n : pJson["Anime"]) {
 				FrameInfo tmp;
@@ -746,7 +742,7 @@ namespace DXLibRef {
 				}
 				m_AnimeFrame.emplace_back(tmp);
 			}
-			//
+			// 
 		}
 		void UISystem::UI_CommonAnimes::Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept {
 			if (m_AnimeFrame.size() == 0) {
@@ -756,7 +752,7 @@ namespace DXLibRef {
 				return;
 			}
 			float FramePer = 0.f;
-			//現在のアニメ番号を取得
+			// 現在のアニメ番号を取得
 			m_NowAnim = InvalidID;
 			int tmpFrame = m_Frame;
 			for (size_t index = 0; auto & a : m_AnimeFrame) {
@@ -784,7 +780,7 @@ namespace DXLibRef {
 				m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
 				FramePer = 1.f;
 			}
-			//反映
+			// 反映
 			for (auto& t : m_TargetID) {
 				for (auto& p : *Parts) {
 					if (p->GetUniqueID() == t) {
@@ -802,7 +798,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		//1レイヤー分
+		// 1レイヤー分
 		void UISystem::UI_OneLayer::Load(const char* path) noexcept {
 			m_IsEnd = false;
 
@@ -856,7 +852,7 @@ namespace DXLibRef {
 			m_CommonParts.clear();
 			UniqueIDNum = InvalidID;
 		}
-		//全体
+		// 全体
 		int UISystem::AddUI(const char* path) noexcept {
 			for (size_t index = 0; auto & l : m_Layer) {
 				if (!l.IsActive()) {
@@ -895,7 +891,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	//
+	// 
 	void CameraShake::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (m_SendCamShakeTime > 0.f) {
@@ -909,5 +905,5 @@ namespace DXLibRef {
 			this->m_CamShake = std::max(this->m_CamShake - 1.f / DrawParts->GetFps(), 0.f);
 		}
 	}
-	//
+	// 
 };

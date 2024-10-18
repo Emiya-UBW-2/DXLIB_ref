@@ -42,9 +42,9 @@ namespace DXLibRef {
 		return nullptr;
 	}
 	void			ObjectManager::DelObj(SharedObj* ptr) noexcept {
-		for (size_t index = 0; auto& o : this->m_Object) {
+		for (size_t index = 0; auto & o : this->m_Object) {
 			if (o == *ptr) {
-				//順番の維持のためここはerase
+				// 順番の維持のためここはerase
 				o->Dispose();
 				this->m_Object.erase(this->m_Object.begin() + index);
 				break;
@@ -53,14 +53,14 @@ namespace DXLibRef {
 		}
 	}
 	void			ObjectManager::ExecuteObject(void) noexcept {
-		//オブジェクトが増えた場合に備えて範囲forは使わない
+		// オブジェクトが増えた場合に備えて範囲forは使わない
 		for (int i : std::views::iota(0, static_cast<int>(this->m_Object.size()))) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				o->FirstExecute();
 			}
 		}
-		//物理アップデート
+		// 物理アップデート
 		this->m_ResetP.Execute(CheckHitKeyWithCheck(KEY_INPUT_P) != 0);
 		for (int i : std::views::iota(0, static_cast<int>(this->m_Object.size()))) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
@@ -71,11 +71,11 @@ namespace DXLibRef {
 				o->ExecuteCommon();
 			}
 		}
-		//オブジェクトの排除チェック
+		// オブジェクトの排除チェック
 		for (int i = 0, Max = static_cast<int>(this->m_Object.size()); i < Max; i++) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (o->GetIsDelete()) {
-				//順番の維持のためここはerase
+				// 順番の維持のためここはerase
 				o->Dispose();
 				this->m_Object.erase(this->m_Object.begin() + i);
 				i--;
@@ -117,6 +117,6 @@ namespace DXLibRef {
 			}
 		}
 		this->m_Model.clear();
-		this->m_LastUniqueID = 0;//一旦ユニークIDもリセット
+		this->m_LastUniqueID = 0;// 一旦ユニークIDもリセット
 	}
 };

@@ -1,13 +1,13 @@
 #pragma once
-//#include "DXLib_ref.h"
+// #include "DXLib_ref.h"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*DXLIBに直接かかわりのない便利モノ																											*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 namespace DXLibRef {
-	//--------------------------------------------------------------------------------------------------
-	//シングルトン
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// シングルトン
+	// --------------------------------------------------------------------------------------------------
 	template <class T>
 	class SingletonBase {
 	private:
@@ -21,7 +21,7 @@ namespace DXLibRef {
 				MessageBox(NULL, "Failed Instance Create", "", MB_OK);
 				exit(InvalidID);
 			}
-			//if (m_Singleton == nullptr) { m_Singleton = new T(); }
+			// if (m_Singleton == nullptr) { m_Singleton = new T(); }
 			return (T*)m_Singleton;
 		}
 	protected:
@@ -33,7 +33,7 @@ namespace DXLibRef {
 		SingletonBase(SingletonBase&&) = delete;
 		SingletonBase& operator=(SingletonBase&&) = delete;
 	};
-	//子のサンプル
+	// 子のサンプル
 	/*
 	class A : public SingletonBase<A> {
 	private:
@@ -41,10 +41,48 @@ namespace DXLibRef {
 	}
 	//*/
 
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
+	// DXLIBのハンドル操作系の基底クラス
+	// --------------------------------------------------------------------------------------------------
+	class DXHandle {
+	private:
+		int m_handle{ InvalidID };
+	protected:
+		constexpr DXHandle(int h) noexcept : m_handle(h) {}
+	public:
+		constexpr DXHandle(void) noexcept : m_handle(InvalidID) {}
+		DXHandle(const DXHandle&) = delete;
+		DXHandle(DXHandle&& o) noexcept : m_handle(o.get()) { o.SetHandleDirect(InvalidID); }
+		DXHandle& operator=(const DXHandle&) = delete;
+		DXHandle& operator=(DXHandle&& o) noexcept {
+			SetHandleDirect(o.get());
+			o.SetHandleDirect(InvalidID);
+			return *this;
+		}
+
+		virtual ~DXHandle(void) noexcept {
+			Dispose();
+		}
+	public:
+		const int get(void) const noexcept { return this->m_handle; }
+		constexpr bool IsActive(void) const noexcept { return this->m_handle != InvalidID; }
+		constexpr explicit operator bool(void) const noexcept { return IsActive(); }
+	public:
+		void Dispose(void) noexcept {
+			if (IsActive()) {
+				Dispose_Sub();
+				SetHandleDirect(InvalidID);
+			}
+		}
+	protected:
+		void SetHandleDirect(int handle) noexcept { this->m_handle = handle; }
+		virtual void Dispose_Sub(void) noexcept {}
+	};
+
+	// --------------------------------------------------------------------------------------------------
 	// ファイル操作
-	//--------------------------------------------------------------------------------------------------
-	//ディレクトリ内のファイル走査
+	// --------------------------------------------------------------------------------------------------
+	// ディレクトリ内のファイル走査
 	static void GetFileNamesInDirectory(const char* pPath, std::vector<WIN32_FIND_DATA>* pData) noexcept {
 		pData->clear();
 		WIN32_FIND_DATA win32fdt;
@@ -57,10 +95,10 @@ namespace DXLibRef {
 				}
 
 			} while (FindNextFile(hFind, &win32fdt));
-		} //else{ return false; }
+		} // else{ return false; }
 		FindClose(hFind);
 	}
-	//ファイル選択ダイアログ
+	// ファイル選択ダイアログ
 	class DialogManager {
 		OPENFILENAME	ofn;
 		TCHAR			strFile[MAX_PATH]{ 0 };
@@ -105,10 +143,10 @@ namespace DXLibRef {
 		}
 	};
 
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
 	// 起動
-	//--------------------------------------------------------------------------------------------------
-	//起動
+	// --------------------------------------------------------------------------------------------------
+	// 起動
 	static void CreateOurProcess(char* szCmd, DWORD flag, bool fWait) noexcept {
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
@@ -116,11 +154,11 @@ namespace DXLibRef {
 		memset(&pi, 0, sizeof(PROCESS_INFORMATION));
 		si.cb = sizeof(STARTUPINFO);
 		CreateProcess(NULL, szCmd, NULL, NULL, FALSE, flag, NULL, NULL, &si, &pi);
-		if (fWait) WaitForSingleObject(pi.hProcess, INFINITE);	//終了を待つ.
+		if (fWait) WaitForSingleObject(pi.hProcess, INFINITE);	// 終了を待つ.
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
-	//自身を多重起動
+	// 自身を多重起動
 	static void StartMe(void) noexcept {
 		char Path[MAX_PATH];
 		// EXEのあるフォルダのパスを取得
@@ -128,18 +166,18 @@ namespace DXLibRef {
 		CreateOurProcess(Path, SW_HIDE, false);
 	}
 
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
 	// 角度変換
-	//--------------------------------------------------------------------------------------------------
-	//角度からラジアンに
+	// --------------------------------------------------------------------------------------------------
+	// 角度からラジアンに
 	extern void* enabler;// ダミー変数
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
 	constexpr float deg2rad(T p1) noexcept { return float(p1) * DX_PI_F / 180.f; }
-	//ラジアンから角度に
+	// ラジアンから角度に
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
 	constexpr float rad2deg(T p1) noexcept { return float(p1) * 180.f / DX_PI_F; }
 
-	//余弦定理
+	// 余弦定理
 	constexpr float GetCosFormula(float a, float b, float c) noexcept {
 		if (b + c > a && c + a > b && a + b > c) {
 			return std::clamp((b * b + c * c - a * a) / (2.f * b * c), -1.f, 1.f);
@@ -147,9 +185,9 @@ namespace DXLibRef {
 		return 1.f;
 	}
 
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
 	// 文字変換
-	//--------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
 	/*wstringをstringへ変換*/
 	static std::string WStringToString(std::wstring_view oWString) noexcept {
 		// wstring → SJIS
@@ -180,22 +218,4 @@ namespace DXLibRef {
 		// 変換結果を返す
 		return oRet;
 	}
-	//--------------------------------------------------------------------------------------------------
-	// フォントファイル管理
-	//--------------------------------------------------------------------------------------------------
-	class FontInstallClass {
-		std::string		m_Path;
-	public:
-		void Install(LPCSTR font_path) noexcept {
-			m_Path = font_path;
-			if (AddFontResourceEx(m_Path.c_str(), FR_PRIVATE, NULL) == 0) {
-				MessageBox(NULL, "フォント読込失敗", "", MB_OK);
-			}
-		}
-		void Remove(void) noexcept {
-			if (RemoveFontResourceEx(m_Path.c_str(), FR_PRIVATE, NULL) == 0) {
-				MessageBox(NULL, "フォント読込削除", "", MB_OK);
-			}
-		}
-	};
 }
