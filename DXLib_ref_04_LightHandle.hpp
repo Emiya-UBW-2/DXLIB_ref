@@ -13,8 +13,8 @@ namespace DXLibRef {
 			DeleteLightHandle(DXHandle::get());
 		}
 	public:
-		void	SetPos(const Vector3DX& Position) noexcept { SetLightPositionHandle(DXHandle::get(), Position.get()); }
-		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) noexcept {
+		void	SetPos(const Vector3DX& Position) const noexcept { SetLightPositionHandle(DXHandle::get(), Position.get()); }
+		void SetPos(const Vector3DX& Position, const Vector3DX& Direction) const noexcept {
 			SetPos(Position);
 			SetLightDirectionHandle(DXHandle::get(), Direction.get());
 		}

@@ -147,7 +147,7 @@ namespace DXLibRef {
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;
 		bool			UpdateShadowActive(void) noexcept;
-		void			UpdateWindowSize(void)noexcept {
+		void			UpdateWindowSize(void) const noexcept {
 			// DPIê›íË
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);

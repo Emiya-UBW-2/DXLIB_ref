@@ -601,6 +601,7 @@ namespace DXLibRef {
 			StringAutoFit,
 			RotaGraph,
 			ExtendGraph,
+			CircleGauge,
 		};
 		class DrawData {
 			DrawType								m_type{ DrawType::Box };
@@ -781,6 +782,17 @@ namespace DXLibRef {
 				Back->InputintParam(2, x2);
 				Back->InputintParam(3, y2);
 				Back->InputboolParam(0, trns);
+			}
+			// 
+			void SetDrawCircleGauge(DrawLayer Layer, const GraphHandle* pGraphHandle, int   CenterX, int   CenterY, float Percent, float StartPercent = 0.f, float Scale = 1.0f) noexcept {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::CircleGauge);
+				Back->InputGraphHandleParam(0, pGraphHandle);
+				Back->InputintParam(0, CenterX);
+				Back->InputintParam(1, CenterY);
+				Back->InputfloatParam(0, Percent);
+				Back->InputfloatParam(1, StartPercent);
+				Back->InputfloatParam(2, Scale);
 			}
 			// 
 			template <typename... Args>

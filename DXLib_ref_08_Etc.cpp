@@ -63,7 +63,12 @@ namespace DXLibRef {
 
 			switch (m_type) {
 			case DrawType::Alpha:
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam[0]);
+				if (this->m_intParam[0] < 255) {
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam[0]);
+				}
+				else {
+					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, this->m_intParam[0]);
+				}
 				break;
 			case DrawType::Add:
 				SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam[0]);
@@ -146,6 +151,15 @@ namespace DXLibRef {
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
 					m_GraphHandleParam.at(0)->DrawExtendGraph(this->m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_intParam[3], this->m_boolParam[0]);
 					SetDrawMode(prev);
+				}
+				break;
+			case DrawType::CircleGauge:
+				if (m_GraphHandleParam.at(0)) {
+					DrawCircleGauge(this->m_intParam[0], this->m_intParam[1],
+						(double)this->m_floatParam[0],
+						m_GraphHandleParam.at(0)->get(),
+						(double)this->m_floatParam[1],
+						(double)this->m_floatParam[2]);
 				}
 				break;
 			default:
