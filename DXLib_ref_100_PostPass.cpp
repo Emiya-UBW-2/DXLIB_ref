@@ -18,8 +18,9 @@ namespace DXLibRef {
 		float MAX_DISTANCE = 1500.0f;
 	public:
 		void Load_Sub(void) noexcept override {
-			int xsize = ScreenWidth;
-			int ysize = ScreenHeight;
+			auto* DrawParts = DXDraw::Instance();
+			int xsize = DrawParts->GetScreenXMax();
+			int ysize = DrawParts->GetScreenYMax();
 			m_ScreenVertex.SetScreenVertex(xsize, ysize);
 			m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
 			m_ShaderBlur.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_BilateralBlur.pso");
@@ -67,7 +68,7 @@ namespace DXLibRef {
 				ColorGraph->SetUseTextureToShader(0);
 				NormalPtr->SetUseTextureToShader(1);
 				DepthPtr->SetUseTextureToShader(2);
-				m_ShaderSSAO.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_ShaderSSAO.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
 				m_ShaderSSAO.SetPixelParam(4, SCALE, BIAS, SAMPLE_RAD, MAX_DISTANCE);
 
@@ -82,7 +83,7 @@ namespace DXLibRef {
 			{
 				SSRScreen2.SetUseTextureToShader(0);	// 使用するテクスチャをセット
 
-				m_ShaderBlur.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_ShaderBlur.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				m_ShaderBlur.Draw(m_ScreenVertex);
 
 				SetUseTextureToShader(0, InvalidID);
@@ -92,9 +93,9 @@ namespace DXLibRef {
 			{
 				TargetGraph->DrawGraph(0, 0, true);
 				SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
-				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				// SSRScreen2.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				// SSRScreen2.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 			}
 		}
 	};
@@ -122,8 +123,9 @@ namespace DXLibRef {
 		virtual ~PostPassSSR(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			int xsize = ScreenWidth / EXTEND;
-			int ysize = ScreenHeight / EXTEND;
+			auto* DrawParts = DXDraw::Instance();
+			int xsize = DrawParts->GetScreenXMax() / EXTEND;
+			int ysize = DrawParts->GetScreenYMax() / EXTEND;
 			SSRScreen.Make(xsize, ysize, true);
 			{
 				bkScreen2.Make(xsize, ysize, false);
@@ -135,13 +137,11 @@ namespace DXLibRef {
 
 					DrawOval(xsize / 2, ysize / 2, xr, yr, White, TRUE);
 
-					int r = 0, c = 0, p = 2;
+					int p = 1;
+					for (int r = 0; r < 255; r += p) {
+						uint8_t c = static_cast<uint8_t>(255 - static_cast<int>(std::powf(static_cast<float>(255 - r) / 255.f, 1.5f) * 255.f));
 
-					p = 1;
-					for (r = 0; r < 255; r += p) {
-						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f) * 255.f);
-
-						DrawOval(xsize / 2, ysize / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(xsize / 2, ysize / 2, xr - r / p, yr - r / p, GetColorFix(c, c, c), FALSE, 2);
 					}
 				}
 			}
@@ -216,7 +216,7 @@ namespace DXLibRef {
 			TargetGraph->SetDraw_Screen(false);
 			{
 				TargetGraph->DrawGraph(0, 0, true);
-				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 			}
 		}
 	};
@@ -235,8 +235,9 @@ namespace DXLibRef {
 		virtual ~PostPassDoF(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			DoFScreen.Make(ScreenWidth, ScreenHeight, true);
-			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			auto* DrawParts = DXDraw::Instance();
+			DoFScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 			m_Shader.Init("CommonData/shader/VS_DoF.vso", "CommonData/shader/PS_DoF.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -249,6 +250,7 @@ namespace DXLibRef {
 		}
 	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 			DoFScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 2000);
 			TargetGraph->SetDraw_Screen();
@@ -256,7 +258,7 @@ namespace DXLibRef {
 				ColorGraph->SetUseTextureToShader(0);
 				DoFScreen.SetUseTextureToShader(1);
 				DepthPtr->SetUseTextureToShader(2);
-				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				m_Shader.SetPixelParam(3, PostPassParts->Get_near_DoF(), PostPassParts->Get_far_DoF(), PostPassParts->Get_near_DoFMax(), PostPassParts->Get_far_DoFMin());
 				{
 					m_Shader.Draw(m_ScreenVertex);
@@ -283,8 +285,9 @@ namespace DXLibRef {
 		virtual ~PostPassBloom(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			GaussScreen_.Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
-			BufScreen.Make(ScreenWidth, ScreenHeight, true);
+			auto* DrawParts = DXDraw::Instance();
+			GaussScreen_.Make(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND, true);
+			BufScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			GaussScreen_.Dispose();
@@ -295,6 +298,7 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::bloom);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			BufScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_TWO_COLOR, 250, Black, 255, Gray50, 255);
 			GaussScreen_.GraphFilterBlt(BufScreen, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			GaussScreen_.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 1000);
@@ -303,8 +307,8 @@ namespace DXLibRef {
 				auto Prev = GetDrawMode();
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				GaussScreen_.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
-				GaussScreen_.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
+				GaussScreen_.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 				SetDrawMode(Prev);
 			}
@@ -323,8 +327,9 @@ namespace DXLibRef {
 		virtual ~PostPassAberration(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			for (auto& buf : BufScreen) {
-				buf.Make(ScreenWidth, ScreenHeight, true);
+				buf.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 			}
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -338,25 +343,25 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
-			BufScreen[0].SetDraw_Screen(false);
-			BufScreen[0].FillGraph(0, 0, 0);
-			BufScreen[1].SetDraw_Screen(false);
-			BufScreen[1].FillGraph(0, 0, 0);
-			BufScreen[2].SetDraw_Screen(false);
-			BufScreen[2].FillGraph(0, 0, 0);
-			BufScreen[0].GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+			BufScreen.at(0).SetDraw_Screen(false);
+			BufScreen.at(0).FillGraph(0, 0, 0);
+			BufScreen.at(1).SetDraw_Screen(false);
+			BufScreen.at(1).FillGraph(0, 0, 0);
+			BufScreen.at(2).SetDraw_Screen(false);
+			BufScreen.at(2).FillGraph(0, 0, 0);
+			BufScreen.at(0).GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_BLEND_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
-			BufScreen[1].GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+			BufScreen.at(1).GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_BLEND_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_SRC_A);
-			BufScreen[2].GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
+			BufScreen.at(2).GraphBlend(*TargetGraph, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_BLEND_B, DX_RGBA_SELECT_SRC_A);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				TargetGraph->FillGraph(0, 0, 0);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				BufScreen[0].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
-				BufScreen[1].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f, 0.f, true);
-				BufScreen[2].DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen.at(0).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen.at(1).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f, 0.f, true);
+				BufScreen.at(2).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -381,8 +386,9 @@ namespace DXLibRef {
 			~BlurScreen(void) noexcept {}
 		public:
 			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
+				auto* DrawParts = DXDraw::Instance();
 				for (int i : std::views::iota(0, MAX)) {
-					m_screen.at(static_cast<size_t>(i)).Make(ScreenWidth, ScreenHeight);
+					m_screen.at(static_cast<size_t>(i)).Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				}
 				m_current = 0;
 				m_alpha = t_alpha;
@@ -400,6 +406,7 @@ namespace DXLibRef {
 			}
 		public:
 			auto* PostRenderBlurScreen(std::function<void()> doing) noexcept {
+				auto* DrawParts = DXDraw::Instance();
 				auto next = (m_current != 0) ? (m_current - 1) : MAX - 1;
 				m_screen[static_cast<size_t>(m_current)].SetDraw_Screen();
 				{
@@ -408,7 +415,7 @@ namespace DXLibRef {
 						int drawMode = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
-						m_screen[static_cast<size_t>(next)].DrawExtendGraph(m_offsetX1, m_offsetY1, ScreenWidth + m_offsetX2, ScreenHeight + offsetY2, false);
+						m_screen[static_cast<size_t>(next)].DrawExtendGraph(m_offsetX1, m_offsetY1, DrawParts->GetScreenXMax() + m_offsetX2, DrawParts->GetScreenYMax() + offsetY2, false);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 						SetDrawMode(drawMode);
 					}
@@ -467,28 +474,27 @@ namespace DXLibRef {
 		virtual ~PostPassCornerBlur(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			AberrationScreen.Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
+			auto* DrawParts = DXDraw::Instance();
+			AberrationScreen.Make(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND, true);
 			{
-				bkScreen2.Make(ScreenWidth, ScreenHeight, false);
+				bkScreen2.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), false);
 				bkScreen2.SetDraw_Screen(false);
 				{
 					bkScreen2.FillGraph(0, 0, 0);
-					int xr = ScreenWidth * 60 / 100;
-					int yr = ScreenHeight * 70 / 100;
+					int xr = DrawParts->GetScreenXMax() * 60 / 100;
+					int yr = DrawParts->GetScreenYMax() * 70 / 100;
 
-					DrawOval(ScreenWidth / 2, ScreenHeight / 2, xr, yr, White, TRUE);
+					DrawOval(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, xr, yr, White, TRUE);
 
-					int r = 0, c = 0, p = 2;
+					int p = 1;
+					for (int r = 0; r < 255; r += p) {
+						uint8_t c = static_cast<uint8_t>(255 - static_cast<int>(std::powf(static_cast<float>(255 - r) / 255.f, 1.5f) * 255.f));
 
-					p = 1;
-					for (r = 0; r < 255; r += p) {
-						c = 255 - int(std::powf(float(255 - r) / 255.f, 1.5f) * 255.f);
-
-						DrawOval(ScreenWidth / 2, ScreenHeight / 2, xr - r / p, yr - r / p, GetColor(c, c, c), FALSE, 2);
+						DrawOval(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, xr - r / p, yr - r / p, GetColorFix(c, c, c), FALSE, 2);
 					}
 				}
 			}
-			BufScreen.Make(ScreenWidth, ScreenHeight, true);
+			BufScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			AberrationScreen.Dispose();
@@ -500,13 +506,14 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			AberrationScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			AberrationScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 1000);
 			BufScreen.GraphBlendBlt(*TargetGraph, bkScreen2, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
 			{
-				AberrationScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, false);
+				AberrationScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), false);
 				BufScreen.DrawGraph(0, 0, true);
 			}
 		}
@@ -525,25 +532,25 @@ namespace DXLibRef {
 		virtual ~PostPassVignette(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			{
-				bkScreen.Make(ScreenWidth, ScreenHeight, false);
+				bkScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), false);
 				bkScreen.SetDraw_Screen(true);
 				bkScreen.FillGraph(255, 255, 255);
 				{
-					int y = 0, c = 0, p = 2;
-					p = 1;
-					for (y = 0; y < 255; y += p) {
-						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 64.f);
-						DxLib::DrawLine(0, y / p, ScreenWidth, y / p, GetColor(c, c, c));
+					int p = 1;
+					for (int y = 0; y < 255; y += p) {
+						uint8_t c = static_cast<uint8_t>(255 - static_cast<int>(std::powf(static_cast<float>(255 - y) / 255.f, 1.5f) * 64.f));
+						DxLib::DrawLine(0, y / p, DrawParts->GetScreenXMax(), y / p, GetColorFix(c, c, c));
 					}
-					p = 2;
-					for (y = 0; y < 255; y += p) {
-						c = 255 - int(std::powf(float(255 - y) / 255.f, 1.5f) * 128.f);
-						DxLib::DrawLine(0, ScreenHeight - y / p, ScreenWidth, ScreenHeight - y / p, GetColor(c, c, c));
+					p = 1;
+					for (int y = 0; y < 255; y += p) {
+						uint8_t c = static_cast<uint8_t>(255 - static_cast<int>(std::powf(static_cast<float>(255 - y) / 255.f, 1.5f) * 128.f));
+						DxLib::DrawLine(0, DrawParts->GetScreenYMax() - y / p, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax() - y / p, GetColorFix(c, c, c));
 					}
 				}
 			}
-			BufScreen.Make(ScreenWidth, ScreenHeight, true);
+			BufScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			bkScreen.Dispose();
@@ -583,6 +590,7 @@ namespace DXLibRef {
 			float Absorption,		// 内側の円に引き込まれるドット数
 			const GraphHandle& ScreenHandle// 画面グラフィックハンドル
 		) {
+			auto* DrawParts = DXDraw::Instance();
 			const int CIRCLE_ANGLE_VERTEX_NUM = 16;			// 円周の頂点数
 			const int CIRCLE_RADIUS_VERTEX_NUM = 8;			// 半径の頂点数
 
@@ -672,8 +680,8 @@ namespace DXLibRef {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(ScreenWidth);
-					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(ScreenHeight);
+					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(DrawParts->GetScreenXMax());
+					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(DrawParts->GetScreenYMax());
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -707,8 +715,8 @@ namespace DXLibRef {
 					Vert->pos.z = 0.0f;
 
 					// テクスチャ座標のセット
-					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(ScreenWidth);
-					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(ScreenHeight);
+					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(DrawParts->GetScreenXMax());
+					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(DrawParts->GetScreenYMax());
 
 					// その他のパラメータをセット
 					Vert->rhw = 1.0f;
@@ -721,7 +729,8 @@ namespace DXLibRef {
 		}
 	public:
 		void Load_Sub(void) noexcept override {
-			BufScreen.Make(ScreenWidth, ScreenHeight, true);
+			auto* DrawParts = DXDraw::Instance();
+			BufScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 		}
 		void Dispose_Sub(void) noexcept override {
 			BufScreen.Dispose();
@@ -731,6 +740,7 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect) && OptionParts->GetParamBoolean(EnumProjectSettingParam::Distortion);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			BufScreen.SetDraw_Screen();
 			{
 				TargetGraph->DrawGraph(0, 0, true);
@@ -740,8 +750,8 @@ namespace DXLibRef {
 			{
 				// 画面を歪ませて描画
 				DrawCircleScreen(
-					ScreenWidth / 2, ScreenHeight / 2,
-					static_cast<float>(ScreenWidth * 2 / 3), 120.0f, BufScreen);
+					DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2,
+					static_cast<float>(DrawParts->GetScreenXMax() * 2 / 3), DrawParts->GetDistortionPer(), BufScreen);
 			}
 		}
 	};
@@ -751,7 +761,8 @@ namespace DXLibRef {
 		ShaderUseClass		m_Shader;
 	public:
 		void Load_Sub(void) noexcept override {
-			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			auto* DrawParts = DXDraw::Instance();
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 			m_Shader.Init("CommonData/shader/VS_FXAA.vso", "CommonData/shader/PS_FXAA.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -762,10 +773,11 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::AA);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
+			auto* DrawParts = DXDraw::Instance();
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->SetUseTextureToShader(0);
-				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
+				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				{
 					m_Shader.Draw(m_ScreenVertex);
 				}
@@ -794,10 +806,11 @@ namespace DXLibRef {
 		virtual ~PostPassGodRay(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			m_ScreenVertex.SetScreenVertex(ScreenWidth / EXTEND, ScreenHeight / EXTEND);
+			auto* DrawParts = DXDraw::Instance();
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND);
 			m_Shader.Init("CommonData/shader/VS_GodRay.vso", "CommonData/shader/PS_GodRay.pso");
-			SSRScreen.Make(ScreenWidth / EXTEND, ScreenHeight / EXTEND, true);
-			SSRDepthScreen.MakeDepth(ScreenWidth / EXTEND, ScreenHeight / EXTEND);
+			SSRScreen.Make(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND, true);
+			SSRDepthScreen.MakeDepth(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND);
 		}
 		void Dispose_Sub(void) noexcept override {
 			SSRScreen.Dispose();
@@ -849,7 +862,7 @@ namespace DXLibRef {
 			{
 				ColorGraph->DrawGraph(0, 0, true);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255 / 2);
-				SSRScreen.DrawExtendGraph(0, 0, ScreenWidth, ScreenHeight, true);
+				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -868,7 +881,8 @@ namespace DXLibRef {
 		virtual ~PostPassScope(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			auto* DrawParts = DXDraw::Instance();
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 			m_Shader.Init("CommonData/shader/VS_lens.vso", "CommonData/shader/PS_lens.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -880,8 +894,8 @@ namespace DXLibRef {
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
-				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
-				m_Shader.SetPixelParam(3, DrawParts->GetLensParam().param[0], DrawParts->GetLensParam().param[1], DrawParts->GetLensParam().param[2], DrawParts->GetLensParam().param[3]);
+				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
+				m_Shader.SetPixelParam(3, DrawParts->GetLensParam().param.at(0), DrawParts->GetLensParam().param.at(1), DrawParts->GetLensParam().param.at(2), DrawParts->GetLensParam().param.at(3));
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);
@@ -902,7 +916,8 @@ namespace DXLibRef {
 		virtual ~PostPassBlackout(void) noexcept {}
 	public:
 		void Load_Sub(void) noexcept override {
-			m_ScreenVertex.SetScreenVertex(ScreenWidth, ScreenHeight);
+			auto* DrawParts = DXDraw::Instance();
+			m_ScreenVertex.SetScreenVertex(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 			m_Shader.Init("CommonData/shader/VS_BlackOut.vso", "CommonData/shader/PS_BlackOut.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -914,8 +929,8 @@ namespace DXLibRef {
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
-				m_Shader.SetPixelDispSize(ScreenWidth, ScreenHeight);
-				m_Shader.SetPixelParam(3, DrawParts->GetBlackoutParam().param[0], DrawParts->GetBlackoutParam().param[1], DrawParts->GetBlackoutParam().param[2], DrawParts->GetBlackoutParam().param[3]);
+				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
+				m_Shader.SetPixelParam(3, DrawParts->GetBlackoutParam().param.at(0), DrawParts->GetBlackoutParam().param.at(1), DrawParts->GetBlackoutParam().param.at(2), DrawParts->GetBlackoutParam().param.at(3));
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);
@@ -928,10 +943,11 @@ namespace DXLibRef {
 	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	// 
 	PostPassEffect::PostPassEffect(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 		SetCreateDrawValidGraphZBufferBitDepth(24);
-		BufferScreen.Make(ScreenWidth, ScreenHeight, true);
-		ColorScreen.Make(ScreenWidth, ScreenHeight, false);
+		BufferScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
+		ColorScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), false);
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		// ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
@@ -1031,7 +1047,7 @@ namespace DXLibRef {
 	void PostPassEffect::DrawPostProcess(void) noexcept {
 		BufferScreen.SetDraw_Screen(false);
 		// 色味補正
-		BufferScreen.GraphFilter(DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, int(InColorGamma * 100), 0, 255);
+		BufferScreen.GraphFilter(DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, static_cast<int>(InColorGamma * 100), 0, 255);
 		// ポストパスエフェクトのbufに描画
 		if (m_IsActiveGBuffer) {
 			for (auto& P : m_PostPass) {
@@ -1042,10 +1058,11 @@ namespace DXLibRef {
 	}
 	// 
 	void PostPassEffect::LoadGBuffer(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 		SetCreateDrawValidGraphZBufferBitDepth(24);
-		NormalScreen.Make(ScreenWidth, ScreenHeight, false);
-		DepthScreen.MakeDepth(ScreenWidth, ScreenHeight);
+		NormalScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), false);
+		DepthScreen.MakeDepth(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 	}
 	void PostPassEffect::DisposeGBuffer(void) noexcept {

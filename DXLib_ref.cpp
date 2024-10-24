@@ -45,7 +45,7 @@ namespace DXLibRef {
 	// 
 	void DXLib_ref::UpdatePause(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		m_PauseFlashCount += 1.f / DrawParts->GetFps();
+		m_PauseFlashCount += DrawParts->GetDeltaTime();
 		if (m_PauseFlashCount > 1.f) {
 			m_PauseFlashCount -= 1.f;
 		}
@@ -58,7 +58,7 @@ namespace DXLibRef {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		// 
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, UIWidth, UIHeight, Black, TRUE);
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax(), Black, TRUE);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 		// 
 		if (m_PauseFlashCount > 0.5f) {
@@ -89,19 +89,19 @@ namespace DXLibRef {
 		else if (m_FPSAvg < 58.f) {
 			color = Yellow;
 		}
-		WindowSystem::SetMsg(UIWidth - DrawParts->GetUIY(8), DrawParts->GetUIY(8) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, color, Black, "%5.2f FPS", m_FPSAvg);
-		WindowSystem::SetMsg(UIWidth - DrawParts->GetUIY(8), DrawParts->GetUIY(8 + 20) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d Drawcall", GetDrawCallCount());
+		WindowSystem::SetMsg(DrawParts->GetUIXMax() - DrawParts->GetUIY(8), DrawParts->GetUIY(8) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, color, Black, "%5.2f FPS", m_FPSAvg);
+		WindowSystem::SetMsg(DrawParts->GetUIXMax() - DrawParts->GetUIY(8), DrawParts->GetUIY(8 + 20) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d Drawcall", GetDrawCallCount());
 	}
 	void DXLib_ref::DrawUICommon(void) const noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		DrawPause();
 		DrawFPSCounter();
 		UniversalUI::UISystem::Instance()->Draw();
 		PadControl::Instance()->Draw();
 		SideLog::Instance()->Draw();
-		PopUp::Instance()->Draw(UIWidth / 2, UIHeight / 2);
+		PopUp::Instance()->Draw(DrawParts->GetUIXMax() / 2, DrawParts->GetUIYMax() / 2);
 #if defined(DEBUG)
-		auto* DrawParts = DXDraw::Instance();
-		DebugClass::Instance()->DebugWindow(UIWidth - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
+		DebugClass::Instance()->DebugWindow(DrawParts->GetUIXMax() - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
 #endif // DEBUG
 	}
 	// 

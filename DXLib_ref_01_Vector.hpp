@@ -377,7 +377,7 @@ namespace DXLibRef {
 
 		Sin = std::sinf(Rotate);
 		Cos = std::cosf(Rotate);
-		// _SINCOS_PLATFORM(Rotate, &Sin, &Cos);
+
 		f = xv3.x * Cos - xv3.y * Sin;
 		xv3.y = xv3.x * Sin + xv3.y * Cos;
 		xv3.x = f;
@@ -413,17 +413,94 @@ namespace DXLibRef {
 		float rad = VRad(In1.get(), In2.get());
 		return M33GetRotAxis(av, rad);
 	}
+
+	// ãtçsóÒÇçÏê¨Ç∑ÇÈ
+	static int CreateInverseMatrix33(MATRIX33* Out, const MATRIX33& In) {
+		float detA =
+			In.m[0][0] * In.m[1][1] * In.m[2][2] +
+			In.m[0][1] * In.m[1][2] * In.m[2][0] +
+			In.m[0][2] * In.m[1][0] * In.m[2][1] -
+			In.m[0][0] * In.m[1][2] * In.m[2][1] -
+			In.m[0][1] * In.m[1][0] * In.m[2][2] -
+			In.m[0][2] * In.m[1][1] * In.m[2][0];
+
+		if (detA < 0.0000001f && detA > -0.0000001f) {
+			return FALSE;
+		}
+
+		Out->m[0][0] =
+			(
+				In.m[1][1] * In.m[2][2] -
+				In.m[1][2] * In.m[2][1] 
+				) / detA;
+
+		Out->m[0][1] =
+			(
+				
+				In.m[0][2] * In.m[2][1] -
+				In.m[0][1] * In.m[2][2] 
+				) / detA;
+
+		Out->m[0][2] =
+			(
+				In.m[0][1] * In.m[1][2] -
+				In.m[0][2] * In.m[1][1] 
+				) / detA;
+
+		Out->m[1][0] =
+			(
+				
+				In.m[1][2] * In.m[2][0] -
+				In.m[1][0] * In.m[2][2] 
+				) / detA;
+
+		Out->m[1][1] =
+			(
+				In.m[0][0] * In.m[2][2] -
+				In.m[0][2] * In.m[2][0] 
+				) / detA;
+
+		Out->m[1][2] =
+			(
+				
+				In.m[0][2] * In.m[1][0] -
+				In.m[0][0] * In.m[1][2] 
+				) / detA;
+
+		Out->m[2][0] =
+			(
+				In.m[1][0] * In.m[2][1] -
+				In.m[1][1] * In.m[2][0]
+				) / detA;
+
+		Out->m[2][1] =
+			(
+				
+				In.m[0][1] * In.m[2][0] -
+				In.m[0][0] * In.m[2][1]
+				) / detA;
+
+		Out->m[2][2] =
+			(
+				In.m[0][0] * In.m[1][1] -
+				In.m[0][1] * In.m[1][0]
+				) / detA;
+
+		return TRUE;
+	}
 	// ãtçsóÒÇìæÇÈ
-	static MATRIX33 M33Inverse(MATRIX33 InM) noexcept {
-		MATRIX In;
+	static MATRIX33 M33Inverse(const MATRIX33& InM) {
 		MATRIX33 Result;
-		M33toMATRIX(&In, InM);
-		In = DxLib::MInverse(In);
-		MATRIXtoM33(&Result, In);
+
+		if (!CreateInverseMatrix33(&Result, InM)) {
+			return M33GetIdent();
+		}
+
 		return Result;
 	}
+
 	// ì]íuçsóÒÇìæÇÈ
-	static MATRIX33 M33Transpose(MATRIX33 InM) noexcept {
+	static MATRIX33 M33Transpose(const MATRIX33& InM) noexcept {
 		MATRIX33 Result =
 		{
 			{
@@ -435,7 +512,7 @@ namespace DXLibRef {
 		return Result;
 	}
 	// çsóÒÇÃèÊéZÇçsÇ§
-	static MATRIX33 M33Mult(MATRIX33 In1, MATRIX33 In2) noexcept {
+	static MATRIX33 M33Mult(const MATRIX33& In1, const MATRIX33& In2) noexcept {
 		MATRIX33 Result =
 		{
 			{

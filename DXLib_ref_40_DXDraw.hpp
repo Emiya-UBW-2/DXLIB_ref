@@ -60,8 +60,8 @@ namespace DXLibRef {
 			bool UpdateActive(void) noexcept;
 		};
 		struct shaderparam {
-			bool			use{ false };
-			float			param[4]{ 0,0,0,0 };
+			bool					use{ false };
+			std::array<float, 4>	param{ 0,0,0,0 };
 		};
 	private:
 		int							m_DispXSize{ deskx };
@@ -75,9 +75,10 @@ namespace DXLibRef {
 
 		int							m_ScreenXSize{ deskx };
 		int							m_ScreenYSize{ desky };
-		float						m_FPS{ FrameRate };
 
 		switchs						m_PauseActive;
+
+		float						m_DeltaTime{ 0.f };
 		LONGLONG					m_StartTime{ 0 };
 
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
@@ -100,18 +101,20 @@ namespace DXLibRef {
 
 		CheckPCSpec					m_CheckPCSpec;
 		ShaderUseClass				m_PBR_Shader;
+
+		float						m_DistortionPer{ 120.f };
 	public:// ゲッター
-		const auto& is_lens(void) const noexcept { return m_Shader2D[0].use; }
-		const auto& zoom_lens(void) const noexcept { return m_Shader2D[0].param[3]; }
-		void			Set_is_lens(bool value) noexcept { m_Shader2D[0].use = value; }
-		void			Set_xp_lens(float value) noexcept { m_Shader2D[0].param[0] = value; }
-		void			Set_yp_lens(float value) noexcept { m_Shader2D[0].param[1] = value; }
-		void			Set_size_lens(float value) noexcept { m_Shader2D[0].param[2] = value; }
-		void			Set_zoom_lens(float value) noexcept { m_Shader2D[0].param[3] = value; }
-		void			Set_is_Blackout(bool value) noexcept { m_Shader2D[1].use = value; }
-		void			Set_Per_Blackout(float value) noexcept { m_Shader2D[1].param[0] = value; }
-		const auto& GetLensParam(void) const noexcept { return m_Shader2D[0]; }
-		const auto& GetBlackoutParam(void) const noexcept { return m_Shader2D[1]; }
+		const auto& is_lens(void) const noexcept { return m_Shader2D.at(0).use; }
+		const auto& zoom_lens(void) const noexcept { return m_Shader2D.at(0).param.at(3); }
+		void			Set_is_lens(bool value) noexcept { m_Shader2D.at(0).use = value; }
+		void			Set_xp_lens(float value) noexcept { m_Shader2D.at(0).param.at(0) = value; }
+		void			Set_yp_lens(float value) noexcept { m_Shader2D.at(0).param.at(1) = value; }
+		void			Set_size_lens(float value) noexcept { m_Shader2D.at(0).param.at(2) = value; }
+		void			Set_zoom_lens(float value) noexcept { m_Shader2D.at(0).param.at(3) = value; }
+		void			Set_is_Blackout(bool value) noexcept { m_Shader2D.at(1).use = value; }
+		void			Set_Per_Blackout(float value) noexcept { m_Shader2D.at(1).param.at(0) = value; }
+		const auto& GetLensParam(void) const noexcept { return m_Shader2D.at(0); }
+		const auto& GetBlackoutParam(void) const noexcept { return m_Shader2D.at(1); }
 
 		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		// UI以外のスクリーン空間
@@ -127,8 +130,9 @@ namespace DXLibRef {
 		const auto& GetUIXMax(void) const noexcept { return this->m_DispXSize; }
 		const auto& GetUIYMax(void) const noexcept { return this->m_DispYSize; }
 		// 
-		void			GetMousePosition(int* MouseX, int* MouseY) const noexcept;
-		const auto& GetFps(void) const noexcept { return m_FPS; }
+		void		GetMousePosition(int* MouseX, int* MouseY) const noexcept;
+		const auto&	GetDeltaTime(void) const noexcept { return m_DeltaTime; }
+		const auto	GetFps(void) const noexcept { return 1.f / m_DeltaTime; }
 		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
 		const auto& IsExit(void) const noexcept { return m_IsExitSelect; }
 		const auto& IsRestart(void) const noexcept { return m_IsRestartSelect; }
@@ -136,11 +140,13 @@ namespace DXLibRef {
 		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
 		const auto& GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
+		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
+		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
 	public:
+		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
 		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
 		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
 		void			SetPause(bool value) noexcept;
-		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;

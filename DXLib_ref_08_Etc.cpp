@@ -16,7 +16,7 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		switch (EasingType) {
 		case EasingType::OutExpo:
-			return (1.f - std::powf(ratio, FrameRate / DrawParts->GetFps()));
+			return (1.f - std::powf(ratio, FrameRate * DrawParts->GetDeltaTime()));
 		default:
 			return 1.f;
 		}
@@ -28,13 +28,14 @@ namespace DXLibRef {
 		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		// ビュー行列と射影行列の取得
 		Camera3DInfo tmpcam;
 		tmpcam.SetCamPos(campos, camvec, camup);
 		tmpcam.SetCamInfo(fov, near_t, far_t);
 		// ビューポート行列（スクリーン行列）の作成
-		float w = static_cast<float>(ScreenWidth) / 2.0f;
-		float h = static_cast<float>(ScreenHeight) / 2.0f;
+		float w = static_cast<float>(DrawParts->GetScreenXMax()) / 2.0f;
+		float h = static_cast<float>(DrawParts->GetScreenYMax()) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,
@@ -59,89 +60,90 @@ namespace DXLibRef {
 	// 
 	namespace WindowSystem {
 		void DrawData::Output() const noexcept {
-			Rect2D Widow; Widow.Set(0, 0, UIWidth, UIHeight);
+			auto* DrawParts = DXDraw::Instance();
+			Rect2D Widow; Widow.Set(0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
 
 			switch (m_type) {
 			case DrawType::Alpha:
-				if (this->m_intParam[0] < 255) {
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam[0]);
+				if (this->m_intParam.at(0) < 255) {
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam.at(0));
 				}
 				else {
-					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, this->m_intParam[0]);
+					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, this->m_intParam.at(0));
 				}
 				break;
 			case DrawType::Add:
-				SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam[0]);
+				SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam.at(0));
 				break;
 			case DrawType::Bright:
-				SetDrawBright(this->m_intParam[0], this->m_intParam[1], this->m_intParam[2]);
+				SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
 				break;
 			case DrawType::Box:
 			{
-				Rect2D One; One.Set(std::min(this->m_intParam[0], this->m_intParam[2]), std::min(this->m_intParam[1], this->m_intParam[3]),
-					std::abs(this->m_intParam[0] - this->m_intParam[2]), std::abs(this->m_intParam[1] - this->m_intParam[3]));
+				Rect2D One; One.Set(std::min(this->m_intParam.at(0), this->m_intParam.at(2)), std::min(this->m_intParam.at(1), this->m_intParam.at(3)),
+					std::abs(this->m_intParam.at(0) - this->m_intParam.at(2)), std::abs(this->m_intParam.at(1) - this->m_intParam.at(3)));
 				if (Widow.IsHit(One)) {
-					DxLib::DrawBox(m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_intParam[3], this->m_UintParam[0], (m_boolParam[0]) ? TRUE : FALSE);
+					DxLib::DrawBox(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
 				}
 			}
 			break;
 			case DrawType::Quadrangle:
 			{
 				DxLib::DrawQuadrangle(
-					this->m_intParam[0], this->m_intParam[1],
-					this->m_intParam[2], this->m_intParam[3],
-					this->m_intParam[4], this->m_intParam[5],
-					this->m_intParam[6], this->m_intParam[7],
-					this->m_UintParam[0], (m_boolParam[0]) ? TRUE : FALSE);
+					this->m_intParam.at(0), this->m_intParam.at(1),
+					this->m_intParam.at(2), this->m_intParam.at(3),
+					this->m_intParam.at(4), this->m_intParam.at(5),
+					this->m_intParam.at(6), this->m_intParam.at(7),
+					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
 			}
 			break;
 			case DrawType::Circle:
 			{
-				Rect2D One; One.Set(this->m_intParam[0] - this->m_intParam[2] / 2, this->m_intParam[1] - this->m_intParam[2] / 2,
-					this->m_intParam[2] * 2, this->m_intParam[2] * 2);
+				Rect2D One; One.Set(this->m_intParam.at(0) - this->m_intParam.at(2) / 2, this->m_intParam.at(1) - this->m_intParam.at(2) / 2,
+					this->m_intParam.at(2) * 2, this->m_intParam.at(2) * 2);
 				if (Widow.IsHit(One)) {
-					DxLib::DrawCircle(m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_UintParam[0], (m_boolParam[0]) ? TRUE : FALSE, this->m_intParam[3]);
+					DxLib::DrawCircle(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE, this->m_intParam.at(3));
 				}
 			}
 			break;
 			case DrawType::Line:
 			{
-				Rect2D One; One.Set(std::min(this->m_intParam[0], this->m_intParam[2]), std::min(this->m_intParam[1], this->m_intParam[3]),
-					std::abs(this->m_intParam[0] - this->m_intParam[2]), std::abs(this->m_intParam[1] - this->m_intParam[3]));
+				Rect2D One; One.Set(std::min(this->m_intParam.at(0), this->m_intParam.at(2)), std::min(this->m_intParam.at(1), this->m_intParam.at(3)),
+					std::abs(this->m_intParam.at(0) - this->m_intParam.at(2)), std::abs(this->m_intParam.at(1) - this->m_intParam.at(3)));
 				if (Widow.IsHit(One)) {
-					DxLib::DrawLine(m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_intParam[3], this->m_UintParam[0], this->m_intParam[4]);
+					DxLib::DrawLine(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_UintParam.at(0), this->m_intParam.at(4));
 				}
 			}
 			break;
 			case DrawType::String:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam[0], this->m_intParam[1], 3)->DrawString(
+				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0), this->m_intParam.at(1), 3)->DrawString(
 					InvalidID,
-					(FontHandle::FontXCenter)m_intParam[2], (FontHandle::FontYCenter)m_intParam[3],
-					m_intParam[4], this->m_intParam[5],
-					m_UintParam[0],
-					m_UintParam[1],
+					(FontHandle::FontXCenter)m_intParam.at(2), (FontHandle::FontYCenter)m_intParam.at(3),
+					m_intParam.at(4), this->m_intParam.at(5),
+					m_UintParam.at(0),
+					m_UintParam.at(1),
 					m_string.c_str()
 				);
 				break;
 			case DrawType::StringAutoFit:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam[0], this->m_intParam[1], 3)->DrawStringAutoFit(
-					m_intParam[2], m_intParam[3],
-					m_intParam[4], this->m_intParam[5],
-					m_UintParam[0],
-					m_UintParam[1],
+				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0), this->m_intParam.at(1), 3)->DrawStringAutoFit(
+					m_intParam.at(2), m_intParam.at(3),
+					m_intParam.at(4), this->m_intParam.at(5),
+					m_UintParam.at(0),
+					m_UintParam.at(1),
 					m_string.c_str()
 				);
 				break;
 			case DrawType::RotaGraph:
 				if (m_GraphHandleParam.at(0)) {
-					if (m_floatParam[0] < 0.9f && 1.1f < this->m_floatParam[0]) {
+					if (m_floatParam.at(0) < 0.9f && 1.1f < this->m_floatParam.at(0)) {
 						auto prev = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
-						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
+						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_boolParam.at(0));
 						SetDrawMode(prev);
 					}
 					else {
-						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam[0], this->m_intParam[1], this->m_floatParam[0], this->m_floatParam[1], this->m_boolParam[0]);
+						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_boolParam.at(0));
 					}
 				}
 				break;
@@ -149,17 +151,17 @@ namespace DXLibRef {
 				if (m_GraphHandleParam.at(0)) {
 					auto prev = GetDrawMode();
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
-					m_GraphHandleParam.at(0)->DrawExtendGraph(this->m_intParam[0], this->m_intParam[1], this->m_intParam[2], this->m_intParam[3], this->m_boolParam[0]);
+					m_GraphHandleParam.at(0)->DrawExtendGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_boolParam.at(0));
 					SetDrawMode(prev);
 				}
 				break;
 			case DrawType::CircleGauge:
 				if (m_GraphHandleParam.at(0)) {
-					DrawCircleGauge(this->m_intParam[0], this->m_intParam[1],
-						(double)this->m_floatParam[0],
+					DrawCircleGauge(this->m_intParam.at(0), this->m_intParam.at(1),
+						(double)this->m_floatParam.at(0),
 						m_GraphHandleParam.at(0)->get(),
-						(double)this->m_floatParam[1],
-						(double)this->m_floatParam[2]);
+						(double)this->m_floatParam.at(1),
+						(double)this->m_floatParam.at(2));
 				}
 				break;
 			default:
@@ -167,13 +169,15 @@ namespace DXLibRef {
 			}
 		}
 		DrawControl::DrawControl(void) noexcept {
-			this->m_DrawDatas.resize((int)DrawLayer::Max);
-			this->m_PrevDrawDatas.resize((int)DrawLayer::Max);
+			this->m_DrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
+			this->m_PrevDrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
 
-			m_BufferScreen.Make(UIWidth, UIHeight, true);
+			auto* DrawParts = DXDraw::Instance();
+			m_BufferScreen.Make(DrawParts->GetUIXMax(), DrawParts->GetUIYMax(), true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
-			return HitRectangleToRectangle(0, 0, ScreenWidth, ScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
+			auto* DrawParts = DXDraw::Instance();
+			return HitRectangleToRectangle(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
 		}
 		// 箱
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
@@ -194,16 +198,16 @@ namespace DXLibRef {
 				*xp1 = *xp1 + DrawParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1), (*yp1 - ySize / 2), (*xp1 + xSize), (*yp1 + ySize / 2),
-					0, 0, UIWidth, UIHeight);
+					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
 			case FontHandle::FontXCenter::MIDDLE:
 				return HitRectangleToRectangle(
 					(*xp1 - xSize / 2), (*yp1 - ySize / 2), (*xp1 + xSize / 2), (*yp1 + ySize),
-					0, 0, UIWidth, UIHeight);
+					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
 			case FontHandle::FontXCenter::RIGHT:
 				*xp1 = *xp1 - DrawParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1 - xSize), (*yp1 - ySize / 2), (*xp1), (*yp1 + ySize / 2),
-					0, 0, UIWidth, UIHeight);
+					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
 			default:
 				return false;
 			}
@@ -281,9 +285,9 @@ namespace DXLibRef {
 			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
 
 			m_repeat = trigger();
-			m_repeatcount -= FrameRate / DrawParts->GetFps();
+			m_repeatcount -= DrawParts->GetDeltaTime();
 			if (m_repeatcount <= 0.f) {
-				m_repeatcount += 2.f;
+				m_repeatcount += 2.f / 60.f;
 				m_repeat = true;
 			}
 		}
@@ -291,7 +295,7 @@ namespace DXLibRef {
 			m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
 
 			m_repeat = false;
-			m_repeatcount = FrameRate / 2.f;
+			m_repeatcount = 0.5f;
 		}
 		if (trigger()) {
 			m_on ^= 1;
@@ -300,14 +304,14 @@ namespace DXLibRef {
 	// 
 	void			Pendulum2D::Update(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
-		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) / DrawParts->GetFps();
-		m_rad += this->m_vel / DrawParts->GetFps();
+		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * DrawParts->GetDeltaTime();
+		m_rad += this->m_vel * DrawParts->GetDeltaTime();
 	}
 	// 
 	void SideLog::SideLogData::UpdateActive(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		if (m_Time > 0.f) {
-			m_Time -= 1.f / DrawParts->GetFps();
+			m_Time -= DrawParts->GetDeltaTime();
 		}
 		else {
 			m_Time = -1.f;
@@ -916,7 +920,7 @@ namespace DXLibRef {
 			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
 			Easing(&this->m_CamShake1, Vector3DX::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
 			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
-			this->m_CamShake = std::max(this->m_CamShake - 1.f / DrawParts->GetFps(), 0.f);
+			this->m_CamShake = std::max(this->m_CamShake - DrawParts->GetDeltaTime(), 0.f);
 		}
 	}
 	// 

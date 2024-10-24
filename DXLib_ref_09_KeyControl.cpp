@@ -445,7 +445,7 @@ namespace DXLibRef {
 				}
 				else {
 					if (!DrawParts->IsPause()) {
-						SetMousePoint(UIWidth / 2, UIHeight / 2);
+						SetMousePoint(DrawParts->GetUIXMax() / 2, DrawParts->GetUIYMax() / 2);
 						SetMouseDispFlag(FALSE);
 					}
 					else {
@@ -457,8 +457,8 @@ namespace DXLibRef {
 				SetMouseDispFlag(TRUE);
 			}
 			auto* OptionParts = OPTION::Instance();
-			Look_XradAdd = static_cast<float>(MouseX - UIWidth / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-			Look_YradAdd = -static_cast<float>(MouseY - UIHeight / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+			Look_XradAdd = static_cast<float>(MouseX - DrawParts->GetUIXMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+			Look_YradAdd = -static_cast<float>(MouseY - DrawParts->GetUIYMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 		}
 		break;
 		default:
@@ -560,10 +560,10 @@ namespace DXLibRef {
 	void PadControl::Draw(void) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		int xp = 0;
-		int y = UIHeight - DrawParts->GetUIY(21 + 16);
+		int y = DrawParts->GetUIYMax() - DrawParts->GetUIY(21 + 16);
 		for (const auto& k : Key) {
 			xp += k->Draw(DrawParts->GetUIY(32) + xp, y);
-			if (xp > UIWidth / 2) {
+			if (xp > DrawParts->GetUIXMax() / 2) {
 				xp = 0;
 				y -= DrawParts->GetUIY(28);
 			}

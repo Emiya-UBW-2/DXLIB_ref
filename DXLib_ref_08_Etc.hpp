@@ -4,12 +4,6 @@
 #define EdgeSize	DXDraw::Instance()->GetUIY(2)
 #define LineHeight	DXDraw::Instance()->GetUIY(18)
 
-#define UIWidth		DXDraw::Instance()->GetUIXMax()
-#define UIHeight	DXDraw::Instance()->GetUIYMax()
-
-#define ScreenWidth		DXDraw::Instance()->GetScreenXMax()
-#define ScreenHeight	DXDraw::Instance()->GetScreenYMax()
-
 namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 補完
@@ -541,28 +535,46 @@ namespace DXLibRef {
 		return DxLib::DrawSphere3D(p1.get(), range, 8, color, speccolor, TRUE) == TRUE;
 	}
 
+	// 固定でA8R8G8B8を出す
+	constexpr uint32_t GetColorFix(uint8_t Red, uint8_t Green, uint8_t Blue) {
+		return 0xff000000 | (((uint32_t)Red) << 16) | (((uint32_t)Green) << 8) | ((uint32_t)Blue);
+	}
+
 	// カラー指定
-	static const unsigned int Red{ GetColor(255, 0, 0) };
-	static const unsigned int Red25{ GetColor(192, 0, 0) };
-	static const unsigned int Red50{ GetColor(128, 0, 0) };
+	static constexpr unsigned int Red{ GetColorFix(255, 0, 0) };
+	static constexpr unsigned int Red25{ GetColorFix(192, 0, 0) };
+	static constexpr unsigned int Red50{ GetColorFix(128, 0, 0) };
 
-	static const unsigned int Green{ GetColor(0, 255, 0) };// GetColor(43, 255, 91)
-	static const unsigned int DarkGreen{ GetColor(0, 64, 0) };// GetColor(21, 128, 45)
+	static constexpr unsigned int Green{ GetColorFix(0, 255, 0) };// GetColorFix(43, 255, 91)
+	static constexpr unsigned int DarkGreen{ GetColorFix(0, 64, 0) };// GetColorFix(21, 128, 45)
 
-	static const unsigned int Blue{ GetColor(0, 0, 255) };
+	static constexpr unsigned int Blue{ GetColorFix(0, 0, 255) };
 
-	static const unsigned int Yellow{ GetColor(255, 255, 0) };
+	static constexpr unsigned int Yellow{ GetColorFix(255, 255, 0) };
 
-	static const unsigned int WhiteSel{ GetColor(216, 255, 216) };
+	static constexpr unsigned int WhiteSel{ GetColorFix(216, 255, 216) };
 
-	static const unsigned int White{ GetColor(255, 255, 255) };
-	static const unsigned int Gray10{ GetColor(230, 230, 230) };
-	static const unsigned int Gray15{ GetColor(216, 216, 216) };
-	static const unsigned int Gray25{ GetColor(192, 192, 192) };
-	static const unsigned int Gray50{ GetColor(128, 128, 128) };
-	static const unsigned int Gray65{ GetColor(96, 96, 96) };
-	static const unsigned int Gray75{ GetColor(64, 64, 64) };
-	static const unsigned int Black{ GetColor(0, 0, 0) };
+	static constexpr unsigned int White{ GetColorFix(255, 255, 255) };
+	static constexpr unsigned int Gray05{ GetColorFix(255 * 95 / 100, 255 * 95 / 100, 255 * 95 / 100) };
+	static constexpr unsigned int Gray10{ GetColorFix(255 * 90 / 100, 255 * 90 / 100, 255 * 90 / 100) };
+	static constexpr unsigned int Gray15{ GetColorFix(255 * 85 / 100, 255 * 85 / 100, 255 * 85 / 100) };
+	static constexpr unsigned int Gray20{ GetColorFix(255 * 80 / 100, 255 * 80 / 100, 255 * 80 / 100) };
+	static constexpr unsigned int Gray25{ GetColorFix(255 * 75 / 100, 255 * 75 / 100, 255 * 75 / 100) };
+	static constexpr unsigned int Gray30{ GetColorFix(255 * 70 / 100, 255 * 70 / 100, 255 * 70 / 100) };
+	static constexpr unsigned int Gray35{ GetColorFix(255 * 65 / 100, 255 * 65 / 100, 255 * 65 / 100) };
+	static constexpr unsigned int Gray40{ GetColorFix(255 * 60 / 100, 255 * 60 / 100, 255 * 60 / 100) };
+	static constexpr unsigned int Gray45{ GetColorFix(255 * 55 / 100, 255 * 55 / 100, 255 * 55 / 100) };
+	static constexpr unsigned int Gray50{ GetColorFix(255 * 50 / 100, 255 * 50 / 100, 255 * 50 / 100) };
+	static constexpr unsigned int Gray55{ GetColorFix(255 * 45 / 100, 255 * 45 / 100, 255 * 45 / 100) };
+	static constexpr unsigned int Gray60{ GetColorFix(255 * 40 / 100, 255 * 40 / 100, 255 * 40 / 100) };
+	static constexpr unsigned int Gray65{ GetColorFix(255 * 35 / 100, 255 * 35 / 100, 255 * 35 / 100) };
+	static constexpr unsigned int Gray70{ GetColorFix(255 * 30 / 100, 255 * 30 / 100, 255 * 30 / 100) };
+	static constexpr unsigned int Gray75{ GetColorFix(255 * 25 / 100, 255 * 25 / 100, 255 * 25 / 100) };
+	static constexpr unsigned int Gray80{ GetColorFix(255 * 20 / 100, 255 * 20 / 100, 255 * 20 / 100) };
+	static constexpr unsigned int Gray85{ GetColorFix(255 * 15 / 100, 255 * 15 / 100, 255 * 15 / 100) };
+	static constexpr unsigned int Gray90{ GetColorFix(255 * 10 / 100, 255 * 10 / 100, 255 * 10 / 100) };
+	static constexpr unsigned int Gray95{ GetColorFix(255 *  5 / 100, 255 *  5 / 100, 255 *  5 / 100) };
+	static constexpr unsigned int Black{ GetColorFix(0, 0, 0) };
 
 	namespace WindowSystem {
 		// 
@@ -685,8 +697,8 @@ namespace DXLibRef {
 			}
 
 			DrawData* GetBack(DrawLayer Layer) noexcept {
-				this->m_DrawDatas.at((int)Layer).resize(this->m_DrawDatas.at((int)Layer).size() + 1);
-				return &this->m_DrawDatas.at((int)Layer).back();
+				this->m_DrawDatas.at(static_cast<int>(Layer)).resize(this->m_DrawDatas.at(static_cast<int>(Layer)).size() + 1);
+				return &this->m_DrawDatas.at(static_cast<int>(Layer)).back();
 			}
 		public:
 			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept;
@@ -816,10 +828,10 @@ namespace DXLibRef {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::String);
 
-				Back->InputintParam(0, (int)type);
+				Back->InputintParam(0, static_cast<int>(type));
 				Back->InputintParam(1, fontSize);
-				Back->InputintParam(2, (int)FontX);
-				Back->InputintParam(3, (int)FontY);
+				Back->InputintParam(2, static_cast<int>(FontX));
+				Back->InputintParam(3, static_cast<int>(FontY));
 				Back->InputintParam(4, x);
 				Back->InputintParam(5, y);
 				Back->InputUintParam(0, Color);
@@ -835,7 +847,7 @@ namespace DXLibRef {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::StringAutoFit);
 
-				Back->InputintParam(0, (int)type);
+				Back->InputintParam(0, static_cast<int>(type));
 				Back->InputintParam(1, fontSize);
 				Back->InputintParam(2, x1);
 				Back->InputintParam(3, y1);
@@ -1179,12 +1191,12 @@ namespace DXLibRef {
 		bool		m_press{ false };// オンオフ判定
 		bool		m_repeat{ false };// オンオフ判定
 		int8_t		m_presscount{ 0 };// プッシュ判定
-		float		m_repeatcount{ FrameRate / 2.f };// プッシュ判定
+		float		m_repeatcount{ 0.5f };// プッシュ判定
 	public:
 		switchs(void) noexcept {
 			Set(false);
 			m_presscount = 0;
-			m_repeatcount = FrameRate / 2.f;
+			m_repeatcount = 0.5f;
 			m_press = false;
 		}
 		~switchs(void) noexcept {}
@@ -1318,9 +1330,7 @@ namespace DXLibRef {
 	public:
 		// 初期化
 		void			Init(const char* VertexShader, const char* PixelShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 頂点シェーダー周り
 			for (auto& h : m_VertexShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
@@ -1339,17 +1349,13 @@ namespace DXLibRef {
 			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);			// ピクセルシェーダーバイナリコードの読み込み
 		}
 		void			AddGeometryShader(const char* GeometryShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			this->m_GeometryShaderMatcbhandle = CreateShaderConstantBuffer(sizeof(DX_D3D11_GS_CONST_BUFFER_BASE));
 			this->m_GeometryShaderhandle = LoadGeometryShader(GeometryShader);
 		}
 		// 後始末
 		void			Dispose(void) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 頂点シェーダー周り
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				DeleteShaderConstantBuffer(h);
@@ -1372,9 +1378,7 @@ namespace DXLibRef {
 	public:
 		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -1385,9 +1389,7 @@ namespace DXLibRef {
 		}
 		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle[0]);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
@@ -1400,15 +1402,15 @@ namespace DXLibRef {
 		void CalcGWave() {
 			for (int i : std::views::iota(0, 20)) {
 				Wave& w = WaveData.waves[i];
-				float randomRad = (float)(GetRand(30) * DX_PI_F * 2 * 0.3f);
+				float randomRad = static_cast<float>(GetRand(30) * DX_PI_F * 2 * 0.3f);
 				w.dir[0] = sinf(randomRad);
 				w.dir[1] = cosf(randomRad);
-				w.amplitude = (0.03f + powf(2.0f, (float)GetRand(3) * 2.0f) * 0.05f) * 0.05f * Scale3DRate;
-				w.waveLength = 1.0f + powf(2.f, 1.f + (float)GetRand(3)) * 10.f;
+				w.amplitude = (0.03f + powf(2.0f, static_cast<float>(GetRand(3)) * 2.0f) * 0.05f) * 0.05f * Scale3DRate;
+				w.waveLength = 1.0f + powf(2.f, 1.f + static_cast<float>(GetRand(3))) * 10.f;
 			}
 		}
 		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetVertexWave(void) noexcept {
+		void			SetVertexWave(void) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			ImmutableCB* f4 = (ImmutableCB*)GetBufferShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			*f4 = WaveData;
@@ -1417,12 +1419,8 @@ namespace DXLibRef {
 		}
 		// シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
-			if (this->m_GeometryShaderhandle == InvalidID) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
+			if (this->m_GeometryShaderhandle == InvalidID) { return; }
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
 
 			// ビュー変換用行列をセットする
@@ -1461,9 +1459,7 @@ namespace DXLibRef {
 		}
 		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -1474,9 +1470,7 @@ namespace DXLibRef {
 		}
 		// ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
 		void			SetPixelDispSize(int dispx, int dispy) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
 			dispsize->u = static_cast<float>(dispx);
 			dispsize->v = static_cast<float>(dispy);
@@ -1485,9 +1479,7 @@ namespace DXLibRef {
 		}
 		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)));				// ピクセルシェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
@@ -1514,9 +1506,7 @@ namespace DXLibRef {
 		}
 		// 2D画像に適用する場合の関数
 		void			Draw(ScreenVertex& Screenvertex) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				return;
-			}
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
 	};

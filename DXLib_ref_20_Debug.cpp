@@ -26,7 +26,7 @@ namespace DXLibRef {
 			return;
 		}
 		if (m_PointSel < PointMax) {
-			m_Point[0][m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
+			m_Point.at(0)[m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
 			m_Str[m_PointSel] = DebugMes;
 			m_PointSel++;
 			return;
@@ -42,11 +42,11 @@ namespace DXLibRef {
 		SetPoint("-----End-----");
 		for (int index : std::views::iota(0, PMax)) {
 			if (!(static_cast<int>(m_PointSel) > index)) {
-				m_Point[0][static_cast<std::size_t>(index)] = m_Point[0][m_PointSel - 1];
+				m_Point.at(0)[static_cast<std::size_t>(index)] = m_Point.at(0)[m_PointSel - 1];
 			}
 			if (index == PointMax) {
 				auto* DrawParts = DXDraw::Instance();
-				m_Point[0][static_cast<std::size_t>(index)] = 1000.0f / DrawParts->GetFps();
+				m_Point.at(0)[static_cast<std::size_t>(index)] = 1000.0f * DrawParts->GetDeltaTime();
 			}
 
 			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {
@@ -78,15 +78,15 @@ namespace DXLibRef {
 				Red,
 				Yellow,
 				Green,
-				GetColor(0,255,255),
-				GetColor(100,100,255),
-				GetColor(255, 0,255),
+				GetColorFix(0,255,255),
+				GetColorFix(100,100,255),
+				GetColorFix(255, 0,255),
 				Red,
 				Yellow,
 				Green,
-				GetColor(0,255,255),
-				GetColor(100,100,255),
-				GetColor(255, 0,255),
+				GetColorFix(0,255,255),
+				GetColorFix(100,100,255),
+				GetColorFix(255, 0,255),
 				Red,
 		};
 		auto PMax = PointMax + 1;

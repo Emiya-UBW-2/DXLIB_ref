@@ -242,8 +242,8 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				// 画面セット
-				m_OutScreen.Make(ScreenWidth, ScreenHeight);	// 左目
-				UI_Screen.Make(ScreenWidth, ScreenHeight, true);	// UI
+				m_OutScreen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());	// 左目
+				UI_Screen.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);	// UI
 			}
 		}
 		void Execute(void) noexcept {
@@ -386,8 +386,8 @@ namespace DXLibRef {
 		DepthScreenHandle.SetRenderTargetToShader(2);
 		{
 			SetupCam(Center, m_Scale);
-			m_CamViewMatrix[0] = GetCameraViewMatrix();
-			m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
+			m_CamViewMatrix.at(0) = GetCameraViewMatrix();
+			m_CamProjectionMatrix.at(0) = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, InvalidID);
@@ -402,8 +402,8 @@ namespace DXLibRef {
 		DepthFarScreenHandle.SetRenderTargetToShader(2);
 		{
 			SetupCam(Center, m_ScaleFar);
-			m_CamViewMatrix[1] = GetCameraViewMatrix();
-			m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
+			m_CamViewMatrix.at(1) = GetCameraViewMatrix();
+			m_CamProjectionMatrix.at(1) = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, InvalidID);
@@ -421,12 +421,12 @@ namespace DXLibRef {
 		tmp_cam.FlipCamInfo();
 		{
 			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
-			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
-			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
+			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
+			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_Shader.Draw_lamda(doing);
 			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
-			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix[0], m_CamProjectionMatrix[0]);
-			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix[1], m_CamProjectionMatrix[1]);
+			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
+			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
 		SetUseTextureToShader(1, InvalidID);				// 使用テクスチャの設定を解除
@@ -450,17 +450,19 @@ namespace DXLibRef {
 		m_ShaderRigid.Dispose();
 	}
 	void DXDraw::ShadowDraw::SetActive(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
-		Init(11, ScreenWidth, ScreenHeight);
+		Init(11, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 	}
 	bool DXDraw::ShadowDraw::UpdateActive(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
 			if (shadow) {
-				Init(11, ScreenWidth, ScreenHeight);
+				Init(11, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
 				return true;
 			}
 			else {
@@ -487,8 +489,8 @@ namespace DXLibRef {
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
 			// m_VR_SystemPtr->GetRecommendedRenderTargetSize(&t_x,&t_y);
-			DispXSize = int(t_x) * 2;
-			DispYSize = int(t_y) * 2;
+			DispXSize = static_cast<int>(t_x) * 2;
+			DispYSize = static_cast<int>(t_y) * 2;
 		}
 		else {
 			// 解像度指定
@@ -622,9 +624,9 @@ namespace DXLibRef {
 		auto y_UIMs = [this](int p1) {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamInt(EnumSaveParam::WindowMode) == static_cast<int>(WindowType::Window)) {
-				return (int(p1) * m_DispYSize_Border / desky);
+				return (static_cast<int>(p1) * m_DispYSize_Border / desky);
 			}
-			return (int(p1) * m_DispYSize / desky);
+			return (static_cast<int>(p1) * m_DispYSize / desky);
 			};
 		int mx = 0, my = 0;
 		GetMousePoint(&mx, &my);
@@ -873,7 +875,7 @@ namespace DXLibRef {
 		Update_effect_was = GetNowHiPerformanceCount();
 	}
 	void			DXDraw::FirstExecute(void) noexcept {
-		m_FPS = std::max((1000.f * 1000.f) / static_cast<float>(GetNowHiPerformanceCount() - m_StartTime), 30.f);
+		m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000000.f;
 		m_StartTime = GetNowHiPerformanceCount();
 	}
 	void			DXDraw::Update(void) noexcept {
@@ -989,6 +991,7 @@ namespace DXLibRef {
 		std::function<void()> doingUI,
 		std::function<void()> doingUI2
 	) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		// UIをスクリーンに描画しておく
 		this->GetVRControl()->SetUpBackUI(doingUI);
@@ -1009,7 +1012,7 @@ namespace DXLibRef {
 		{
 			FillGraph(GetDrawScreen(), 0, 0, 0);
 			if (this->GetVRControl()->GetOutBuffer()) {
-				this->GetVRControl()->GetOutBuffer()->DrawRotaGraph(ScreenWidth / 2, ScreenHeight / 2, 0.5f, 0, false);
+				this->GetVRControl()->GetOutBuffer()->DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 0.5f, 0, false);
 			}
 		}
 	}

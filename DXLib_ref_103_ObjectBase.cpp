@@ -218,7 +218,7 @@ namespace DXLibRef {
 			if (index == 0) {
 				continue;
 			}
-			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes[0].second) * f.second);
+			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes.at(0).second) * f.second);
 			index++;
 		}
 		// •¨—XV
@@ -230,12 +230,12 @@ namespace DXLibRef {
 			else {
 				auto NowMat = this->GetObj().GetMatrix();
 				int Max = 2;
-				if (DrawParts->GetFps() > 120.f) {
+				if (DrawParts->GetFps() > FrameRate * Max) {
 					Max = 1;
 				}
 				for (int i : std::views::iota(0, Max)) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f * FrameRate / DrawParts->GetFps() / static_cast<float>(Max));
+					this->GetObj().PhysicsCalculation(1000.0f * FrameRate * DrawParts->GetDeltaTime() / static_cast<float>(Max));
 				}
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();

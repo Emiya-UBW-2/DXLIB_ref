@@ -51,13 +51,13 @@ namespace DXLibRef {
 			return ans;
 		}
 
-		void CubeMapDraw(void) noexcept;
-		void ShadowDraw_Far(void) noexcept;
-		void ShadowDraw(void) noexcept;
+		void CubeMapDraw(void) const noexcept;
+		void ShadowDraw_Far(void) const noexcept;
+		void ShadowDraw(void) const noexcept;
 
 		void Draw3DVR(std::function<void()> doingUI) noexcept;
 		void Draw3D(std::function<void()> doingUI) noexcept;
-		void Draw2D(std::function<void()> doingUI) noexcept;
+		void Draw2D(std::function<void()> doingUI) const noexcept;
 
 		void Dispose(void) noexcept { Dispose_Sub(); }
 		void Dispose_Load(void) noexcept {
@@ -71,16 +71,17 @@ namespace DXLibRef {
 		virtual void Set_Sub(void) noexcept {}
 		virtual bool Update_Sub(void) noexcept { return true; }
 
-		virtual void CubeMap_Sub(void) noexcept {}
-		virtual void BG_Draw_Sub(void) noexcept;
-		virtual void SetShadowDraw_Rigid_Sub(void) noexcept {}
-		virtual void SetShadowDraw_Sub(void) noexcept {}
-		virtual void MainDraw_Sub(void) noexcept {}
-		virtual void MainDrawFront_Sub(void) noexcept {}
-		virtual void DrawUI_Base_Sub(void) noexcept {}
-		virtual void DrawUI_In_Sub(void) noexcept {}
-		virtual void ShadowDraw_Far_Sub(void) noexcept {}
-		virtual void ShadowDraw_Sub(void) noexcept {}
+		virtual void CubeMap_Sub(void) const noexcept {}
+		virtual void BG_Draw_Sub(void) const noexcept;
+		virtual void SetShadowDraw_Rigid_Sub(void) const noexcept {}
+		virtual void SetShadowDraw_Sub(void) const noexcept {}
+		virtual void CalcOnDraw_Sub(void) noexcept {}
+		virtual void MainDraw_Sub(void) const noexcept {}
+		virtual void MainDrawFront_Sub(void) const noexcept {}
+		virtual void DrawUI_Base_Sub(void) const noexcept {}
+		virtual void DrawUI_In_Sub(void) const noexcept {}
+		virtual void ShadowDraw_Far_Sub(void) const noexcept {}
+		virtual void ShadowDraw_Sub(void) const noexcept {}
 
 		virtual void Dispose_Sub(void) noexcept {}
 		virtual void Dispose_Load_Sub(void) noexcept {}

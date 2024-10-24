@@ -172,10 +172,10 @@ namespace DXLibRef {
 	// 角度からラジアンに
 	extern void* enabler;// ダミー変数
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float deg2rad(T p1) noexcept { return float(p1) * DX_PI_F / 180.f; }
+	constexpr float deg2rad(T p1) noexcept { return static_cast<float>(p1) * DX_PI_F / 180.f; }
 	// ラジアンから角度に
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
-	constexpr float rad2deg(T p1) noexcept { return float(p1) * 180.f / DX_PI_F; }
+	constexpr float rad2deg(T p1) noexcept { return static_cast<float>(p1) * 180.f / DX_PI_F; }
 
 	// 余弦定理
 	constexpr float GetCosFormula(float a, float b, float c) noexcept {
@@ -191,11 +191,11 @@ namespace DXLibRef {
 	/*wstringをstringへ変換*/
 	static std::string WStringToString(std::wstring_view oWString) noexcept {
 		// wstring → SJIS
-		int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), int(oWString.size() + 1), nullptr, 0, NULL, NULL);
+		int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), static_cast<int>(oWString.size() + 1), nullptr, 0, NULL, NULL);
 		// バッファの取得
 		CHAR* cpMultiByte = new CHAR[static_cast<size_t>(iBufferSize)];
 		// wstring → SJIS
-		WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), int(oWString.size() + 1), cpMultiByte, iBufferSize, NULL, NULL);
+		WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), static_cast<int>(oWString.size() + 1), cpMultiByte, iBufferSize, NULL, NULL);
 		// stringの生成
 		std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
 		// バッファの破棄
@@ -206,11 +206,11 @@ namespace DXLibRef {
 	/*stringをwstringへ変換する*/
 	static std::wstring StringToWString(std::string_view oString) noexcept {
 		// SJIS → wstring
-		int iBufferSize = MultiByteToWideChar(CP_ACP, 0, oString.data(), int(oString.size() + 1), nullptr, 0);
+		int iBufferSize = MultiByteToWideChar(CP_ACP, 0, oString.data(), static_cast<int>(oString.size() + 1), nullptr, 0);
 		// バッファの取得
 		wchar_t* cpUCS2 = new wchar_t[static_cast<size_t>(iBufferSize)];
 		// SJIS → wstring
-		MultiByteToWideChar(CP_ACP, 0, oString.data(), int(oString.size() + 1), cpUCS2, iBufferSize);
+		MultiByteToWideChar(CP_ACP, 0, oString.data(), static_cast<int>(oString.size() + 1), cpUCS2, iBufferSize);
 		// stringの生成
 		std::wstring oRet(cpUCS2, cpUCS2 + iBufferSize - 1);
 		// バッファの破棄

@@ -60,42 +60,46 @@ namespace DXLibRef {
 		}
 	public:
 		/*読み込み*/
-		static void		Load(std::basic_string_view<TCHAR> FileName, MV1* _ModelHandle, int mode = DX_LOADMODEL_PHYSICS_LOADCALC, float Grav = GravityRate) noexcept {
+		static void		Load(std::basic_string_view<TCHAR> FileName, MV1* targetMV1, int mode = DX_LOADMODEL_PHYSICS_LOADCALC/*, float Grav = GravityRate*/) noexcept {
 			if (mode != DX_LOADMODEL_PHYSICS_LOADCALC) {
 				MV1SetLoadModelUsePhysicsMode(mode);
 			}
+			/*
 			if (Grav != GravityRate) {
-				// MV1SetLoadModelPhysicsWorldGravity(Grav);
+				MV1SetLoadModelPhysicsWorldGravity(Grav);
 			}
-			_ModelHandle->SetHandleDirect(DxLib::MV1LoadModelWithStrLen(FileName.data(), FileName.length()));
+			//*/
+			targetMV1->SetHandleDirect(DxLib::MV1LoadModelWithStrLen(FileName.data(), FileName.length()));
+			/*
 			if (Grav != GravityRate) {
-				// MV1SetLoadModelPhysicsWorldGravity(GravityRate);
+				MV1SetLoadModelPhysicsWorldGravity(GravityRate);
 			}
+			//*/
 			if (mode != DX_LOADMODEL_PHYSICS_LOADCALC) {
 				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
 			}
-			_ModelHandle->m_AnimControler.clear();
+			targetMV1->m_AnimControler.clear();
 			return;
 		}
-		static void		SetAnime(MV1* _ModelHandle, const MV1& _Have_Anim) noexcept {
+		static void		SetAnime(MV1* targetMV1, const MV1& animPaletteMV1) noexcept {
 			// 元用、アニメ用が読めていない場合は待つ
 			{
 				while (ProcessMessage() == 0) {
-					if ((CheckHandleASyncLoad(_ModelHandle->get()) == TRUE) && (CheckHandleASyncLoad(_Have_Anim.get()) == TRUE)) {
+					if ((CheckHandleASyncLoad(targetMV1->get()) == TRUE) && (CheckHandleASyncLoad(animPaletteMV1.get()) == TRUE)) {
 						continue;
 					}
 					break;
 				}
 			}
 			// エラー
-			if (MV1GetAnimNum(_Have_Anim.get()) < 0) {
+			if (MV1GetAnimNum(animPaletteMV1.get()) < 0) {
 				printfDx("error");
 				WaitKey();
 			}
-			_ModelHandle->m_AnimControler.resize(static_cast<size_t>(MV1GetAnimNum(_Have_Anim.get())));
-			if (_ModelHandle->m_AnimControler.size() > 0) {
-				for (int i : std::views::iota(0, int(_ModelHandle->m_AnimControler.size()))) {
-					_ModelHandle->m_AnimControler.at(static_cast<size_t>(i)).Set(_ModelHandle, i, &_Have_Anim);
+			targetMV1->m_AnimControler.resize(static_cast<size_t>(MV1GetAnimNum(animPaletteMV1.get())));
+			if (targetMV1->GetAnimNum() > 0) {
+				for (int i : std::views::iota(0, static_cast<int>(targetMV1->GetAnimNum()))) {
+					targetMV1->SetAnim(i).Set(targetMV1, i, &animPaletteMV1);
 				}
 			}
 			return;
@@ -157,9 +161,9 @@ namespace DXLibRef {
 		void			SetPrioritizePhysicsOverAnimFlag(bool p1) const noexcept { MV1SetPrioritizePhysicsOverAnimFlag(DXHandle::get(), p1 ? TRUE : FALSE); }
 
 		/*アニメーション*/
-		auto& SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
-		auto& GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
-		auto			GetAnimNum(void) const noexcept { return this->m_AnimControler.size(); }
+		AnimControler& SetAnim(int p1) noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		const AnimControler& GetAnim(int p1) const noexcept { return this->m_AnimControler.at(static_cast<size_t>(p1)); }
+		size_t			GetAnimNum(void) const noexcept { return this->m_AnimControler.size(); }
 		int				AttachAnim(int AnimIndex, const MV1* model_haveanim = nullptr) noexcept {
 			if (model_haveanim && (this->DXHandle::get() != model_haveanim->DXHandle::get())) {
 				return MV1AttachAnim(this->DXHandle::get(), AnimIndex, model_haveanim->DXHandle::get());

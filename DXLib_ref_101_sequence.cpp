@@ -6,14 +6,14 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 
-	void TEMPSCENE::CubeMapDraw(void) noexcept {
+	void TEMPSCENE::CubeMapDraw(void) const noexcept {
 		if (!Get3DActive()) { return; }
 		auto* DrawParts = DXDraw::Instance();
 		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
 		DrawParts->Update_CubeMap([this]() { CubeMap_Sub(); }, Pos);
 	}
 
-	void TEMPSCENE::ShadowDraw_Far(void) noexcept {
+	void TEMPSCENE::ShadowDraw_Far(void) const noexcept {
 		if (!Get3DActive()) { return; }
 		auto* DrawParts = DXDraw::Instance();
 		if (DrawParts->UpdateShadowActive() || GetIsFirstLoop()) {
@@ -21,7 +21,7 @@ namespace DXLibRef {
 		}
 	}
 
-	void TEMPSCENE::ShadowDraw(void) noexcept {
+	void TEMPSCENE::ShadowDraw(void) const noexcept {
 		if (!Get3DActive()) { return; }
 		auto* DrawParts = DXDraw::Instance();
 		DrawParts->Update_Shadow([this] { ShadowDraw_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), GetShadowScale(), false);
@@ -34,7 +34,10 @@ namespace DXLibRef {
 			[this]() { BG_Draw_Sub(); },
 			[this]() { SetShadowDraw_Rigid_Sub(); },
 			[this]() { SetShadowDraw_Sub(); },
-			[this]() { MainDraw_Sub(); },
+			[this]() {
+				CalcOnDraw_Sub();
+				MainDraw_Sub();
+			},
 			[this]() { MainDrawFront_Sub(); },
 			[&]() {
 				DrawUI_Base_Sub();
@@ -56,7 +59,10 @@ namespace DXLibRef {
 			[this]() { BG_Draw_Sub(); },
 			[this]() { SetShadowDraw_Rigid_Sub(); },
 			[this]() { SetShadowDraw_Sub(); },
-			[this]() { MainDraw_Sub(); },
+			[this]() {
+				CalcOnDraw_Sub();
+				MainDraw_Sub();
+			},
 			[this]() { MainDrawFront_Sub(); },
 			DrawParts->GetMainCamera());
 		// ディスプレイ描画
@@ -69,7 +75,7 @@ namespace DXLibRef {
 			});
 	}
 
-	void TEMPSCENE::Draw2D(std::function<void()> doingUI) noexcept {
+	void TEMPSCENE::Draw2D(std::function<void()> doingUI) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
 		// 描画
 		DrawParts->Draw2DMain([this]() { MainDraw_Sub(); });
@@ -83,7 +89,7 @@ namespace DXLibRef {
 			});
 	}
 
-	void TEMPSCENE::BG_Draw_Sub(void) noexcept {
+	void TEMPSCENE::BG_Draw_Sub(void) const noexcept {
 		FillGraph(GetDrawScreen(), 192, 192, 192);
 	}
 

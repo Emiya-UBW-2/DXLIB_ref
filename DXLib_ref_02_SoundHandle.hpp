@@ -97,12 +97,12 @@ namespace DXLibRef {
 				if (is3Dsound) {
 					SetCreate3DSoundFlag(TRUE);
 				}
-				this->shandle.back()->handle[0].Load(this->shandle.back()->path);
+				this->shandle.back()->handle.at(0).Load(this->shandle.back()->path);
 				for (size_t i : std::views::iota(1, static_cast<int>(this->shandle.back()->handle.size()))) {
 					if (is3Dsound) {
 						SetCreate3DSoundFlag(TRUE);
 					}
-					this->shandle.back()->handle.at(static_cast<size_t>(i)).Duplicate(this->shandle.back()->handle[0]);
+					this->shandle.back()->handle.at(static_cast<size_t>(i)).Duplicate(this->shandle.back()->handle.at(0));
 				}
 				SetCreate3DSoundFlag(FALSE);
 
