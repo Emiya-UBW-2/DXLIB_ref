@@ -1007,7 +1007,7 @@ namespace DXLibRef {
 			}
 		}
 		for (auto& P : m_PostPass) {
-			P->UpdateActive();
+			P->UpdateActive(P->IsActive());
 		}
 	}
 	void PostPassEffect::SetCamMat(const Camera3DInfo& camInfo) noexcept {
@@ -1054,6 +1054,21 @@ namespace DXLibRef {
 				ColorScreen.GraphFilterBlt(BufferScreen, DX_GRAPH_FILTER_DOWN_SCALE, 1);
 				P->SetEffect(&BufferScreen, &ColorScreen, &NormalScreen, &DepthScreen);
 			}
+		}
+	}
+	void PostPassEffect::ResetAllBuffer(void) noexcept {
+		bool ActiveGBuffer = false;
+		if (m_IsActiveGBuffer != ActiveGBuffer) {
+			m_IsActiveGBuffer = ActiveGBuffer;
+			if (m_IsActiveGBuffer) {
+				LoadGBuffer();
+			}
+			else {
+				DisposeGBuffer();
+			}
+		}
+		for (auto& P : m_PostPass) {
+			P->UpdateActive(false);
 		}
 	}
 	// 

@@ -173,7 +173,7 @@ namespace DXLibRef {
 			this->m_PrevDrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
 
 			auto* DrawParts = DXDraw::Instance();
-			m_BufferScreen.Make(DrawParts->GetUIXMax(), DrawParts->GetUIYMax(), true);
+			m_BufferScreen.Make(DrawParts->GetSizeXMax(), DrawParts->GetSizeYMax(), true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
 			auto* DrawParts = DXDraw::Instance();

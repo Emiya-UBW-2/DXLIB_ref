@@ -127,6 +127,7 @@ namespace DXLibRef {
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
 #if defined(DEBUG)
 		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
@@ -271,6 +272,8 @@ namespace DXLibRef {
 			// 次のシーンへ移行
 			SceneParts->NextScene();
 			Pad->Dispose();
+
+			PostPassParts->ResetAllBuffer();
 		}
 		return true;
 	}

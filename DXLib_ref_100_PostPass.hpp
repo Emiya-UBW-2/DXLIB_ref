@@ -22,8 +22,7 @@ namespace DXLibRef {
 				Load_Sub();
 			}
 		}
-		void UpdateActive(void) noexcept {
-			bool active = IsActive_Sub();
+		void UpdateActive(bool active) noexcept {
 			if (m_PrevActive != active) {
 				m_PrevActive = active;
 				if (active) {
@@ -108,6 +107,7 @@ namespace DXLibRef {
 		void ResetBuffer(void) noexcept;
 		void DrawGBuffer(float near_len, float far_len, std::function<void()> done) noexcept;
 		void DrawPostProcess(void) noexcept;
+		void ResetAllBuffer(void) noexcept;
 	private:
 		void LoadGBuffer(void) noexcept;
 		void DisposeGBuffer(void) noexcept;

@@ -129,6 +129,9 @@ namespace DXLibRef {
 		// UI—p(1920,1080‚Ìê‡)
 		const auto& GetUIXMax(void) const noexcept { return this->m_DispXSize; }
 		const auto& GetUIYMax(void) const noexcept { return this->m_DispYSize; }
+		// UI—p(1920,1080‚Ìê‡)
+		const auto& GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
+		const auto& GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
 		// 
 		void		GetMousePosition(int* MouseX, int* MouseY) const noexcept;
 		const auto&	GetDeltaTime(void) const noexcept { return m_DeltaTime; }
