@@ -140,6 +140,7 @@ namespace DXLibRef {
 		const auto& IsExit(void) const noexcept { return m_IsExitSelect; }
 		const auto& IsRestart(void) const noexcept { return m_IsRestartSelect; }
 		const auto		IsPause(void) const noexcept { return m_PauseActive.on(); }
+		const auto	IsPauseSwitch(void) const noexcept { return m_PauseActive.trigger(); }
 		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
 		const auto& GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
