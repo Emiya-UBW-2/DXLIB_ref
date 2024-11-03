@@ -315,8 +315,8 @@ namespace DXLibRef {
 				Load();
 				if (GetJoypadNum() > 0) {
 					auto* ItemLogParts = SideLog::Instance();
-					ItemLogParts->Add(10.f, White, LocalizeParts->Get(298));
-					ItemLogParts->Add(10.f, White, LocalizeParts->Get(299));
+					ItemLogParts->Add(10.f, 0.f, White, LocalizeParts->Get(298));
+					ItemLogParts->Add(10.f, 0.f, White, LocalizeParts->Get(299));
 				}
 			}
 		}

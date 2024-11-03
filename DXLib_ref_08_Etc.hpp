@@ -1656,6 +1656,7 @@ namespace DXLibRef {
 		class SideLogData {
 			unsigned int m_Color{ 0 };
 			char m_Message[64]{};
+			float m_TimeStart{ -1.f };
 			float m_TimeMax{ -1.f };
 			float m_Time{ -1.f };
 			float m_Flip{ 0.f };
@@ -1663,10 +1664,11 @@ namespace DXLibRef {
 		public:
 			void AddFlip(float value) noexcept { m_Flip += value; }
 			template <typename... Args>
-			void SetData(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
+			void SetData(float second, float startSec, unsigned int Color, const char* Mes, Args&&... args) noexcept {
 				snprintfDx(m_Message, 64, Mes, args...);
+				m_TimeStart = startSec;
 				m_TimeMax = second;
-				m_Time = m_TimeMax;
+				m_Time = m_TimeStart + m_TimeMax;
 				m_Flip = 0.f;
 				m_Flip_Y = -1.f;
 				m_Color = Color;
@@ -1674,7 +1676,17 @@ namespace DXLibRef {
 			void UpdateActive(void) noexcept;
 		public:
 			float GetFlip(void) const noexcept { return m_Flip_Y; }
-			float ActivePer(void) const noexcept { return (m_Time > 1.f) ? std::clamp((m_TimeMax - m_Time) * 5.f + 0.1f, 0.f, 1.f) : std::clamp(m_Time, 0.f, 1.f); }
+			float ActivePer(void) const noexcept {
+				if (m_Time > m_TimeMax) {
+					return 0.f;
+				}
+				else if (m_Time > 1.f) {
+					return std::clamp((m_TimeMax - m_Time) * 5.f + 0.1f, 0.f, 1.f);
+				}
+				else {
+					return std::clamp(m_Time, 0.f, 1.f);
+				}
+			}
 			const char* GetMsg(void) const noexcept { return m_Message; }
 			unsigned int GetMsgColor(void) const noexcept { return m_Color; }
 		};
@@ -1692,18 +1704,16 @@ namespace DXLibRef {
 		~SideLog(void) noexcept {}
 	public:
 		template <typename... Args>
-		void Add(float second, unsigned int Color, const char* Mes, Args&&... args) noexcept {
+		void Add(float second, float startSec, unsigned int Color, const char* Mes, Args&&... args) noexcept {
 			for (auto& d : data) {
 				d.AddFlip(1.f);
 			}
-			data.at(m_LastSel).SetData(second, Color, Mes, args...);
+			data.at(m_LastSel).SetData(second, startSec, Color, Mes, args...);
 			++m_LastSel %= data.size();
 		}
 		void Update(void) noexcept {
 			for (auto& d : data) {
-				if (d.ActivePer() > 0.f) {
-					d.UpdateActive();
-				}
+				d.UpdateActive();
 			}
 		}
 		void Draw(void) noexcept;
