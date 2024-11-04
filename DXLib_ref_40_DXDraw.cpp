@@ -662,14 +662,16 @@ namespace DXLibRef {
 
 		m_CheckPCSpec.Set();
 
+		int xBase = GetUIY(1366);
+		int yBase = GetUIY(768);
+		SetWindowPosition((deskx - xBase) / 2, (desky - yBase) / 2);
+		SetWindowSize(xBase, yBase);
+
 		// 初期設定画面
 		OptionWindowParts->SetActive();
 		while (ProcessMessage() == 0) {
+			FirstExecute();
 			WindowSystem::DrawControl::Instance()->ClearList();
-			int xBase = GetUIY(1366);
-			int yBase = GetUIY(768);
-			SetWindowPosition((deskx - xBase) / 2, (desky - yBase) / 2);
-			SetWindowSize(xBase, yBase);
 
 			Pad->Update();
 			OptionWindowParts->Update();

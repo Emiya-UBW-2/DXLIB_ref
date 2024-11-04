@@ -197,6 +197,11 @@ namespace DXLibRef {
 				h.SetVol(vol);
 			}
 		}
+		void			StopAll() noexcept {
+			for (auto& h : this->havehandle) {
+				h.StopAll(0);
+			}
+		}
 	public:
 		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) noexcept {
 			for (size_t index = 0; auto & h : this->havehandle) {

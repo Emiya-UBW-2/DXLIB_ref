@@ -384,7 +384,7 @@ namespace DXLibRef {
 		}
 	}
 	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
-		if (m_ActivePer < 1.f / 255.f) { return; }
+		if (m_ActivePer < (1.f / 255.f)) { return; }
 
 		auto* DrawParts = DXDraw::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
