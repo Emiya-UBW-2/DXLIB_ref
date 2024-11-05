@@ -861,7 +861,7 @@ namespace DXLibRef {
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->DrawGraph(0, 0, true);
-				SetDrawBlendMode(DX_BLENDMODE_ADD, 255 / 2);
+				SetDrawBlendMode(DX_BLENDMODE_ADD, (int)(255.f * DrawParts->GetGodRayPer()));
 				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}

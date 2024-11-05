@@ -79,5 +79,14 @@ namespace DXLibRef {
 			}
 			//*/
 		}
+		void			Dispose(void) noexcept {
+			for (auto& h : handles)
+			{
+				if (h.IsActive())
+				{
+					h.Dispose();
+				}
+			}
+		}
 	};
 };

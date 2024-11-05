@@ -103,6 +103,8 @@ namespace DXLibRef {
 		ShaderUseClass				m_PBR_Shader;
 
 		float						m_DistortionPer{ 120.f };
+
+		float						m_GodRayPer{ 0.5f };
 	public:// ÉQÉbÉ^Å[
 		const auto& is_lens(void) const noexcept { return m_Shader2D.at(0).use; }
 		const auto& zoom_lens(void) const noexcept { return m_Shader2D.at(0).param.at(3); }
@@ -146,7 +148,9 @@ namespace DXLibRef {
 		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
+		const auto& GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 	public:
+		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
 		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
 		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
 		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
