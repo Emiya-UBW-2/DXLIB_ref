@@ -1681,7 +1681,7 @@ namespace DXLibRef {
 					return 0.f;
 				}
 				else if (m_Time > 1.f) {
-					return std::clamp((m_TimeMax - m_Time) * 5.f + 0.1f, 0.f, 1.f);
+					return std::clamp((m_TimeMax - m_Time) * 10.f + 0.1f, 0.f, 1.f);
 				}
 				else {
 					return std::clamp(m_Time, 0.f, 1.f);
@@ -1694,8 +1694,12 @@ namespace DXLibRef {
 		std::array<SideLogData, 16> data;
 		size_t		m_LastSel{ 0 };
 
+		GraphHandle					m_SelectBackImage;
+		float SelYadd{ 0.f };
 	private:
-		SideLog(void) noexcept {}
+		SideLog(void) noexcept {
+			this->m_SelectBackImage.Load("CommonData/UI/select.png");
+		}
 		SideLog(const SideLog&) = delete;
 		SideLog(SideLog&& o) = delete;
 		SideLog& operator=(const SideLog&) = delete;
@@ -1710,11 +1714,13 @@ namespace DXLibRef {
 			}
 			data.at(m_LastSel).SetData(second, startSec, Color, Mes, args...);
 			++m_LastSel %= data.size();
+			SelYadd = 10.f;
 		}
 		void Update(void) noexcept {
 			for (auto& d : data) {
 				d.UpdateActive();
 			}
+			Easing(&SelYadd, 0.f, 0.9f, EasingType::OutExpo);
 		}
 		void Draw(void) noexcept;
 	};

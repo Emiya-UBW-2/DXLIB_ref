@@ -325,6 +325,20 @@ namespace DXLibRef {
 		xp1 = DrawParts->GetUIY(64);
 		yp1 = DrawParts->GetUIY(256);
 
+		{
+			int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * 0.f));
+			if (SelYadd > 0.f) {
+				float per = std::clamp(SelYadd / 5.f, 0.f, 1.f);
+				float per2 = 1.f - std::clamp(SelYadd / 10.f, 0.f, 1.f);
+				WindowSystem::DrawControl::Instance()->SetAdd(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
+				WindowSystem::DrawControl::Instance()->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
+					&this->m_SelectBackImage,
+					xp1 + DrawParts->GetUIY(200 / 2) - (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
+					xp1 + DrawParts->GetUIY(200 / 2) + (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),
+					true);
+			}
+		}
+
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
