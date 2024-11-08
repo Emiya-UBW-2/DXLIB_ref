@@ -33,6 +33,7 @@ namespace DXLibRef {
 		}
 	}
 	void DebugClass::SetEndPoint(void) noexcept {
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		m_Switch.Execute(CheckHitKeyWithCheck(KEY_INPUT_F1) != 0);
 		if (!m_Switch.on()) {
 			return;
@@ -45,8 +46,7 @@ namespace DXLibRef {
 				m_Point.at(0)[static_cast<std::size_t>(index)] = m_Point.at(0)[m_PointSel - 1];
 			}
 			if (index == PointMax) {
-				auto* DrawParts = DXDraw::Instance();
-				m_Point.at(0)[static_cast<std::size_t>(index)] = 1000.0f * DrawParts->GetDeltaTime();
+				m_Point.at(0)[static_cast<std::size_t>(index)] = 1000.0f * DXLib_refParts->GetDeltaTime();
 			}
 
 			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {

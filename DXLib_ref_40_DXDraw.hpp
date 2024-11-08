@@ -64,22 +64,19 @@ namespace DXLibRef {
 			std::array<float, 4>	param{ 0,0,0,0 };
 		};
 	private:
-		int							m_DispXSize{ deskx };
-		int							m_DispYSize{ desky };
+		int							m_DispXSize{ BaseScreenWidth };
+		int							m_DispYSize{ BaseScreenHeight };
 
-		int							m_DispXSize_Win{ deskx };
-		int							m_DispYSize_Win{ desky };
+		int							m_DispXSize_Win{ BaseScreenWidth };
+		int							m_DispYSize_Win{ BaseScreenHeight };
 
-		int							m_DispXSize_Border{ deskx };
-		int							m_DispYSize_Border{ desky };
+		int							m_DispXSize_Border{ BaseScreenWidth };
+		int							m_DispYSize_Border{ BaseScreenHeight };
 
-		int							m_ScreenXSize{ deskx };
-		int							m_ScreenYSize{ desky };
+		int							m_ScreenXSize{ BaseScreenWidth };
+		int							m_ScreenYSize{ BaseScreenHeight };
 
 		switchs						m_PauseActive;
-
-		float						m_DeltaTime{ 0.f };
-		LONGLONG					m_StartTime{ 0 };
 
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
 
@@ -136,8 +133,6 @@ namespace DXLibRef {
 		const auto& GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
 		// 
 		void		GetMousePosition(int* MouseX, int* MouseY) const noexcept;
-		const auto&	GetDeltaTime(void) const noexcept { return m_DeltaTime; }
-		const auto	GetFps(void) const noexcept { return 1.f / m_DeltaTime; }
 		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
 		const auto& IsExit(void) const noexcept { return m_IsExitSelect; }
 		const auto& IsRestart(void) const noexcept { return m_IsRestartSelect; }
@@ -180,7 +175,6 @@ namespace DXLibRef {
 	public:
 		void			Init(void) noexcept;
 		void			FirstBootSetting(void) noexcept;
-		void			FirstExecute(void) noexcept;
 		void			Update(void) noexcept;
 		void			Draw3DVR(
 			std::function<void()> sky_doing,
@@ -201,7 +195,6 @@ namespace DXLibRef {
 		) noexcept;
 		void			Draw2DMain(std::function<void()> doing) noexcept;
 		void			DrawFlipDisplay(std::function<void()> doingUI) const noexcept;
-		bool			Screen_Flip(void) noexcept;
 		// VR
 	private:
 		class VRControl;
@@ -218,5 +211,6 @@ namespace DXLibRef {
 		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
 		Vector3DX			Get_VR_Hand2TouchPadPoint(void) const noexcept;
 		void				VR_Haptic(char id_, unsigned short times) noexcept;	// VRコントローラー振動
+		void				VR_WaitSync(void) noexcept;
 	};
 };

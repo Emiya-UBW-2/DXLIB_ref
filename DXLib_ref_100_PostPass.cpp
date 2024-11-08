@@ -751,7 +751,7 @@ namespace DXLibRef {
 				// ‰æ–Ê‚ð˜c‚Ü‚¹‚Ä•`‰æ
 				DrawCircleScreen(
 					DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2,
-					static_cast<float>(DrawParts->GetScreenXMax() * 2 / 3), DrawParts->GetScreenY(DrawParts->GetDistortionPer()), BufScreen);
+					static_cast<float>(DrawParts->GetScreenXMax() * 2 / 3), static_cast<float>(DrawParts->GetScreenY(static_cast<int>(DrawParts->GetDistortionPer()))), BufScreen);
 			}
 		}
 	};

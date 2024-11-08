@@ -91,10 +91,6 @@ constexpr int		InvalidID{ -1 };								/*共通の無効値*/
 constexpr int		BaseScreenWidth{ 1920 };						/*UI描画などの基準となる解像度*/
 constexpr int		BaseScreenHeight{ 1080 };						/*UI描画などの基準となる解像度*/
 
-// DPIを反映するデスクトップサイズ
-const int deskx{ static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) };
-const int desky{ static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) };
-
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include DXLIB																																*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -135,6 +131,9 @@ namespace DXLibRef {
 		float						m_PauseFlashCount{ 0.f };
 		bool						m_IsEnd{ false };
 		bool						m_IsFirstBoot{ false };
+	private:
+		float						m_DeltaTime{ 0.f };		//1フレームにかかった時間 マイクロ秒
+		LONGLONG					m_StartTime{ 0 };		// 1フレームが始まってからの経過時間 マイクロ秒
 	private:// コンストラクタ
 		DXLib_ref(void) noexcept;
 		DXLib_ref(const DXLib_ref&) = delete;
@@ -161,5 +160,15 @@ namespace DXLibRef {
 	public:
 		bool StartLogic(void) const noexcept;
 		bool MainLogic(void) noexcept;
+	public:
+		const auto& GetDeltaTime(void) const noexcept { return m_DeltaTime; }		// 1フレームにかかった時間を取得
+		const auto	GetFps(void) const noexcept { return 1.f / m_DeltaTime; }		// FPS値の取得
+	public:
+		//垂直同期のフラグ設定
+		void		SetWaitVSync(void) noexcept;
+		// ループの最初に通す
+		void		StartCount(void) noexcept;
+		// 表画面に反映し、垂直同期または一定のFPSまで待機する
+		bool		WaitCount(void) const noexcept;
 	};
 };

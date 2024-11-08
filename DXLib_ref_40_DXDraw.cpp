@@ -477,13 +477,15 @@ namespace DXLibRef {
 	DXDraw::DXDraw(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		// VR初期化
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			m_VRControl = new VRControl;
 			this->GetVRControl()->Init();// 機器が認識できないと中でusevr=falseに
 		}
-		int DispXSize = deskx;
-		int DispYSize = desky;
+		// DPIを反映するデスクトップサイズ
+		int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
+		int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// 解像度指定
 			uint32_t t_x = 1080;
@@ -494,13 +496,11 @@ namespace DXLibRef {
 		}
 		else {
 			// 解像度指定
-			if (desky >= (deskx * BaseScreenHeight / BaseScreenWidth)) {// 4:3
-				DispXSize = deskx;
-				DispYSize = (deskx * BaseScreenHeight / BaseScreenWidth);
+			if (DispYSize >= (DispXSize * BaseScreenHeight / BaseScreenWidth)) {// 4:3
+				DispYSize = (DispXSize * BaseScreenHeight / BaseScreenWidth);
 			}
 			else {// 16:9より横長
-				DispXSize = (desky * BaseScreenWidth / BaseScreenHeight);
-				DispYSize = desky;
+				DispXSize = (DispYSize * BaseScreenWidth / BaseScreenHeight);
 			}
 		}
 		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
@@ -518,7 +518,7 @@ namespace DXLibRef {
 		}
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				// ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									// 
-		SetWaitVSyncFlag((DXVer == DX_DIRECT3D_11) && OptionParts->GetParamBoolean(EnumSaveParam::vsync));		// 垂直同期
+		DXLib_refParts->SetWaitVSync();// 垂直同期
 		SetZBufferBitDepth(32);										// デフォのZバッファ精度を32bitに
 		DxLib_Init();												// 初期化
 		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			// 画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
@@ -624,9 +624,9 @@ namespace DXLibRef {
 		auto y_UIMs = [this](int p1) {
 			auto* OptionParts = OPTION::Instance();
 			if (OptionParts->GetParamInt(EnumSaveParam::WindowMode) == static_cast<int>(WindowType::Window)) {
-				return (static_cast<int>(p1) * m_DispYSize_Border / desky);
+				return (static_cast<int>(p1) * m_DispYSize_Border / m_DispYSize_Border);
 			}
-			return (static_cast<int>(p1) * m_DispYSize / desky);
+			return (static_cast<int>(p1) * m_DispYSize / m_DispYSize_Border);
 			};
 		int mx = 0, my = 0;
 		GetMousePoint(&mx, &my);
@@ -657,6 +657,7 @@ namespace DXLibRef {
 		auto* PopUpParts = PopUp::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* OptionParts = OPTION::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 
 		OptionWindowParts->Init();
 
@@ -664,13 +665,13 @@ namespace DXLibRef {
 
 		int xBase = GetUIY(1366);
 		int yBase = GetUIY(768);
-		SetWindowPosition((deskx - xBase) / 2, (desky - yBase) / 2);
+		SetWindowPosition((m_DispXSize_Border - xBase) / 2, (m_DispYSize_Border - yBase) / 2);
 		SetWindowSize(xBase, yBase);
 
 		// 初期設定画面
 		OptionWindowParts->SetActive();
 		while (ProcessMessage() == 0) {
-			FirstExecute();
+			DXLib_refParts->StartCount();
 			WindowSystem::DrawControl::Instance()->ClearList();
 
 			Pad->Update();
@@ -834,7 +835,8 @@ namespace DXLibRef {
 
 				WindowSystem::DrawControl::Instance()->Draw();
 			}
-			Screen_Flip();
+			ScreenFlip();
+			DXLib_refParts->WaitCount();
 		}
 		OptionParts->Save();
 	}
@@ -876,10 +878,6 @@ namespace DXLibRef {
 		}
 		Update_effect_was = GetNowHiPerformanceCount();
 	}
-	void			DXDraw::FirstExecute(void) noexcept {
-		m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000000.f;
-		m_StartTime = GetNowHiPerformanceCount();
-	}
 	void			DXDraw::Update(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		{
@@ -905,9 +903,9 @@ namespace DXLibRef {
 		}
 		// 
 #if defined(_USE_EFFEKSEER_)
-		if (!IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
+		if (!IsPause() && ((GetNowHiPerformanceCount() - Update_effect_was) >= 1000000 / 60)) {
+			Update_effect_was = GetNowHiPerformanceCount();
 			UpdateEffekseer3D();
-			Update_effect_was = m_StartTime;
 		}
 #endif
 		auto* PostPassParts = PostPassEffect::Instance();
@@ -1030,28 +1028,6 @@ namespace DXLibRef {
 			doingUI();
 		}
 	}
-	bool			DXDraw::Screen_Flip(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
-		ScreenFlip();
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
-			// 4msだけスリープ
-			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
-				if (ProcessMessage() != 0) {
-					return false;
-				}
-				SleepThread(1);	// 1msecスリープする
-			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {
-			}
-		}
-		else {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				WaitVSync(1);
-			}
-		}
-		this->GetVRControl()->WaitSync();
-		return true;
-	}
 	// VR
 	void			DXDraw::Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX* mat) noexcept { this->GetVRControl()->GetHMDPosition(pos_, mat); }
 	void			DXDraw::Reset_VR_HMD(void) noexcept { this->GetVRControl()->ResetHMD(); }
@@ -1062,4 +1038,5 @@ namespace DXLibRef {
 	bool			DXDraw::Get_VR_Hand2TouchPress(VR_PAD ID) const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->PadTouch(ID) : false; }
 	Vector3DX		DXDraw::Get_VR_Hand2TouchPadPoint(void) const noexcept { return this->GetVRControl()->Get_VR_Hand2Device() ? this->GetVRControl()->Get_VR_Hand2Device()->GetTouchPadPoint() : Vector3DX::zero(); }
 	void			DXDraw::VR_Haptic(char id_, unsigned short times) noexcept { this->GetVRControl()->Haptic(id_, times); }
+	void			DXDraw::VR_WaitSync(void) noexcept { this->GetVRControl()->WaitSync(); }
 };

@@ -209,7 +209,7 @@ namespace DXLibRef {
 	}
 	// 
 	void			ObjectBaseClass::ExecuteCommon(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = this->GetObj().GetMatrix();
 		}
@@ -230,12 +230,12 @@ namespace DXLibRef {
 			else {
 				auto NowMat = this->GetObj().GetMatrix();
 				int Max = 2;
-				if (DrawParts->GetFps() > FrameRate * Max) {
+				if (DXLib_refParts->GetFps() > FrameRate * Max) {
 					Max = 1;
 				}
 				for (int i : std::views::iota(0, Max)) {
 					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f * FrameRate * DrawParts->GetDeltaTime() / static_cast<float>(Max));
+					this->GetObj().PhysicsCalculation(1000.0f * FrameRate * DXLib_refParts->GetDeltaTime() / static_cast<float>(Max));
 				}
 			}
 			this->m_PrevMat = this->GetObj().GetMatrix();

@@ -13,10 +13,10 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 	float GetEasingRatio(EasingType EasingType, float ratio) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		switch (EasingType) {
 		case EasingType::OutExpo:
-			return (1.f - std::powf(ratio, FrameRate * DrawParts->GetDeltaTime()));
+			return (1.f - std::powf(ratio, FrameRate * DXLib_refParts->GetDeltaTime()));
 		default:
 			return 1.f;
 		}
@@ -279,13 +279,13 @@ namespace DXLibRef {
 	};
 	// 
 	void			switchs::Execute(bool key) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		m_press = key;
 		if (m_press) {
 			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
 
 			m_repeat = trigger();
-			m_repeatcount -= DrawParts->GetDeltaTime();
+			m_repeatcount -= DXLib_refParts->GetDeltaTime();
 			if (m_repeatcount <= 0.f) {
 				m_repeatcount += 2.f / 60.f;
 				m_repeat = true;
@@ -303,15 +303,15 @@ namespace DXLibRef {
 	}
 	// 
 	void			Pendulum2D::Update(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * DrawParts->GetDeltaTime();
-		m_rad += this->m_vel * DrawParts->GetDeltaTime();
+		auto* DXLib_refParts = DXLib_ref::Instance();
+		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * DXLib_refParts->GetDeltaTime();
+		m_rad += this->m_vel * DXLib_refParts->GetDeltaTime();
 	}
 	// 
 	void SideLog::SideLogData::UpdateActive(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (m_Time > 0.f) {
-			m_Time -= DrawParts->GetDeltaTime();
+			m_Time -= DXLib_refParts->GetDeltaTime();
 		}
 		else {
 			m_Time = -1.f;
@@ -925,7 +925,7 @@ namespace DXLibRef {
 	}
 	// 
 	void CameraShake::Update(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (m_SendCamShakeTime > 0.f) {
 			if (m_SendCamShake) {
 				m_SendCamShake = false;
@@ -934,7 +934,7 @@ namespace DXLibRef {
 			auto RandRange = this->m_CamShake / m_SendCamShakeTime * m_SendCamShakePower;
 			Easing(&this->m_CamShake1, Vector3DX::vget(GetRandf(RandRange), GetRandf(RandRange), GetRandf(RandRange)), 0.8f, EasingType::OutExpo);
 			Easing(&this->m_CamShake2, this->m_CamShake1, 0.8f, EasingType::OutExpo);
-			this->m_CamShake = std::max(this->m_CamShake - DrawParts->GetDeltaTime(), 0.f);
+			this->m_CamShake = std::max(this->m_CamShake - DXLib_refParts->GetDeltaTime(), 0.f);
 		}
 	}
 	// 

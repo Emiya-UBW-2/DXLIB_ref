@@ -44,8 +44,7 @@ namespace DXLibRef {
 	}
 	// 
 	void DXLib_ref::UpdatePause(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		m_PauseFlashCount += DrawParts->GetDeltaTime();
+		m_PauseFlashCount += GetDeltaTime();
 		if (m_PauseFlashCount > 1.f) {
 			m_PauseFlashCount -= 1.f;
 		}
@@ -123,6 +122,7 @@ namespace DXLibRef {
 		auto* SceneParts = SceneControl::Instance();
 		auto* OptionParts = OPTION::Instance();
 		auto* DrawParts = DXDraw::Instance();
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionWindowClass::Instance();
@@ -152,7 +152,7 @@ namespace DXLibRef {
 				clsDx();
 #endif // DEBUG
 				WindowSystem::DrawControl::Instance()->ClearList();
-				DrawParts->FirstExecute();
+				StartCount();
 				if (Pad->GetEsc().trigger() && !DrawParts->IsExit()) {
 					DrawParts->SetExitFlag(true);
 					PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
@@ -263,8 +263,10 @@ namespace DXLibRef {
 #if defined(DEBUG)
 				DebugParts->SetEndPoint();
 #endif // DEBUG
+				ScreenFlip();
+				DXLib_refParts->WaitCount();
 				// 画面の反映
-				DrawParts->Screen_Flip();
+				DrawParts->VR_WaitSync();
 				if (SelEnd) {
 					break;
 				}
@@ -274,6 +276,43 @@ namespace DXLibRef {
 			Pad->Dispose();
 
 			PostPassParts->ResetAllBuffer();
+		}
+		return true;
+	}
+
+	void			DXLib_ref::SetWaitVSync(void) noexcept {
+		// 垂直同期
+		auto* OptionParts = OPTION::Instance();
+		if (DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)] == DX_DIRECT3D_11) {
+			SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));//DirectX11ではあとからの変更が効く
+		}
+		else {
+			SetWaitVSyncFlag(FALSE);//DirectX9では後からの変更が効かない
+		}
+	}
+	// ループの最初に通す
+	void			DXLib_ref::StartCount(void) noexcept {
+		m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000000.f;
+		m_StartTime = GetNowHiPerformanceCount();
+	}
+	// 表画面に反映し、垂直同期または一定のFPSまで待機する
+	bool			DXLib_ref::WaitCount(void) const noexcept {
+		auto* OptionParts = OPTION::Instance();
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
+			// 4msだけスリープ
+			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
+				if (ProcessMessage() != 0) {
+					return false;
+				}
+				SleepThread(1);	// 1msecスリープする
+			}
+			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {
+			}
+		}
+		else {
+			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
+				WaitVSync(1);
+			}
 		}
 		return true;
 	}
