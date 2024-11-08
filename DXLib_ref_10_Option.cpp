@@ -1225,6 +1225,7 @@ namespace DXLibRef {
 
 
 	void OptionWindowClass::ControlTabsInfo::Init_Sub(void) noexcept {
+		auto* Pad = PadControl::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		const int KeyInfo = 1151;
 
@@ -1235,14 +1236,15 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool isMine) {
+				auto* Pad = PadControl::Instance();
 				auto* DrawParts = DXDraw::Instance();
-				if (isMine && PadControl::Instance()->GetMouseClick().trigger()) {
-					PadControl::Instance()->ResetAssign();
+				if (isMine && Pad->GetMouseClick().trigger()) {
+					Pad->ResetAssign();
 				}
 				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
-		if (PadControl::Instance()->IsUseButton((PADS)0)) {
+		if (Pad->IsUseButton((PADS)0)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
 				[]() {},
@@ -1252,7 +1254,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 0); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)2)) {
+		if (Pad->IsUseButton((PADS)2)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
 				[]() {},
@@ -1262,7 +1264,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 2); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)1)) {
+		if (Pad->IsUseButton((PADS)1)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
 				[]() {},
@@ -1272,7 +1274,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 1); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)3)) {
+		if (Pad->IsUseButton((PADS)3)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
 				[]() {},
@@ -1282,7 +1284,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 3); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)10)) {
+		if (Pad->IsUseButton((PADS)10)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
 				[]() {},
@@ -1292,7 +1294,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 10); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)11)) {
+		if (Pad->IsUseButton((PADS)11)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
 				[]() {},
@@ -1302,7 +1304,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 11); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)12)) {
+		if (Pad->IsUseButton((PADS)12)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
 				[]() {},
@@ -1312,7 +1314,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 12); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)13)) {
+		if (Pad->IsUseButton((PADS)13)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
 				[]() {},
@@ -1322,7 +1324,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 13); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)14)) {
+		if (Pad->IsUseButton((PADS)14)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
 				[]() {},
@@ -1332,7 +1334,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 14); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)15)) {
+		if (Pad->IsUseButton((PADS)15)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
 				[]() {},
@@ -1342,7 +1344,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 15); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)16)) {
+		if (Pad->IsUseButton((PADS)16)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
 				[]() {},
@@ -1352,7 +1354,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 16); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)18)) {
+		if (Pad->IsUseButton((PADS)18)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
 				[]() {},
@@ -1362,7 +1364,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 18); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)19)) {
+		if (Pad->IsUseButton((PADS)19)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
 				[]() {},
@@ -1372,7 +1374,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 19); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)20)) {
+		if (Pad->IsUseButton((PADS)20)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
 				[]() {},
@@ -1382,7 +1384,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 20); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)21)) {
+		if (Pad->IsUseButton((PADS)21)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
 				[]() {},
@@ -1392,7 +1394,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 21); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)22)) {
+		if (Pad->IsUseButton((PADS)22)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
 				[]() {},
@@ -1402,7 +1404,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 22); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)23)) {
+		if (Pad->IsUseButton((PADS)23)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
 				[]() {},
@@ -1412,7 +1414,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 23); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)24)) {
+		if (Pad->IsUseButton((PADS)24)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
 				[]() {},
@@ -1422,7 +1424,7 @@ namespace DXLibRef {
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, 24); }
 			);
 		}
-		if (PadControl::Instance()->IsUseButton((PADS)25)) {
+		if (Pad->IsUseButton((PADS)25)) {
 			this->m_Elements.resize(this->m_Elements.size() + 1);
 			this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
 				[]() {},

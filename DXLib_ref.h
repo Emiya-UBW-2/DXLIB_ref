@@ -101,7 +101,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #endif
 // ’Ç‰Á
 #include "DXLib_ref_00_Util.hpp"
-#include "DXLib_ref_01_Vector.hpp"
+#include "DXLib_ref_01_Algorithm.hpp"
 #include "DXLib_ref_02_SoundHandle.hpp"
 #include "DXLib_ref_03_GraphHandle.hpp"
 #include "DXLib_ref_04_LightHandle.hpp"
@@ -111,6 +111,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #include "DXLib_ref_08_Etc.hpp"
 #include "DXLib_ref_09_KeyControl.hpp"
 #include "DXLib_ref_10_Option.hpp"
+#include "DXLib_ref_11_FileControl.hpp"
 #include "DXLib_ref_20_Debug.hpp"
 #include "DXLib_ref_30_Box2D.hpp"
 #include "DXLib_ref_40_DXDraw.hpp"

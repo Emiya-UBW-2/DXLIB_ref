@@ -330,8 +330,8 @@ namespace DXLibRef {
 			if (SelYadd > 0.f) {
 				float per = std::clamp(SelYadd / 5.f, 0.f, 1.f);
 				float per2 = 1.f - std::clamp(SelYadd / 10.f, 0.f, 1.f);
-				WindowSystem::DrawControl::Instance()->SetAdd(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
-				WindowSystem::DrawControl::Instance()->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
+				DrawCtrls->SetAdd(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
+				DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
 					&this->m_SelectBackImage,
 					xp1 + DrawParts->GetUIY(200 / 2) - (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
 					xp1 + DrawParts->GetUIY(200 / 2) + (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),

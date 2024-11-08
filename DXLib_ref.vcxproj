@@ -170,10 +170,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DXLib_ref_11_FileControl.hpp" />
     <ClInclude Include="DXLib_ref_40_DXDraw.hpp" />
     <ClInclude Include="DXLib_ref.h" />
     <ClInclude Include="DXLib_ref_00_Util.hpp" />
-    <ClInclude Include="DXLib_ref_01_Vector.hpp" />
+    <ClInclude Include="DXLib_ref_01_Algorithm.hpp" />
     <ClInclude Include="DXLib_ref_02_SoundHandle.hpp" />
     <ClInclude Include="DXLib_ref_03_GraphHandle.hpp" />
     <ClInclude Include="DXLib_ref_04_LightHandle.hpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="json.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DXLib_ref_11_FileControl.cpp" />
     <ClCompile Include="DXLib_ref_40_DXDraw.cpp" />
     <ClCompile Include="DXLib_ref.cpp" />
     <ClCompile Include="DXLib_ref_00_Util.cpp" />

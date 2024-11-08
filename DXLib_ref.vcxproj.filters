@@ -54,7 +54,7 @@
     <ClInclude Include="DXLib_ref_00_Util.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_01_Vector.hpp">
+    <ClInclude Include="DXLib_ref_01_Algorithm.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="DXLib_ref_02_SoundHandle.hpp">
@@ -73,6 +73,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="DXLib_ref_40_DXDraw.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="DXLib_ref_11_FileControl.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -129,6 +132,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="DXLib_ref_40_DXDraw.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="DXLib_ref_11_FileControl.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

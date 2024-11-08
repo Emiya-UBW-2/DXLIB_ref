@@ -44,134 +44,13 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*関数																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// クリップボードに画像をコピー
-	static auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
-		HWND  hwnd = GetMainWindowHandle();
-
-		if (IsClipboardFormatAvailable(CF_BITMAP) == FALSE) {
-			return false;
-		}	// 指定した形式のデータがクリップボードにあるかを問い合わせる
-		if (OpenClipboard(hwnd) == FALSE) {
-			return false;
-		}						// オープン
-		HBITMAP hBitmap = (HBITMAP)GetClipboardData(CF_BITMAP);					// データ取得
-		CloseClipboard();														// クローズ
-		if (hBitmap == NULL) {
-			return false;
-		}
-
-		BITMAP bitmap{};
-		GetObject(hBitmap, sizeof(BITMAP), &bitmap);
-
-		BITMAPINFO bmpInfo{};
-		bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bmpInfo.bmiHeader.biWidth = bitmap.bmWidth;
-		bmpInfo.bmiHeader.biHeight = bitmap.bmHeight;
-		bmpInfo.bmiHeader.biPlanes = 1;
-		bmpInfo.bmiHeader.biBitCount = 32;
-		bmpInfo.bmiHeader.biCompression = BI_RGB;
-
-		size_t Siz = static_cast<size_t>(bitmap.bmWidth * bitmap.bmHeight * (LONG)4);
-		BYTE* bmpData = new BYTE[Siz];
-		HDC hDC = GetDC(hwnd);
-		GetDIBits(hDC, hBitmap, 0, static_cast<UINT>(bitmap.bmHeight), (void*)bmpData, &bmpInfo, DIB_RGB_COLORS);
-		ReleaseDC(hwnd, hDC);
-		DeleteObject(hBitmap);
-
-		RetHandle->CreateGraphFromBmp(&bmpInfo, bmpData);	// ハンドルに変換
-		delete[] bmpData;
-		return true;
-	}
-
-	// 点と矩形との2D判定
-	static bool HitPointToRectangle(int xp, int yp, int x1, int y1, int x2, int y2) noexcept { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
-	// 矩形と矩形との2D判定
-	static bool HitRectangleToRectangle(int xp1, int yp1, int xp2, int yp2, int x1, int y1, int x2, int y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
-	// 点と四角形との2D判定
-	static bool HitPointToSquare(int xp, int yp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) noexcept {
-		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1)), Vector2DX::vget(static_cast<float>(xp - x1), static_cast<float>(yp - y1)))) { return false; }
-		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2)), Vector2DX::vget(static_cast<float>(xp - x2), static_cast<float>(yp - y2)))) { return false; }
-		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x4 - x3), static_cast<float>(y4 - y3)), Vector2DX::vget(static_cast<float>(xp - x3), static_cast<float>(yp - y3)))) { return false; }
-		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x1 - x4), static_cast<float>(y1 - y4)), Vector2DX::vget(static_cast<float>(xp - x4), static_cast<float>(yp - y4)))) { return false; }
-		return true;
-	}
-
 	// マウスと矩形の判定
 	extern bool IntoMouse(int x1, int y1, int x2, int y2) noexcept;
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 演算補助
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 球と三角との判定
-	static bool GetHitSphereToTriangle(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
-		return HitCheck_Sphere_Triangle(pos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
-	}
-	// 三角とカプセルとの判定
-	static bool GetHitCapsuleToTriangle(const Vector3DX& startpos, const Vector3DX& endpos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
-		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
-	}
-	// 球とカプセルとの判定
-	static bool GetHitSphereToCapsule(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, float size2) noexcept {
-		return HitCheck_Sphere_Capsule(pos.get(), size, tri_p1.get(), tri_p2.get(), size2) == TRUE;
-	}
-	// カプセルとカプセルとの判定
-	static bool GetHitCheckToCapsule(const Vector3DX& pos1, const Vector3DX& pos2, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, float size2) noexcept {
-		return HitCheck_Capsule_Capsule(pos1.get(), pos2.get(), size, tri_p1.get(), tri_p2.get(), size2) == TRUE;
-	}
-	// 直線と直線の一番近い距離
-	static float GetMinLenSegmentToSegment(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgtstartpos, const Vector3DX& tgtendpos) noexcept {
-		return Segment_Segment_MinLength(startpos.get(), endpos.get(), tgtstartpos.get(), tgtendpos.get());
-	}
-	// 直線と点の一番近い点
-	static float GetMinLenSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) noexcept {
-		return Segment_Point_MinLength(startpos.get(), endpos.get(), tgt.get());
-	}
-	// 平面と点の一番近い点
-	static Vector3DX GetMinPosSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) noexcept {
-		return Plane_Point_MinLength_Position(startpos.get(), endpos.get(), tgt.get());
-	}
 	// ランダム
 	static float GetRandf(float m_arg) noexcept { return -m_arg + static_cast<float>(GetRand(static_cast<int>(m_arg * 2.f * 10000.f))) / 10000.f; }
-	// 線分同士の交差判定
-	static bool GetSegmenttoSegment(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) noexcept {
-		VECTOR Pos1t = SegmentAPos1.get();
-		VECTOR Pos2t = SegmentAPos2.get();
-		VECTOR PosAt = SegmentBPos1.get();
-		VECTOR PosBt = SegmentBPos2.get();
-
-		Segment_Segment_Analyse(&Pos1t, &Pos2t, &PosAt, &PosBt, Result);
-		float len = 0.001f;
-		return (Result->SegA_SegB_MinDist_Square <= (len * len));
-	}
-	// 線分と三角との交差判定
-	static bool GetSegmenttoTriangle(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, const Vector3DX& SegmentBPos3, SEGMENT_TRIANGLE_RESULT* Result) noexcept {
-		VECTOR Pos1t = SegmentAPos1.get();
-		VECTOR Pos2t = SegmentAPos2.get();
-		VECTOR PosAt = SegmentBPos1.get();
-		VECTOR PosBt = SegmentBPos2.get();
-		VECTOR PosCt = SegmentBPos3.get();
-
-		Segment_Triangle_Analyse(&Pos1t, &Pos2t, &PosAt, &PosBt, &PosCt, Result);
-		float len = 0.001f;
-		return (Result->Seg_Tri_MinDist_Square <= (len * len));
-	}
-	// 線分と点との交差判定
-	static bool GetSegmenttoPoint(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& PointPos, SEGMENT_POINT_RESULT* Result) noexcept {
-		VECTOR Pos1t = SegmentAPos1.get();
-		VECTOR Pos2t = SegmentAPos2.get();
-		VECTOR PosAt = PointPos.get();
-
-		Segment_Point_Analyse(&Pos1t, &Pos2t, &PosAt, Result);
-		float len = 0.001f;
-		return (Result->Seg_Point_MinDist_Square <= (len * len));
-	}
-	// ファイルが存在するかチェック
-	static bool IsFileExist(const char* Path) noexcept {
-		FILEINFO FileInfo;
-		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
-	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// IK
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1216,26 +1095,6 @@ namespace DXLibRef {
 		bool			release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
 		// 離している間
 		bool			release(void) const noexcept { return !m_press; }
-	};
-	// 2次元振り子演算
-	class Pendulum2D {
-		float	m_PendulumLength = 10.f;
-		float	m_PendulumMass = 2.f;
-		float	m_drag_coeff = 2.02f;
-
-		float	m_rad = deg2rad(12.f);
-		float	m_vel = 0.f;
-	public:
-		void Init(float Length, float N, float rad) noexcept {
-			m_PendulumLength = Length;
-			m_PendulumMass = N;
-			m_rad = rad;
-			m_vel = 0.f;
-		}
-		void Update(void) noexcept;
-	public:
-		auto GetRad(void) const noexcept { return this->m_rad; }
-		void AddRad(float value) noexcept { this->m_rad += value; }
 	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
