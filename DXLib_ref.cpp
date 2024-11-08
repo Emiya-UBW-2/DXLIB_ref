@@ -93,11 +93,12 @@ namespace DXLibRef {
 	}
 	void DXLib_ref::DrawUICommon(void) const noexcept {
 		auto* DrawParts = DXDraw::Instance();
+		auto* SideLogParts = SideLog::Instance();
 		DrawPause();
 		DrawFPSCounter();
 		UniversalUI::UISystem::Instance()->Draw();
 		PadControl::Instance()->Draw();
-		SideLog::Instance()->Draw();
+		SideLogParts->Draw();
 		PopUp::Instance()->Draw(DrawParts->GetUIXMax() / 2, DrawParts->GetUIYMax() / 2);
 #if defined(DEBUG)
 		DebugClass::Instance()->DebugWindow(DrawParts->GetUIXMax() - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
@@ -128,6 +129,7 @@ namespace DXLibRef {
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
+		auto* SideLogParts = SideLog::Instance();
 #if defined(DEBUG)
 		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
@@ -234,7 +236,7 @@ namespace DXLibRef {
 				OptionWindowParts->Update();
 				DrawParts->Update();
 				CameraShake::Instance()->Update();
-				SideLog::Instance()->Update();
+				SideLogParts->Update();
 				PopUpParts->Update();
 				UpdatePause();
 				UpdateFPSCounter();
