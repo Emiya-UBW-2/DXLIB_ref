@@ -342,6 +342,7 @@ namespace DXLibRef {
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
+			auto* PostPassParts = PostPassEffect::Instance();
 			auto* DrawParts = DXDraw::Instance();
 			BufScreen.at(0).SetDraw_Screen(false);
 			BufScreen.at(0).FillGraph(0, 0, 0);
@@ -359,9 +360,9 @@ namespace DXLibRef {
 			{
 				TargetGraph->FillGraph(0, 0, 0);
 				SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
-				BufScreen.at(0).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f + 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen.at(0).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f + 0.005f * PostPassParts->GetAberrationPower(), 0.f, true);
 				BufScreen.at(1).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f, 0.f, true);
-				BufScreen.at(2).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f - 0.005f * DrawParts->GetAberrationPower(), 0.f, true);
+				BufScreen.at(2).DrawRotaGraph(DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2, 1.f - 0.005f * PostPassParts->GetAberrationPower(), 0.f, true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}
 		}
@@ -889,13 +890,14 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
+			auto* PostPassParts = PostPassEffect::Instance();
 			auto* DrawParts = DXDraw::Instance();
-			if (!DrawParts->GetLensParam().use) { return; }
+			if (!PostPassParts->GetLensParam().use) { return; }
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
 				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
-				m_Shader.SetPixelParam(3, DrawParts->GetLensParam().param.at(0), DrawParts->GetLensParam().param.at(1), DrawParts->GetLensParam().param.at(2), DrawParts->GetLensParam().param.at(3));
+				m_Shader.SetPixelParam(3, PostPassParts->GetLensParam().param.at(0), PostPassParts->GetLensParam().param.at(1), PostPassParts->GetLensParam().param.at(2), PostPassParts->GetLensParam().param.at(3));
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);
@@ -924,13 +926,14 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
+			auto* PostPassParts = PostPassEffect::Instance();
 			auto* DrawParts = DXDraw::Instance();
-			if (!DrawParts->GetBlackoutParam().use) { return; }
+			if (!PostPassParts->GetBlackoutParam().use) { return; }
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
 				m_Shader.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
-				m_Shader.SetPixelParam(3, DrawParts->GetBlackoutParam().param.at(0), DrawParts->GetBlackoutParam().param.at(1), DrawParts->GetBlackoutParam().param.at(2), DrawParts->GetBlackoutParam().param.at(3));
+				m_Shader.SetPixelParam(3, PostPassParts->GetBlackoutParam().param.at(0), PostPassParts->GetBlackoutParam().param.at(1), PostPassParts->GetBlackoutParam().param.at(2), PostPassParts->GetBlackoutParam().param.at(3));
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);

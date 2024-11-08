@@ -59,10 +59,6 @@ namespace DXLibRef {
 			void SetActive(void) noexcept;
 			bool UpdateActive(void) noexcept;
 		};
-		struct shaderparam {
-			bool					use{ false };
-			std::array<float, 4>	param{ 0,0,0,0 };
-		};
 	private:
 		int							m_DispXSize{ BaseScreenWidth };
 		int							m_DispYSize{ BaseScreenHeight };
@@ -85,12 +81,9 @@ namespace DXLibRef {
 		Camera3DInfo				m_MainCamera;							// カメラ
 		// カメラシェイク
 		// 
-		float						m_AberrationPower{ 1.f };
-		// 
 		bool						m_IsExitSelect{ false };
 		bool						m_IsRestartSelect{ false };
 
-		std::array<shaderparam, 2>	m_Shader2D;
 		LONGLONG					Update_effect_was = 0;					// エフェクトのアップデートタイミングタイマー
 
 		bool						m_IsCubeMap{ true };
@@ -103,18 +96,6 @@ namespace DXLibRef {
 
 		float						m_GodRayPer{ 0.5f };
 	public:// ゲッター
-		const auto& is_lens(void) const noexcept { return m_Shader2D.at(0).use; }
-		const auto& zoom_lens(void) const noexcept { return m_Shader2D.at(0).param.at(3); }
-		void			Set_is_lens(bool value) noexcept { m_Shader2D.at(0).use = value; }
-		void			Set_xp_lens(float value) noexcept { m_Shader2D.at(0).param.at(0) = value; }
-		void			Set_yp_lens(float value) noexcept { m_Shader2D.at(0).param.at(1) = value; }
-		void			Set_size_lens(float value) noexcept { m_Shader2D.at(0).param.at(2) = value; }
-		void			Set_zoom_lens(float value) noexcept { m_Shader2D.at(0).param.at(3) = value; }
-		void			Set_is_Blackout(bool value) noexcept { m_Shader2D.at(1).use = value; }
-		void			Set_Per_Blackout(float value) noexcept { m_Shader2D.at(1).param.at(0) = value; }
-		const auto& GetLensParam(void) const noexcept { return m_Shader2D.at(0); }
-		const auto& GetBlackoutParam(void) const noexcept { return m_Shader2D.at(1); }
-
 		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		// UI以外のスクリーン空間
 		const auto		GetScreenX(int value) const noexcept { return value * this->m_ScreenXSize / BaseScreenWidth; }
@@ -139,7 +120,6 @@ namespace DXLibRef {
 		const auto		IsPause(void) const noexcept { return m_PauseActive.on(); }
 		const auto	IsPauseSwitch(void) const noexcept { return m_PauseActive.trigger(); }
 		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
-		const auto& GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
@@ -150,7 +130,6 @@ namespace DXLibRef {
 		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
 		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
 		void			SetPause(bool value) noexcept;
-		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
