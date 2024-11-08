@@ -742,6 +742,7 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
+			auto* PostPassParts = PostPassEffect::Instance();
 			BufScreen.SetDraw_Screen();
 			{
 				TargetGraph->DrawGraph(0, 0, true);
@@ -752,7 +753,7 @@ namespace DXLibRef {
 				// ‰æ–Ê‚ð˜c‚Ü‚¹‚Ä•`‰æ
 				DrawCircleScreen(
 					DrawParts->GetScreenXMax() / 2, DrawParts->GetScreenYMax() / 2,
-					static_cast<float>(DrawParts->GetScreenXMax() * 2 / 3), static_cast<float>(DrawParts->GetScreenY(static_cast<int>(DrawParts->GetDistortionPer()))), BufScreen);
+					static_cast<float>(DrawParts->GetScreenXMax() * 2 / 3), static_cast<float>(DrawParts->GetScreenY(static_cast<int>(PostPassParts->GetDistortionPer()))), BufScreen);
 			}
 		}
 	};
@@ -862,7 +863,7 @@ namespace DXLibRef {
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->DrawGraph(0, 0, true);
-				SetDrawBlendMode(DX_BLENDMODE_ADD, (int)(255.f * DrawParts->GetGodRayPer()));
+				SetDrawBlendMode(DX_BLENDMODE_ADD, (int)(255.f * PostPassParts->GetGodRayPer()));
 				SSRScreen.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}

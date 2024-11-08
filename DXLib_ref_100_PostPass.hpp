@@ -77,6 +77,9 @@ namespace DXLibRef {
 
 		std::array<shaderparam, 2>	m_Shader2D;
 		float						m_AberrationPower{ 1.f };
+
+		float						m_DistortionPer{ 120.f };
+		float						m_GodRayPer{ 0.5f };
 	public:
 		const auto& GetCamViewMat(void) const noexcept { return m_CamViewMat; }
 		const auto& GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
@@ -103,6 +106,12 @@ namespace DXLibRef {
 
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
+
+		const auto& GetGodRayPer(void) const noexcept { return m_GodRayPer; }
+		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
+
+		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
+		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
 	public:
 		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
 		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {

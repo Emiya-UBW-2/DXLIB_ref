@@ -15,6 +15,7 @@ namespace DXLibRef {
 		friend class SingletonBase<DXDraw>;
 	private:
 		class ShadowDraw {
+		private:
 			GraphHandle			BaseShadowHandle;
 			GraphHandle			DepthBaseScreenHandle;
 			GraphHandle			DepthScreenHandle;
@@ -26,38 +27,35 @@ namespace DXLibRef {
 			float				m_Scale{ 1.f };
 			float				m_ScaleFar{ 1.f };
 
+			bool						m_PrevShadow{ false };
+
 			std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
 			std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
-		public:
-			const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
-			const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }
-
-			const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
-			const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
-
-			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
-
-			void Init(int ShadowMapSize, int dispsizex, int dispsizey) noexcept;
-			void Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
-			void UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
-			void SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
-			void Draw(void) noexcept;
-			void Dispose(void) noexcept;
 		private:
 			void SetupCam(Vector3DX Center, float scale) const noexcept;
-		private:
-			bool						m_PrevShadow{ false };
 		public:
 			ShadowDraw(void) noexcept {}
 			ShadowDraw(const ShadowDraw&) = delete;
 			ShadowDraw(ShadowDraw&& o) = delete;
 			ShadowDraw& operator=(const ShadowDraw&) = delete;
 			ShadowDraw& operator=(ShadowDraw&& o) = delete;
-
 			~ShadowDraw(void) noexcept {}
 		public:
-			void SetActive(void) noexcept;
-			bool UpdateActive(void) noexcept;
+			const auto&		GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+			const auto&		GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+			const auto&		GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
+			const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//未使用
+		public:
+			void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
+			void			SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
+
+			void			Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
+			void			UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
+			void			Draw(void) noexcept;
+			void			Dispose(void) noexcept;
+		public:
+			void			SetActive(void) noexcept;
+			bool			UpdateActive(void) noexcept;
 		};
 	private:
 		int							m_DispXSize{ BaseScreenWidth };
@@ -91,10 +89,6 @@ namespace DXLibRef {
 
 		CheckPCSpec					m_CheckPCSpec;
 		ShaderUseClass				m_PBR_Shader;
-
-		float						m_DistortionPer{ 120.f };
-
-		float						m_GodRayPer{ 0.5f };
 	public:// ゲッター
 		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		// UI以外のスクリーン空間
@@ -122,11 +116,7 @@ namespace DXLibRef {
 		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
 		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
-		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
-		const auto& GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 	public:
-		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
-		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
 		void			SetExitFlag(bool value) noexcept { m_IsExitSelect = value; }
 		void			SetRestartFlag(bool value) noexcept { m_IsRestartSelect = value; }
 		void			SetPause(bool value) noexcept;

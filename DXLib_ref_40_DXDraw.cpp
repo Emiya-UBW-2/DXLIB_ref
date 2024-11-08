@@ -358,15 +358,6 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	void DXDraw::ShadowDraw::Init(int ShadowMapSize, int dispsizex, int dispsizey) noexcept {
-		BaseShadowHandle.Make(dispsizex, dispsizey, TRUE);
-		int size = 2 << ShadowMapSize;
-		DepthBaseScreenHandle.Make(size, size, FALSE);			// 深度バッファ用の作成
-		DepthScreenHandle.MakeDepth(size, size);					// 深度バッファの作成
-		DepthFarScreenHandle.MakeDepth(size, size);				// 深度バッファの作成
-		m_Shader.Init("CommonData/shader/VS_SoftShadow.vso", "CommonData/shader/PS_SoftShadow.pso");
-		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
-	}
 	void DXDraw::ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		ClearDrawScreen();
 		SetupCamera_Ortho(30.f * scale * Scale3DRate);		// カメラのタイプを正射影タイプにセット、描画範囲も指定
@@ -453,7 +444,13 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
-		Init(11, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
+		BaseShadowHandle.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), TRUE);
+		int size = 2 << 11;
+		DepthBaseScreenHandle.Make(size, size, FALSE);			// 深度バッファ用の作成
+		DepthScreenHandle.MakeDepth(size, size);					// 深度バッファの作成
+		DepthFarScreenHandle.MakeDepth(size, size);				// 深度バッファの作成
+		m_Shader.Init("CommonData/shader/VS_SoftShadow.vso", "CommonData/shader/PS_SoftShadow.pso");
+		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	bool DXDraw::ShadowDraw::UpdateActive(void) noexcept {
 		auto* DrawParts = DXDraw::Instance();
@@ -462,7 +459,7 @@ namespace DXLibRef {
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
 			if (shadow) {
-				Init(11, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
+				SetActive();
 				return true;
 			}
 			else {
@@ -476,7 +473,6 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	DXDraw::DXDraw(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
-		auto* LocalizeParts = LocalizePool::Instance();
 		// VR初期化
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			m_VRControl = new VRControl;
@@ -535,6 +531,7 @@ namespace DXLibRef {
 		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			// 画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
 		SetUsePixelLighting(TRUE);									// ピクセルライティングの使用
 		if (GetUseDirect3DVersion() != DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]) {
+			auto* LocalizeParts = LocalizePool::Instance();
 			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
 		}
 		SetSysCommandOffFlag(TRUE);									// 
