@@ -477,24 +477,28 @@ namespace DXLibRef {
 	DXDraw::DXDraw(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
-		auto* DXLib_refParts = DXLib_ref::Instance();
 		// VR初期化
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			m_VRControl = new VRControl;
 			this->GetVRControl()->Init();// 機器が認識できないと中でusevr=falseに
 		}
-		// DPIを反映するデスクトップサイズ
-		int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
-		int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// 解像度指定
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
 			// m_VR_SystemPtr->GetRecommendedRenderTargetSize(&t_x,&t_y);
-			DispXSize = static_cast<int>(t_x) * 2;
-			DispYSize = static_cast<int>(t_y) * 2;
+			int DispXSize = static_cast<int>(t_x) * 2;
+			int DispYSize = static_cast<int>(t_y) * 2;
+
+			this->m_DispXSize_Win = DispXSize - 72 * 16 / 9;
+			this->m_DispYSize_Win = DispYSize - 72;
+			this->m_DispXSize_Border = DispXSize;
+			this->m_DispYSize_Border = DispYSize;
 		}
 		else {
+			// DPIを反映するデスクトップサイズ
+			int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN));
+			int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN));
 			// 解像度指定
 			if (DispYSize >= (DispXSize * BaseScreenHeight / BaseScreenWidth)) {// 4:3
 				DispYSize = (DispXSize * BaseScreenHeight / BaseScreenWidth);
@@ -502,28 +506,35 @@ namespace DXLibRef {
 			else {// 16:9より横長
 				DispXSize = (DispYSize * BaseScreenWidth / BaseScreenHeight);
 			}
+			this->m_DispXSize_Win = DispXSize - 72 * 16 / 9;
+			this->m_DispYSize_Win = DispYSize - 72;
+			this->m_DispXSize_Border = DispXSize;
+			this->m_DispYSize_Border = DispYSize;
 		}
-		int DXVer = DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)];
+		int DispXSize_Max = std::min(GetSizeXMax(), static_cast<int>(static_cast<float>(std::min<int>(BaseScreenWidth, GetSizeXMax())) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		int DispYSize_Max = std::min(GetSizeYMax(), static_cast<int>(static_cast<float>(std::min<int>(BaseScreenHeight, GetSizeYMax())) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
+		this->m_ScreenXSize = BaseScreenWidth * DispXSize_Max / this->m_DispXSize_Win;
+		this->m_ScreenYSize = BaseScreenHeight * DispYSize_Max / this->m_DispYSize_Win;
+
 		SetOutApplicationLogValidFlag(TRUE);						// log
 		SetMainWindowText("Loading...");							// タイトル
 		ChangeWindowMode(TRUE);										// 窓表示
-		SetUseDirect3DVersion(DXVer);								// directX ver
+		SetUseDirect3DVersion(DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);								// directX ver
 		SetUseDirectInputFlag(TRUE);								// 
 		SetDirectInputMouseMode(TRUE);								// 
 		{
 			// DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
-			SetGraphMode(DispXSize * DPI / 96, DispYSize * DPI / 96, 32);		// 解像度
+			SetGraphMode(GetSizeXMax() * DPI / 96, GetSizeYMax() * DPI / 96, 32);		// 解像度
 		}
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				// ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									// 
-		DXLib_refParts->SetWaitVSync();// 垂直同期
 		SetZBufferBitDepth(32);										// デフォのZバッファ精度を32bitに
 		DxLib_Init();												// 初期化
 		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			// 画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
 		SetUsePixelLighting(TRUE);									// ピクセルライティングの使用
-		if (GetUseDirect3DVersion() != DXVer) {
+		if (GetUseDirect3DVersion() != DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]) {
 			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
 		}
 		SetSysCommandOffFlag(TRUE);									// 
@@ -535,16 +546,6 @@ namespace DXLibRef {
 		SetUseZBuffer3D(TRUE);										// zbufuse
 		SetWriteZBuffer3D(TRUE);									// zbufwrite
 		// MV1SetLoadModelPhysicsWorldGravity(GravityRate);			// 重力
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			this->m_DispXSize_Win = DispXSize - 72 * 16 / 9;
-			this->m_DispYSize_Win = DispYSize - 72;
-			this->m_DispXSize_Border = DispXSize;
-			this->m_DispYSize_Border = DispYSize;
-		}
-		int DispXSize_Max = std::min(DispXSize, static_cast<int>(static_cast<float>(std::min<int>(BaseScreenWidth, DispXSize)) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		int DispYSize_Max = std::min(DispYSize, static_cast<int>(static_cast<float>(std::min<int>(BaseScreenHeight, DispYSize)) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		this->m_ScreenXSize = BaseScreenWidth * DispXSize_Max / this->m_DispXSize_Win;
-		this->m_ScreenYSize = BaseScreenHeight * DispYSize_Max / this->m_DispYSize_Win;
 		SetWindowOrBorderless();
 		m_ShadowDraw = std::make_unique<ShadowDraw>();
 	}
@@ -620,19 +621,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void			DXDraw::GetMousePosition(int* MouseX, int* MouseY) const noexcept {
-		auto y_UIMs = [this](int p1) {
-			auto* OptionParts = OPTION::Instance();
-			if (OptionParts->GetParamInt(EnumSaveParam::WindowMode) == static_cast<int>(WindowType::Window)) {
-				return (static_cast<int>(p1) * m_DispYSize_Border / m_DispYSize_Border);
-			}
-			return (static_cast<int>(p1) * m_DispYSize / m_DispYSize_Border);
-			};
-		int mx = 0, my = 0;
-		GetMousePoint(&mx, &my);
-		*MouseX = y_UIMs(mx);
-		*MouseY = y_UIMs(my);
-	}
+	void			DXDraw::GetMousePosition(int* MouseX, int* MouseY) const noexcept { GetMousePoint(MouseX, MouseY); }
 	// 
 	void			DXDraw::SetPause(bool value) noexcept {
 		auto* Pad = PadControl::Instance();
@@ -665,7 +654,7 @@ namespace DXLibRef {
 
 		int xBase = GetUIY(1366);
 		int yBase = GetUIY(768);
-		SetWindowPosition((m_DispXSize_Border - xBase) / 2, (m_DispYSize_Border - yBase) / 2);
+		SetWindowPosition((GetSizeXMax() - xBase) / 2, (m_DispYSize_Border - yBase) / 2);
 		SetWindowSize(xBase, yBase);
 
 		// 初期設定画面

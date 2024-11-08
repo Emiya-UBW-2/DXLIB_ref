@@ -16,6 +16,7 @@ namespace DXLibRef {
 			SaveDataParts->Save();
 			OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 		}
+		SetWaitVSync();							// 垂直同期
 		DXDraw::Create();						// 汎用
 		// 
 #if defined(DEBUG)
