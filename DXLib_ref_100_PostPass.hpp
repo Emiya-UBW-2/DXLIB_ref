@@ -134,6 +134,7 @@ namespace DXLibRef {
 
 		~PostPassEffect(void) noexcept;
 	public:
+		void Init(void) noexcept;
 		void Update(void) noexcept;
 		void SetCamMat(const Camera3DInfo& camInfo) noexcept;
 		void ResetBuffer(void) noexcept;

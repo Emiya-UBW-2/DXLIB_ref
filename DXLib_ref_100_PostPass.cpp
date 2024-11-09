@@ -820,8 +820,9 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
+			auto* PostPassParts = PostPassEffect::Instance();
 			auto* OptionParts = OPTION::Instance();
-			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::GodRay);
+			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::GodRay) && (PostPassParts->GetGodRayPer() > 0.f);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OPTION::Instance();
@@ -967,6 +968,19 @@ namespace DXLibRef {
 		m_PostPass.emplace_back(std::make_unique<PostPassFXAA>());
 		m_PostPass.emplace_back(std::make_unique<PostPassScope>());
 		m_PostPass.emplace_back(std::make_unique<PostPassBlackout>());
+	}
+	PostPassEffect::~PostPassEffect(void) noexcept {
+		// Gバッファ
+		if (!m_IsActiveGBuffer) {
+			DisposeGBuffer();
+		}
+		// ポストエフェクト
+		for (auto& P : m_PostPass) {
+			P.reset();
+		}
+		m_PostPass.clear();
+	}
+	void PostPassEffect::Init(void) noexcept {
 		for (auto& P : m_PostPass) {
 			P->Init();
 		}
@@ -981,17 +995,6 @@ namespace DXLibRef {
 		if (m_IsActiveGBuffer) {
 			LoadGBuffer();
 		}
-	}
-	PostPassEffect::~PostPassEffect(void) noexcept {
-		// Gバッファ
-		if (!m_IsActiveGBuffer) {
-			DisposeGBuffer();
-		}
-		// ポストエフェクト
-		for (auto& P : m_PostPass) {
-			P.reset();
-		}
-		m_PostPass.clear();
 	}
 	// 
 	void PostPassEffect::Update(void) noexcept {

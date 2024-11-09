@@ -411,13 +411,13 @@ namespace DXLibRef {
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
-			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
+			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), m_Scale * 180.f, 0.f, 0.f);
 			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
-			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
+			//m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_Shader.Draw_lamda(doing);
-			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow) * 3 / 2), m_Scale * 150.f, m_ScaleFar * 150.f, 0.f);
+			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), m_Scale * 180.f, 0.f, 0.f);
 			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
-			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
+			//m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
 		SetUseTextureToShader(1, InvalidID);				// 使用テクスチャの設定を解除
@@ -427,8 +427,9 @@ namespace DXLibRef {
 			DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_R);
 	}
 	void DXDraw::ShadowDraw::Draw(void) noexcept {
+		auto* DrawParts = DXDraw::Instance();
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-		BaseShadowHandle.DrawGraph(0, 0, true);
+		BaseShadowHandle.DrawExtendGraph(0, 0, DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 		// DepthScreenHandle.DrawExtendGraph(0, 0,1080,1080, true);
 	}
@@ -444,8 +445,8 @@ namespace DXLibRef {
 		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
-		BaseShadowHandle.Make(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax(), TRUE);
-		int size = 2 << 11;
+		BaseShadowHandle.Make(DrawParts->GetScreenXMax() / EXTEND, DrawParts->GetScreenYMax() / EXTEND, TRUE);
+		int size = 2 << 10;
 		DepthBaseScreenHandle.Make(size, size, FALSE);			// 深度バッファ用の作成
 		DepthScreenHandle.MakeDepth(size, size);					// 深度バッファの作成
 		DepthFarScreenHandle.MakeDepth(size, size);				// 深度バッファの作成
@@ -453,7 +454,6 @@ namespace DXLibRef {
 		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	bool DXDraw::ShadowDraw::UpdateActive(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
 		auto* OptionParts = OPTION::Instance();
 		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		if (m_PrevShadow != shadow) {
@@ -572,7 +572,7 @@ namespace DXLibRef {
 				m_ShadowDraw->Update(doing, CenterPos, Scale);
 			}
 			else {
-				m_ShadowDraw->UpdateFar(doing, CenterPos, Scale);
+				//m_ShadowDraw->UpdateFar(doing, CenterPos, Scale);
 			}
 		}
 	}
@@ -855,6 +855,8 @@ namespace DXLibRef {
 		LightPool::Create();
 		// シェーダー
 		PostPassEffect::Create();
+		auto* PostPassParts = PostPassEffect::Instance();
+		PostPassParts->Init();
 		// 影生成
 		m_ShadowDraw->SetActive();
 		// キューブマップ

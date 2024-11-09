@@ -15,6 +15,7 @@ namespace DXLibRef {
 		friend class SingletonBase<DXDraw>;
 	private:
 		class ShadowDraw {
+			static const int EXTEND = 4;
 		private:
 			GraphHandle			BaseShadowHandle;
 			GraphHandle			DepthBaseScreenHandle;
