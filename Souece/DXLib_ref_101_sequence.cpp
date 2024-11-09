@@ -72,9 +72,60 @@ namespace DXLibRef {
 				16, 16, Green, Black, "Pause");
 		}
 	}
+	void SceneControl::Draw3DMain(const Camera3DInfo& camInfo) const noexcept {
+		auto* PostPassParts = PostPassEffect::Instance();
+		PostPassParts->SetCamMat(camInfo);
+		// 全ての画面を初期化
+		PostPassParts->ResetBuffer();
+		// 空
+		PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
+		// 遠距離
+		PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [&]() {
+			auto* PostPassParts = PostPassEffect::Instance();
+			PostPassParts->DrawByPBR([this]() {
+				this->m_NowScenesPtr->CalcOnDraw();
+				this->m_NowScenesPtr->MainDraw();
+				});
+			this->m_NowScenesPtr->MainDrawFront();
+			});
+		// 中間
+		PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [&]() {
+#if defined(_USE_EFFEKSEER_)
+			Effekseer_Sync3DSetting();
+#endif
+			auto* PostPassParts = PostPassEffect::Instance();
+			PostPassParts->DrawByPBR([this]() {
+				this->m_NowScenesPtr->CalcOnDraw();
+				this->m_NowScenesPtr->MainDraw();
+				});
+#if defined(_USE_EFFEKSEER_)
+			DrawEffekseer3D();
+#endif
+			this->m_NowScenesPtr->MainDrawFront();
+			});
+		// 至近
+		PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [&]() {
+#if defined(_USE_EFFEKSEER_)
+			Effekseer_Sync3DSetting();
+#endif
+			auto* PostPassParts = PostPassEffect::Instance();
+			PostPassParts->DrawByPBR([this]() {
+				this->m_NowScenesPtr->CalcOnDraw();
+				this->m_NowScenesPtr->MainDraw();
+				});
+#if defined(_USE_EFFEKSEER_)
+			DrawEffekseer3D();
+#endif
+			this->m_NowScenesPtr->MainDrawFront();
+			});
+		// ポストプロセス
+		PostPassParts->DrawPostProcess(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
+	}
 	void SceneControl::DrawUICommon(void) const noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* SideLogParts = SideLog::Instance();
+		//
+		this->m_NowScenesPtr->DrawUI_Base();
 		// ポーズ描画を設定
 		if (IsPause()) {
 			m_PauseDrawer.DrawPause();
@@ -87,6 +138,10 @@ namespace DXLibRef {
 #if defined(DEBUG)
 		DebugClass::Instance()->DebugWindow(WindowSizeParts->GetUIXMax() - WindowSizeParts->GetUIY(350), WindowSizeParts->GetUIY(150));
 #endif // DEBUG
+	}
+	void SceneControl::DrawUIFront(void) const noexcept {
+		this->m_NowScenesPtr->DrawUI_In();
+		WindowSystem::DrawControl::Instance()->Draw();
 	}
 	//
 	void SceneControl::ChangePause(bool value) noexcept {
@@ -201,7 +256,9 @@ namespace DXLibRef {
 		m_IsEndScene = !this->m_NowScenesPtr->Update();		// 更新
 		OptionWindowParts->Update();
 		Set3DSoundListenerPosAndFrontPosAndUpVec(WindowSizeParts->SetMainCamera().GetCamPos().get(), WindowSizeParts->SetMainCamera().GetCamVec().get(), WindowSizeParts->SetMainCamera().GetCamUp().get());		// 音位置指定
-		WindowSizeParts->VR_Update();
+#if defined(_USE_OPENVR_)
+		VRControl::Instance()->Execute();
+#endif
 		PostPassParts->Update();
 		CameraShake::Instance()->Update();
 		SideLogParts->Update();
@@ -240,49 +297,43 @@ namespace DXLibRef {
 		// 画面に反映
 		if (this->m_NowScenesPtr->Get3DActive()) {
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-				WindowSizeParts->Draw3DVR(
-					[this]() { this->m_NowScenesPtr->BG_Draw(); },
-					[this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); },
-					[this]() { this->m_NowScenesPtr->SetShadowDraw(); },
-					[this]() {
-						this->m_NowScenesPtr->CalcOnDraw();
-						this->m_NowScenesPtr->MainDraw();
-					},
-					[this]() { this->m_NowScenesPtr->MainDrawFront(); },
-					[&]() {
-						this->m_NowScenesPtr->DrawUI_Base();
-						DrawUICommon(); 
-					},
-					[this]() {
-						this->m_NowScenesPtr->DrawUI_In();
-						WindowSystem::DrawControl::Instance()->Draw();
+#if defined(_USE_OPENVR_)
+				// UIをスクリーンに描画しておく
+				VRControl::Instance()->SetUpBackUI([&]() { DrawUICommon(); });
+				// VRに移す
+				for (char i = 0; i < 2; ++i) {
+					Camera3DInfo tmp_cam = WindowSizeParts->GetMainCamera();
+					tmp_cam.SetCamPos(
+						tmp_cam.GetCamPos() + VRControl::Instance()->GetEyePosition(i),
+						tmp_cam.GetCamVec() + VRControl::Instance()->GetEyePosition(i),
+						tmp_cam.GetCamUp()
+					);
+					Draw3DMain(tmp_cam);
+					// それぞれの目に内容を送信
+					VRControl::Instance()->SubmitDraw(i, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
+				}
+				// ディスプレイ描画
+				GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
+				{
+					FillGraph(GetDrawScreen(), 0, 0, 0);
+					if (VRControl::Instance()->GetOutBuffer()) {
+						VRControl::Instance()->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2, 0.5f, 0, false);
 					}
-				);
+				}
+#endif
 			}
 			else {
-				WindowSizeParts->Draw3DMain(
-					[this]() { this->m_NowScenesPtr->BG_Draw(); },
-					[this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); },
-					[this]() { this->m_NowScenesPtr->SetShadowDraw(); },
-					[this]() {
-						this->m_NowScenesPtr->CalcOnDraw();
-						this->m_NowScenesPtr->MainDraw();
-					},
-					[this]() { this->m_NowScenesPtr->MainDrawFront(); },
-					WindowSizeParts->GetMainCamera());
+				Draw3DMain(WindowSizeParts->GetMainCamera());
 				// ディスプレイ描画
 				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 				{
 					int Prev = GetDrawMode();
-					// SetDrawMode(DX_DRAWMODE_NEAREST);
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
 					PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
 					SetDrawMode(Prev);
-					this->m_NowScenesPtr->DrawUI_Base();
-					// 追加の描画物
+					//
 					DrawUICommon();
-					this->m_NowScenesPtr->DrawUI_In();
-					WindowSystem::DrawControl::Instance()->Draw();
+					DrawUIFront();
 				}
 			}
 		}
@@ -302,10 +353,9 @@ namespace DXLibRef {
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
 				SetDrawMode(Prev);
-				this->m_NowScenesPtr->DrawUI_Base();
+				//
 				DrawUICommon();
-				this->m_NowScenesPtr->DrawUI_In();
-				WindowSystem::DrawControl::Instance()->Draw();
+				DrawUIFront();
 			}
 		}
 	}

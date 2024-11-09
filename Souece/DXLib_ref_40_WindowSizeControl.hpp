@@ -2,14 +2,6 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-	enum class VR_PAD {
-		TRIGGER,
-		SIDEBUTTON,
-		TOUCHPAD,
-		TOPBUTTON1,
-		TOPBUTTON2,
-	};
-
 	class WindowSizeControl : public SingletonBase<WindowSizeControl> {
 	private:
 		friend class SingletonBase<WindowSizeControl>;
@@ -59,49 +51,12 @@ namespace DXLibRef {
 			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
 		}
 	private:// コンストラクタ
-		WindowSizeControl(void) noexcept;
+		WindowSizeControl(void) noexcept{}
 		WindowSizeControl(const WindowSizeControl&) = delete;
 		WindowSizeControl(WindowSizeControl&& o) = delete;
 		WindowSizeControl& operator=(const WindowSizeControl&) = delete;
 		WindowSizeControl& operator=(WindowSizeControl&& o) = delete;
 	public:
 		void			SetupWindowSize(void) noexcept;
-		void			Draw3DVR(
-			std::function<void()> sky_doing,
-			std::function<void()> setshadowdoing_rigid,
-			std::function<void()> setshadowdoing,
-			std::function<void()> doing,
-			std::function<void()> doingFront,
-			std::function<void()> doingUI,
-			std::function<void()> doingUI2
-		) noexcept;
-		void			Draw3DMain(
-			std::function<void()> sky_doing,
-			std::function<void()> setshadowdoing_rigid,
-			std::function<void()> setshadowdoing,
-			std::function<void()> doing,
-			std::function<void()> doingFront,
-			const Camera3DInfo& camInfo
-		) noexcept;
-		// VR
-	private:
-		class VRControl;
-		VRControl* m_VRControl{ nullptr };
-		VRControl* GetVRControl(void) noexcept { return m_VRControl; }
-		const VRControl* GetVRControl(void) const noexcept { return m_VRControl; }
-	public:
-		void				VR_Setup(void) noexcept;
-		void				VR_Update(void) noexcept;
-		void				VR_Dispose(void) noexcept;
-		void				Get_VR_HMDPositionVR(Vector3DX* pos_, Matrix4x4DX* mat) noexcept;
-		void				Reset_VR_HMD(void) noexcept;
-		bool				Get_VR_Hand1PadPress(VR_PAD) const noexcept;
-		bool				Get_VR_Hand1TouchPress(VR_PAD) const noexcept;
-		Vector3DX			Get_VR_Hand1TouchPadPoint(void) const noexcept;
-		bool				Get_VR_Hand2PadPress(VR_PAD) const noexcept;
-		bool				Get_VR_Hand2TouchPress(VR_PAD) const noexcept;
-		Vector3DX			Get_VR_Hand2TouchPadPoint(void) const noexcept;
-		void				VR_Haptic(char id_, unsigned short times) noexcept;	// VRコントローラー振動
-		void				VR_WaitSync(void) noexcept;
 	};
 };

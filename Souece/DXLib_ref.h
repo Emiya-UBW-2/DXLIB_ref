@@ -4,8 +4,8 @@
 /*ÉrÉãÉhê›íË																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 #define DEBUG
-// #define _USE_OPENVR_
-// #define _USE_BOX2D_
+#define _USE_OPENVR_
+//#define _USE_BOX2D_
 #define _USE_EFFEKSEER_
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -115,6 +115,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UIï`âÊÇ»Ç«ÇÃäÓèÄÇ∆Ç»ÇÈâëúìx*/
 #include "DXLib_ref_12_Draw2DSystem.hpp"
 #include "DXLib_ref_20_Debug.hpp"
 #include "DXLib_ref_30_Box2D.hpp"
+#include "DXLib_ref_31_VR.hpp"
 #include "DXLib_ref_40_WindowSizeControl.hpp"
 #include "DXLib_ref_100_PostPass.hpp"
 #include "DXLib_ref_101_sequence.hpp"

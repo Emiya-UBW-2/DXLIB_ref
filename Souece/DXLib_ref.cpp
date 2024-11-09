@@ -16,6 +16,13 @@ namespace DXLibRef {
 			SaveDataParts->Save();
 			OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 		}
+#if defined(_USE_OPENVR_)
+		// VR初期化
+		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+			VRControl::Create();
+			VRControl::Instance()->Init();// 機器が認識できないと中でusevr=falseに
+		}
+#endif
 		WindowSizeControl::Create();						// 汎用
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		WindowSizeParts->SetupWindowSize();
@@ -277,8 +284,6 @@ namespace DXLibRef {
 #if defined(_USE_EFFEKSEER_)
 		EffectResource::Create();						// エフェクト
 #endif
-		auto* WindowSizeParts = WindowSizeControl::Instance();
-
 		ObjectManager::Create();
 		SideLog::Create();
 		CameraShake::Create();
@@ -289,7 +294,9 @@ namespace DXLibRef {
 		//
 		PostPassParts->Init();
 		//
-		WindowSizeParts->VR_Setup();
+#if defined(_USE_OPENVR_)
+		VRControl::Instance()->SetupBuffer();
+#endif
 		//
 		Update_effect_was = GetNowHiPerformanceCount();
 		//
@@ -297,7 +304,6 @@ namespace DXLibRef {
 	}
 	void			DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 #if defined(DEBUG)
 		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
@@ -331,7 +337,9 @@ namespace DXLibRef {
 				ScreenFlip();
 				WaitCount();
 				// 画面の反映
-				WindowSizeParts->VR_WaitSync();
+#if defined(_USE_OPENVR_)
+				VRControl::Instance()->WaitSync();
+#endif
 				// シーン/ゲームの終了判定が立っているのでループを抜ける
 				if (SceneParts->IsEndScene()) {
 					break;
@@ -344,7 +352,9 @@ namespace DXLibRef {
 				break;
 			}
 		}
-		WindowSizeParts->VR_Dispose();
+#if defined(_USE_OPENVR_)
+		VRControl::Instance()->Dispose();
+#endif
 #if defined(_USE_EFFEKSEER_)
 		Effkseer_End();
 #endif

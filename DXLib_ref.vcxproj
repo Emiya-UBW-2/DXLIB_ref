@@ -39,6 +39,7 @@
     <ClInclude Include="Souece\DXLib_ref_12_Draw2DSystem.hpp" />
     <ClInclude Include="Souece\DXLib_ref_20_Debug.hpp" />
     <ClInclude Include="Souece\DXLib_ref_30_Box2D.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_31_VR.hpp" />
     <ClInclude Include="Souece\DXLib_ref_40_WindowSizeControl.hpp" />
     <ClInclude Include="Souece\json.hpp" />
   </ItemGroup>
@@ -62,6 +63,7 @@
     <ClCompile Include="Souece\DXLib_ref_12_Draw2DSystem.cpp" />
     <ClCompile Include="Souece\DXLib_ref_20_Debug.cpp" />
     <ClCompile Include="Souece\DXLib_ref_30_Box2D.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_31_VR.cpp" />
     <ClCompile Include="Souece\DXLib_ref_40_WindowSizeControl.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

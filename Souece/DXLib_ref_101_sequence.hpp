@@ -129,7 +129,9 @@ namespace DXLibRef {
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
 	private:
+		void	Draw3DMain(const Camera3DInfo& camInfo) const noexcept;
 		void	DrawUICommon(void) const noexcept;
+		void	DrawUIFront(void) const noexcept;
 	public:
 		const auto&		IsEndGame(void) const noexcept { return m_IsEndGame; }
 		const auto&		IsPause(void) const noexcept { return m_IsPauseActive; }
