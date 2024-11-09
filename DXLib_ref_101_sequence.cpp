@@ -6,94 +6,314 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 
-	void TEMPSCENE::CubeMapDraw(void) const noexcept {
-		if (!Get3DActive()) { return; }
-		auto* DrawParts = DXDraw::Instance();
-		Vector3DX Pos = DrawParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
-		DrawParts->Update_CubeMap([this]() { CubeMap_Sub(); }, Pos);
+	// FPS表示
+	void SceneControl::FPSDrawer::Initialize(void) noexcept {
+		// 各々の数値を初期化
+		for (auto& f : FPSAvgs) {
+			f = FrameRate;
+		}
+		m_FPSAvgCount = 0;
 	}
-
-	void TEMPSCENE::ShadowDraw_Far(void) const noexcept {
-		if (!Get3DActive()) { return; }
-		auto* DrawParts = DXDraw::Instance();
-		if (DrawParts->UpdateShadowActive() || GetIsFirstLoop()) {
-			DrawParts->Update_Shadow([this]() { ShadowDraw_Far_Sub(); }, Vector3DX::zero(), GetShadowScale() * 4.f, true);
+	void SceneControl::FPSDrawer::Update(void) noexcept {
+		// m_FPSAvgCountの番号に対して今のフレームレートを保存
+		FPSAvgs.at(m_FPSAvgCount) = DXLib_ref::Instance()->GetFps();
+		// 保存する場所をずらす
+		++m_FPSAvgCount %= FPSAvgs.size();
+		// 保存している過去のFPS値の平均をとる
+		m_FPSAvg = 0.f;
+		for (auto& f : FPSAvgs) {
+			m_FPSAvg += f;
+		}
+		m_FPSAvg = m_FPSAvg / static_cast<float>(FPSAvgs.size());
+	}
+	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		auto* OptionParts = OPTION::Instance();
+		// FPSの平均値が設定していた上限値に対して高いなら緑、低いなら黄色赤色と変化させる
+		auto color = White;
+		if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+			color = Green;// 十分にFPSが出ている
+		}
+		else if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 10)) {
+			color = Yellow;// 十分にFPSが出ていない
+		}
+		else {
+			color = Red;// まったくFPSが出ていない
+		}
+		// FPS値の表示
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+			LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+			BaseScreenWidth - 8, 8, color, Black, "%5.2f FPS", m_FPSAvg);
+		// ドローコール(DirectXに何回描画指示を送ったか)の表示
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+			LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+			BaseScreenWidth - 8, 8 + 20, White, Black, "%d Drawcall", GetDrawCallCount());
+	}
+	// ポーズ画面
+	void SceneControl::PauseDrawer::Update(void) noexcept {
+		// ポーズ画面では点滅の演算を行う
+		m_PauseFlashCount += DXLib_ref::Instance()->GetDeltaTime();
+		// 1秒経ったら0秒にリセットする
+		if (m_PauseFlashCount > 1.f) {
+			m_PauseFlashCount -= 1.f;
 		}
 	}
-
-	void TEMPSCENE::ShadowDraw(void) const noexcept {
-		if (!Get3DActive()) { return; }
-		auto* DrawParts = DXDraw::Instance();
-		DrawParts->Update_Shadow([this] { ShadowDraw_Sub(); }, DrawParts->SetMainCamera().GetCamPos(), GetShadowScale(), false);
+	void SceneControl::PauseDrawer::DrawPause(void) const noexcept {
+		// ポーズ画面に入っていない場合はスルーする
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		// 半透明の暗幕
+		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 128);
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, BaseScreenWidth, BaseScreenHeight, Black, TRUE);
+		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+		// カウントが0.5秒以上であれば Pause の文字を表示
+		if (m_PauseFlashCount > 0.5f) {
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+				36, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+				16, 16, Green, Black, "Pause");
+		}
 	}
+	void SceneControl::DrawUICommon(void) const noexcept {
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		auto* SideLogParts = SideLog::Instance();
+		// ポーズ描画を設定
+		if (IsPause()) {
+			m_PauseDrawer.DrawPause();
+		}
+		// FPS表示描画を設定
+		m_FPSDrawer.DrawFPSCounter();
+		PadControl::Instance()->Draw();
+		SideLogParts->Draw();
+		PopUp::Instance()->Draw(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
+#if defined(DEBUG)
+		DebugClass::Instance()->DebugWindow(WindowSizeParts->GetUIXMax() - WindowSizeParts->GetUIY(350), WindowSizeParts->GetUIY(150));
+#endif // DEBUG
+	}
+	//
+	void SceneControl::ChangePause(bool value) noexcept {
+		auto* PopUpParts = PopUp::Instance();
+		if (m_IsPauseActive != value) {
+			m_IsPauseActive = value;
+			auto* Pad = PadControl::Instance();
+			Pad->SetGuideUpdate();
+		}
+		//ポップアップをすべて削除とする
+		PopUpParts->EndAll();
+	}
+	//
+	void SceneControl::Initialize(void) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		auto* Pad = PadControl::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
+		Pad->Dispose();
+		PostPassParts->ResetAllBuffer();
+		//
+		this->m_NowScenesPtr->Load();
+		//
+		SetUseMaskScreenFlag(FALSE);// ←一部画面でエフェクトが出なくなるため入れる
+		// カメラの初期設定
+		WindowSizeParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
+		// 環境光と影の初期化
+		WindowSizeParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
+		this->m_NowScenesPtr->Set();
+		Pad->SetGuideUpdate();
+		// FPS表示の初期化
+		m_FPSDrawer.Initialize();
+	}
+	void SceneControl::Update(void) noexcept {
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		auto* Pad = PadControl::Instance();
+		auto* PopUpParts = PopUp::Instance();
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* LocalizeParts = LocalizePool::Instance();
+		auto* SideLogParts = SideLog::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
+		WindowSystem::DrawControl::Instance()->ClearList();
+		if (Pad->GetEsc().trigger() && !m_IsExitSelect) {
+			m_IsExitSelect = true;
+			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
+				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* WindowSizeParts = WindowSizeControl::Instance();
+					auto* LocalizeParts = LocalizePool::Instance();
+					int xp1, yp1;
+					// タイトル
+					{
+						xp1 = xmin + WindowSizeParts->GetUIY(24);
+						yp1 = ymin + LineHeight;
 
-	void TEMPSCENE::Draw3DVR(std::function<void()> doingUI) noexcept {
+						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
+					}
+					// 
+					{
+						xp1 = (xmax + xmin) / 2 - WindowSizeParts->GetUIY(54);
+						yp1 = ymax - LineHeight * 3;
+
+						auto* Pad = PadControl::Instance();
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
+						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+							// 終了フラグを立てる
+							this->m_IsEndGame = true;
+						}
+					}
+				},
+				[this]() {
+					m_IsExitSelect = false;
+				},
+				[]() {},
+				true
+			);
+		}
+		if (OptionWindowParts->IsRestartSwitch() && !m_IsRestartSelect) {
+			m_IsRestartSelect = true;
+			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
+				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* WindowSizeParts = WindowSizeControl::Instance();
+					auto* LocalizeParts = LocalizePool::Instance();
+					int xp1, yp1;
+					// タイトル
+					{
+						xp1 = xmin + WindowSizeParts->GetUIY(24);
+						yp1 = ymin + LineHeight;
+
+						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
+					}
+					// 
+					{
+						xp1 = (xmax + xmin) / 2 - WindowSizeParts->GetUIY(54);
+						yp1 = ymax - LineHeight * 3;
+
+						auto* Pad = PadControl::Instance();
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
+						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+							this->m_IsEndGame = true;
+							StartMe();
+						}
+					}
+				},
+				[this]() {
+					m_IsRestartSelect = false;
+				},
+				[this]() {},
+				true
+			);
+		}
+		Pad->Update();
+		m_IsEndScene = !this->m_NowScenesPtr->Update();		// 更新
+		OptionWindowParts->Update();
+		Set3DSoundListenerPosAndFrontPosAndUpVec(WindowSizeParts->SetMainCamera().GetCamPos().get(), WindowSizeParts->SetMainCamera().GetCamVec().get(), WindowSizeParts->SetMainCamera().GetCamUp().get());		// 音位置指定
+		WindowSizeParts->VR_Update();
+		PostPassParts->Update();
+		CameraShake::Instance()->Update();
+		SideLogParts->Update();
+		PopUpParts->Update();
+		// ポーズ画面の更新
+		if (IsPause()) {
+			m_PauseDrawer.Update();
+		}
+		// ポーズ入力によるオンオフ
+		if (Pad->GetKey(PADS::INVENTORY).trigger()) {
+			ChangePause(!IsPause());
+		}
+		// FPS表示機能の更新
+		m_FPSDrawer.Update();
+	}
+	void SceneControl::DrawMainLoop(void) const noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* PostPassParts = PostPassEffect::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		if (this->m_NowScenesPtr->Get3DActive()) {
+			// キューブマップをセット
+			Vector3DX Pos = WindowSizeParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
+			PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
+			// 影をセット
+			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop()) {
+				PostPassParts->Update_Shadow(
+					[this]() { this->m_NowScenesPtr->ShadowDraw_Far(); },
+					Vector3DX::zero(),
+					this->m_NowScenesPtr->GetShadowScale() * 4.f, true);
+			}
+			PostPassParts->Update_Shadow(
+				[this] { this->m_NowScenesPtr->ShadowDraw(); },
+				WindowSizeParts->SetMainCamera().GetCamPos(),
+				this->m_NowScenesPtr->GetShadowScale(), false);
+		}
 		// 画面に反映
-		auto* DrawParts = DXDraw::Instance();
-		DrawParts->Draw3DVR(
-			[this]() { BG_Draw_Sub(); },
-			[this]() { SetShadowDraw_Rigid_Sub(); },
-			[this]() { SetShadowDraw_Sub(); },
-			[this]() {
-				CalcOnDraw_Sub();
-				MainDraw_Sub();
-			},
-			[this]() { MainDrawFront_Sub(); },
-			[&]() {
-				DrawUI_Base_Sub();
-				// 追加の描画物
-				doingUI();
-			},
-			[this]() {
-				DrawUI_In_Sub();
+		if (this->m_NowScenesPtr->Get3DActive()) {
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+				WindowSizeParts->Draw3DVR(
+					[this]() { this->m_NowScenesPtr->BG_Draw(); },
+					[this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); },
+					[this]() { this->m_NowScenesPtr->SetShadowDraw(); },
+					[this]() {
+						this->m_NowScenesPtr->CalcOnDraw();
+						this->m_NowScenesPtr->MainDraw();
+					},
+					[this]() { this->m_NowScenesPtr->MainDrawFront(); },
+					[&]() {
+						this->m_NowScenesPtr->DrawUI_Base();
+						DrawUICommon(); 
+					},
+					[this]() {
+						this->m_NowScenesPtr->DrawUI_In();
+						WindowSystem::DrawControl::Instance()->Draw();
+					}
+				);
+			}
+			else {
+				WindowSizeParts->Draw3DMain(
+					[this]() { this->m_NowScenesPtr->BG_Draw(); },
+					[this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); },
+					[this]() { this->m_NowScenesPtr->SetShadowDraw(); },
+					[this]() {
+						this->m_NowScenesPtr->CalcOnDraw();
+						this->m_NowScenesPtr->MainDraw();
+					},
+					[this]() { this->m_NowScenesPtr->MainDrawFront(); },
+					WindowSizeParts->GetMainCamera());
+				// ディスプレイ描画
+				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
+				{
+					int Prev = GetDrawMode();
+					// SetDrawMode(DX_DRAWMODE_NEAREST);
+					SetDrawMode(DX_DRAWMODE_BILINEAR);
+					PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
+					SetDrawMode(Prev);
+					this->m_NowScenesPtr->DrawUI_Base();
+					// 追加の描画物
+					DrawUICommon();
+					this->m_NowScenesPtr->DrawUI_In();
+					WindowSystem::DrawControl::Instance()->Draw();
+				}
+			}
+		}
+		else {
+			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);			// Dofを無効化
+			PostPassParts->ResetBuffer();			// 全ての画面を初期化
+			// 2D描画
+			PostPassParts->GetBufferScreen().SetDraw_Screen();
+			{
+				this->m_NowScenesPtr->MainDraw();
+			}
+			PostPassParts->DrawPostProcess(Camera3DInfo(), []() {}, []() {});			// ポストプロセス
+			// ディスプレイ描画
+			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
+			{
+				int Prev = GetDrawMode();
+				SetDrawMode(DX_DRAWMODE_BILINEAR);
+				PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
+				SetDrawMode(Prev);
+				this->m_NowScenesPtr->DrawUI_Base();
+				DrawUICommon();
+				this->m_NowScenesPtr->DrawUI_In();
 				WindowSystem::DrawControl::Instance()->Draw();
 			}
-		);
+		}
 	}
-
-	void TEMPSCENE::Draw3D(std::function<void()> doingUI) noexcept {
-		// 画面に反映
-		auto* DrawParts = DXDraw::Instance();
-		// 描画
-		DrawParts->Draw3DMain(
-			[this]() { BG_Draw_Sub(); },
-			[this]() { SetShadowDraw_Rigid_Sub(); },
-			[this]() { SetShadowDraw_Sub(); },
-			[this]() {
-				CalcOnDraw_Sub();
-				MainDraw_Sub();
-			},
-			[this]() { MainDrawFront_Sub(); },
-			DrawParts->GetMainCamera());
-		// ディスプレイ描画
-		DrawParts->DrawFlipDisplay([&]() {
-			DrawUI_Base_Sub();
-			// 追加の描画物
-			doingUI();
-			DrawUI_In_Sub();
-			WindowSystem::DrawControl::Instance()->Draw();
-			});
+	void SceneControl::ExitMainLoop(void) noexcept {
+		this->m_NowScenesPtr->Dispose();										// 今のシーンからの解放
+		if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// 今のシーンと次のシーンとが別のシーンなら
+			this->m_NowScenesPtr->Dispose_Load();								// ロードしていたデータを破棄
+		}
+		this->m_NowScenesPtr = this->m_NowScenesPtr->Get_Next();	// 次のシーンへ遷移
 	}
-
-	void TEMPSCENE::Draw2D(std::function<void()> doingUI) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		// 描画
-		DrawParts->Draw2DMain([this]() { MainDraw_Sub(); });
-		// ディスプレイ描画
-		DrawParts->DrawFlipDisplay([&]() {
-			DrawUI_Base_Sub();
-			// 追加の描画物
-			doingUI();
-			DrawUI_In_Sub();
-			WindowSystem::DrawControl::Instance()->Draw();
-			});
-	}
-
-	void TEMPSCENE::BG_Draw_Sub(void) const noexcept {
-		FillGraph(GetDrawScreen(), 192, 192, 192);
-	}
-
-	// --------------------------------------------------------------------------------------------------
-	// 
-	// --------------------------------------------------------------------------------------------------
 };

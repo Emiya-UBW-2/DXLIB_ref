@@ -114,7 +114,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI描画などの基準となる解像度*/
 #include "DXLib_ref_11_FileControl.hpp"
 #include "DXLib_ref_20_Debug.hpp"
 #include "DXLib_ref_30_Box2D.hpp"
-#include "DXLib_ref_40_DXDraw.hpp"
+#include "DXLib_ref_40_WindowSizeControl.hpp"
 #include "DXLib_ref_100_PostPass.hpp"
 #include "DXLib_ref_101_sequence.hpp"
 #include "DXLib_ref_102_ObjectManager.hpp"
@@ -126,15 +126,13 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<DXLib_ref>;
 	private:
-		std::array<float, 60>		FPSAvgs{};
-		int							m_FPSAvgCount = 0;
-		float						m_FPSAvg{ 0.f };
-		float						m_PauseFlashCount{ 0.f };
-		bool						m_IsEnd{ false };
 		bool						m_IsFirstBoot{ false };
-	private:
+		LONGLONG					Update_effect_was = 0;					// エフェクトのアップデートタイミングタイマー
+
 		float						m_DeltaTime{ 0.f };		//1フレームにかかった時間 マイクロ秒
 		LONGLONG					m_StartTime{ 0 };		// 1フレームが始まってからの経過時間 マイクロ秒
+
+		CheckPCSpec					m_CheckPCSpec;
 	private:// コンストラクタ
 		DXLib_ref(void) noexcept;
 		DXLib_ref(const DXLib_ref&) = delete;
@@ -144,32 +142,16 @@ namespace DXLibRef {
 
 		~DXLib_ref(void) noexcept {}
 	private:
-		void	UpdatePause(void) noexcept;
-		void	DrawPause(void) const noexcept;
-		// 
-		void	InitFPSCounter(void) noexcept {
-			// FPS表示
-			for (auto& f : FPSAvgs) {
-				f = FrameRate;
-			}
-			m_FPSAvgCount = 0;
-		}
-		void	UpdateFPSCounter(void) noexcept;
-		void	DrawFPSCounter(void) const noexcept;
-
-		void	DrawUICommon(void) const noexcept;
-	public:
-		bool StartLogic(void) const noexcept;
-		bool MainLogic(void) noexcept;
+		void		StartCount(void) noexcept;			// ループの最初に通す
+		bool		WaitCount(void) const noexcept;		// 表画面に反映し、垂直同期または一定のFPSまで待機する
 	public:
 		const auto& GetDeltaTime(void) const noexcept { return m_DeltaTime; }		// 1フレームにかかった時間を取得
 		const auto	GetFps(void) const noexcept { return 1.f / m_DeltaTime; }		// FPS値の取得
 	public:
-		//垂直同期のフラグ設定
-		void		SetWaitVSync(void) noexcept;
-		// ループの最初に通す
-		void		StartCount(void) noexcept;
-		// 表画面に反映し、垂直同期または一定のFPSまで待機する
-		bool		WaitCount(void) const noexcept;
+		void		SetWaitVSync(void) noexcept;		//垂直同期のフラグ設定
+	public:
+		bool		FirstBootSetting(void) noexcept;
+		void		StartLogic(void) noexcept;
+		void		MainLogic(void) noexcept;
 	};
 };

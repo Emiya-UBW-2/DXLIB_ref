@@ -72,7 +72,7 @@
     <ClInclude Include="DXLib_ref_103_ObjectBase.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_40_DXDraw.hpp">
+    <ClInclude Include="DXLib_ref_40_WindowSizeControl.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="DXLib_ref_11_FileControl.hpp">
@@ -131,7 +131,7 @@
     <ClCompile Include="DXLib_ref_103_ObjectBase.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_40_DXDraw.cpp">
+    <ClCompile Include="DXLib_ref_40_WindowSizeControl.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="DXLib_ref_11_FileControl.cpp">

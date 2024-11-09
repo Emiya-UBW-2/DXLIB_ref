@@ -1,8 +1,8 @@
 #pragma once
 #include "DXLib_ref.h"
 // リサイズ
-#define EdgeSize	DXDraw::Instance()->GetUIY(2)
-#define LineHeight	DXDraw::Instance()->GetUIY(18)
+#define EdgeSize	WindowSizeControl::Instance()->GetUIY(2)
+#define LineHeight	WindowSizeControl::Instance()->GetUIY(18)
 
 namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -845,7 +845,7 @@ namespace DXLibRef {
 		public:
 			const auto&		GetNowScrollYPer(void) const noexcept { return this->m_NowScrollYPer; }
 			void			ScrollBox(int xp1, int yp1, int xp2, int yp2, float TotalPer, bool IsActive) noexcept {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* Pad = PadControl::Instance();
 				unsigned int color = Gray25;
 
@@ -864,7 +864,7 @@ namespace DXLibRef {
 							m_NowScrollYPer = std::clamp(m_NowScrollYPer + static_cast<float>(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
-					if (IntoMouse(xp2 - DrawParts->GetUIY(24), yp1, xp2, yp2))
+					if (IntoMouse(xp2 - WindowSizeParts->GetUIY(24), yp1, xp2, yp2))
 		{
 						if (Pad->GetINTERACTKey().trigger())
 		{
@@ -904,8 +904,8 @@ namespace DXLibRef {
 						}
 					}
 				}
-				SetBox(xp2 - DrawParts->GetUIY(24), yp1, xp2, yp2, Gray50);
-				SetBox(xp2 - DrawParts->GetUIY(24) + DrawParts->GetUIY(1), Yp_s, xp2 - DrawParts->GetUIY(1), Yp_e, color);
+				SetBox(xp2 - WindowSizeParts->GetUIY(24), yp1, xp2, yp2, Gray50);
+				SetBox(xp2 - WindowSizeParts->GetUIY(24) + WindowSizeParts->GetUIY(1), Yp_s, xp2 - WindowSizeParts->GetUIY(1), Yp_e, color);
 			}
 		}
 		//*/
@@ -1838,188 +1838,6 @@ namespace DXLibRef {
 		}
 	};
 
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 統一UI
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	namespace UniversalUI {
-		enum class EnumUIPartsType :int {
-			Zero = 0,
-			Box = Zero,
-			Msg,
-			Max,
-		};
-		static const char* g_UIPartsString[static_cast<int>(EnumUIPartsType::Max)] = {
-			"Box",
-			"Msg",
-		};
-		enum class LerpType : size_t {
-			linear,
-			pow2,
-			Max
-		};
-		static const char* g_LerpTypeStr[static_cast<int>(LerpType::Max)] = {
-			"linear",
-			"pow2",
-		};
-
-		static const int g_UIColorPalletNum = 13;
-		static const unsigned int g_UIColorPallet[g_UIColorPalletNum] = {
-			Red,
-			Green,
-			DarkGreen,
-			Blue,
-			Yellow,
-			WhiteSel,
-			White,
-			Gray15,
-			Gray25,
-			Gray50,
-			Gray65,
-			Gray75,
-			Black,
-		};
-		static const char* g_UIColorPalletString[g_UIColorPalletNum] = {
-			"Red",
-			"Green",
-			"DarkGreen",
-			"Blue",
-			"Yellow",
-			"WhiteSel",
-			"White",
-			"Gray15",
-			"Gray25",
-			"Gray50",
-			"Gray65",
-			"Gray75",
-			"Black",
-		};
-		enum class UIXCenter : int {
-			LEFT,
-			MIDDLE,
-			RIGHT,
-		};
-		static const char* g_UIXCenterString[] = {
-			"Left",
-			"Middle",
-			"Right",
-		};
-		enum class UIYCenter : int {
-			TOP,
-			MIDDLE,
-			BOTTOM,
-		};
-		static const char* g_UIYCenterString[] = {
-			"Top",
-			"Middle",
-			"Bottom",
-		};
-
-		class UISystem : public SingletonBase<UISystem> {
-		private:
-			friend class SingletonBase<UISystem>;
-		private:
-			struct FrameInfo {
-				int			m_framepoint{ 0 };	// 前回～現在のフレーム数
-				float		m_Alpha{ 1.f };		// 上記のフレーム数の段階でのXXX
-				float		m_XScale{ 1.f };
-				float		m_YScale{ 1.f };
-				float		m_XOfs{ 0.f };
-				float		m_YOfs{ 0.f };
-				float		m_ZRotOfs{ 0.f };
-				LerpType	m_LerpType{ LerpType::linear };// 前フレームとのつなぎ方
-			};
-			class UI_CommonParts {
-			private:// 固定のパラメーター類
-				int				m_UniqueID{ 0 };
-				std::string		m_Name{};
-
-				EnumUIPartsType	m_EnumUIPartsType{ EnumUIPartsType::Zero };
-				int				m_Layer{ 0 };
-				// 
-				bool			m_IsMouseClickActive{ false };
-				// 
-				int				m_XPos{ 0 };
-				int				m_YPos{ 0 };
-				int				m_XSize{ 0 };
-				int				m_YSize{ 0 };
-				float			m_ZRotate{ 0.f };
-				UIXCenter		m_UIXCenter{ UIXCenter::LEFT };
-				UIYCenter		m_UIYCenter{ UIYCenter::TOP };
-				// 
-				unsigned int	m_PressColor{ Gray25 };
-				unsigned int	m_IntoColor{ White };
-				unsigned int	m_BaseColor{ Black };
-				unsigned int	m_EdgeColor{ Gray75 };
-				// 
-				int				m_TextID{ 0 };
-			private:// 変動する値
-				bool			m_MouseOver{ false };
-				bool			m_MousePress{ false };
-				int				m_DrawXCenter{ 0 };
-				int				m_DrawYCenter{ 0 };
-			public:// 外からいじられるもの
-				FrameInfo					m_FrameInfo{};
-				std::array<std::string, 3>	m_TextEX0{};
-			public:
-				const auto& GetUniqueID(void) const noexcept { return m_UniqueID; }
-				const auto& GetName(void) const noexcept { return m_Name; }
-				const auto& GetLayer(void) const noexcept { return m_Layer; }
-
-				const auto& GetMousePress(void) const noexcept { return m_MousePress; }
-			public:
-				void SetUniqueID(int value) noexcept { m_UniqueID = value; }
-				void SetFrameInfo(const FrameInfo& value) noexcept { m_FrameInfo = value; }
-			public:
-				void SetParts(const nlohmann::json& pJson) noexcept;
-				void Update(void) noexcept;
-				void Draw(void) noexcept;
-			};
-			class UI_CommonAnimes {
-			private:// 固定のパラメーター類
-				std::vector<int> m_TargetID{};// 対照のパーツ
-				std::vector<FrameInfo> m_AnimeFrame{};
-			private:// 変動する値
-				int m_NowAnim{ 0 };
-			public:// 外からいじられるもの
-				int m_Frame{ 0 };
-			public:
-			public:
-				void SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept;
-				void Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept;
-			};
-
-			class UI_OneLayer {
-			private:
-				std::vector<std::unique_ptr<UI_CommonParts>> m_CommonParts;
-				std::vector<std::unique_ptr<UI_CommonAnimes>> m_CommonAnimes;
-				int UniqueIDNum{ InvalidID };
-				bool m_IsEnd{ false };// アニメーション側からの終了命令
-			public:
-				auto IsActive(void) const noexcept { return UniqueIDNum != InvalidID; }
-			public:
-				void Load(const char* path) noexcept;
-				void Update(void) noexcept;
-				void Draw(void) noexcept;
-				void Dispose(void) noexcept;
-			};
-		private:
-			std::array<UI_OneLayer, 5> m_Layer;
-		public:
-			UISystem(void) noexcept {}
-			UISystem(const UISystem&) = delete;
-			UISystem(UISystem&& o) = delete;
-			UISystem& operator=(const UISystem&) = delete;
-			UISystem& operator=(UISystem&& o) = delete;
-			~UISystem(void) noexcept {}
-		public:
-			int AddUI(const char* path) noexcept;
-			void DelUI(int layer) noexcept;
-
-			void Update(void) noexcept;
-			void Draw(void) noexcept;
-			void DisposeAll(void) noexcept;
-		};
-	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// カメラシェイク
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/

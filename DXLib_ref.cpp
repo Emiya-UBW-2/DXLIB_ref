@@ -16,25 +16,50 @@ namespace DXLibRef {
 			SaveDataParts->Save();
 			OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 		}
-		SetWaitVSync();							// 垂直同期
-		DXDraw::Create();						// 汎用
-		// 
-#if defined(DEBUG)
-		DebugClass::Create();
-#endif // DEBUG
+		WindowSizeControl::Create();						// 汎用
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		WindowSizeParts->SetupWindowSize();
+		SetWaitVSync();												// 垂直同期
+		SetOutApplicationLogValidFlag(TRUE);						// log
+		SetMainWindowText("Loading...");							// タイトル
+		ChangeWindowMode(TRUE);										// 窓表示
+		SetUseDirect3DVersion(DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);								// directX ver
+		SetUseDirectInputFlag(TRUE);								// 
+		SetDirectInputMouseMode(TRUE);								// 
+		{
+			// DPI設定
+			int DPI = 96;
+			GetMonitorDpi(NULL, &DPI);
+			SetGraphMode(WindowSizeParts->GetSizeXMax() * DPI / 96, WindowSizeParts->GetSizeYMax() * DPI / 96, 32);		// 解像度
+		}
+		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				// ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
+		Set3DSoundOneMetre(1.0f);									// 
+		SetZBufferBitDepth(32);										// デフォのZバッファ精度を32bitに
+		DxLib_Init();												// 初期化
+		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);			// 画面モード変更時( とウインドウモード変更時 )にリセットを走らせない
+		SetUsePixelLighting(TRUE);									// ピクセルライティングの使用
+		if (GetUseDirect3DVersion() != DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]) {
+			auto* LocalizeParts = LocalizePool::Instance();
+			MessageBox(NULL, LocalizeParts->Get(10), "", MB_OK);
+		}
+		SetSysCommandOffFlag(TRUE);									// 
 #if defined(_USE_EFFEKSEER_)
-		EffectResource::Create();						// エフェクト
+		Effekseer_Init(8000);										// Effekseer
+		Effekseer_SetGraphicsDeviceLostCallbackFunctions();			// Effekseer
 #endif
+		SetAlwaysRunFlag(TRUE);										// background
+		SetUseZBuffer3D(TRUE);										// zbufuse
+		SetWriteZBuffer3D(TRUE);									// zbufwrite
+		// MV1SetLoadModelPhysicsWorldGravity(GravityRate);			// 重力
+		WindowSizeParts->SetWindowOrBorderless();
+
+		// 
 		SoundPool::Create();							// サウンド
 		BGMPool::Create();
 		FontPool::Create();
 		PadControl::Create();							// キー
 		OptionWindowClass::Create();
-		ObjectManager::Create();
-		SideLog::Create();
 		PopUp::Create();
-		UniversalUI::UISystem::Create();
-		CameraShake::Create();
 
 		auto* SE = SoundPool::Instance();
 		SE->Add(static_cast<int>(SoundEnumCommon::UI_Select), 2, "CommonData/Sound/UI/cursor.wav", false);
@@ -42,245 +67,288 @@ namespace DXLibRef {
 		SE->Add(static_cast<int>(SoundEnumCommon::UI_OK), 1, "CommonData/Sound/UI/ok.wav", false);
 		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
-	}
-	// 
-	void DXLib_ref::UpdatePause(void) noexcept {
-		m_PauseFlashCount += GetDeltaTime();
-		if (m_PauseFlashCount > 1.f) {
-			m_PauseFlashCount -= 1.f;
-		}
-	}
-	void DXLib_ref::DrawPause(void) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		if (!DrawParts->IsPause()) {
-			return;
-		}
-		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		// 
-		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax(), Black, TRUE);
-		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-		// 
-		if (m_PauseFlashCount > 0.5f) {
-			WindowSystem::SetMsg(DrawParts->GetUIY(16), DrawParts->GetUIY(16) + DrawParts->GetUIY(36) / 2, DrawParts->GetUIY(36), FontHandle::FontXCenter::LEFT, Green, Black, "Pause");
-		}
-	}
-	void DXLib_ref::UpdateFPSCounter(void) noexcept {
-		FPSAvgs.at(static_cast<size_t>(m_FPSAvgCount)) = GetFPS();
 
-		++m_FPSAvgCount %= static_cast<int>(FPSAvgs.size());
-		m_FPSAvg = 0.f;
-		for (auto& f : FPSAvgs) {
-			m_FPSAvg += f;
-		}
-		m_FPSAvg = m_FPSAvg / static_cast<float>(FPSAvgs.size());
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		WindowSystem::DrawControl::Create();
+		OptionWindowParts->Init();
 	}
-	void DXLib_ref::DrawFPSCounter(void) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		auto* OptionParts = OPTION::Instance();
-		auto color = White;
-		// 十分！
-		if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
-			color = Green;
+	bool			DXLib_ref::FirstBootSetting(void) noexcept {
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		if (m_IsFirstBoot) {
+			SetMainWindowText("FirstBoot Option");						// タイトル
+			auto* OptionWindowParts = OptionWindowClass::Instance();
+			auto* Pad = PadControl::Instance();
+			auto* PopUpParts = PopUp::Instance();
+			auto* LocalizeParts = LocalizePool::Instance();
+			auto* OptionParts = OPTION::Instance();
+
+			m_CheckPCSpec.Set();
+
+			int xBase = WindowSizeParts->GetUIY(1366);
+			int yBase = WindowSizeParts->GetUIY(768);
+			SetWindowPosition((WindowSizeParts->GetSizeXMax() - xBase) / 2, (WindowSizeParts->GetSizeYMax() - yBase) / 2);
+			SetWindowSize(xBase, yBase);
+
+			// 初期設定画面
+			OptionWindowParts->SetActive();
+			while (ProcessMessage() == 0) {
+				StartCount();
+				WindowSystem::DrawControl::Instance()->ClearList();
+
+				Pad->Update();
+				OptionWindowParts->Update();
+				PopUpParts->Update();
+				if (!PopUpParts->IsActivePop()) {
+					break;
+				}
+				// 
+				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
+				{
+					int Width = WindowSizeParts->GetUIY(720);
+					int Height = WindowSizeParts->GetUIY(720);
+					int Edge = WindowSizeParts->GetUIY(16);
+
+					PopUpParts->Draw(Width / 2 + Edge, Height / 2 + Edge);
+
+					WindowSystem::SetMsg(Edge + Edge, Height + Edge + Edge, WindowSizeParts->GetUIY(12), FontHandle::FontXCenter::LEFT, Green, Black, LocalizeParts->Get(109));
+
+					int xp = Width + Edge + Edge;
+					int yp = Edge;
+					if (WindowSystem::SetMsgClickBox(xp, yp, xp + WindowSizeParts->GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
+						m_CheckPCSpec.StartSearch();
+					}
+					yp += WindowSizeParts->GetUIY(24);
+					if (m_CheckPCSpec.GetCPUDatas()) {
+						int MouseOverID = InvalidID;
+						// CPU
+						WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
+						for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
+							int TextID = 0;
+							unsigned int Color = White;
+							if (c.m_Score >= 17276) {// 
+								Color = Green;
+								TextID = 2002;
+							}
+							else if (c.m_Score >= 6600) {// 
+								Color = Yellow;
+								TextID = 2003;
+							}
+							else {// 
+								Color = Red;
+								TextID = 2004;
+							}
+							if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
+								switch (TextID) {
+								case 2002:
+									MouseOverID = 2040;
+									break;
+								case 2003:
+									MouseOverID = 2041;
+									break;
+								case 2004:
+									MouseOverID = 2042;
+									break;
+								default:
+									break;
+								}
+							}
+							WindowSystem::SetMsg(xp + Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%s]", c.m_Name.c_str());
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+							yp += LineHeight;
+						}
+						if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
+							WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
+						}
+						// Mem
+						{
+							WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
+							int TextID = 0;
+							unsigned int Color = White;
+							if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {// 
+								Color = Green;
+								TextID = 2012;
+							}
+							else {// 
+								Color = Yellow;
+								TextID = 2013;
+							}
+							if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 1)) {
+								switch (TextID) {
+								case 2012:
+									MouseOverID = 2043;
+									break;
+								case 2013:
+									MouseOverID = 2044;
+									break;
+								default:
+									break;
+								}
+							}
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+							yp += LineHeight;
+						}
+						// GPU
+						WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2021)); yp += LineHeight;
+						for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
+							int TextID = 0;
+							unsigned int Color = White;
+							if (c.m_Score >= 14649) {// 
+								Color = Green;
+								TextID = 2022;
+							}
+							else if (c.m_Score >= 5003) {// 
+								Color = Yellow;
+								TextID = 2023;
+							}
+							else {// 
+								Color = Red;
+								TextID = 2024;
+							}
+							if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
+								switch (TextID) {
+								case 2022:
+									MouseOverID = 2045;
+									break;
+								case 2023:
+									MouseOverID = 2046;
+									break;
+								case 2024:
+									MouseOverID = 2047;
+									break;
+								default:
+									break;
+								}
+							}
+							WindowSystem::SetMsg(xp + Edge, yp + LineHeight / 2, LineHeight * 3 / 4, FontHandle::FontXCenter::LEFT, White, DarkGreen, "%s", c.m_Name.c_str());
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
+							WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
+							yp += LineHeight;
+						}
+						if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
+							WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
+						}
+						// DirectX
+						int NowSet = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
+						for (int loop : std::views::iota(0, 2)) {
+							if (GetUseDirect3DVersion() == DirectXVerID[loop]) {
+								NowSet = loop;
+							}
+						}
+						if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
+							MouseOverID = 2048;
+						}
+						WindowSystem::SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, DarkGreen, LocalizeParts->Get(2035));
+						WindowSystem::SetMsg(xBase - Edge, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
+						if (MouseOverID != InvalidID) {
+							xp = Pad->GetMS_X();
+							yp = Pad->GetMS_Y();
+							WindowSystem::SetMsg(xp, yp - LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, Green, DarkGreen, LocalizeParts->Get(MouseOverID));
+						}
+					}
+
+					xp = Width + Edge + Edge + Edge;
+					yp = Height;
+					if (WindowSystem::SetMsgClickBox(xp, yp, xBase - Edge + Edge, yp + Edge + Edge, LineHeight, Green, false, true, "Start Game!")) {
+						PopUpParts->EndAll();
+					}
+
+					WindowSystem::DrawControl::Instance()->Draw();
+				}
+				ScreenFlip();
+				WaitCount();
+			}
+			OptionParts->Save();
+#if defined(_USE_EFFEKSEER_)
+			Effkseer_End();
+#endif
+			DxLib_End();
+			StartMe();
+			return true;
 		}
-		else if (m_FPSAvg < 45.f) {
-			color = Red;
-		}
-		else if (m_FPSAvg < 58.f) {
-			color = Yellow;
-		}
-		WindowSystem::SetMsg(DrawParts->GetUIXMax() - DrawParts->GetUIY(8), DrawParts->GetUIY(8) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, color, Black, "%5.2f FPS", m_FPSAvg);
-		WindowSystem::SetMsg(DrawParts->GetUIXMax() - DrawParts->GetUIY(8), DrawParts->GetUIY(8 + 20) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d Drawcall", GetDrawCallCount());
-	}
-	void DXLib_ref::DrawUICommon(void) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		auto* SideLogParts = SideLog::Instance();
-		DrawPause();
-		DrawFPSCounter();
-		UniversalUI::UISystem::Instance()->Draw();
-		PadControl::Instance()->Draw();
-		SideLogParts->Draw();
-		PopUp::Instance()->Draw(DrawParts->GetUIXMax() / 2, DrawParts->GetUIYMax() / 2);
-#if defined(DEBUG)
-		DebugClass::Instance()->DebugWindow(DrawParts->GetUIXMax() - DrawParts->GetUIY(350), DrawParts->GetUIY(150));
-#endif // DEBUG
+		return false;
 	}
 	// 
-	bool DXLib_ref::StartLogic(void) const noexcept {
-		WindowSystem::DrawControl::Create();
-		auto* DrawParts = DXDraw::Instance();
-		if (m_IsFirstBoot) {
-			DrawParts->FirstBootSetting();
-			StartMe();
-			return false;
-		}
-		else {
-			DrawParts->Init();
-			SceneControl::Create();
-		}
-		return true;
-	}
-	bool DXLib_ref::MainLogic(void) noexcept {
-		auto* SceneParts = SceneControl::Instance();
-		auto* OptionParts = OPTION::Instance();
-		auto* DrawParts = DXDraw::Instance();
-		auto* DXLib_refParts = DXLib_ref::Instance();
-		auto* Pad = PadControl::Instance();
-		auto* PopUpParts = PopUp::Instance();
-		auto* OptionWindowParts = OptionWindowClass::Instance();
-		auto* LocalizeParts = LocalizePool::Instance();
+	void			DXLib_ref::StartLogic(void) noexcept {
+#if defined(DEBUG)
+		DebugClass::Create();
+#endif // DEBUG
+#if defined(_USE_EFFEKSEER_)
+		EffectResource::Create();						// エフェクト
+#endif
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+
+		ObjectManager::Create();
+		SideLog::Create();
+		CameraShake::Create();
+		LightPool::Create();
+		// シェーダー
+		PostPassEffect::Create();
 		auto* PostPassParts = PostPassEffect::Instance();
-		auto* SideLogParts = SideLog::Instance();
+		//
+		PostPassParts->Init();
+		//
+		WindowSizeParts->VR_Setup();
+		//
+		Update_effect_was = GetNowHiPerformanceCount();
+		//
+		SceneControl::Create();
+	}
+	void			DXLib_ref::MainLogic(void) noexcept {
+		auto* SceneParts = SceneControl::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 #if defined(DEBUG)
 		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
-		// 最初の読み込み
-		auto& NowScene = SceneParts->GetNowScene();
 		// 繰り返し
 		while (true) {
-			NowScene->Load();
-			{
-				SetUseMaskScreenFlag(FALSE);// ←一部画面でエフェクトが出なくなるため入れる
-				// カメラの初期設定
-				DrawParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
-				// 環境光と影の初期化
-				DrawParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
-				NowScene->Set();
-				Pad->SetGuideUpdate();
-			}
-			InitFPSCounter();
+			SceneParts->Initialize();
 			while (true) {
-				if (!(ProcessMessage() == 0)) { return false; }
+				if (!(ProcessMessage() == 0)) { break; }
+				StartCount();
 #if defined(DEBUG)
 				clsDx();
-#endif // DEBUG
-				WindowSystem::DrawControl::Instance()->ClearList();
-				StartCount();
-				if (Pad->GetEsc().trigger() && !DrawParts->IsExit()) {
-					DrawParts->SetExitFlag(true);
-					PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
-						[this](int xmin, int ymin, int xmax, int ymax, bool) {
-							auto* DrawParts = DXDraw::Instance();
-							auto* LocalizeParts = LocalizePool::Instance();
-							int xp1, yp1;
-							// タイトル
-							{
-								xp1 = xmin + DrawParts->GetUIY(24);
-								yp1 = ymin + LineHeight;
-
-								WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
-							}
-							// 
-							{
-								xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
-								yp1 = ymax - LineHeight * 3;
-
-								auto* Pad = PadControl::Instance();
-								bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
-								if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
-									m_IsEnd = true;
-								}
-							}
-						},
-						[]() {
-							auto* DrawParts = DXDraw::Instance();
-							DrawParts->SetExitFlag(false);
-						},
-						[]() {},
-						true
-					);
-				}
-				if (OptionWindowParts->IsRestartSwitch() && !DrawParts->IsRestart()) {
-					DrawParts->SetRestartFlag(true);
-					PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
-						[this](int xmin, int ymin, int xmax, int ymax, bool) {
-							auto* DrawParts = DXDraw::Instance();
-							auto* LocalizeParts = LocalizePool::Instance();
-							int xp1, yp1;
-							// タイトル
-							{
-								xp1 = xmin + DrawParts->GetUIY(24);
-								yp1 = ymin + LineHeight;
-
-								WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
-							}
-							// 
-							{
-								xp1 = (xmax + xmin) / 2 - DrawParts->GetUIY(54);
-								yp1 = ymax - LineHeight * 3;
-
-								auto* Pad = PadControl::Instance();
-								bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
-								if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
-									m_IsEnd = true;
-									StartMe();
-								}
-							}
-						},
-						[this]() {
-							auto* DrawParts = DXDraw::Instance();
-							DrawParts->SetRestartFlag(false);
-						},
-						[this]() {},
-						true
-					);
-				}
-				if (m_IsEnd) {
-					return false;
-				}
-#if defined(DEBUG)
 				DebugParts->SetStartPoint();
 #endif // DEBUG
-				Pad->Update();
-				UniversalUI::UISystem::Instance()->Update();
-				auto SelEnd = !NowScene->Update();		// 更新
-				OptionWindowParts->Update();
-				DrawParts->Update();
-				CameraShake::Instance()->Update();
-				SideLogParts->Update();
-				PopUpParts->Update();
-				UpdatePause();
-				UpdateFPSCounter();
-				// キューブマップをセット
-				NowScene->CubeMapDraw();
-				// 影をセット
-				NowScene->ShadowDraw_Far();
-				NowScene->ShadowDraw();
-				// 描画
+				SceneParts->Update();
+				// 
+#if defined(_USE_EFFEKSEER_)
+				if (!SceneParts->IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
+					Update_effect_was = m_StartTime;
+					UpdateEffekseer3D();
+				}
+#endif
 #if defined(DEBUG)
 				DebugParts->SetPoint("-----DrawStart-----");
 #endif // DEBUG
-				// 画面に反映
-				if (NowScene->Get3DActive()) {
-					if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-						NowScene->Draw3DVR([this]() {DrawUICommon(); });
-					}
-					else {
-						NowScene->Draw3D([this]() {DrawUICommon(); });
-					}
-				}
-				else {
-					NowScene->Draw2D([this]() {DrawUICommon(); });
-				}
+				// シーンの描画を行う処理
+				SceneParts->DrawMainLoop();
 				// デバッグ
 #if defined(DEBUG)
 				DebugParts->SetEndPoint();
 #endif // DEBUG
 				ScreenFlip();
-				DXLib_refParts->WaitCount();
+				WaitCount();
 				// 画面の反映
-				DrawParts->VR_WaitSync();
-				if (SelEnd) {
+				WindowSizeParts->VR_WaitSync();
+				// シーン/ゲームの終了判定が立っているのでループを抜ける
+				if (SceneParts->IsEndScene()) {
 					break;
 				}
 			}
-			// 次のシーンへ移行
-			SceneParts->NextScene();
-			Pad->Dispose();
-
-			PostPassParts->ResetAllBuffer();
+			// シーンの終わりに通る処理
+			SceneParts->ExitMainLoop();
+			// 終了フラグが立った場合即終了
+			if (SceneParts->IsEndGame()) {
+				break;
+			}
 		}
-		return true;
+		WindowSizeParts->VR_Dispose();
+#if defined(_USE_EFFEKSEER_)
+		Effkseer_End();
+#endif
+		DxLib_End();
 	}
 
 	void			DXLib_ref::SetWaitVSync(void) noexcept {

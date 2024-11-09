@@ -68,7 +68,7 @@ namespace DXLibRef {
 	}
 
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* OptionParts = OPTION::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		if (!m_Switch.on()) {
@@ -91,8 +91,8 @@ namespace DXLibRef {
 		};
 		auto PMax = PointMax + 1;
 		{
-			const int wide = DrawParts->GetUIY(340);
-			const int height = DrawParts->GetUIY(360);
+			const int wide = WindowSizeParts->GetUIY(340);
+			const int height = WindowSizeParts->GetUIY(360);
 			const int border = height * 2 / 3;
 			// ”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
@@ -134,14 +134,14 @@ namespace DXLibRef {
 			ypos += height;
 		}
 		{
-			const int wide = DrawParts->GetUIY(350);
-			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + DrawParts->GetUIY(10);
+			const int wide = WindowSizeParts->GetUIY(350);
+			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + WindowSizeParts->GetUIY(10);
 			// ”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
-			xpos += DrawParts->GetUIY(2);
-			ypos += DrawParts->GetUIY(2);
+			xpos += WindowSizeParts->GetUIY(2);
+			ypos += WindowSizeParts->GetUIY(2);
 			int i = 0;
 			// “à—e
 			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());

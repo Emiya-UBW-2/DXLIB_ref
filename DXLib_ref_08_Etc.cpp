@@ -5,7 +5,6 @@ namespace DXLibRef {
 	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
-	const UniversalUI::UISystem* SingletonBase<UniversalUI::UISystem>::m_Singleton = nullptr;
 	const CameraShake* SingletonBase<CameraShake>::m_Singleton = nullptr;
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
 
@@ -28,14 +27,14 @@ namespace DXLibRef {
 		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
 	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		// ビュー行列と射影行列の取得
 		Camera3DInfo tmpcam;
 		tmpcam.SetCamPos(campos, camvec, camup);
 		tmpcam.SetCamInfo(fov, near_t, far_t);
 		// ビューポート行列（スクリーン行列）の作成
-		float w = static_cast<float>(DrawParts->GetScreenXMax()) / 2.0f;
-		float h = static_cast<float>(DrawParts->GetScreenYMax()) / 2.0f;
+		float w = static_cast<float>(WindowSizeParts->GetScreenXMax()) / 2.0f;
+		float h = static_cast<float>(WindowSizeParts->GetScreenYMax()) / 2.0f;
 		MATRIX viewport = {
 			w , 0 , 0 , 0 ,
 			0 ,-h , 0 , 0 ,
@@ -60,8 +59,8 @@ namespace DXLibRef {
 	// 
 	namespace WindowSystem {
 		void DrawData::Output() const noexcept {
-			auto* DrawParts = DXDraw::Instance();
-			Rect2D Widow; Widow.Set(0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
+			auto* WindowSizeParts = WindowSizeControl::Instance();
+			Rect2D Widow; Widow.Set(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
 
 			switch (m_type) {
 			case DrawType::Alpha:
@@ -172,12 +171,12 @@ namespace DXLibRef {
 			this->m_DrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
 			this->m_PrevDrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
 
-			auto* DrawParts = DXDraw::Instance();
-			m_BufferScreen.Make(DrawParts->GetSizeXMax(), DrawParts->GetSizeYMax(), true);
+			auto* WindowSizeParts = WindowSizeControl::Instance();
+			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
-			auto* DrawParts = DXDraw::Instance();
-			return HitRectangleToRectangle(0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax(), std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
+			auto* WindowSizeParts = WindowSizeControl::Instance();
+			return HitRectangleToRectangle(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
 		}
 		// 箱
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
@@ -192,29 +191,29 @@ namespace DXLibRef {
 		};
 		// 文字
 		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
-			auto* DrawParts = DXDraw::Instance();
+			auto* WindowSizeParts = WindowSizeControl::Instance();
 			switch (FontX) {
 			case FontHandle::FontXCenter::LEFT:
-				*xp1 = *xp1 + DrawParts->GetUIY(6);
+				*xp1 = *xp1 + WindowSizeParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1), (*yp1 - ySize / 2), (*xp1 + xSize), (*yp1 + ySize / 2),
-					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
+					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
 			case FontHandle::FontXCenter::MIDDLE:
 				return HitRectangleToRectangle(
 					(*xp1 - xSize / 2), (*yp1 - ySize / 2), (*xp1 + xSize / 2), (*yp1 + ySize),
-					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
+					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
 			case FontHandle::FontXCenter::RIGHT:
-				*xp1 = *xp1 - DrawParts->GetUIY(6);
+				*xp1 = *xp1 - WindowSizeParts->GetUIY(6);
 				return HitRectangleToRectangle(
 					(*xp1 - xSize), (*yp1 - ySize / 2), (*xp1), (*yp1 + ySize / 2),
-					0, 0, DrawParts->GetUIXMax(), DrawParts->GetUIYMax());
+					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
 			default:
 				return false;
 			}
 		};
 		// オンオフできるボタン
 		bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
-			auto* DrawParts = DXDraw::Instance();
+			auto* WindowSizeParts = WindowSizeControl::Instance();
 			int xp3 = xp1 + EdgeSize;
 			int yp3 = yp1 + EdgeSize;
 			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
@@ -228,7 +227,7 @@ namespace DXLibRef {
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			int Edge = DrawParts->GetUIY(5);
+			int Edge = WindowSizeParts->GetUIY(5);
 			SetBox(xp3 + Edge, yp3 + Edge, xp4 - Edge, yp4 - Edge, Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
 			SetBox(xp3 + Edge, yp3 + Edge, xp4 + Edge, yp4 - Edge, Gray50);
@@ -319,22 +318,22 @@ namespace DXLibRef {
 		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
 	}
 	void SideLog::Draw(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		int xp1, yp1;
-		xp1 = DrawParts->GetUIY(64);
-		yp1 = DrawParts->GetUIY(256);
+		xp1 = WindowSizeParts->GetUIY(64);
+		yp1 = WindowSizeParts->GetUIY(256);
 
 		{
-			int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * 0.f));
+			int yp = yp1 - WindowSizeParts->GetUIY(static_cast<int>(24.f * 0.f));
 			if (SelYadd > 0.f) {
 				float per = std::clamp(SelYadd / 5.f, 0.f, 1.f);
 				float per2 = 1.f - std::clamp(SelYadd / 10.f, 0.f, 1.f);
 				DrawCtrls->SetAdd(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
 				DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
 					&this->m_SelectBackImage,
-					xp1 + DrawParts->GetUIY(200 / 2) - (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
-					xp1 + DrawParts->GetUIY(200 / 2) + (int)((float)(DrawParts->GetUIY(150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),
+					xp1 + WindowSizeParts->GetUIY(200 / 2) - (int)((float)(WindowSizeParts->GetUIY(150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
+					xp1 + WindowSizeParts->GetUIY(200 / 2) + (int)((float)(WindowSizeParts->GetUIY(150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),
 					true);
 			}
 		}
@@ -342,10 +341,10 @@ namespace DXLibRef {
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
-				int yp = yp1 - DrawParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
+				int yp = yp1 - WindowSizeParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
-					xp1 - DrawParts->GetUIY(6), yp + LineHeight,
-					xp1 - DrawParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), DrawParts->GetUIY(200))) * d.ActivePer()), yp + LineHeight + DrawParts->GetUIY(5),
+					xp1 - WindowSizeParts->GetUIY(6), yp + LineHeight,
+					xp1 - WindowSizeParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), WindowSizeParts->GetUIY(200))) * d.ActivePer()), yp + LineHeight + WindowSizeParts->GetUIY(5),
 					Black);
 				WindowSystem::SetMsg(static_cast<int>(xp1), static_cast<int>(yp) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, d.GetMsgColor(), Black, d.GetMsg());
 			}
@@ -400,14 +399,14 @@ namespace DXLibRef {
 	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
 		if (m_ActivePer < (1.f / 255.f)) { return; }
 
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 
-		int xm1 = xcenter - DrawParts->GetUIY(WinSizeX) / 2;
-		int ym1 = ycenter - DrawParts->GetUIY(WinSizeY) / 2;
-		int xm2 = xcenter + DrawParts->GetUIY(WinSizeX) / 2;
-		int ym2 = ycenter + DrawParts->GetUIY(WinSizeY) / 2;
+		int xm1 = xcenter - WindowSizeParts->GetUIY(WinSizeX) / 2;
+		int ym1 = ycenter - WindowSizeParts->GetUIY(WinSizeY) / 2;
+		int xm2 = xcenter + WindowSizeParts->GetUIY(WinSizeX) / 2;
+		int ym2 = ycenter + WindowSizeParts->GetUIY(WinSizeY) / 2;
 
 		// 背景
 		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
@@ -417,21 +416,21 @@ namespace DXLibRef {
 
 		// タイトル
 		WindowSystem::SetMsg(
-			xm1 + DrawParts->GetUIY(32), ym1 + LineHeight / 4 + LineHeight,
+			xm1 + WindowSizeParts->GetUIY(32), ym1 + LineHeight / 4 + LineHeight,
 			LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 		// 
 		if (m_Active) {
-			int xp1 = xm2 - DrawParts->GetUIY(140);
+			int xp1 = xm2 - WindowSizeParts->GetUIY(140);
 			int yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(108), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + WindowSizeParts->GetUIY(5), xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2 - WindowSizeParts->GetUIY(5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
 				End();
 			}
 		}
 		// 背景
 		{
-			int xp1 = xm1 + DrawParts->GetUIY(24);
+			int xp1 = xm1 + WindowSizeParts->GetUIY(24);
 			int yp1 = ym1 + LineHeight * 3;
-			int xp2 = xm2 - DrawParts->GetUIY(24);
+			int xp2 = xm2 - WindowSizeParts->GetUIY(24);
 			int yp2 = ym2 - LineHeight;
 			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
 			WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
@@ -451,9 +450,9 @@ namespace DXLibRef {
 		Last.Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
 		if (!IsActivePop()) {
 			Last.Start();
-			auto* DrawParts = DXDraw::Instance();
-			PrevPause = DrawParts->IsPause();
-			DrawParts->SetPause(true);
+			auto* SceneParts = SceneControl::Instance();
+			PrevPause = SceneParts->IsPause();
+			SceneParts->ChangePause(true);
 		}
 		else if (IsInsert) {
 			que.at(NowSel).End();
@@ -481,444 +480,8 @@ namespace DXLibRef {
 			}
 			else {
 				if (!PrevPause) {
-					auto* DrawParts = DXDraw::Instance();
-					DrawParts->SetPause(false);
-				}
-			}
-		}
-	}
-	// 
-	namespace UniversalUI {
-		void UISystem::UI_CommonParts::SetParts(const nlohmann::json& pJson) noexcept {
-			this->m_Name = pJson["Name"];
-			// 
-			std::string Type = pJson["Type"];
-			for (size_t i : std::views::iota(0, static_cast<int>(EnumUIPartsType::Max))) {
-				if (Type == g_UIPartsString[i]) {
-					this->m_EnumUIPartsType = (EnumUIPartsType)i;
-					break;
-				}
-			}
-			// 
-			this->m_Layer = pJson["Layer"];
-			// 
-			this->m_IsMouseClickActive = pJson["MouseClickActive"];
-			// 
-			this->m_XPos = pJson["XPos"];
-			this->m_YPos = pJson["YPos"];
-			this->m_XSize = pJson["XSize"];
-			this->m_YSize = pJson["YSize"];
-			this->m_ZRotate = pJson["ZRotate"];
-			// 
-			std::string XCenter = pJson["XCenter"];
-			for (size_t i : std::views::iota(0, 3)) {
-				if (XCenter == g_UIXCenterString[i]) {
-					this->m_UIXCenter = (UIXCenter)i;
-					break;
-				}
-			}
-			std::string YCenter = pJson["YCenter"];
-			for (size_t i : std::views::iota(0, 3)) {
-				if (YCenter == g_UIYCenterString[i]) {
-					this->m_UIYCenter = (UIYCenter)i;
-					break;
-				}
-			}
-			// 色関係
-			auto GetColorByPallet = [this](const std::string& ColorStr) {
-				for (size_t i : std::views::iota(0, static_cast<int>(g_UIColorPalletNum))) {
-					if (ColorStr == g_UIColorPalletString[i]) {
-						return g_UIColorPallet[i];
-						break;
-					}
-				}
-				return Black;
-				};
-			this->m_PressColor = GetColorByPallet(pJson["PressColor"]);
-			this->m_IntoColor = GetColorByPallet(pJson["IntoColor"]);
-			this->m_BaseColor = GetColorByPallet(pJson["BaseColor"]);
-			this->m_EdgeColor = GetColorByPallet(pJson["EdgeColor"]);
-			// テキスト
-			this->m_TextID = pJson["TextID"];
-			// 描画位置を決定
-			switch (this->m_UIXCenter) {
-			case UIXCenter::LEFT:
-				this->m_DrawXCenter = this->m_XPos + this->m_XSize / 2;
-				break;
-			case UIXCenter::MIDDLE:
-				this->m_DrawXCenter = this->m_XPos;
-				break;
-			case UIXCenter::RIGHT:
-				this->m_DrawXCenter = this->m_XPos - this->m_XSize / 2;
-				break;
-			default:
-				break;
-			}
-			switch (this->m_UIYCenter) {
-			case UIYCenter::TOP:
-				this->m_DrawYCenter = this->m_YPos + this->m_YSize / 2;
-				break;
-			case UIYCenter::MIDDLE:
-				this->m_DrawYCenter = this->m_YPos;
-				break;
-			case UIYCenter::BOTTOM:
-				this->m_DrawYCenter = this->m_YPos - this->m_YSize / 2;
-				break;
-			default:
-				break;
-			}
-		}
-		void UISystem::UI_CommonParts::Update(void) noexcept {
-			if (this->m_IsMouseClickActive) {
-				auto* Pad = PadControl::Instance();
-				int mx = Pad->GetMS_X();
-				int my = Pad->GetMS_Y();
-
-				float rad = this->m_ZRotate + this->m_FrameInfo.m_ZRotOfs;
-				switch (this->m_EnumUIPartsType) {
-				case EnumUIPartsType::Box:
-				{
-					int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
-					int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
-					float xs = static_cast<float>(this->m_XSize) * this->m_FrameInfo.m_XScale / 2.f;
-					float ys = static_cast<float>(this->m_YSize) * this->m_FrameInfo.m_YScale / 2.f;
-
-					int  x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
-					int  y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
-					int  x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
-					int  y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
-					int  x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
-					int  y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
-					int  x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
-					int  y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
-					m_MouseOver = HitPointToSquare(
-						mx, my,
-						xp + x1, yp + y1,
-						xp + x2, yp + y2,
-						xp + x3, yp + y3,
-						xp + x4, yp + y4
-					);
-					m_MousePress = m_MouseOver && Pad->GetMouseClick().press();
-					printfDx("[]\n");
-				}
-				break;
-				case EnumUIPartsType::Msg:
-				case EnumUIPartsType::Max:
-				default:
-					m_MouseOver = false;
-					break;
-				}
-			}
-			else {
-				m_MouseOver = false;
-			}
-		}
-		void UISystem::UI_CommonParts::Draw(void) noexcept {
-			if (this->m_FrameInfo.m_Alpha == 0.f) {
-				return;
-			}
-			auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-			if (1.f > this->m_FrameInfo.m_Alpha) {
-				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * this->m_FrameInfo.m_Alpha), 0, 255));
-			}
-			auto* LocalizeParts = LocalizePool::Instance();
-
-			float rad = this->m_ZRotate + this->m_FrameInfo.m_ZRotOfs;
-
-			switch (this->m_EnumUIPartsType) {
-			case EnumUIPartsType::Box:
-			{
-				int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
-				int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
-				float xs = static_cast<float>(this->m_XSize) * this->m_FrameInfo.m_XScale / 2.f;
-				float ys = static_cast<float>(this->m_YSize) * this->m_FrameInfo.m_YScale / 2.f;
-
-				int  x1 = static_cast<int>(-xs * cos(rad) - -ys * sin(rad));
-				int  y1 = static_cast<int>(-ys * cos(rad) + -xs * sin(rad));
-				int  x2 = static_cast<int>(xs * cos(rad) - -ys * sin(rad));
-				int  y2 = static_cast<int>(-ys * cos(rad) + xs * sin(rad));
-				int  x3 = static_cast<int>(xs * cos(rad) - ys * sin(rad));
-				int  y3 = static_cast<int>(ys * cos(rad) + xs * sin(rad));
-				int  x4 = static_cast<int>(-xs * cos(rad) - ys * sin(rad));
-				int  y4 = static_cast<int>(ys * cos(rad) + -xs * sin(rad));
-				DrawQuadrangle(
-					xp + x1, yp + y1,
-					xp + x2, yp + y2,
-					xp + x3, yp + y3,
-					xp + x4, yp + y4,
-					m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, TRUE);
-			}
-			break;
-			case EnumUIPartsType::Msg:
-			{
-				int Width = GetDrawFormatStringWidth(
-					LocalizeParts->Get(this->m_TextID),
-					m_TextEX0.at(0).c_str(),
-					m_TextEX0.at(1).c_str(),
-					m_TextEX0.at(2).c_str()
-				);
-				int Size = GetFontSize();
-				double XCenter = 0.5;
-				double YCenter = 0.5;
-				switch (this->m_UIXCenter) {
-				case UIXCenter::LEFT:
-					this->m_DrawXCenter = this->m_XPos;
-					XCenter = 0.0;
-					break;
-				case UIXCenter::MIDDLE:
-					this->m_DrawXCenter = this->m_XPos + Width / 2;
-					XCenter = 0.5;
-					break;
-				case UIXCenter::RIGHT:
-					this->m_DrawXCenter = this->m_XPos + Width;
-					XCenter = 1.0;
-					break;
-				default:
-					break;
-				}
-				switch (this->m_UIYCenter) {
-				case UIYCenter::TOP:
-					this->m_DrawYCenter = this->m_YPos;
-					YCenter = 0.0;
-					break;
-				case UIYCenter::MIDDLE:
-					this->m_DrawYCenter = this->m_YPos + Size / 2;
-					YCenter = 0.5;
-					break;
-				case UIYCenter::BOTTOM:
-					this->m_DrawYCenter = this->m_YPos + Size;
-					YCenter = 1.0;
-					break;
-				default:
-					break;
-				}
-				int xp = this->m_DrawXCenter + static_cast<int>(this->m_FrameInfo.m_XOfs);
-				int yp = this->m_DrawYCenter + static_cast<int>(this->m_FrameInfo.m_YOfs);
-
-				DrawRotaFormatString(
-					xp, yp,
-					1.0, 1.0,
-					XCenter, YCenter,
-					static_cast<double>(rad),
-					m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
-					FALSE,
-					LocalizeParts->Get(this->m_TextID),
-					m_TextEX0.at(0).c_str(),
-					m_TextEX0.at(1).c_str(),
-					m_TextEX0.at(2).c_str()
-				);
-				/*
-				GetDrawFormatStringWidthToHandle(
-					int FontHandle,
-					LocalizeParts->Get(this->m_TextID),
-					m_TextEX0.at(0).c_str(),
-					m_TextEX0.at(1).c_str(),
-					m_TextEX0.at(2).c_str()
-				);
-				GetFontSizeToHandle(int FontHandle);
-				DrawRotaFormatStringToHandle(
-					xp, yp,
-					1.0, 1.0,
-					XCenter, YCenter,
-					static_cast<double>(rad),
-					m_MouseOver ? (m_MousePress ? this->m_PressColor : this->m_IntoColor) : this->m_BaseColor, this->m_EdgeColor,
-					int FontHandle,
-					this->m_EdgeColor,
-					FALSE,
-					LocalizeParts->Get(this->m_TextID),
-					m_TextEX0.at(0).c_str(),
-					m_TextEX0.at(1).c_str(),
-					m_TextEX0.at(2).c_str()
-					);
-					//*/
-			}
-			break;
-			case EnumUIPartsType::Max:
-			default:
-				break;
-			}
-			if (1.f > this->m_FrameInfo.m_Alpha) {
-				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-			}
-		}
-		// 
-		void UISystem::UI_CommonAnimes::SetParts(const nlohmann::json& pJson, const std::vector<std::unique_ptr<UI_CommonParts>>& Parts) noexcept {
-			// 
-			m_TargetID.clear();
-			for (auto& n : pJson["Target"]) {
-				std::string S = n;
-				for (auto& p : Parts) {
-					if (p->GetName() == S) {
-						m_TargetID.emplace_back(p->GetUniqueID());
-						break;
-					}
-				}
-			}
-			// 
-			m_AnimeFrame.clear();
-			for (auto& n : pJson["Anime"]) {
-				FrameInfo tmp;
-				tmp.m_framepoint = n["Frame"];
-				tmp.m_Alpha = n["Alpha"];
-				tmp.m_XScale = n["XScale"];
-				tmp.m_YScale = n["YScale"];
-				tmp.m_XOfs = n["XOffset"];
-				tmp.m_YOfs = n["YOffset"];
-				tmp.m_ZRotOfs = n["ZRotOfs"];
-				std::string Lerptype = n["LerpType"];
-				for (size_t i : std::views::iota(0, static_cast<int>(LerpType::Max))) {
-					if (Lerptype == g_LerpTypeStr[i]) {
-						tmp.m_LerpType = (LerpType)i;
-						break;
-					}
-				}
-				m_AnimeFrame.emplace_back(tmp);
-			}
-			// 
-		}
-		void UISystem::UI_CommonAnimes::Update(std::vector<std::unique_ptr<UI_CommonParts>>* Parts) noexcept {
-			if (m_AnimeFrame.size() == 0) {
-				return;
-			}
-			if (m_Frame < 0) {
-				return;
-			}
-			float FramePer = 0.f;
-			// 現在のアニメ番号を取得
-			m_NowAnim = InvalidID;
-			int tmpFrame = m_Frame;
-			for (size_t index = 0; auto & a : m_AnimeFrame) {
-				if (tmpFrame < a.m_framepoint) {
-					m_NowAnim = static_cast<int>(index);
-					FramePer = static_cast<float>(tmpFrame) / static_cast<float>(a.m_framepoint);
-					switch (a.m_LerpType) {
-					case LerpType::linear:
-						FramePer = FramePer;
-						break;
-					case LerpType::pow2:
-						FramePer = FramePer * FramePer;
-						break;
-					case LerpType::Max:
-						break;
-					default:
-						break;
-					}
-					break;
-				}
-				tmpFrame -= a.m_framepoint;
-				index++;
-			}
-			if (m_NowAnim == InvalidID) {
-				m_NowAnim = static_cast<int>(m_AnimeFrame.size()) - 1;
-				FramePer = 1.f;
-			}
-			// 反映
-			for (auto& t : m_TargetID) {
-				for (auto& p : *Parts) {
-					if (p->GetUniqueID() == t) {
-						auto& Prev = m_AnimeFrame.at(static_cast<size_t>(std::max(m_NowAnim - 1, 0)));
-						auto& Now = m_AnimeFrame.at(static_cast<size_t>(m_NowAnim));
-						FrameInfo tmp;
-						tmp.m_Alpha = Lerp(Prev.m_Alpha, Now.m_Alpha, FramePer);
-						tmp.m_XScale = Lerp(Prev.m_XScale, Now.m_XScale, FramePer);
-						tmp.m_YScale = Lerp(Prev.m_YScale, Now.m_YScale, FramePer);
-						tmp.m_XOfs = Lerp(Prev.m_XOfs, Now.m_XOfs, FramePer);
-						tmp.m_YOfs = Lerp(Prev.m_YOfs, Now.m_YOfs, FramePer);
-						tmp.m_ZRotOfs = Lerp(Prev.m_ZRotOfs, Now.m_ZRotOfs, FramePer);
-						p->SetFrameInfo(tmp);
-					}
-				}
-			}
-		}
-		// 1レイヤー分
-		void UISystem::UI_OneLayer::Load(const char* path) noexcept {
-			m_IsEnd = false;
-
-			UniqueIDNum = 0;
-
-			int mdata = FileRead_open(path);
-			size_t size = static_cast<size_t>(FileRead_size_handle(mdata));
-			std::string JsonStr; JsonStr.resize(size, '\0');
-			FileRead_read((void*)JsonStr.c_str(), static_cast<int>(size), mdata);
-			FileRead_close(mdata);
-
-			nlohmann::json pJson = nlohmann::json::parse(JsonStr);
-			for (auto& j : pJson["Parts"]) {
-				m_CommonParts.emplace_back(std::make_unique<UI_CommonParts>());
-				m_CommonParts.back()->SetUniqueID(UniqueIDNum);
-				m_CommonParts.back()->SetParts(j);
-				++UniqueIDNum;
-			}
-			for (auto& j : pJson["TotalAnim"]) {
-				m_CommonAnimes.emplace_back(std::make_unique<UI_CommonAnimes>());
-				m_CommonAnimes.back()->SetParts(j, m_CommonParts);
-			}
-			std::sort(m_CommonParts.begin(), m_CommonParts.end(), [this](const std::unique_ptr<UI_CommonParts>& A, const std::unique_ptr<UI_CommonParts>& B) {
-				return (A->GetLayer() != B->GetLayer()) ? (A->GetLayer() < B->GetLayer()) : (A->GetUniqueID() < B->GetUniqueID());
-				});
-			if (UniqueIDNum == 0) {
-				UniqueIDNum = InvalidID;
-			}
-		}
-		void UISystem::UI_OneLayer::Update(void) noexcept {
-			for (auto& p : m_CommonAnimes) {
-				p->Update(&m_CommonParts);
-			}
-			for (auto& p : m_CommonParts) {
-				p->Update();
-			}
-		}
-		void UISystem::UI_OneLayer::Draw(void) noexcept {
-			for (auto& p : m_CommonParts) {
-				p->Draw();
-			}
-		}
-		void UISystem::UI_OneLayer::Dispose(void) noexcept {
-			for (auto& p : m_CommonAnimes) {
-				p.reset();
-			}
-			m_CommonAnimes.clear();
-			for (auto& p : m_CommonParts) {
-				p.reset();
-			}
-			m_CommonParts.clear();
-			UniqueIDNum = InvalidID;
-		}
-		// 全体
-		int UISystem::AddUI(const char* path) noexcept {
-			for (size_t index = 0; auto & l : m_Layer) {
-				if (!l.IsActive()) {
-					l.Load(path);
-					return static_cast<int>(index);
-				}
-				index++;
-			}
-			return InvalidID;
-		}
-		void UISystem::DelUI(int layer) noexcept {
-			auto& l = m_Layer.at(static_cast<size_t>(layer));
-			if (l.IsActive()) {
-				l.Dispose();
-			}
-		}
-		void UISystem::Update(void) noexcept {
-			for (auto& l : m_Layer) {
-				if (l.IsActive()) {
-					l.Update();
-				}
-			}
-		}
-		void UISystem::Draw(void) noexcept {
-			for (auto& l : m_Layer) {
-				if (l.IsActive()) {
-					l.Draw();
-				}
-			}
-		}
-		void UISystem::DisposeAll(void) noexcept {
-			for (auto& l : m_Layer) {
-				if (l.IsActive()) {
-					l.Dispose();
+					auto* SceneParts = SceneControl::Instance();
+					SceneParts->ChangePause(false);
 				}
 			}
 		}

@@ -45,6 +45,51 @@ namespace DXLibRef {
 		}
 	};
 	//
+	class ShadowDraw {
+		static const int EXTEND = 4;
+	private:
+		GraphHandle			BaseShadowHandle;
+		GraphHandle			DepthBaseScreenHandle;
+		GraphHandle			DepthScreenHandle;
+		GraphHandle			DepthFarScreenHandle;
+
+		ShaderUseClass		m_Shader;
+		ShaderUseClass		m_ShaderRigid;
+		Vector3DX			m_ShadowVec{ Vector3DX::up() };
+		float				m_Scale{ 1.f };
+		float				m_ScaleFar{ 1.f };
+
+		bool						m_PrevShadow{ false };
+
+		std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
+		std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
+	private:
+		void SetupCam(Vector3DX Center, float scale) const noexcept;
+	public:
+		ShadowDraw(void) noexcept {}
+		ShadowDraw(const ShadowDraw&) = delete;
+		ShadowDraw(ShadowDraw&& o) = delete;
+		ShadowDraw& operator=(const ShadowDraw&) = delete;
+		ShadowDraw& operator=(ShadowDraw&& o) = delete;
+		~ShadowDraw(void) noexcept {}
+	public:
+		const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+		const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
+		const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//–¢Žg—p
+	public:
+		void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
+		void			SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
+
+		void			Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
+		void			UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
+		void			Draw(void) noexcept;
+		void			Dispose(void) noexcept;
+	public:
+		void			SetActive(void) noexcept;
+		bool			UpdateActive(void) noexcept;
+	};
+	//
 	struct shaderparam {
 		bool					use{ false };
 		std::array<float, 4>	param{ 0,0,0,0 };
@@ -80,9 +125,19 @@ namespace DXLibRef {
 
 		float						m_DistortionPer{ 120.f };
 		float						m_GodRayPer{ 0.5f };
+
+		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
+
+		bool						m_IsCubeMap{ true };
+		RealTimeCubeMap				m_RealTimeCubeMap;
+
+		ShaderUseClass				m_PBR_Shader;
 	public:
 		const auto& GetCamViewMat(void) const noexcept { return m_CamViewMat; }
 		const auto& GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
+	public:
+		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
+		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 	public:
 		auto& GetBufferScreen(void) noexcept { return BufferScreen; }
 		auto& GetColorBuffer(void) noexcept { return ColorScreen; }
@@ -139,8 +194,17 @@ namespace DXLibRef {
 		void SetCamMat(const Camera3DInfo& camInfo) noexcept;
 		void ResetBuffer(void) noexcept;
 		void DrawGBuffer(float near_len, float far_len, std::function<void()> done) noexcept;
-		void DrawPostProcess(void) noexcept;
+		void DrawPostProcess(const Camera3DInfo& camInfo,
+			std::function<void()> setshadowdoing_rigid,
+			std::function<void()> setshadowdoing) noexcept;
 		void ResetAllBuffer(void) noexcept;
+
+		bool			UpdateShadowActive(void) noexcept { return m_ShadowDraw->UpdateActive(); }
+		void			SetAmbientLight(const Vector3DX& AmbientLightVec) noexcept { m_ShadowDraw->SetVec(AmbientLightVec); }
+		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
+		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
+
+		void			DrawByPBR(std::function<void()> doing) noexcept;
 	private:
 		void LoadGBuffer(void) noexcept;
 		void DisposeGBuffer(void) noexcept;

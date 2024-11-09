@@ -243,10 +243,10 @@ namespace DXLibRef {
 	const OptionWindowClass* SingletonBase<OptionWindowClass>::m_Singleton = nullptr;
 	// 
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
-		ypos += DrawParts->GetUIY(static_cast<int>(selanim));
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		ypos += WindowSizeParts->GetUIY(static_cast<int>(selanim));
 		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
-		m_Draw(xpos + DrawParts->GetUIY(720 - 324), ypos, isMine);
+		m_Draw(xpos + WindowSizeParts->GetUIY(720 - 324), ypos, isMine);
 	}
 	// 
 	void OptionWindowClass::OptionTabsInfo::Execute(int* select, bool CanPress) noexcept {
@@ -288,13 +288,13 @@ namespace DXLibRef {
 		}
 	}
 	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int* select) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		int xp1, yp1;
 		// タブ
 		{
-			xp1 = xpos + (DrawParts->GetUIY(140) + DrawParts->GetUIY(12)) * m_id;
+			xp1 = xpos + (WindowSizeParts->GetUIY(140) + WindowSizeParts->GetUIY(12)) * m_id;
 			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + DrawParts->GetUIY(5), xp1 + DrawParts->GetUIY(140), yp1 + LineHeight * 2 - DrawParts->GetUIY(5), LineHeight, (isActive ? Gray25 : Gray75), false, true, m_name)) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + WindowSizeParts->GetUIY(5), xp1 + WindowSizeParts->GetUIY(140), yp1 + LineHeight * 2 - WindowSizeParts->GetUIY(5), LineHeight, (isActive ? Gray25 : Gray75), false, true, m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
@@ -306,8 +306,8 @@ namespace DXLibRef {
 			xp1 = xpos;
 			yp1 = ypos + LineHeight * 2;
 			for (int i : std::views::iota(0, static_cast<int>(m_Elements.size()))) {
-				yp1 += (LineHeight + DrawParts->GetUIY(6));
-				if (IntoMouse(xp1, yp1, xp1 + DrawParts->GetUIY(500), yp1 + (LineHeight + DrawParts->GetUIY(6)))) {
+				yp1 += (LineHeight + WindowSizeParts->GetUIY(6));
+				if (IntoMouse(xp1, yp1, xp1 + WindowSizeParts->GetUIY(500), yp1 + (LineHeight + WindowSizeParts->GetUIY(6)))) {
 					*select = i;
 				}
 				m_Elements.at(static_cast<size_t>(i)).Draw(xp1, yp1, (*select == i));
@@ -341,10 +341,10 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
 				auto* BGM = BGMPool::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM) * 100.f + 0.5f), 0, 100);
+				int value = WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM) * 100.f + 0.5f), 0, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::BGM, static_cast<float>(value) / 100.f);
 				BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
 			}
@@ -368,10 +368,10 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* SE = SoundPool::Instance();
 				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE) * 100.f + 0.5f), 0, 100);
+				int value = WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE) * 100.f + 0.5f), 0, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::SE, static_cast<float>(value) / 100.f);
 				SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 			}
@@ -504,10 +504,10 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset);
-				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
+				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
 				if (prev != OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 					switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 					case 0:
@@ -571,27 +571,27 @@ namespace DXLibRef {
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) - 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				auto* DrawParts = DXDraw::Instance();
-				DrawParts->SetWindowOrBorderless();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
+				WindowSizeParts->SetWindowOrBorderless();
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) + 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				auto* DrawParts = DXDraw::Instance();
-				DrawParts->SetWindowOrBorderless();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
+				WindowSizeParts->SetWindowOrBorderless();
 			},
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* LocalizeParts = LocalizePool::Instance();
 				auto* OptionParts = OPTION::Instance();
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::WindowMode);
-				OptionParts->SetParamInt(EnumSaveParam::WindowMode, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::WindowMode), static_cast<int>(WindowType::Max)));
+				OptionParts->SetParamInt(EnumSaveParam::WindowMode, WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::WindowMode), static_cast<int>(WindowType::Max)));
 				if (prev != OptionParts->GetParamInt(EnumSaveParam::WindowMode)) {
-					DrawParts->SetWindowOrBorderless();
+					WindowSizeParts->SetWindowOrBorderless();
 				}
 				std::string Type;
 				switch (static_cast<WindowType>(OptionParts->GetParamInt(EnumSaveParam::WindowMode))) {
@@ -608,7 +608,7 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(250), ypos + LineHeight / 2,
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(250), ypos + LineHeight / 2,
 					LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, Type.c_str());
 			}
 		);
@@ -706,7 +706,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				int ret = 0;
 				// 結果から一番近いやつに指定
 				int diff = 10000;
@@ -717,9 +717,9 @@ namespace DXLibRef {
 						ret = i;
 					}
 				}
-				int value = WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, ret, FrameLimitsNum);
+				int value = WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, ret, FrameLimitsNum);
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(250), ypos + LineHeight / 2,
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(250), ypos + LineHeight / 2,
 					LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 			}
 		);
@@ -744,7 +744,7 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* OptionParts = OPTION::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
@@ -752,7 +752,7 @@ namespace DXLibRef {
 				if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
 					OptionWindowParts->SetRestart();
 				}
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(100), ypos + LineHeight / 2,
 					LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 			}
 		);
@@ -817,8 +817,8 @@ namespace DXLibRef {
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
-				auto* DrawParts = DXDraw::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
+				auto* WindowSizeParts = WindowSizeControl::Instance();
+				OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
 			}
 		);
 
@@ -839,9 +839,9 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
+				OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -861,9 +861,9 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
+				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -967,9 +967,9 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
+				OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -993,11 +993,11 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* OptionParts = OPTION::Instance();
 				int prev = static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) * 100.f + 0.5f);
-				int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) * 100.f + 0.5f), 25, 100);
+				int value = WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) * 100.f + 0.5f), 25, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, static_cast<float>(value) / 100.f);
 				if (prev != value) {
 					OptionWindowParts->SetRestart();
@@ -1049,7 +1049,7 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::Language);
 				if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == static_cast<int>(LanguageType::Eng)))) {
@@ -1064,7 +1064,7 @@ namespace DXLibRef {
 					LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 				}
 
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 2,
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(125), ypos + LineHeight / 2,
 					LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 			}
 		);
@@ -1085,9 +1085,9 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) * 100.f + 0.5f), 10, 100);
+				int value = WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) * 100.f + 0.5f), 10, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, static_cast<float>(value) / 100.f);
 			}
 		);
@@ -1108,9 +1108,9 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + DrawParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) * 100.f + 0.5f), 10, 100);
+				int value = WindowSystem::UpDownBar(xpos, xpos + WindowSizeParts->GetUIY(200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) * 100.f + 0.5f), 10, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, static_cast<float>(value) / 100.f);
 			}
 		);
@@ -1172,7 +1172,7 @@ namespace DXLibRef {
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* OptionParts = OPTION::Instance();
 				if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::PS4)))) {
 					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
@@ -1182,11 +1182,11 @@ namespace DXLibRef {
 				}
 				ypos -= LineHeight * 1 / 6;
 				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
-					WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3,
+					WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(125), ypos + LineHeight / 3,
 						LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
 				}
 				else {
-					WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight / 3,
+					WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(125), ypos + LineHeight / 3,
 						LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
 				}
 
@@ -1199,12 +1199,12 @@ namespace DXLibRef {
 					case DX_PADTYPE_SWITCH_JOY_CON_R:
 					case DX_PADTYPE_SWITCH_PRO_CTRL:
 					case DX_PADTYPE_SWITCH_HORI_PAD:
-						WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3,
+						WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(125), ypos + LineHeight * 3 / 3,
 							LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:DirectInput");
 						break;
 					case DX_PADTYPE_XBOX_360:
 					case DX_PADTYPE_XBOX_ONE:
-						WindowSystem::SetMsg(xpos + DrawParts->GetUIY(125), ypos + LineHeight * 3 / 3,
+						WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(125), ypos + LineHeight * 3 / 3,
 							LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:XInput");
 						break;
 					default:
@@ -1216,8 +1216,8 @@ namespace DXLibRef {
 	}
 	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept {
 		auto* Pad = PadControl::Instance();
-		auto* DrawParts = DXDraw::Instance();
-		WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2,
+		auto* WindowSizeParts = WindowSizeControl::Instance();
+		WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(100), ypos + LineHeight / 2,
 			LineHeight, FontHandle::FontXCenter::MIDDLE, (Pad->GetKeyReserve((PADS)Sel) < 0) ? Red : (isMine ? White : Gray25), Black,
 			"[%s]->[%s]", Pad->GetIDtoStr(Pad->GetKeyassign((PADS)Sel)).c_str(), Pad->GetIDtoStr(Pad->GetKeyReserve((PADS)Sel)).c_str());
 
@@ -1237,11 +1237,11 @@ namespace DXLibRef {
 			[]() {},
 			[](int xpos, int ypos, bool isMine) {
 				auto* Pad = PadControl::Instance();
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				if (isMine && Pad->GetMouseClick().trigger()) {
 					Pad->ResetAssign();
 				}
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
 		if (Pad->IsUseButton((PADS)0)) {
@@ -1442,12 +1442,12 @@ namespace DXLibRef {
 			[]() {},
 			[](int xpos, int ypos, bool isMine) {
 				auto* Pad = PadControl::Instance();
-				auto* DrawParts = DXDraw::Instance();
+				auto* WindowSizeParts = WindowSizeControl::Instance();
 				if (isMine && Pad->GetMouseClick().trigger()) {
 					Pad->FlipAssign();
 					Pad->Save();
 				}
-				WindowSystem::SetMsg(xpos + DrawParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+				WindowSystem::SetMsg(xpos + WindowSizeParts->GetUIY(100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
 	}
@@ -1471,20 +1471,20 @@ namespace DXLibRef {
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", 720, 720,
 				[this](int xmin, int ymin, int, int ymax, bool EndSwitch) {
-					auto* DrawParts = DXDraw::Instance();
+					auto* WindowSizeParts = WindowSizeControl::Instance();
 					auto* OptionParts = OPTION::Instance();
 					auto* Pad = PadControl::Instance();
 					auto* SE = SoundPool::Instance();
 					int xp1, yp1;
 
 
-					xp1 = xmin + DrawParts->GetUIY(24);
+					xp1 = xmin + WindowSizeParts->GetUIY(24);
 					yp1 = ymin;
 					for (auto& t : m_Tabs) {
 						t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
 					}
 					// ガイド
-					xp1 = xmin + DrawParts->GetUIY(24);
+					xp1 = xmin + WindowSizeParts->GetUIY(24);
 					yp1 = ymax - LineHeight * 3 / 2;
 					m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
 

@@ -9,18 +9,16 @@ namespace DXLibRef {
 	private:
 		bool			m_IsFirstLoop{ true };			// 初回チェック
 		bool			m_IsLoading{ false };
-
 		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{ nullptr };
 		size_t			m_Next_Select{ 0 };
-
 		bool			m_Is3DActive{ true };
 		float			m_ShadowScale{ 1.f };
 	public:
 		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
-		auto& Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
+		auto&		Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
-		void SetShadowScale(float value) noexcept { m_ShadowScale = value; }
+		void		SetShadowScale(float value) noexcept { m_ShadowScale = value; }
 	public:// ゲッター
 		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
@@ -31,7 +29,6 @@ namespace DXLibRef {
 		TEMPSCENE(TEMPSCENE&& o) = delete;
 		TEMPSCENE& operator=(const TEMPSCENE&) = delete;
 		TEMPSCENE& operator=(TEMPSCENE&& o) = delete;
-
 		virtual ~TEMPSCENE(void) noexcept {}
 	public:// メイン更新
 		void Load(void) noexcept {
@@ -50,15 +47,6 @@ namespace DXLibRef {
 			m_IsFirstLoop = false;
 			return ans;
 		}
-
-		void CubeMapDraw(void) const noexcept;
-		void ShadowDraw_Far(void) const noexcept;
-		void ShadowDraw(void) const noexcept;
-
-		void Draw3DVR(std::function<void()> doingUI) noexcept;
-		void Draw3D(std::function<void()> doingUI) noexcept;
-		void Draw2D(std::function<void()> doingUI) const noexcept;
-
 		void Dispose(void) noexcept { Dispose_Sub(); }
 		void Dispose_Load(void) noexcept {
 			if (m_IsLoading) {
@@ -66,13 +54,25 @@ namespace DXLibRef {
 				Dispose_Load_Sub();
 			}
 		}
+	public:
+		void CubeMap(void) noexcept { CubeMap_Sub(); }
+		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
+		void SetShadowDraw_Rigid(void) noexcept { SetShadowDraw_Rigid_Sub(); }
+		void SetShadowDraw(void) noexcept { SetShadowDraw_Sub(); }
+		void CalcOnDraw(void) noexcept { CalcOnDraw_Sub(); }
+		void MainDraw(void) noexcept { MainDraw_Sub(); }
+		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
+		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
+		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
+		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
+		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 	protected:// 継承物
 		virtual void Load_Sub(void) noexcept {}
 		virtual void Set_Sub(void) noexcept {}
 		virtual bool Update_Sub(void) noexcept { return true; }
 
 		virtual void CubeMap_Sub(void) const noexcept {}
-		virtual void BG_Draw_Sub(void) const noexcept;
+		virtual void BG_Draw_Sub(void) const noexcept { FillGraph(GetDrawScreen(), 192, 192, 192); }
 		virtual void SetShadowDraw_Rigid_Sub(void) const noexcept {}
 		virtual void SetShadowDraw_Sub(void) const noexcept {}
 		virtual void CalcOnDraw_Sub(void) noexcept {}
@@ -85,7 +85,6 @@ namespace DXLibRef {
 
 		virtual void Dispose_Sub(void) noexcept {}
 		virtual void Dispose_Load_Sub(void) noexcept {}
-
 	};
 	// --------------------------------------------------------------------------------------------------
 	// 
@@ -94,36 +93,55 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<SceneControl>;
 	private:
-		std::vector<std::shared_ptr<TEMPSCENE>> m_ScenesPtr{};
+		// FPS表示用クラス
+		class FPSDrawer {
+			std::array<float, 60>		FPSAvgs{};
+			size_t						m_FPSAvgCount{ 0 };
+			float						m_FPSAvg{ 0.f };
+		public:
+			// FPS表示
+			void	Initialize(void) noexcept;
+			void	Update(void) noexcept;
+			void	DrawFPSCounter(void) const noexcept;
+		};
+		// ポーズ画面表示用クラス
+		class PauseDrawer {
+			float						m_PauseFlashCount{ 0.f };
+		public:
+			void	Update(void) noexcept;
+			void	DrawPause(void) const noexcept;
+		};
+	private:
 		std::shared_ptr<TEMPSCENE>	m_NowScenesPtr;
+		bool						m_IsEndScene{ false };		// 現在のシーンが終了したフラグ
+		bool						m_IsEndGame{ false };		// ゲーム終了フラグ
+		bool						m_IsExitSelect{ false };	// 終了ポップアップが開いているかのフラグ
+		bool						m_IsRestartSelect{ false };	// 再起動ポップアップが開いているかのフラグ
+		FPSDrawer					m_FPSDrawer;				// FPS表示用クラスの実体
+		PauseDrawer					m_PauseDrawer;				// ポーズ画面表示用クラスの実体
+		bool						m_IsPauseActive{ false };	// ポーズ中かどうかのフラグ
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;
 		SceneControl(SceneControl&& o) = delete;
 		SceneControl& operator=(const SceneControl&) = delete;
 		SceneControl& operator=(SceneControl&& o) = delete;
-
-		~SceneControl(void) noexcept {
-			for (auto& s : this->m_ScenesPtr) {
-				s->Dispose();
-			}
-		}
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
+	private:
+		void	DrawUICommon(void) const noexcept;
 	public:
-		void	AddList(const std::shared_ptr<TEMPSCENE>& ptr) noexcept {
-			this->m_ScenesPtr.emplace_back(ptr);
-			if (this->m_ScenesPtr.size() == 1) {
-				this->m_NowScenesPtr = this->m_ScenesPtr.back();
-			}
-		}
+		const auto&		IsEndGame(void) const noexcept { return m_IsEndGame; }
+		const auto&		IsPause(void) const noexcept { return m_IsPauseActive; }
+		const auto&		IsExit(void) const noexcept { return m_IsExitSelect; }
+		const auto&		IsRestart(void) const noexcept { return m_IsRestartSelect; }
+		const auto		IsEndScene(void) const noexcept { return m_IsEndScene || m_IsEndGame; }
+		void			ChangePause(bool value) noexcept;
+		void			SetFirstScene(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { m_NowScenesPtr = ptr; }
 	public:
-		void	NextScene(void) noexcept {
-			GetNowScene()->Dispose();							// 解放
-			if (GetNowScene() != GetNowScene()->Get_Next()) {
-				GetNowScene()->Dispose_Load();
-			}
-			this->m_NowScenesPtr = GetNowScene()->Get_Next();		// 遷移
-		}
+		void			Initialize(void) noexcept;
+		void			Update(void) noexcept;
+		void			DrawMainLoop(void) const noexcept;
+		void			ExitMainLoop(void) noexcept;
 	};
 };

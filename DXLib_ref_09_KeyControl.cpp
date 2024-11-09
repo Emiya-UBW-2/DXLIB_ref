@@ -6,12 +6,12 @@ namespace DXLibRef {
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
 
 	void PadControl::KeyGuideGraphs::AddGuideXBox(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		if (pGuide) {
 			pGuideImg = pGuide;
 			pGuideImg->GetSize(&xsize, &ysize);
-			xsize = xsize * DrawParts->GetUIY(24) / ysize;
-			ysize = ysize * DrawParts->GetUIY(24) / ysize;
+			xsize = xsize * WindowSizeParts->GetUIY(24) / ysize;
+			ysize = ysize * WindowSizeParts->GetUIY(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -20,12 +20,12 @@ namespace DXLibRef {
 		GuideString = GuideStr;
 	}
 	void PadControl::KeyGuideGraphs::AddGuideDS4(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		if (pGuide) {
 			pGuideImg = pGuide;
 			pGuideImg->GetSize(&xsize, &ysize);
-			xsize = xsize * DrawParts->GetUIY(24) / ysize;
-			ysize = ysize * DrawParts->GetUIY(24) / ysize;
+			xsize = xsize * WindowSizeParts->GetUIY(24) / ysize;
+			ysize = ysize * WindowSizeParts->GetUIY(24) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -34,15 +34,15 @@ namespace DXLibRef {
 		GuideString = GuideStr;
 	}
 	void PadControl::KeyGuideGraphs::AddGuidePC(GraphHandle* pGuide, std::string_view GuideStr) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		if (pGuide) {
 			pGuideImg = pGuide;
 			pGuideImg->GetSize(&xsize, &ysize);
 			if (ysize == 0) {
 				ysize = 1;
 			}
-			xsize = xsize * DrawParts->GetUIY(21) / ysize;
-			ysize = ysize * DrawParts->GetUIY(21) / ysize;
+			xsize = xsize * WindowSizeParts->GetUIY(21) / ysize;
+			ysize = ysize * WindowSizeParts->GetUIY(21) / ysize;
 		}
 		else {
 			xsize = 0;
@@ -51,29 +51,29 @@ namespace DXLibRef {
 		GuideString = GuideStr;
 	}
 	int PadControl::KeyGuideGraphs::GetDrawSize(void) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
-			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
+			ofs += static_cast<int>(xsize) + WindowSizeParts->GetUIY(3);
 		}
 		if (GuideString != "") {
-			ofs += WindowSystem::GetMsgLen(LineHeight, GuideString) + DrawParts->GetUIY(12);
+			ofs += WindowSystem::GetMsgLen(LineHeight, GuideString) + WindowSizeParts->GetUIY(12);
 		}
 		return ofs;
 	}
 
 	int PadControl::KeyGuideGraphs::Draw(int x, int y) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 
 		int ofs = 0;
 		if (xsize > 0) {
 			DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
 				pGuideImg, x + ofs, y, x + ofs + static_cast<int>(xsize), y + static_cast<int>(ysize), true);
-			ofs += static_cast<int>(xsize) + DrawParts->GetUIY(3);
+			ofs += static_cast<int>(xsize) + WindowSizeParts->GetUIY(3);
 		}
-		WindowSystem::SetMsg(x + ofs, y + DrawParts->GetUIY(24) / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, GuideString);
+		WindowSystem::SetMsg(x + ofs, y + WindowSizeParts->GetUIY(24) / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, GuideString);
 		return GetDrawSize();
 	}
 
@@ -299,8 +299,9 @@ namespace DXLibRef {
 	}
 
 	void PadControl::Update(void) noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
+		auto* SceneParts = SceneControl::Instance();
 		// コントロールタイプ決定
 		{
 			ControlType NextControlType = ControlType::PC;
@@ -362,7 +363,7 @@ namespace DXLibRef {
 			}
 			// 右スティック
 			{
-				DrawParts->GetMousePosition(&MouseX, &MouseY);
+				GetMousePoint(&MouseX, &MouseY);
 				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 				SetMouseDispFlag(TRUE);
 				int RS_X = input.ThumbRX;
@@ -374,7 +375,7 @@ namespace DXLibRef {
 				RS_X = 1000 * RS_X / 32768;
 				RS_Y = 1000 * RS_Y / 32768;
 
-				if (!DrawParts->IsPause()) {
+				if (!SceneParts->IsPause()) {
 					auto* OptionParts = OPTION::Instance();
 					Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
 					Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
@@ -417,7 +418,7 @@ namespace DXLibRef {
 			}
 			// 右スティック
 			{
-				DrawParts->GetMousePosition(&MouseX, &MouseY);
+				GetMousePoint(&MouseX, &MouseY);
 				MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 				SetMouseDispFlag(TRUE);
 				int RS_X = input.Z;
@@ -436,7 +437,7 @@ namespace DXLibRef {
 		case ControlType::PC:
 			// 右スティック
 		{
-			DrawParts->GetMousePosition(&MouseX, &MouseY);
+			GetMousePoint(&MouseX, &MouseY);
 			MouseClick.Execute((GetMouseInputWithCheck() & MOUSE_INPUT_LEFT) != 0);
 
 			if (m_MouseMoveEnable) {
@@ -444,8 +445,8 @@ namespace DXLibRef {
 					SetMouseDispFlag(TRUE);
 				}
 				else {
-					if (!DrawParts->IsPause()) {
-						SetMousePoint(DrawParts->GetUIXMax() / 2, DrawParts->GetUIYMax() / 2);
+					if (!SceneParts->IsPause()) {
+						SetMousePoint(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
 						SetMouseDispFlag(FALSE);
 					}
 					else {
@@ -457,8 +458,8 @@ namespace DXLibRef {
 				SetMouseDispFlag(TRUE);
 			}
 			auto* OptionParts = OPTION::Instance();
-			Look_XradAdd = static_cast<float>(MouseX - DrawParts->GetUIXMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-			Look_YradAdd = -static_cast<float>(MouseY - DrawParts->GetUIYMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+			Look_XradAdd = static_cast<float>(MouseX - WindowSizeParts->GetUIXMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+			Look_YradAdd = -static_cast<float>(MouseY - WindowSizeParts->GetUIYMax() / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 		}
 		break;
 		default:
@@ -558,14 +559,14 @@ namespace DXLibRef {
 		MouseWheelRot = GetMouseWheelRotVolWithCheck();
 	}
 	void PadControl::Draw(void) const noexcept {
-		auto* DrawParts = DXDraw::Instance();
+		auto* WindowSizeParts = WindowSizeControl::Instance();
 		int xp = 0;
-		int y = DrawParts->GetUIYMax() - DrawParts->GetUIY(21 + 16);
+		int y = WindowSizeParts->GetUIYMax() - WindowSizeParts->GetUIY(21 + 16);
 		for (const auto& k : Key) {
-			xp += k->Draw(DrawParts->GetUIY(32) + xp, y);
-			if (xp > DrawParts->GetUIXMax() / 2) {
+			xp += k->Draw(WindowSizeParts->GetUIY(32) + xp, y);
+			if (xp > WindowSizeParts->GetUIXMax() / 2) {
 				xp = 0;
-				y -= DrawParts->GetUIY(28);
+				y -= WindowSizeParts->GetUIY(28);
 			}
 		}
 	}
