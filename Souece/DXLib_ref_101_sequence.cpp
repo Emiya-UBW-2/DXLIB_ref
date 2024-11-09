@@ -5,7 +5,6 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-
 	// FPS表示
 	void SceneControl::FPSDrawer::Initialize(void) noexcept {
 		// 各々の数値を初期化
@@ -72,6 +71,7 @@ namespace DXLibRef {
 				16, 16, Green, Black, "Pause");
 		}
 	}
+	//
 	void SceneControl::Draw3DMain(const Camera3DInfo& camInfo) const noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
 		PostPassParts->SetCamMat(camInfo);

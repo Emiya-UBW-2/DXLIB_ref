@@ -345,12 +345,12 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			// シーンの終わりに通る処理
-			SceneParts->ExitMainLoop();
 			// 終了フラグが立った場合即終了
 			if (SceneParts->IsEndGame()) {
 				break;
 			}
+			// シーンの終わりに通る処理
+			SceneParts->ExitMainLoop();
 		}
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Dispose();
