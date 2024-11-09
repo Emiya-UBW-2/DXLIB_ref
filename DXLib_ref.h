@@ -112,6 +112,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #include "DXLib_ref_09_KeyControl.hpp"
 #include "DXLib_ref_10_Option.hpp"
 #include "DXLib_ref_11_FileControl.hpp"
+#include "DXLib_ref_12_Draw2DSystem.hpp"
 #include "DXLib_ref_20_Debug.hpp"
 #include "DXLib_ref_30_Box2D.hpp"
 #include "DXLib_ref_40_WindowSizeControl.hpp"
