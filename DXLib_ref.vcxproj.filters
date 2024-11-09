@@ -15,132 +15,132 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DXLib_ref_03_GraphHandle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_03_GraphHandle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_04_LightHandle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_04_LightHandle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_05_FontHandle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_05_FontHandle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_06_MV1Handle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_06_MV1Handle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_07_EffekseerEffectHandle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_07_EffekseerEffectHandle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_08_Etc.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_08_Etc.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_10_Option.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_09_KeyControl.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_20_Debug.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_10_Option.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_100_PostPass.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_11_FileControl.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_101_sequence.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_12_Draw2DSystem.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="json.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_20_Debug.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_30_Box2D.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_00_Util.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_40_WindowSizeControl.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_01_Algorithm.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_100_PostPass.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_02_SoundHandle.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_101_sequence.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_09_KeyControl.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_102_ObjectManager.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_30_Box2D.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_103_ObjectBase.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_102_ObjectManager.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\json.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_103_ObjectBase.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_40_WindowSizeControl.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_00_Util.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_11_FileControl.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_01_Algorithm.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DXLib_ref_12_Draw2DSystem.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Souece\DXLib_ref_02_SoundHandle.hpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DXLib_ref.cpp">
+    <ClCompile Include="Souece\DXLib_ref.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_00_Util.cpp">
+    <ClCompile Include="Souece\DXLib_ref_00_Util.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_20_Debug.cpp">
+    <ClCompile Include="Souece\DXLib_ref_02_SoundHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_07_EffekseerEffectHandle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_03_GraphHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_04_LightHandle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_04_LightHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_05_FontHandle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_05_FontHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_06_MV1Handle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_06_MV1Handle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_101_sequence.cpp">
+    <ClCompile Include="Souece\DXLib_ref_07_EffekseerEffectHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_08_Etc.cpp">
+    <ClCompile Include="Souece\DXLib_ref_08_Etc.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_10_Option.cpp">
+    <ClCompile Include="Souece\DXLib_ref_09_KeyControl.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_100_PostPass.cpp">
+    <ClCompile Include="Souece\DXLib_ref_10_Option.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_02_SoundHandle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_11_FileControl.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_03_GraphHandle.cpp">
+    <ClCompile Include="Souece\DXLib_ref_12_Draw2DSystem.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_09_KeyControl.cpp">
+    <ClCompile Include="Souece\DXLib_ref_20_Debug.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_30_Box2D.cpp">
+    <ClCompile Include="Souece\DXLib_ref_30_Box2D.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_102_ObjectManager.cpp">
+    <ClCompile Include="Souece\DXLib_ref_40_WindowSizeControl.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_103_ObjectBase.cpp">
+    <ClCompile Include="Souece\DXLib_ref_100_PostPass.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_40_WindowSizeControl.cpp">
+    <ClCompile Include="Souece\DXLib_ref_101_sequence.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_11_FileControl.cpp">
+    <ClCompile Include="Souece\DXLib_ref_102_ObjectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DXLib_ref_12_Draw2DSystem.cpp">
+    <ClCompile Include="Souece\DXLib_ref_103_ObjectBase.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

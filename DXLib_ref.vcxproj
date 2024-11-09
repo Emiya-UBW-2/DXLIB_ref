@@ -18,6 +18,52 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Souece\DXLib_ref.h" />
+    <ClInclude Include="Souece\DXLib_ref_00_Util.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_01_Algorithm.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_02_SoundHandle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_03_GraphHandle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_04_LightHandle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_05_FontHandle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_06_MV1Handle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_07_EffekseerEffectHandle.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_08_Etc.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_09_KeyControl.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_100_PostPass.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_101_sequence.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_102_ObjectManager.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_103_ObjectBase.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_10_Option.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_11_FileControl.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_12_Draw2DSystem.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_20_Debug.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_30_Box2D.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_40_WindowSizeControl.hpp" />
+    <ClInclude Include="Souece\json.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Souece\DXLib_ref.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_00_Util.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_02_SoundHandle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_03_GraphHandle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_04_LightHandle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_05_FontHandle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_06_MV1Handle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_07_EffekseerEffectHandle.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_08_Etc.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_09_KeyControl.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_100_PostPass.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_101_sequence.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_102_ObjectManager.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_103_ObjectBase.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_10_Option.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_11_FileControl.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_12_Draw2DSystem.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_20_Debug.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_30_Box2D.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_40_WindowSizeControl.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{F75A46BF-2B66-43E2-8067-F68B6600275D}</ProjectGuid>
@@ -169,52 +215,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="DXLib_ref_11_FileControl.hpp" />
-    <ClInclude Include="DXLib_ref_12_Draw2DSystem.hpp" />
-    <ClInclude Include="DXLib_ref_40_WindowSizeControl.hpp" />
-    <ClInclude Include="DXLib_ref.h" />
-    <ClInclude Include="DXLib_ref_00_Util.hpp" />
-    <ClInclude Include="DXLib_ref_01_Algorithm.hpp" />
-    <ClInclude Include="DXLib_ref_02_SoundHandle.hpp" />
-    <ClInclude Include="DXLib_ref_03_GraphHandle.hpp" />
-    <ClInclude Include="DXLib_ref_04_LightHandle.hpp" />
-    <ClInclude Include="DXLib_ref_05_FontHandle.hpp" />
-    <ClInclude Include="DXLib_ref_06_MV1Handle.hpp" />
-    <ClInclude Include="DXLib_ref_07_EffekseerEffectHandle.hpp" />
-    <ClInclude Include="DXLib_ref_08_Etc.hpp" />
-    <ClInclude Include="DXLib_ref_09_KeyControl.hpp" />
-    <ClInclude Include="DXLib_ref_100_PostPass.hpp" />
-    <ClInclude Include="DXLib_ref_101_sequence.hpp" />
-    <ClInclude Include="DXLib_ref_102_ObjectManager.hpp" />
-    <ClInclude Include="DXLib_ref_103_ObjectBase.hpp" />
-    <ClInclude Include="DXLib_ref_10_Option.hpp" />
-    <ClInclude Include="DXLib_ref_20_Debug.hpp" />
-    <ClInclude Include="DXLib_ref_30_Box2D.hpp" />
-    <ClInclude Include="json.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="DXLib_ref_11_FileControl.cpp" />
-    <ClCompile Include="DXLib_ref_12_Draw2DSystem.cpp" />
-    <ClCompile Include="DXLib_ref_40_WindowSizeControl.cpp" />
-    <ClCompile Include="DXLib_ref.cpp" />
-    <ClCompile Include="DXLib_ref_00_Util.cpp" />
-    <ClCompile Include="DXLib_ref_02_SoundHandle.cpp" />
-    <ClCompile Include="DXLib_ref_03_GraphHandle.cpp" />
-    <ClCompile Include="DXLib_ref_04_LightHandle.cpp" />
-    <ClCompile Include="DXLib_ref_05_FontHandle.cpp" />
-    <ClCompile Include="DXLib_ref_06_MV1Handle.cpp" />
-    <ClCompile Include="DXLib_ref_07_EffekseerEffectHandle.cpp" />
-    <ClCompile Include="DXLib_ref_08_Etc.cpp" />
-    <ClCompile Include="DXLib_ref_09_KeyControl.cpp" />
-    <ClCompile Include="DXLib_ref_100_PostPass.cpp" />
-    <ClCompile Include="DXLib_ref_101_sequence.cpp" />
-    <ClCompile Include="DXLib_ref_102_ObjectManager.cpp" />
-    <ClCompile Include="DXLib_ref_103_ObjectBase.cpp" />
-    <ClCompile Include="DXLib_ref_10_Option.cpp" />
-    <ClCompile Include="DXLib_ref_20_Debug.cpp" />
-    <ClCompile Include="DXLib_ref_30_Box2D.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
