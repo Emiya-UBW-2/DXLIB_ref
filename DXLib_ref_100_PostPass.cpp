@@ -11,11 +11,6 @@ namespace DXLibRef {
 		ShaderUseClass		m_ShaderBlur;										// シェーダー
 		GraphHandle SSRScreen;		// 描画スクリーン
 		GraphHandle SSRScreen2;		// 描画スクリーン
-		float INTENSITY = 1.0f;
-		float SCALE = 0.f;
-		float BIAS = 0.33f;
-		float SAMPLE_RAD = 4.5f;
-		float MAX_DISTANCE = 1500.0f;
 	public:
 		void Load_Sub(void) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
@@ -42,26 +37,6 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
 			auto* DrawParts = DXDraw::Instance();
-#if defined(DEBUG) && FALSE
-			switch (GetInputChar(TRUE)) {
-			case 'r': INTENSITY += 1.f; break;
-			case 'f': INTENSITY -= 1.f; break;
-			case 't': SCALE += 0.1f; break;
-			case 'g': SCALE -= 0.1f; break;
-			case 'y': BIAS += 0.1f; break;
-			case 'h': BIAS -= 0.1f; break;
-			case 'u': SAMPLE_RAD += 1.f; break;
-			case 'j': SAMPLE_RAD -= 1.f; break;
-			case 'i': MAX_DISTANCE += 100.f; break;
-			case 'k': MAX_DISTANCE -= 100.f; break;
-			default:break;
-			}
-			printfDx("INTENSITY    %f\n", INTENSITY);
-			printfDx("SCALE        %f\n", SCALE);
-			printfDx("BIAS         %f\n", BIAS);
-			printfDx("SAMPLE_RAD   %f\n", SAMPLE_RAD);
-			printfDx("MAX_DISTANCE %f\n", MAX_DISTANCE);
-#endif // DEBUG
 			// SSRシェーダーを適用
 			SSRScreen2.SetDraw_Screen(false);
 			{
@@ -69,8 +44,7 @@ namespace DXLibRef {
 				NormalPtr->SetUseTextureToShader(1);
 				DepthPtr->SetUseTextureToShader(2);
 				m_ShaderSSAO.SetPixelDispSize(DrawParts->GetScreenXMax(), DrawParts->GetScreenYMax());
-				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), INTENSITY);
-				m_ShaderSSAO.SetPixelParam(4, SCALE, BIAS, SAMPLE_RAD, MAX_DISTANCE);
+				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(DrawParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 
 				m_ShaderSSAO.Draw(m_ScreenVertex);
 
@@ -956,10 +930,10 @@ namespace DXLibRef {
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		// ポストエフェクト
 		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
-		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
 		m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
 		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
+		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
 		m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
 		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
 		m_PostPass.emplace_back(std::make_unique<PostPassMotionBlur>());
