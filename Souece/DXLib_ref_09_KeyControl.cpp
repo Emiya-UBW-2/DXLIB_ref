@@ -202,13 +202,13 @@ namespace DXLibRef {
 		break;
 		case ControlType::PC:
 		{
-			// 視点移動は前フレームからの移動量
-			Look_XradAdd = static_cast<float>(MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-			Look_YradAdd = -static_cast<float>(MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 			//マウスによる入力(FPS、TPS)の場合
 			if (m_MouseMoveEnable) {
 				//最前面でポーズ中でない場合
 				if ((GetMainWindowHandle() == GetForegroundWindow()) && !SceneParts->IsPause()) {
+					// 視点移動は前フレームからの移動量
+					Look_XradAdd = static_cast<float>(MouseX - BaseScreenWidth / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					Look_YradAdd = -static_cast<float>(MouseY - BaseScreenHeight / 2) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					//移動をリセット
 					SetMousePoint(BaseScreenWidth / 2, BaseScreenHeight / 2);
 					//マウスを表示しない
@@ -223,6 +223,9 @@ namespace DXLibRef {
 				}
 			}
 			else {
+				// 視点移動は前フレームからの移動量
+				Look_XradAdd = static_cast<float>(MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+				Look_YradAdd = -static_cast<float>(MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				//マウスを表示
 				SetMouseDispFlag(TRUE);
 			}
