@@ -4,13 +4,12 @@
 namespace DXLibRef {
 	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
 	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
+	const KeyGuide* SingletonBase<KeyGuide>::m_Singleton = nullptr;
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
 	// 
 	namespace WindowSystem {
 		void DrawData::Output() const noexcept {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			Rect2D Widow; Widow.Set(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
-
 			switch (m_type) {
 			case DrawType::Alpha:
 				if (this->m_intParam.at(0) < 255) {
@@ -27,71 +26,66 @@ namespace DXLibRef {
 				SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
 				break;
 			case DrawType::Box:
-			{
-				Rect2D One; One.Set(std::min(this->m_intParam.at(0), this->m_intParam.at(2)), std::min(this->m_intParam.at(1), this->m_intParam.at(3)),
-					std::abs(this->m_intParam.at(0) - this->m_intParam.at(2)), std::abs(this->m_intParam.at(1) - this->m_intParam.at(3)));
-				if (Widow.IsHit(One)) {
-					DxLib::DrawBox(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
-				}
-			}
-			break;
-			case DrawType::Quadrangle:
-			{
-				DxLib::DrawQuadrangle(
-					this->m_intParam.at(0), this->m_intParam.at(1),
-					this->m_intParam.at(2), this->m_intParam.at(3),
-					this->m_intParam.at(4), this->m_intParam.at(5),
-					this->m_intParam.at(6), this->m_intParam.at(7),
+				DxLib::DrawBox(
+					WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+					WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
 					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
-			}
-			break;
+				break;
+			case DrawType::Quadrangle:
+				DxLib::DrawQuadrangle(
+					WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+					WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
+					WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+					WindowSizeParts->GetUIY(this->m_intParam.at(6)), WindowSizeParts->GetUIY(this->m_intParam.at(7)),
+					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
+				break;
 			case DrawType::Circle:
-			{
-				Rect2D One; One.Set(this->m_intParam.at(0) - this->m_intParam.at(2) / 2, this->m_intParam.at(1) - this->m_intParam.at(2) / 2,
-					this->m_intParam.at(2) * 2, this->m_intParam.at(2) * 2);
-				if (Widow.IsHit(One)) {
-					DxLib::DrawCircle(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE, this->m_intParam.at(3));
-				}
-			}
-			break;
+				DxLib::DrawCircle(
+					WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)),
+					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE,
+					(this->m_intParam.at(3) >= 2) ? WindowSizeParts->GetUIY(this->m_intParam.at(3)) : this->m_intParam.at(3));
+				break;
 			case DrawType::Line:
-			{
-				Rect2D One; One.Set(std::min(this->m_intParam.at(0), this->m_intParam.at(2)), std::min(this->m_intParam.at(1), this->m_intParam.at(3)),
-					std::abs(this->m_intParam.at(0) - this->m_intParam.at(2)), std::abs(this->m_intParam.at(1) - this->m_intParam.at(3)));
-				if (Widow.IsHit(One)) {
-					DxLib::DrawLine(m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_UintParam.at(0), this->m_intParam.at(4));
-				}
-			}
-			break;
+				DxLib::DrawLine(WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_UintParam.at(0),
+					(this->m_intParam.at(4) >= 2) ? WindowSizeParts->GetUIY(this->m_intParam.at(4)) : this->m_intParam.at(4));
+				break;
 			case DrawType::String:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0), this->m_intParam.at(1), 3)->DrawString(
-					InvalidID,
-					(FontHandle::FontXCenter)m_intParam.at(2), (FontHandle::FontYCenter)m_intParam.at(3),
-					m_intParam.at(4), this->m_intParam.at(5),
-					m_UintParam.at(0),
-					m_UintParam.at(1),
-					m_string.c_str()
-				);
+				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0),
+					WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawString(
+						InvalidID,
+						(FontHandle::FontXCenter)m_intParam.at(2), (FontHandle::FontYCenter)m_intParam.at(3),
+						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+						m_UintParam.at(0),
+						m_UintParam.at(1),
+						m_string.c_str()
+					);
 				break;
 			case DrawType::StringAutoFit:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0), this->m_intParam.at(1), 3)->DrawStringAutoFit(
-					m_intParam.at(2), m_intParam.at(3),
-					m_intParam.at(4), this->m_intParam.at(5),
-					m_UintParam.at(0),
-					m_UintParam.at(1),
-					m_string.c_str()
-				);
+				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0),
+					WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawStringAutoFit(
+						WindowSizeParts->GetUIY(m_intParam.at(2)), WindowSizeParts->GetUIY(m_intParam.at(3)),
+						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+						m_UintParam.at(0),
+						m_UintParam.at(1),
+						m_string.c_str()
+					);
 				break;
 			case DrawType::RotaGraph:
 				if (m_GraphHandleParam.at(0)) {
-					if (m_floatParam.at(0) < 0.9f && 1.1f < this->m_floatParam.at(0)) {
+					float Scale = (float)(WindowSizeParts->GetUIY((int)(this->m_floatParam.at(0) * 100))) / 100.f;
+
+					if (Scale < 0.95f && 1.05f < Scale) {
 						auto prev = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
-						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_boolParam.at(0));
+						m_GraphHandleParam.at(0)->DrawRotaGraph(
+							WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+							Scale, this->m_floatParam.at(1), this->m_boolParam.at(0));
 						SetDrawMode(prev);
 					}
 					else {
-						m_GraphHandleParam.at(0)->DrawRotaGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_boolParam.at(0));
+						m_GraphHandleParam.at(0)->DrawRotaGraph(
+							WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+							Scale, this->m_floatParam.at(1), this->m_boolParam.at(0));
 					}
 				}
 				break;
@@ -99,17 +93,17 @@ namespace DXLibRef {
 				if (m_GraphHandleParam.at(0)) {
 					auto prev = GetDrawMode();
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
-					m_GraphHandleParam.at(0)->DrawExtendGraph(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2), this->m_intParam.at(3), this->m_boolParam.at(0));
+					m_GraphHandleParam.at(0)->DrawExtendGraph(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_boolParam.at(0));
 					SetDrawMode(prev);
 				}
 				break;
 			case DrawType::CircleGauge:
 				if (m_GraphHandleParam.at(0)) {
-					DrawCircleGauge(this->m_intParam.at(0), this->m_intParam.at(1),
+					DrawCircleGauge(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 						(double)this->m_floatParam.at(0),
 						m_GraphHandleParam.at(0)->get(),
 						(double)this->m_floatParam.at(1),
-						(double)this->m_floatParam.at(2));
+						(double)(this->m_floatParam.at(2) * (float)(WindowSizeParts->GetUIY(100)) / 100.f));
 				}
 				break;
 			default:
@@ -124,8 +118,7 @@ namespace DXLibRef {
 			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
-			auto* WindowSizeParts = WindowSizeControl::Instance();
-			return HitRectangleToRectangle(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
+			return HitRectangleToRectangle(0, 0, BaseScreenWidth, BaseScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
 		}
 		// 箱
 		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
@@ -138,31 +131,8 @@ namespace DXLibRef {
 			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
 			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
 		};
-		// 文字
-		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept {
-			auto* WindowSizeParts = WindowSizeControl::Instance();
-			switch (FontX) {
-			case FontHandle::FontXCenter::LEFT:
-				*xp1 = *xp1 + WindowSizeParts->GetUIY(6);
-				return HitRectangleToRectangle(
-					(*xp1), (*yp1 - ySize / 2), (*xp1 + xSize), (*yp1 + ySize / 2),
-					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
-			case FontHandle::FontXCenter::MIDDLE:
-				return HitRectangleToRectangle(
-					(*xp1 - xSize / 2), (*yp1 - ySize / 2), (*xp1 + xSize / 2), (*yp1 + ySize),
-					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
-			case FontHandle::FontXCenter::RIGHT:
-				*xp1 = *xp1 - WindowSizeParts->GetUIY(6);
-				return HitRectangleToRectangle(
-					(*xp1 - xSize), (*yp1 - ySize / 2), (*xp1), (*yp1 + ySize / 2),
-					0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax());
-			default:
-				return false;
-			}
-		};
 		// オンオフできるボタン
 		bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
-			auto* WindowSizeParts = WindowSizeControl::Instance();
 			int xp3 = xp1 + EdgeSize;
 			int yp3 = yp1 + EdgeSize;
 			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
@@ -176,7 +146,7 @@ namespace DXLibRef {
 				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
-			int Edge = WindowSizeParts->GetUIY(5);
+			int Edge = (5);
 			SetBox(xp3 + Edge, yp3 + Edge, xp4 - Edge, yp4 - Edge, Black);
 			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
 			SetBox(xp3 + Edge, yp3 + Edge, xp4 + Edge, yp4 - Edge, Gray50);
@@ -237,22 +207,21 @@ namespace DXLibRef {
 		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
 	}
 	void SideLog::Draw(void) noexcept {
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		int xp1, yp1;
-		xp1 = WindowSizeParts->GetUIY(64);
-		yp1 = WindowSizeParts->GetUIY(256);
+		xp1 = (64);
+		yp1 = (256);
 
 		{
-			int yp = yp1 - WindowSizeParts->GetUIY(static_cast<int>(24.f * 0.f));
+			int yp = yp1 - (static_cast<int>(24.f * 0.f));
 			if (SelYadd > 0.f) {
 				float per = std::clamp(SelYadd / 5.f, 0.f, 1.f);
 				float per2 = 1.f - std::clamp(SelYadd / 10.f, 0.f, 1.f);
 				DrawCtrls->SetAdd(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
 				DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
 					&this->m_SelectBackImage,
-					xp1 + WindowSizeParts->GetUIY(200 / 2) - (int)((float)(WindowSizeParts->GetUIY(150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
-					xp1 + WindowSizeParts->GetUIY(200 / 2) + (int)((float)(WindowSizeParts->GetUIY(150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),
+					xp1 + (200 / 2) - (int)((float)((150)) * per2), yp + LineHeight / 2 - (int)((float)(LineHeight * 4) * per2),
+					xp1 + (200 / 2) + (int)((float)((150)) * per2), yp + LineHeight / 2 + (int)((float)(LineHeight * 4) * per2),
 					true);
 			}
 		}
@@ -260,10 +229,10 @@ namespace DXLibRef {
 		for (auto& d : data) {
 			if (d.ActivePer() > 0.f) {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
-				int yp = yp1 - WindowSizeParts->GetUIY(static_cast<int>(24.f * d.GetFlip()));
+				int yp = yp1 - (static_cast<int>(24.f * d.GetFlip()));
 				WindowSystem::SetBox(
-					xp1 - WindowSizeParts->GetUIY(6), yp + LineHeight,
-					xp1 - WindowSizeParts->GetUIY(6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), WindowSizeParts->GetUIY(200))) * d.ActivePer()), yp + LineHeight + WindowSizeParts->GetUIY(5),
+					xp1 - (6), yp + LineHeight,
+					xp1 - (6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), (200))) * d.ActivePer()), yp + LineHeight + (5),
 					Black);
 				WindowSystem::SetMsg(static_cast<int>(xp1), static_cast<int>(yp) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, d.GetMsgColor(), Black, d.GetMsg());
 			}
@@ -273,14 +242,15 @@ namespace DXLibRef {
 	// 
 	void PopUp::PopUpDrawClass::Start(void) noexcept {
 		auto* SE = SoundPool::Instance();
-		auto* Pad = PadControl::Instance();
+		auto* KeyGuideParts = KeyGuide::Instance();
 
-		Pad->SetGuideUpdate();
-		Pad->ChangeGuide(
+		KeyGuideParts->SetGuideFlip();
+		KeyGuideParts->ChangeGuide(
 			[this]() {
 				auto* Pad = PadControl::Instance();
+				auto* KeyGuideParts = KeyGuide::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
-				Pad->AddGuide(PADS::RELOAD, LocalizeParts->Get(9991));
+				KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::RELOAD).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9991));
 				if (m_GuideDoing) {
 					m_GuideDoing();
 				}
@@ -293,12 +263,12 @@ namespace DXLibRef {
 	}
 	void PopUp::PopUpDrawClass::End(void) noexcept {
 		auto* SE = SoundPool::Instance();
-		auto* Pad = PadControl::Instance();
+		auto* KeyGuideParts = KeyGuide::Instance();
 
 		SE->Get(static_cast<int>(SoundEnumCommon::UI_CANCEL)).Play(0, DX_PLAYTYPE_BACK, TRUE);
 		m_Active = false;
 		m_ActiveSwitch = true;
-		Pad->SetGuideUpdate();
+		KeyGuideParts->SetGuideFlip();
 		if (m_ExitDoing) {
 			m_ExitDoing();
 		}
@@ -310,7 +280,7 @@ namespace DXLibRef {
 
 		if (m_Active) {
 			Pad->SetMouseMoveEnable(false);
-			if (Pad->GetKey(PADS::RELOAD).trigger()) {
+			if (Pad->GetPadsInfo(PADS::RELOAD).GetKey().trigger()) {
 				End();
 			}
 		}
@@ -318,14 +288,13 @@ namespace DXLibRef {
 	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
 		if (m_ActivePer < (1.f / 255.f)) { return; }
 
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 
-		int xm1 = xcenter - WindowSizeParts->GetUIY(WinSizeX) / 2;
-		int ym1 = ycenter - WindowSizeParts->GetUIY(WinSizeY) / 2;
-		int xm2 = xcenter + WindowSizeParts->GetUIY(WinSizeX) / 2;
-		int ym2 = ycenter + WindowSizeParts->GetUIY(WinSizeY) / 2;
+		int xm1 = xcenter - (WinSizeX) / 2;
+		int ym1 = ycenter - (WinSizeY) / 2;
+		int xm2 = xcenter + (WinSizeX) / 2;
+		int ym2 = ycenter + (WinSizeY) / 2;
 
 		// 背景
 		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
@@ -335,21 +304,21 @@ namespace DXLibRef {
 
 		// タイトル
 		WindowSystem::SetMsg(
-			xm1 + WindowSizeParts->GetUIY(32), ym1 + LineHeight / 4 + LineHeight,
+			xm1 + (32), ym1 + LineHeight / 4 + LineHeight,
 			LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
 		// 
 		if (m_Active) {
-			int xp1 = xm2 - WindowSizeParts->GetUIY(140);
+			int xp1 = xm2 - (140);
 			int yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + WindowSizeParts->GetUIY(5), xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2 - WindowSizeParts->GetUIY(5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
+			if (WindowSystem::SetMsgClickBox(xp1, yp1 + (5), xp1 + (108), yp1 + LineHeight * 2 - (5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
 				End();
 			}
 		}
 		// 背景
 		{
-			int xp1 = xm1 + WindowSizeParts->GetUIY(24);
+			int xp1 = xm1 + (24);
 			int yp1 = ym1 + LineHeight * 3;
-			int xp2 = xm2 - WindowSizeParts->GetUIY(24);
+			int xp2 = xm2 - (24);
 			int yp2 = ym2 - LineHeight;
 			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
 			WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
@@ -402,6 +371,95 @@ namespace DXLibRef {
 					auto* SceneParts = SceneControl::Instance();
 					SceneParts->ChangePause(false);
 				}
+			}
+		}
+	}
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
+	int KeyGuide::KeyGuideGraph::GetDrawSize(void) const noexcept {
+		return (xsize * 24 / ysize) + 3;
+	}
+	int KeyGuide::KeyGuideGraph::Draw(int x, int y) const noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
+			&GuideImg, x, y, x + (xsize * 24 / ysize), y + 24, true);
+		return GetDrawSize();
+	}
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
+	int KeyGuide::KeyGuideOnce::GetDrawSize(void) const noexcept {
+		int ofs = (m_GuideGraph) ? m_GuideGraph->GetDrawSize() : 0;
+		if (GuideString != "") {
+			ofs += FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(InvalidID, GuideString) + 12;
+		}
+		return ofs;
+	}
+	int KeyGuide::KeyGuideOnce::Draw(int x, int y) const noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		int ofs = (m_GuideGraph) ? m_GuideGraph->Draw(x, y) : 0;
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+			LineHeight, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE,
+			x + ofs, y + 24 / 2,
+			White, Black, GuideString);
+		return GetDrawSize();
+	}
+	// --------------------------------------------------------------------------------------------------
+	// 
+	// --------------------------------------------------------------------------------------------------
+	KeyGuide::KeyGuide(void) noexcept {
+		SetGuideFlip();
+		m_GuideBaseImage.Load("CommonData/key/OutputFont.png");
+		{
+			int count = 0;
+			FileStreamDX FileStream("CommonData/key/OutputFont.psf");
+			while (true) {
+				if (FileStream.ComeEof()) { break; }
+				auto ALL = FileStream.SeekLineAndGetStr();
+				if (ALL == "") { continue; }
+				//=の右側の文字をカンマ区切りとして識別する
+				auto RIGHT = FileStreamDX::getright(ALL);
+				std::vector<int> Args;
+				while (true) {
+					auto div = RIGHT.find(",");
+					if (div != std::string::npos) {
+						Args.emplace_back(std::stoi(RIGHT.substr(0, div)));
+						RIGHT = RIGHT.substr(div + 1);
+					}
+					else {
+						Args.emplace_back(std::stoi(RIGHT));
+						break;
+					}
+				}
+				//得た情報をもとに分割した画像を得る
+				m_DerivationGuideImage.emplace_back(std::make_shared<KeyGuideGraph>());
+				m_DerivationGuideImage.back()->AddGuide(Args.at(0), Args.at(1), Args.at(2), Args.at(3), m_GuideBaseImage);
+				++count;
+			}
+		}
+	}
+	void KeyGuide::ChangeGuide(std::function<void()>Guide_Pad) noexcept {
+		if (m_IsFlipGuide) {
+			m_IsFlipGuide = false;
+			Dispose();
+			// 絶対出すガイド
+			auto* Pad = PadControl::Instance();
+			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::Escape).GetAssign(), ControlType::PC), "終了");
+			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::INVENTORY).GetAssign(), Pad->GetControlType()), "ポーズ");
+			// 追加のガイド
+			Guide_Pad();
+		}
+	}
+	void KeyGuide::Draw(void) const noexcept {
+		int xp = 0;
+		int y = BaseScreenHeight - (21 + 16);
+		for (const auto& k : m_Key) {
+			xp += k->Draw(32 + xp, y);
+			//次の行へ移行
+			if (xp > BaseScreenWidth / 2) {
+				xp = 0;
+				y -= 28;
 			}
 		}
 	}

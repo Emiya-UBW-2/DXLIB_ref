@@ -15,6 +15,7 @@ namespace DXLibRef {
 		std::vector<std::array<float, PointMax + 1>>							m_Point;
 		size_t																	m_PointSel{ 0 };
 		switchs																	m_Switch;
+		bool																	m_IsActive{ true };
 	private:
 		DebugClass(void) noexcept;
 		DebugClass(const DebugClass&) = delete;

@@ -10,11 +10,11 @@ namespace DXLibRef {
 
 	DebugClass::DebugClass(void) noexcept {
 		m_Point.resize(static_cast<size_t>(PointFrame + 1));
-		m_Switch.Set(true);
+		m_IsActive = true;
 	}
 
 	void DebugClass::SetStartPoint(void) noexcept {
-		if (!m_Switch.on()) {
+		if (!m_IsActive) {
 			return;
 		}
 		m_StartTime = GetNowHiPerformanceCount();
@@ -22,7 +22,7 @@ namespace DXLibRef {
 		SetPoint("-----Start-----");
 	}
 	void DebugClass::SetPoint(const char* DebugMes) noexcept {
-		if (!m_Switch.on()) {
+		if (!m_IsActive) {
 			return;
 		}
 		if (m_PointSel < PointMax) {
@@ -34,8 +34,11 @@ namespace DXLibRef {
 	}
 	void DebugClass::SetEndPoint(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		m_Switch.Execute(CheckHitKeyWithCheck(KEY_INPUT_F1) != 0);
-		if (!m_Switch.on()) {
+		m_Switch.Update(CheckHitKey(KEY_INPUT_F1) != 0);
+		if (m_Switch.trigger()) {
+			m_IsActive ^= 1;
+		}
+		if (!m_IsActive) {
 			return;
 		}
 		auto PMax = PointMax + 1;
@@ -68,10 +71,9 @@ namespace DXLibRef {
 	}
 
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* OptionParts = OPTION::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		if (!m_Switch.on()) {
+		if (!m_IsActive) {
 			return;
 		}
 		const unsigned int Colors[PointMax + 1] = {
@@ -91,8 +93,8 @@ namespace DXLibRef {
 		};
 		auto PMax = PointMax + 1;
 		{
-			const int wide = WindowSizeParts->GetUIY(340);
-			const int height = WindowSizeParts->GetUIY(360);
+			const int wide = (340);
+			const int height = (360);
 			const int border = height * 2 / 3;
 			// ”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
@@ -134,14 +136,14 @@ namespace DXLibRef {
 			ypos += height;
 		}
 		{
-			const int wide = WindowSizeParts->GetUIY(350);
-			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + WindowSizeParts->GetUIY(10);
+			const int wide = (350);
+			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + (10);
 			// ”wŒi
 			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
 			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
 
-			xpos += WindowSizeParts->GetUIY(2);
-			ypos += WindowSizeParts->GetUIY(2);
+			xpos += (2);
+			ypos += (2);
 			int i = 0;
 			// “à—e
 			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());

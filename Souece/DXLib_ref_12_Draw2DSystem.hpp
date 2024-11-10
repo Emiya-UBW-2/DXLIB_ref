@@ -1,8 +1,8 @@
 #pragma once
 #include "DXLib_ref.h"
 // リサイズ
-#define EdgeSize	WindowSizeControl::Instance()->GetUIY(2)
-#define LineHeight	WindowSizeControl::Instance()->GetUIY(18)
+constexpr auto EdgeSize = (2);
+constexpr auto LineHeight = (18);
 
 namespace DXLibRef {
 
@@ -494,7 +494,7 @@ namespace DXLibRef {
 				Back->InputintParam(4, Thickness);
 			}
 			// 
-			void SetDrawRotaGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int posx, int posy, float Exrate, float rad, bool trns) noexcept {
+			void	SetDrawRotaGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int posx, int posy, float Exrate, float rad, bool trns) noexcept {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::RotaGraph);
 				Back->InputGraphHandleParam(0, pGraphHandle);
@@ -504,8 +504,7 @@ namespace DXLibRef {
 				Back->InputfloatParam(1, rad);
 				Back->InputboolParam(0, trns);
 			}
-			// 
-			void SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int x1, int y1, int x2, int y2, bool trns) noexcept {
+			void	SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int x1, int y1, int x2, int y2, bool trns) noexcept {
 				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// 画面外は表示しない
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::ExtendGraph);
@@ -517,21 +516,10 @@ namespace DXLibRef {
 				Back->InputboolParam(0, trns);
 			}
 			// 
-			void SetDrawCircleGauge(DrawLayer Layer, const GraphHandle* pGraphHandle, int   CenterX, int   CenterY, float Percent, float StartPercent = 0.f, float Scale = 1.0f) noexcept {
-				DrawData* Back = GetBack(Layer);
-				Back->InputType(DrawType::CircleGauge);
-				Back->InputGraphHandleParam(0, pGraphHandle);
-				Back->InputintParam(0, CenterX);
-				Back->InputintParam(1, CenterY);
-				Back->InputfloatParam(0, Percent);
-				Back->InputfloatParam(1, StartPercent);
-				Back->InputfloatParam(2, Scale);
-			}
-			// 
 			template <typename... Args>
 			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
 				if (Str == "") { return; }
-				int xSize = WindowSystem::GetMsgLen(fontSize, Str.c_str(), args...);
+				int xSize = FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, fontSize, 3)->GetStringWidth(InvalidID, Str.c_str(), args...);
 				switch (FontX) {
 				case FontHandle::FontXCenter::LEFT:
 					if (!IsDrawOnWindow((x), (y - fontSize), (x + xSize), (y + fontSize))) { return; }				// 画面外は表示しない
@@ -549,10 +537,10 @@ namespace DXLibRef {
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::String);
 
-				Back->InputintParam(0, static_cast<int>(type));
+				Back->InputintParam(0, (int)type);
 				Back->InputintParam(1, fontSize);
-				Back->InputintParam(2, static_cast<int>(FontX));
-				Back->InputintParam(3, static_cast<int>(FontY));
+				Back->InputintParam(2, (int)FontX);
+				Back->InputintParam(3, (int)FontY);
 				Back->InputintParam(4, x);
 				Back->InputintParam(5, y);
 				Back->InputUintParam(0, Color);
@@ -567,8 +555,7 @@ namespace DXLibRef {
 				if (Str == "") { return 0.f; }
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::StringAutoFit);
-
-				Back->InputintParam(0, static_cast<int>(type));
+				Back->InputintParam(0, (int)type);
 				Back->InputintParam(1, fontSize);
 				Back->InputintParam(2, x1);
 				Back->InputintParam(3, y1);
@@ -576,9 +563,7 @@ namespace DXLibRef {
 				Back->InputintParam(5, y2);
 				Back->InputUintParam(0, Color);
 				Back->InputUintParam(1, EdgeColor);
-
 				Back->InputStringParam(Str);
-
 				return FontPool::Instance()->Get((FontPool::FontType)type, fontSize, 3)->DrawStringAutoFit(
 					x1 + BaseScreenWidth, y1 + BaseScreenHeight,
 					x2 + BaseScreenWidth, y2 + BaseScreenHeight,
@@ -586,6 +571,17 @@ namespace DXLibRef {
 					EdgeColor,
 					Str
 				);
+			}
+			// 
+			void SetDrawCircleGauge(DrawLayer Layer, const GraphHandle* pGraphHandle, int   CenterX, int   CenterY, float Percent, float StartPercent = 0.f, float Scale = 1.0f) noexcept {
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::CircleGauge);
+				Back->InputGraphHandleParam(0, pGraphHandle);
+				Back->InputintParam(0, CenterX);
+				Back->InputintParam(1, CenterY);
+				Back->InputfloatParam(0, Percent);
+				Back->InputfloatParam(1, StartPercent);
+				Back->InputfloatParam(2, Scale);
 			}
 			// 
 		public:
@@ -649,13 +645,10 @@ namespace DXLibRef {
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
 		// マウスでクリックできるボタン
 		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
-		// 文字
-		bool GetMsgPosOn(int* xp1, int* yp1, int ySize, int xSize, FontHandle::FontXCenter FontX) noexcept;
 		// 文字の長さを取得
 		template <typename... Args>
 		extern void SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
 			if (String == "") { return; }
-			//if (!GetMsgPosOn(&xp1, &yp1, ySize, GetMsgLen(ySize, String, args...), FontX)) { return; }
 			DrawControl::Instance()->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, ySize,
 				FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
 		}
@@ -706,7 +699,7 @@ namespace DXLibRef {
 							m_NowScrollYPer = std::clamp(m_NowScrollYPer + static_cast<float>(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
-					if (IntoMouse(xp2 - WindowSizeParts->GetUIY(24), yp1, xp2, yp2))
+					if (IntoMouse(xp2 - (24), yp1, xp2, yp2))
 		{
 						if (Pad->GetINTERACTKey().trigger())
 		{
@@ -746,8 +739,8 @@ namespace DXLibRef {
 						}
 					}
 				}
-				SetBox(xp2 - WindowSizeParts->GetUIY(24), yp1, xp2, yp2, Gray50);
-				SetBox(xp2 - WindowSizeParts->GetUIY(24) + WindowSizeParts->GetUIY(1), Yp_s, xp2 - WindowSizeParts->GetUIY(1), Yp_e, color);
+				SetBox(xp2 - (24), yp1, xp2, yp2, Gray50);
+				SetBox(xp2 - (24) + (1), Yp_s, xp2 - (1), Yp_e, color);
 			}
 		}
 		//*/
@@ -908,5 +901,124 @@ namespace DXLibRef {
 			}
 			que.at(static_cast<size_t>(NowSel)).Draw(xcenter, ycenter);
 		}
+	};
+
+	// --------------------------------------------------------------------------------------------------
+	// キーガイド
+	// --------------------------------------------------------------------------------------------------
+	class KeyGuide : public SingletonBase<KeyGuide> {
+	private:
+		friend class SingletonBase<KeyGuide>;
+	private:
+		// コンストラクタ
+		KeyGuide(void) noexcept;
+		// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
+		KeyGuide(const KeyGuide&) = delete;
+		KeyGuide(KeyGuide&& o) = delete;
+		KeyGuide& operator=(const KeyGuide&) = delete;
+		KeyGuide& operator=(KeyGuide&& o) = delete;
+		// デストラクタはシングルトンなので呼ばれません
+	private:
+		class KeyGuideGraph {
+			int xsize{ 0 }, ysize{ 0 };
+			GraphHandle GuideImg;
+		public:
+			KeyGuideGraph(void) noexcept {}
+			KeyGuideGraph(const KeyGuideGraph&) = delete;
+			KeyGuideGraph(KeyGuideGraph&& o) = delete;
+			KeyGuideGraph& operator=(const KeyGuideGraph&) = delete;
+			KeyGuideGraph& operator=(KeyGuideGraph&& o) = delete;
+
+			~KeyGuideGraph(void) noexcept {}
+		public:
+			void AddGuide(int x, int y, int xs, int ys, const GraphHandle& baseImage) noexcept {
+				GuideImg.DerivationGraph(x, y, xs, ys, baseImage);
+				xsize = xs;
+				ysize = ys;
+			}
+			void Dispose(void) noexcept { GuideImg.Dispose(); }
+			int GetDrawSize(void) const noexcept;
+			int Draw(int x, int y) const noexcept;
+		};
+		class KeyGuideOnce {
+			std::shared_ptr<KeyGuideGraph> m_GuideGraph;
+			std::string GuideString;
+		public:
+			KeyGuideOnce(void) noexcept {}
+			KeyGuideOnce(const KeyGuideOnce&) = delete;
+			KeyGuideOnce(KeyGuideOnce&& o) = delete;
+			KeyGuideOnce& operator=(const KeyGuideOnce&) = delete;
+			KeyGuideOnce& operator=(KeyGuideOnce&& o) = delete;
+
+			~KeyGuideOnce(void) noexcept {}
+		public:
+			void AddGuide(const std::shared_ptr<KeyGuideGraph>& pGuide, const std::string& GuideStr) noexcept {
+				m_GuideGraph = pGuide;
+				GuideString = GuideStr;
+			}
+			void Dispose(void) noexcept {
+				if (m_GuideGraph) {
+					m_GuideGraph.reset();
+				}
+				GuideString = "";
+			}
+			int GetDrawSize(void) const noexcept;
+			int Draw(int x, int y) const noexcept;
+		};
+	private:
+		bool													m_IsFlipGuide{ true };				// ガイドのコントロール
+		GraphHandle												m_GuideBaseImage;						//分割前の画像
+		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;	//分割後の画像
+		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;
+	public:
+		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }
+	public:
+		const int GetIDtoOffset(int ID, ControlType controlType) const noexcept {
+			switch (controlType) {
+			case ControlType::XBox:
+				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
+					if (XBoxID[i] == ID) {
+						return static_cast<int>(i + KeyNum + XBoxNum);
+					}
+				}
+				break;
+			case ControlType::PS4:
+				for (size_t i = 0; i < static_cast<size_t>(DS4Num); ++i) {
+					if (DS4ID[i] == ID) {
+						return static_cast<int>(i + KeyNum);
+					}
+				}
+				break;
+			case ControlType::PC:
+				for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
+					if (KeyID[i] == ID) {
+						return static_cast<int>(i);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			return InvalidID;
+		}
+		void ChangeGuide(std::function<void()>Guide_Pad) noexcept;
+		void AddGuide(int graphOffset, const std::string& GuideStr) noexcept {
+			m_Key.emplace_back(std::make_unique<KeyGuideOnce>());
+			m_Key.back()->AddGuide((graphOffset != InvalidID) ? m_DerivationGuideImage.at(graphOffset) : nullptr, GuideStr);
+		}
+		void Dispose(void) noexcept {
+			for (auto& k : m_Key) {
+				k->Dispose();
+				k.reset();
+			}
+			m_Key.clear();
+		}
+	public:
+		void Draw(void) const noexcept;
+		void DrawButton(int x, int y, int graphOffset) const noexcept {
+			m_DerivationGuideImage.at(graphOffset)->Draw(x, y);
+		}
+
+		int GetDrawSize(int graphOffset) const noexcept { return m_DerivationGuideImage.at(graphOffset)->GetDrawSize(); }
 	};
 }

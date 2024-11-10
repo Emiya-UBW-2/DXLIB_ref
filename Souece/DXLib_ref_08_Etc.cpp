@@ -54,30 +54,6 @@ namespace DXLibRef {
 		return screenPos;
 	}
 	// 
-	void			switchs::Execute(bool key) noexcept {
-		auto* DXLib_refParts = DXLib_ref::Instance();
-		m_press = key;
-		if (m_press) {
-			m_presscount = std::clamp<int8_t>(m_presscount + 1, 0, 2);
-
-			m_repeat = trigger();
-			m_repeatcount -= DXLib_refParts->GetDeltaTime();
-			if (m_repeatcount <= 0.f) {
-				m_repeatcount += 2.f / 60.f;
-				m_repeat = true;
-			}
-		}
-		else {
-			m_presscount = std::clamp<int8_t>(m_presscount - 1, 0, 2);
-
-			m_repeat = false;
-			m_repeatcount = 0.5f;
-		}
-		if (trigger()) {
-			m_on ^= 1;
-		}
-	}
-	// 
 	void			Pendulum2D::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * DXLib_refParts->GetDeltaTime();

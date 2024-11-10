@@ -124,6 +124,7 @@ namespace DXLibRef {
 	void SceneControl::DrawUICommon(void) const noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* SideLogParts = SideLog::Instance();
+		auto* KeyGuideParts = KeyGuide::Instance();
 		//
 		this->m_NowScenesPtr->DrawUI_Base();
 		// ポーズ描画を設定
@@ -132,11 +133,11 @@ namespace DXLibRef {
 		}
 		// FPS表示描画を設定
 		m_FPSDrawer.DrawFPSCounter();
-		PadControl::Instance()->Draw();
+		KeyGuideParts->Draw();
 		SideLogParts->Draw();
-		PopUp::Instance()->Draw(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
+		PopUp::Instance()->Draw(BaseScreenWidth / 2, WindowSizeParts->GetUIYMax() / 2);
 #if defined(DEBUG)
-		DebugClass::Instance()->DebugWindow(WindowSizeParts->GetUIXMax() - WindowSizeParts->GetUIY(350), WindowSizeParts->GetUIY(150));
+		DebugClass::Instance()->DebugWindow(BaseScreenWidth - (350), (150));
 #endif // DEBUG
 	}
 	void SceneControl::DrawUIFront(void) const noexcept {
@@ -148,8 +149,8 @@ namespace DXLibRef {
 		auto* PopUpParts = PopUp::Instance();
 		if (m_IsPauseActive != value) {
 			m_IsPauseActive = value;
-			auto* Pad = PadControl::Instance();
-			Pad->SetGuideUpdate();
+			auto* KeyGuideParts = KeyGuide::Instance();
+			KeyGuideParts->SetGuideFlip();
 		}
 		//ポップアップをすべて削除とする
 		PopUpParts->EndAll();
@@ -158,9 +159,9 @@ namespace DXLibRef {
 	void SceneControl::Initialize(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		auto* Pad = PadControl::Instance();
+		auto* KeyGuideParts = KeyGuide::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
-		Pad->Dispose();
+		KeyGuideParts->Dispose();
 		PostPassParts->ResetAllBuffer();
 		//
 		this->m_NowScenesPtr->Load();
@@ -171,7 +172,7 @@ namespace DXLibRef {
 		// 環境光と影の初期化
 		WindowSizeParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
 		this->m_NowScenesPtr->Set();
-		Pad->SetGuideUpdate();
+		KeyGuideParts->SetGuideFlip();
 		// FPS表示の初期化
 		m_FPSDrawer.Initialize();
 	}
@@ -184,28 +185,27 @@ namespace DXLibRef {
 		auto* SideLogParts = SideLog::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
-		if (Pad->GetEsc().trigger() && !m_IsExitSelect) {
+		if (Pad->GetPadsInfo(PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
-					auto* WindowSizeParts = WindowSizeControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					// タイトル
 					{
-						xp1 = xmin + WindowSizeParts->GetUIY(24);
+						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
 					}
 					// 
 					{
-						xp1 = (xmax + xmin) / 2 - WindowSizeParts->GetUIY(54);
+						xp1 = (xmax + xmin) / 2 - (54);
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
-						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
+						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
 							// 終了フラグを立てる
 							this->m_IsEndGame = true;
 						}
@@ -222,24 +222,23 @@ namespace DXLibRef {
 			m_IsRestartSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
-					auto* WindowSizeParts = WindowSizeControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					// タイトル
 					{
-						xp1 = xmin + WindowSizeParts->GetUIY(24);
+						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
 						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
 					}
 					// 
 					{
-						xp1 = (xmax + xmin) / 2 - WindowSizeParts->GetUIY(54);
+						xp1 = (xmax + xmin) / 2 - (54);
 						yp1 = ymax - LineHeight * 3;
 
 						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + WindowSizeParts->GetUIY(108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
-						if (Pad->GetKey(PADS::INTERACT).trigger() || ret) {
+						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
+						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
 							this->m_IsEndGame = true;
 							StartMe();
 						}
@@ -268,7 +267,7 @@ namespace DXLibRef {
 			m_PauseDrawer.Update();
 		}
 		// ポーズ入力によるオンオフ
-		if (Pad->GetKey(PADS::INVENTORY).trigger()) {
+		if (Pad->GetPadsInfo(PADS::INVENTORY).GetKey().trigger()) {
 			ChangePause(!IsPause());
 		}
 		// FPS表示機能の更新
@@ -329,7 +328,7 @@ namespace DXLibRef {
 				{
 					int Prev = GetDrawMode();
 					SetDrawMode(DX_DRAWMODE_BILINEAR);
-					PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
+					PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIY(BaseScreenWidth), WindowSizeParts->GetUIY(BaseScreenHeight), false);
 					SetDrawMode(Prev);
 					//
 					DrawUICommon();
@@ -351,7 +350,7 @@ namespace DXLibRef {
 			{
 				int Prev = GetDrawMode();
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
-				PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIXMax(), WindowSizeParts->GetUIYMax(), false);
+				PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIY(BaseScreenWidth), WindowSizeParts->GetUIY(BaseScreenHeight), false);
 				SetDrawMode(Prev);
 				//
 				DrawUICommon();

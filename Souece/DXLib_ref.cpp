@@ -64,6 +64,7 @@ namespace DXLibRef {
 		SoundPool::Create();							// サウンド
 		BGMPool::Create();
 		FontPool::Create();
+		KeyGuide::Create();
 		PadControl::Create();							// キー
 		OptionWindowClass::Create();
 		PopUp::Create();
@@ -75,9 +76,9 @@ namespace DXLibRef {
 		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
 
-		auto* OptionWindowParts = OptionWindowClass::Instance();
 		WindowSystem::DrawControl::Create();
-		OptionWindowParts->Init();
+		//
+		SceneControl::Create();
 	}
 	bool			DXLib_ref::FirstBootSetting(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
@@ -89,18 +90,20 @@ namespace DXLibRef {
 			auto* LocalizeParts = LocalizePool::Instance();
 			auto* OptionParts = OPTION::Instance();
 
+			OptionWindowParts->Init();
 			m_CheckPCSpec.Set();
 
-			int xBase = WindowSizeParts->GetUIY(1366);
-			int yBase = WindowSizeParts->GetUIY(768);
-			SetWindowPosition((WindowSizeParts->GetSizeXMax() - xBase) / 2, (WindowSizeParts->GetSizeYMax() - yBase) / 2);
-			SetWindowSize(xBase, yBase);
+			int xBase = (1366);
+			int yBase = (768);
 
 			// 初期設定画面
 			OptionWindowParts->SetActive();
 			while (ProcessMessage() == 0) {
 				StartCount();
 				WindowSystem::DrawControl::Instance()->ClearList();
+
+				SetWindowPosition((WindowSizeParts->GetSizeXMax() - xBase) / 2, (WindowSizeParts->GetSizeYMax() - yBase) / 2);
+				SetWindowSize(xBase, yBase);
 
 				Pad->Update();
 				OptionWindowParts->Update();
@@ -111,20 +114,20 @@ namespace DXLibRef {
 				// 
 				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 				{
-					int Width = WindowSizeParts->GetUIY(720);
-					int Height = WindowSizeParts->GetUIY(720);
-					int Edge = WindowSizeParts->GetUIY(16);
+					int Width = (720);
+					int Height = (720);
+					int Edge = (16);
 
 					PopUpParts->Draw(Width / 2 + Edge, Height / 2 + Edge);
 
-					WindowSystem::SetMsg(Edge + Edge, Height + Edge + Edge, WindowSizeParts->GetUIY(12), FontHandle::FontXCenter::LEFT, Green, Black, LocalizeParts->Get(109));
+					WindowSystem::SetMsg(Edge + Edge, Height + Edge + Edge, (12), FontHandle::FontXCenter::LEFT, Green, Black, LocalizeParts->Get(109));
 
 					int xp = Width + Edge + Edge;
 					int yp = Edge;
-					if (WindowSystem::SetMsgClickBox(xp, yp, xp + WindowSizeParts->GetUIY(400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
+					if (WindowSystem::SetMsgClickBox(xp, yp, xp + (400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
 						m_CheckPCSpec.StartSearch();
 					}
-					yp += WindowSizeParts->GetUIY(24);
+					yp += (24);
 					if (m_CheckPCSpec.GetCPUDatas()) {
 						int MouseOverID = InvalidID;
 						// CPU
@@ -278,6 +281,8 @@ namespace DXLibRef {
 	}
 	// 
 	void			DXLib_ref::StartLogic(void) noexcept {
+		auto* OptionWindowParts = OptionWindowClass::Instance();
+		OptionWindowParts->Init();
 #if defined(DEBUG)
 		DebugClass::Create();
 #endif // DEBUG
@@ -299,8 +304,6 @@ namespace DXLibRef {
 #endif
 		//
 		Update_effect_was = GetNowHiPerformanceCount();
-		//
-		SceneControl::Create();
 	}
 	void			DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();

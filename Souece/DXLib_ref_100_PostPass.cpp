@@ -147,23 +147,6 @@ namespace DXLibRef {
 			SSRDepthScreen.GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			SSRScreen.SetDraw_Screen();
 			{
-#if defined(DEBUG) && FALSE
-				if (CheckHitKeyWithCheck(KEY_INPUT_1) != 0) {
-					RayInterval = std::max(RayInterval - 1, 0);
-				}
-				if (CheckHitKeyWithCheck(KEY_INPUT_2) != 0) {
-					RayInterval += 1;
-				}
-				if (CheckHitKeyWithCheck(KEY_INPUT_5) != 0) {
-					DepthThreshold = std::max(DepthThreshold - 0.05f, 0.f);
-				}
-				if (CheckHitKeyWithCheck(KEY_INPUT_6) != 0) {
-					DepthThreshold += 0.05f;
-				}
-
-				printfDx("RayInterval  :%d\n", RayInterval);
-				printfDx("DepthThreshold:%f\n", DepthThreshold);
-#endif // DEBUG
 				SSRColorScreen.SetUseTextureToShader(0);
 				SSRNormalScreen.SetUseTextureToShader(1);
 				SSRDepthScreen.SetUseTextureToShader(2);

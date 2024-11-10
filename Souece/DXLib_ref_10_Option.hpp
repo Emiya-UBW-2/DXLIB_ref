@@ -1,4 +1,5 @@
 #pragma once
+#include "DXLib_ref.h"
 
 namespace DXLibRef {
 	enum class EnumSaveParam {
@@ -364,7 +365,7 @@ namespace DXLibRef {
 		protected:
 			void Init_Sub(void) noexcept override;
 		private:
-			void KeyDraw(int xpos, int ypos, bool isMine, int Sel) noexcept;
+			void KeyDraw(int xpos, int ypos, bool isMine, PADS Sel) noexcept;
 		};
 		class ElseTabsInfo :public OptionTabsInfo {
 		public:

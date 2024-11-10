@@ -61,7 +61,7 @@ namespace DXLibRef {
 			}
 		}
 		// 物理アップデート
-		this->m_ResetP.Execute(CheckHitKeyWithCheck(KEY_INPUT_P) != 0);
+		this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
 		for (int i : std::views::iota(0, static_cast<int>(this->m_Object.size()))) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {

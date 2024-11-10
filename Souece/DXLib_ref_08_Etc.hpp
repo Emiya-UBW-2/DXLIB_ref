@@ -135,34 +135,6 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept;
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ウィンドウアクティブチェック付きキー操作
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	static int CheckHitKeyWithCheck(int KeyCode) noexcept {
-		if (GetWindowActiveFlag()) {
-			return CheckHitKey(KeyCode);
-		}
-		else {
-			return 0;
-		}
-	}
-	static int GetMouseInputWithCheck(void) noexcept {
-		if (GetWindowActiveFlag()) {
-			return GetMouseInput();
-		}
-		else {
-			return 0;
-		}
-	}
-	static int GetMouseWheelRotVolWithCheck(int CounterReset = TRUE) noexcept {
-		if (GetWindowActiveFlag()) {
-			return GetMouseWheelRotVol(CounterReset);
-		}
-		else {
-			GetMouseWheelRotVol(CounterReset);
-			return 0;
-		}
-	}
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*クラス																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 文字列から数値を取り出す
@@ -314,38 +286,6 @@ namespace DXLibRef {
 			this->mat = Mat_t;
 			this->matbuf = MatBuf_t;
 		}
-	};
-	// キー押し判定
-	class switchs {
-		bool		m_on{ false };// オンオフ判定
-		bool		m_press{ false };// オンオフ判定
-		bool		m_repeat{ false };// オンオフ判定
-		int8_t		m_presscount{ 0 };// プッシュ判定
-		float		m_repeatcount{ 0.5f };// プッシュ判定
-	public:
-		switchs(void) noexcept {
-			Set(false);
-			m_presscount = 0;
-			m_repeatcount = 0.5f;
-			m_press = false;
-		}
-		~switchs(void) noexcept {}
-		// 使用前の用意
-		void			Set(bool on) noexcept { m_on = on; }
-		// 更新
-		void			Execute(bool key) noexcept;
-		// オンオフの取得
-		bool			on(void) const noexcept { return m_on; }
-		// 押した瞬間
-		bool			trigger(void) const noexcept { return m_press && (m_presscount == 1); }
-		// 押している間
-		bool			press(void) const noexcept { return m_press; }
-		// 押している間(30F+2F毎)
-		bool			repeat(void) const noexcept { return m_repeat; }
-		// 離した瞬間
-		bool			release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }
-		// 離している間
-		bool			release(void) const noexcept { return !m_press; }
 	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1023,5 +963,43 @@ namespace DXLibRef {
 		// 返送
 		template<class T>
 		int				ReturnData(const T& Data) noexcept { return SendData(m_RecvIp, m_RecvPort, Data); }
+	};
+
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*DXLIBのファイル読み込み補助クラス																											*/
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	class FileStreamDX {
+		int mdata = InvalidID;
+	public:
+		//コンストラクタ
+		FileStreamDX() noexcept {}
+		//宣言時にファイルオープン版
+		FileStreamDX(const char* FilePath) noexcept { Open(FilePath); }
+		//デストラクタ
+		~FileStreamDX() noexcept { Close(); }
+	public:
+		//ファイルを開き、探索ポイントを始点に移動
+		void Open(const char* FilePath) noexcept { mdata = DxLib::FileRead_open(FilePath, FALSE); }
+		// 1行そのまま取得し、次の行に探索ポイントを移る
+		std::string SeekLineAndGetStr() const noexcept {
+			const int charLength = 512;
+			char mstr[charLength] = "";
+			DxLib::FileRead_gets(mstr, charLength, mdata);
+			return std::string(mstr);
+		}
+		// 探索ポイントが終端(EOF)で終わる
+		bool ComeEof() const noexcept { return DxLib::FileRead_eof(mdata) != 0; }
+		//　閉じる
+		void Close() noexcept {
+			if (mdata != InvalidID) {
+				DxLib::FileRead_close(mdata);
+				mdata = InvalidID;
+			}
+		}
+	public:
+		// 文字列から=より右の値取得
+		static std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
+		// 文字列から=より右の値取得
+		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
 	};
 }
