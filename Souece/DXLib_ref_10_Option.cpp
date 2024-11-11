@@ -285,13 +285,11 @@ namespace DXLibRef {
 			Easing(&e.selanim, 0.f, 0.95f, EasingType::OutExpo);
 		}
 	}
-	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, bool isActive, int* TabSel, int* select) noexcept {
-		int xp1, yp1;
+	void OptionWindowClass::OptionTabsInfo::Draw(int xpos, int ypos, int xsize, bool isActive, int* TabSel, int* select) noexcept {
 		// タブ
 		{
-			xp1 = xpos + ((140) + (12)) * m_id;
-			yp1 = ypos;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + (5), xp1 + (140), yp1 + LineHeight * 2 - (5), LineHeight, (isActive ? Gray25 : Gray75), false, true, m_name)) {
+			int xp1 = xpos + ((140) + (12)) * m_id;
+			if (WindowSystem::SetMsgClickBox(xp1, ypos + (5), xp1 + (140), ypos + LineHeight * 2 - (5), LineHeight, (isActive ? Gray25 : Gray75), false, true, m_name)) {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
@@ -300,14 +298,13 @@ namespace DXLibRef {
 		}
 		// 内容
 		if (isActive) {
-			xp1 = xpos;
-			yp1 = ypos + LineHeight * 2;
+			int yp1 = ypos + LineHeight * 2;
 			for (int i : std::views::iota(0, static_cast<int>(m_Elements.size()))) {
 				yp1 += (LineHeight + (6));
-				if (IntoMouse(xp1, yp1, xp1 + (500), yp1 + (LineHeight + (6)))) {
+				if (IntoMouse(xpos, yp1, xpos + xsize, yp1 + (LineHeight + (6)))) {
 					*select = i;
 				}
-				m_Elements.at(static_cast<size_t>(i)).Draw(xp1, yp1, (*select == i));
+				m_Elements.at(static_cast<size_t>(i)).Draw(xpos, yp1, (*select == i));
 			}
 		}
 	}
@@ -1205,21 +1202,20 @@ namespace DXLibRef {
 			int Size = KeyGuideParts->GetDrawSize(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
 			KeyGuideParts->DrawButton(xpos + 50 - Size, ypos + LineHeight / 2 - 24 / 2, KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
 		}
-
+		else {
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+				LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + 50, ypos, isMine ? Red : Red25, Black, "None");
+		}
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-			LineHeight, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
-			xpos + 100, ypos,
-			isMine ? White : Gray25, Black,
-			"->");
-
+			LineHeight, FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + 75, ypos, isMine ? White : Gray25, Black, "->");
 		if (Pad->GetPadsInfo(Sel).IsEnableSelectReserve()) {
-			//int Size = KeyGuideParts->GetDrawSize(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
-			KeyGuideParts->DrawButton(xpos + 150, ypos + LineHeight / 2 - 24 / 2, KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
-
+			KeyGuideParts->DrawButton(xpos + 100, ypos + LineHeight / 2 - 24 / 2, KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
+		}
+		else {
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
+				LineHeight, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos + 100, ypos, isMine ? Red : Red25, Black, "None");
 		}
 	}
-
-
 	void OptionWindowClass::ControlTabsInfo::Init_Sub(void) noexcept {
 		auto* Pad = PadControl::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
@@ -1580,24 +1576,17 @@ namespace DXLibRef {
 			m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
 			PopUpParts->Add("Option", 720, 720,
-				[this](int xmin, int ymin, int, int ymax, bool EndSwitch) {
+				[this](int xmin, int ymin, int xmax, int ymax, bool EndSwitch) {
 					auto* OptionParts = OPTION::Instance();
 					auto* Pad = PadControl::Instance();
 					auto* KeyGuideParts = KeyGuide::Instance();
 					auto* SE = SoundPool::Instance();
-					int xp1, yp1;
-
-
-					xp1 = xmin + (24);
-					yp1 = ymin;
+					//
 					for (auto& t : m_Tabs) {
-						t->Draw(xp1, yp1, m_tabsel == t->GetID(), &m_tabsel, &m_select);
+						t->Draw(xmin + 24, ymin, (xmax - 24) - (xmin + 24), m_tabsel == t->GetID(), &m_tabsel, &m_select);
 					}
 					// ガイド
-					xp1 = xmin + (24);
-					yp1 = ymax - LineHeight * 3 / 2;
-					m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xp1, yp1, m_select);
-
+					m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, m_select);
 					// 
 					if (Pad->GetPadsInfo(PADS::LEAN_L).GetKey().trigger() && (m_tabsel != 3)) {
 						--m_tabsel;

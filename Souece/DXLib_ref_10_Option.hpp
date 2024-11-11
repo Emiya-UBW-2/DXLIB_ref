@@ -319,7 +319,7 @@ namespace DXLibRef {
 				Init_Sub();
 			}
 			void Execute(int* select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, bool isActive, int* TabSel, int* select) noexcept;
+			void Draw(int xpos, int ypos, int xsize, bool isActive, int* TabSel, int* select) noexcept;
 
 			void DrawInfo(int xpos, int ypos, int select) noexcept;
 		};

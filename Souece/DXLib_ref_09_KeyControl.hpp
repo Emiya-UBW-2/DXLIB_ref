@@ -840,6 +840,15 @@ namespace DXLibRef {
 		}
 		//キーコンフィグの各ボタンの設定
 		void ChangeConfigOnce(PADS select, int SetID) noexcept {
+			bool isHit = false;
+			// 変更不可のもので設定したいものとIDがかぶっている場合不可能
+			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
+				if (!m_PadsInfo.at(p).IsUse() && (m_PadsInfo.at(p).GetAssign() == SetID)) {
+					isHit = true;
+					break;
+				}
+			}
+			if (isHit) { return; }
 			// 既に適用済のものがあった場合そいつを無効化してやる
 			for (size_t p = 0; p < static_cast<size_t>(PADS::MAX); ++p) {
 				if (m_PadsInfo.at(p).GetReserve() == SetID) {
@@ -863,7 +872,12 @@ namespace DXLibRef {
 				if (GetPadsInfo(select).GetKey().trigger()) {//押した瞬間だけ
 					// SetIDとselectで設定しているボタンが同じだったら=> SetID==Assign
 					// Reserveに何か入っていたら空に、入っていなかったらAssignとする
-					m_PadsInfo.at(static_cast<size_t>(select)).SetReserve(GetPadsInfo(select).IsEnableSelectReserve() ? InvalidID : GetPadsInfo(select).GetAssign());
+					if (GetPadsInfo(select).IsEnableSelectReserve()) {
+						m_PadsInfo.at(static_cast<size_t>(select)).SetReserve(InvalidID);
+					}
+					else {
+						ChangeConfigOnce(select, GetPadsInfo(select).GetAssign());
+					}
 					//元と違う設定になっていたらtrue
 					return true;
 				}
