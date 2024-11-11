@@ -62,7 +62,6 @@ namespace DXLibRef {
 
 		// 
 		SoundPool::Create();							// サウンド
-		BGMPool::Create();
 		FontPool::Create();
 		KeyGuide::Create();
 		PadControl::Create();							// キー
@@ -70,11 +69,10 @@ namespace DXLibRef {
 		PopUp::Create();
 
 		auto* SE = SoundPool::Instance();
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_Select), 2, "CommonData/Sound/UI/cursor.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_CANCEL), 1, "CommonData/Sound/UI/cancel.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_OK), 1, "CommonData/Sound/UI/ok.wav", false);
-		SE->Add(static_cast<int>(SoundEnumCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
-		SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
+		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select), 2, "CommonData/Sound/UI/cursor.wav", false);
+		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_CANCEL), 1, "CommonData/Sound/UI/cancel.wav", false);
+		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_OK), 1, "CommonData/Sound/UI/ok.wav", false);
+		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 
 		WindowSystem::DrawControl::Create();
 		//

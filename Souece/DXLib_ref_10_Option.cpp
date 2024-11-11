@@ -261,7 +261,7 @@ namespace DXLibRef {
 					(*select) = static_cast<int>(m_Elements.size()) - 1;
 				}
 				m_Elements.at(static_cast<size_t>(*select)).selanim = 3.f;
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetPadsInfo(PADS::MOVE_S).GetKey().trigger()) {
 				++(*select);
@@ -269,7 +269,7 @@ namespace DXLibRef {
 					(*select) = 0;
 				}
 				m_Elements.at(static_cast<size_t>(*select)).selanim = -3.f;
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetPadsInfo(PADS::MOVE_A).GetKey().repeat()) {
 				m_Elements.at(static_cast<size_t>(*select)).GetLeftPush();
@@ -293,7 +293,7 @@ namespace DXLibRef {
 				*TabSel = GetID();
 				*select = 0;
 				auto* SE = SoundPool::Instance();
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 		}
 		// “à—e
@@ -319,27 +319,25 @@ namespace DXLibRef {
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
-				auto* BGM = BGMPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) - 0.1f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+				SE->FlipVolume();
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
-				auto* BGM = BGMPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) + 0.1f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+				SE->FlipVolume();
 			},
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
-				auto* BGM = BGMPool::Instance();
+				auto* SE = SoundPool::Instance();
 				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM) * 100.f + 0.5f), 0, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::BGM, static_cast<float>(value) / 100.f);
-				BGM->SetVol(OptionParts->GetParamFloat(EnumSaveParam::BGM));
+				SE->FlipVolume();
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -348,15 +346,15 @@ namespace DXLibRef {
 				auto* SE = SoundPool::Instance();
 				auto* OptionParts = OPTION::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) - 0.1f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+				SE->FlipVolume();
 			},
 			[]() {
 				auto* SE = SoundPool::Instance();
 				auto* OptionParts = OPTION::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) + 0.1f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
-				SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+				SE->FlipVolume();
 			},
 			[]() {},
 			[]() {},
@@ -365,7 +363,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE) * 100.f + 0.5f), 0, 100);
 				OptionParts->SetParamFloat(EnumSaveParam::SE, static_cast<float>(value) / 100.f);
-				SE->SetVol(OptionParts->GetParamFloat(EnumSaveParam::SE));
+				SE->FlipVolume();
 			}
 		);
 	}
@@ -381,7 +379,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 				case 0:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -439,7 +437,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) + 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 				case 0:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -561,7 +559,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) - 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				WindowSizeParts->SetWindowOrBorderless();
 			},
@@ -569,7 +567,7 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) + 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				WindowSizeParts->SetWindowOrBorderless();
 			},
@@ -614,7 +612,7 @@ namespace DXLibRef {
 				}
 				auto* DXLib_refParts = DXLib_ref::Instance();
 				DXLib_refParts->SetWaitVSync();// ‚’¼“¯Šú
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[this]() {
 				auto* OptionParts = OPTION::Instance();
@@ -625,7 +623,7 @@ namespace DXLibRef {
 				}
 				auto* DXLib_refParts = DXLib_ref::Instance();
 				DXLib_refParts->SetWaitVSync();// ‚’¼“¯Šú
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -669,7 +667,7 @@ namespace DXLibRef {
 				}
 
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[this]() {
 				auto* OptionParts = OPTION::Instance();
@@ -691,7 +689,7 @@ namespace DXLibRef {
 					value = FrameLimits[1];
 				}
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, value);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -720,7 +718,7 @@ namespace DXLibRef {
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
 			[]() {
@@ -728,7 +726,7 @@ namespace DXLibRef {
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
 			[]() {},
@@ -751,13 +749,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -773,13 +771,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -794,13 +792,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) - 1, 0, 3));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) + 1, 0, 3));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -816,13 +814,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) - 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) + 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -837,13 +835,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) + 1, 0, 4));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -858,13 +856,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -879,13 +877,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -900,13 +898,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -921,13 +919,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -942,13 +940,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -964,7 +962,7 @@ namespace DXLibRef {
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) - 0.1f, 0.25f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
 			[]() {
@@ -972,7 +970,7 @@ namespace DXLibRef {
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
 			[]() {},
@@ -1005,7 +1003,7 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 
 				auto* LocalizeParts = LocalizePool::Instance();
 				LocalizeParts->Dispose();
@@ -1024,7 +1022,7 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 
 				auto* LocalizeParts = LocalizePool::Instance();
 				LocalizeParts->Dispose();
@@ -1057,13 +1055,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) - 0.01f, 0.01f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) + 0.01f, 0.01f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -1079,13 +1077,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) - 0.01f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) + 0.01f, 0.f, 1.f));
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -1101,13 +1099,13 @@ namespace DXLibRef {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
 				OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -1132,7 +1130,7 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -1148,7 +1146,7 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
@@ -1245,7 +1243,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::MOVE_W)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_W); }
@@ -1261,7 +1259,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::MOVE_S)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_S); }
@@ -1277,7 +1275,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::MOVE_A)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_A); }
@@ -1293,7 +1291,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::MOVE_D)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_D); }
@@ -1310,7 +1308,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::LEAN_L)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::LEAN_L); }
@@ -1326,7 +1324,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::LEAN_R)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::LEAN_R); }
@@ -1342,7 +1340,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::RELOAD)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::RELOAD); }
@@ -1358,7 +1356,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::INTERACT)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::INTERACT); }
@@ -1374,7 +1372,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::THROW)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::THROW); }
@@ -1390,7 +1388,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::MELEE)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MELEE); }
@@ -1406,7 +1404,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::JUMP)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::JUMP); }
@@ -1422,7 +1420,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::RUN)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::RUN); }
@@ -1438,7 +1436,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::WALK)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::WALK); }
@@ -1454,7 +1452,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::SHOT)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::SHOT); }
@@ -1470,7 +1468,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::AIM)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::AIM); }
@@ -1486,7 +1484,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::ULT)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::ULT); }
@@ -1502,7 +1500,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::SQUAT)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::SQUAT); }
@@ -1518,7 +1516,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::PRONE)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::PRONE); }
@@ -1534,7 +1532,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					if (Pad->ChangeConfig(PADS::CHECK)) {
 						auto* SE = SoundPool::Instance();
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::CHECK); }
@@ -1594,7 +1592,7 @@ namespace DXLibRef {
 							m_tabsel = static_cast<int>(m_Tabs.size()) - 1;
 						}
 						m_select = 0;
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 					if (Pad->GetPadsInfo(PADS::LEAN_R).GetKey().trigger() && (m_tabsel != 3)) {
 						++m_tabsel;
@@ -1602,7 +1600,7 @@ namespace DXLibRef {
 							m_tabsel = 0;
 						}
 						m_select = 0;
-						SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 
 					m_Tabs.at(static_cast<size_t>(m_tabsel))->Execute(&m_select, (m_tabsel != 3));

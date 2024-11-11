@@ -143,7 +143,7 @@ namespace DXLibRef {
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				switchturn ^= 1;
 				auto* SE = SoundPool::Instance();
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			unsigned int color = Gray25;
 			int Edge = (5);
@@ -164,7 +164,7 @@ namespace DXLibRef {
 			bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
 			if (MouseOver && Pad->GetMouseClick().trigger()) {
 				auto* SE = SoundPool::Instance();
-				SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (MouseOver && Pad->GetMouseClick().press()) {
 				value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
@@ -187,7 +187,7 @@ namespace DXLibRef {
 				int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
 				if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen, false, true)) {
 					auto* SE = SoundPool::Instance();
-					SE->Get(static_cast<int>(SoundEnumCommon::UI_Select)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+					SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 
 					value = loop;
 				}
@@ -256,7 +256,7 @@ namespace DXLibRef {
 				}
 			}
 		);
-		SE->Get(static_cast<int>(SoundEnumCommon::UI_OK)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_OK))->Play(DX_PLAYTYPE_BACK, TRUE);
 
 		m_Active = true;
 		m_ActiveSwitch = true;
@@ -265,7 +265,7 @@ namespace DXLibRef {
 		auto* SE = SoundPool::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 
-		SE->Get(static_cast<int>(SoundEnumCommon::UI_CANCEL)).Play(0, DX_PLAYTYPE_BACK, TRUE);
+		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_CANCEL))->Play(DX_PLAYTYPE_BACK, TRUE);
 		m_Active = false;
 		m_ActiveSwitch = true;
 		KeyGuideParts->SetGuideFlip();

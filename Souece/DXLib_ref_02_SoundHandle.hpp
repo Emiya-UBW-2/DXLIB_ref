@@ -1,350 +1,227 @@
-﻿/*=============================================================================
- Copyright (C) 2020 yumetodo <yume-wikijp@live.jp>
- Distributed under the Boost Software License, Version 1.0.
- (See https:// www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
-#pragma once
+﻿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
-	// 共通のサウンドEnum
-	enum class SoundEnumCommon {
+	// 共通のSEのEnum
+	enum class SoundSelectCommon {
 		UI_Select,
 		UI_CANCEL,
 		UI_OK,
 		UI_NG,
 		Num,
 	};
-	// 
+	//サウンドの分類
+	enum class SoundType {
+		SE,
+		BGM,
+	};
+	// 1音声を管理するハンドル
 	class SoundHandle : public DXHandle {
 	protected:
+		// 破棄する際に呼ばれる関数
 		void	Dispose_Sub(void) noexcept override {
 			DeleteSoundMem(DXHandle::get());
 		}
-	public:
-		bool	CheckPlay(void) const noexcept { return (DxLib::CheckSoundMem(DXHandle::get()) == TRUE); }
+	public:// 変更系
+		// サウンドを再生
 		bool	Play(int type, int flag = 1) const noexcept { return (PlaySoundMem(DXHandle::get(), type, flag) == 0); }
-		bool	Stop(void) const noexcept {
-			if (InvalidID != DXHandle::get()) {
-				return (StopSoundMem(DXHandle::get()) == 0);
-			}
-			else {
-				return false;
-			}
-		}
-		LONGLONG GetTotalTIme(void) const noexcept { return DxLib::GetSoundTotalTime(DXHandle::get()); }
-		bool	SetVol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp<int>(vol, 0, 255), DXHandle::get()) == 0); }
-		int		GetVol(void) const noexcept { return GetVolumeSoundMem2(DXHandle::get()); }
-		bool	SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), DXHandle::get()) == 0); }
-		bool	Radius(float radius) const noexcept { return (Set3DRadiusSoundMem(radius, DXHandle::get()) == 0); }
-
-		bool	Pan(int panpal) const noexcept { return (ChangePanSoundMem(panpal, DXHandle::get()) == 0); }
-		bool	PresetReverbParam(int PresetNo) const noexcept { return (Set3DPresetReverbParamSoundMem(PresetNo, DXHandle::get()) == 0); }
-
 		void	Play3D(const Vector3DX& pos, float radius, int type_t = DX_PLAYTYPE_BACK)const {
 			SetPosition(pos);
 			Radius(radius);
 			Play(type_t, TRUE);
 		}
-	public:
-		void Load(std::basic_string_view<TCHAR> FileName, int BufferNum = 3) noexcept {
+		// サウンドを停止
+		bool	Stop(void) const noexcept { return (InvalidID != DXHandle::get()) ? (StopSoundMem(DXHandle::get()) == 0) : false; }
+		// サウンドの音量を設定(0~255)
+		bool	SetVol(int vol) const noexcept { return (ChangeVolumeSoundMem(std::clamp(vol, 0, 255), DXHandle::get()) == 0); }
+		// サウンドの左右バランスを決定(-255~255)
+		bool	Pan(int panpal) const noexcept { return (ChangePanSoundMem(panpal, DXHandle::get()) == 0); }
+
+		bool	SetPosition(const Vector3DX& pos) const noexcept { return (Set3DPositionSoundMem(pos.get(), DXHandle::get()) == 0); }
+		bool	Radius(float radius) const noexcept { return (Set3DRadiusSoundMem(radius, DXHandle::get()) == 0); }
+		bool	PresetReverbParam(int PresetNo) const noexcept { return (Set3DPresetReverbParamSoundMem(PresetNo, DXHandle::get()) == 0); }
+	public:// 取得系
+		// サウンドが再生中かどうかを取得
+		bool	CheckPlay(void) const noexcept { return (DxLib::CheckSoundMem(DXHandle::get()) == TRUE); }
+		// ミリ秒単位で総裁性時間を取得
+		LONGLONG GetTotalTIme(void) const noexcept { return DxLib::GetSoundTotalTime(DXHandle::get()); }
+		// サウンドの音量を取得
+		int		GetVol(void) const noexcept { return GetVolumeSoundMem2(DXHandle::get()); }
+	public:// 読み込み系
+		// ファイル名からサウンドを読み込み
+		void Load(const std::basic_string<TCHAR>& FileName, int BufferNum = 3) noexcept {
 			DXHandle::SetHandleDirect(DxLib::LoadSoundMemWithStrLen(FileName.data(), FileName.length(), BufferNum));
 		}
+		// 渡されたサウンドハンドルと同じデータを自分にも複製して別ハンドルとして持つ
 		void Duplicate(const SoundHandle& o) noexcept {
 			DXHandle::SetHandleDirect(DxLib::DuplicateSoundMem(o.get()));
 		}
 	};
-
-	// サウンドプール
+	// 同じ音声を多重に持つクラス(1ハンドルで鳴らせる音は一つであるため)
+	class SoundHandles {
+	private:
+		std::vector<SoundHandle> handle;
+		size_t nowSelect = 0;
+	public:
+		// コンストラクタ
+		SoundHandles(size_t buffersize, std::string path_t, bool is3Dsound = true) noexcept {
+			if (is3Dsound) {
+				SetCreate3DSoundFlag(TRUE);
+			}
+			this->handle.resize(buffersize);
+			this->handle[0].Load(path_t);
+			for (size_t i = 1; i < buffersize; ++i) {
+				this->handle.at(static_cast<size_t>(i)).Duplicate(this->handle[0]);
+			}
+			SetCreate3DSoundFlag(FALSE);
+		}
+		SoundHandles(void) noexcept = delete;
+		SoundHandles(const SoundHandles&) = delete;// コピーしてはいけないのですべてdelete
+		SoundHandles(SoundHandles&& o) = delete;
+		SoundHandles& operator=(const SoundHandles&) = delete;
+		SoundHandles& operator=(SoundHandles&& o) = delete;
+		// デストラクタ
+		~SoundHandles(void) noexcept {
+			StopAll();
+			handle.clear();
+		}
+	public:
+		// サウンドが再生中かどうかを取得
+		bool	CheckPlay(void) const noexcept { return handle[nowSelect].CheckPlay(); }
+		// サウンドを一つ再生
+		int				Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int panpal = -256) noexcept {
+			int Answer = static_cast<int>(nowSelect);
+			auto& NowHandle = handle[nowSelect];
+			NowHandle.Play(type_t, Flag_t);
+			if (panpal != -256) { NowHandle.Pan(panpal); }
+			++nowSelect %= handle.size();
+			return Answer;
+		}
+		int 			Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			int Answer = static_cast<int>(nowSelect);
+			auto& NowHandle = handle[nowSelect];
+			NowHandle.Play3D(pos_t, radius, type_t);
+			++nowSelect %= handle.size();
+			return Answer;
+		}
+		// サウンドをすべて停止
+		void			StopAll() noexcept {
+			for (auto& h : handle) {
+				h.Stop();
+			}
+		}
+		// サウンドの音量をすべて変更
+		void			SetVolAll(int vol) noexcept {
+			for (auto& h : handle) {
+				h.SetVol(vol);
+			}
+		}
+	public:
+		// ミリ秒単位で総裁性時間を取得
+		LONGLONG		GetTotalTIme() noexcept { return handle[0].GetTotalTIme(); }
+	};
+	// SoundTypeごとに分かれた音声管理クラス
+	class Soundhave {
+	private:
+		int								m_SoundID{ 0 };		//サウンドの識別用ID
+		std::unique_ptr<SoundHandles>	m_Handles;				//実際に音声を持っているハンドル
+		int								m_LocalVolume = 255;	//音声単位で指定できる音量(フェードアウトなどで使用)
+		SoundType						m_SoundType{ SoundType::SE };//自分の音声タイプ
+	public:
+		//コンストラクタ
+		Soundhave(int SoundIDSelect, size_t buffersize, std::string path_t, SoundType soundType, bool is3Dsound = true) noexcept {
+			// パスに何も描かれていない場合は特に何もしない
+			if (path_t == "") { return; }
+			this->m_SoundID = SoundIDSelect;
+			this->m_Handles = std::make_unique<SoundHandles>(buffersize, path_t, is3Dsound);
+			m_SoundType = soundType;
+			FlipVolume();
+		}
+		// デストラクタ
+		~Soundhave() noexcept {
+			this->m_Handles.reset();
+		}
+	public:
+		//サウンドの識別用ID
+		const auto& GetSoundID(void)const noexcept { return m_SoundID; }
+	public:
+		// サウンドが再生中かどうかを取得
+		bool			CheckPlay(void) const noexcept { return this->m_Handles->CheckPlay(); }
+		//再生中の音声をすべて停止
+		void			StopAll(void) noexcept { this->m_Handles->StopAll(); }
+		//再生
+		int				Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = TRUE, int panpal = -256) noexcept { return this->m_Handles->Play(type_t, Flag_t, panpal); }
+		int 			Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept { return this->m_Handles->Play3D(pos_t, radius, type_t); }
+		// 音声の総裁性時間をミリ秒で取得
+		LONGLONG		GetTotalTIme(void) noexcept { return this->m_Handles->GetTotalTIme(); }
+		// その音量でのみの音量設定
+		void			SetLocalVolume(int vol) noexcept {
+			this->m_LocalVolume = std::clamp(vol, 0, 255);
+			FlipVolume();
+		}
+		// 保持している音声すべての音量を反映
+		void			FlipVolume() noexcept;
+	};
+	// SE,BGMのプール
 	class SoundPool : public SingletonBase<SoundPool> {
 	private:
 		friend class SingletonBase<SoundPool>;
 	private:
-		class Soundhave {
-			class handles {
-			public:
-				handles(void) noexcept {}
-				handles(const handles&) = delete;
-				handles(handles&& o) = delete;
-				handles& operator=(const handles&) = delete;
-				handles& operator=(handles&& o) = delete;
-			public:
-				std::string path;
-				std::vector<SoundHandle> handle;
-			};
-
-			int ID{ 0 };
-			std::vector<std::shared_ptr<handles>> shandle;
-			size_t now = 0;
-			int Set_vol = 255;
-			float vol_rate = 1.f;
-		public:
-			const auto& GetHandles(void)const noexcept { return shandle; }
-			const auto& Get_ID(void)const noexcept { return ID; }
-			void			Set(int ID_t, size_t buffersize, std::string path_t, bool is3Dsound = true) noexcept {
-				if (path_t == "") {
-					return;
-				}
-				for (auto& h : this->shandle) {
-					if (h->path == path_t) {
-						return;
-					}
-				}
-				this->ID = ID_t;
-				this->shandle.emplace_back(std::make_shared<handles>());
-				this->shandle.back()->path = path_t;
-				this->shandle.back()->handle.resize(buffersize);
-				if (is3Dsound) {
-					SetCreate3DSoundFlag(TRUE);
-				}
-				this->shandle.back()->handle.at(0).Load(this->shandle.back()->path);
-				for (size_t i : std::views::iota(1, static_cast<int>(this->shandle.back()->handle.size()))) {
-					if (is3Dsound) {
-						SetCreate3DSoundFlag(TRUE);
-					}
-					this->shandle.back()->handle.at(static_cast<size_t>(i)).Duplicate(this->shandle.back()->handle.at(0));
-				}
-				SetCreate3DSoundFlag(FALSE);
-
-				for (size_t i : std::views::iota(0, static_cast<int>(this->shandle.back()->handle.size()))) {
-					this->shandle.back()->handle.at(i).PresetReverbParam(DX_REVERB_PRESET_MOUNTAINS);
-				}
-
-			}
-			void			Delete(void) noexcept {
-				for (auto& h : shandle) {
-					h->handle.clear();
-					h.reset();
-				}
-				shandle.clear();
-			}
-			void			StopAll(int Sel_t) noexcept {
-				for (auto& h : shandle.at(static_cast<size_t>(Sel_t))->handle) {
-					h.Stop();
-				}
-			}
-			auto			Play(int Sel_t, int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int vol_t = InvalidID, int panpal = -256) noexcept {
-				size_t ans = now;
-				shandle.at(static_cast<size_t>(Sel_t))->handle[now].Play(type_t, Flag_t);
-				if (vol_t != InvalidID) {
-					Set_vol = vol_t;
-					shandle.at(static_cast<size_t>(Sel_t))->handle[now].SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-				}
-				if (panpal != -256) {
-					shandle.at(static_cast<size_t>(Sel_t))->handle[now].Pan(panpal);
-				}
-				++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
-				return static_cast<int>(ans);
-			}
-			int 			Play_3D(int Sel_t, const Vector3DX& pos_t, float radius, int vol_t = InvalidID, int type_t = DX_PLAYTYPE_BACK) noexcept {
-				bool isplay = true;
-				{
-					// 距離内にいない場合鳴らさない
-					// float dist = (pos_t - GetCameraPosition()).size();
-					// isplay = (dist < radius);
-				}
-				if (isplay) {
-					size_t ans = now;
-					shandle.at(static_cast<size_t>(Sel_t))->handle[now].Play3D(pos_t, radius, type_t);
-					if (vol_t != InvalidID) {
-						Set_vol = vol_t;
-						shandle.at(static_cast<size_t>(Sel_t))->handle[now].SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-					}
-					++now %= shandle.at(static_cast<size_t>(Sel_t))->handle.size();
-					return static_cast<int>(ans);
-				}
-				return InvalidID;
-			}
-			void			SetVol_Local(int Sel_t, int Sel2_t, int vol) noexcept {
-				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].SetVol(static_cast<int>(vol_rate * static_cast<float>(std::clamp(vol, 0, 255))));
-			}
-			void			SetPos(int Sel_t, int Sel2_t, const Vector3DX& pos_t) noexcept {
-				shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].SetPosition(pos_t);
-			}
-			LONGLONG			GetTotalTIme(int Sel_t, int Sel2_t) noexcept {
-				return shandle.at(static_cast<size_t>(Sel_t))->handle[static_cast<size_t>(Sel2_t)].GetTotalTIme();
-			}
-			void			SetVol_Local(int vol) noexcept {
-				Set_vol = std::clamp(vol, 0, 255);
-				for (auto& sh : this->shandle) {
-					for (auto& h : sh->handle) {
-						h.SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-					}
-				}
-			}
-			void			SetVol(float vol) noexcept {
-				vol_rate = std::clamp(vol, 0.f, 1.f);
-				for (auto& sh : this->shandle) {
-					for (auto& h : sh->handle) {
-						h.SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-					}
-				}
-			}
-		};
+		//各種サウンドを保持しておくリスト
+		std::array<std::vector<std::unique_ptr<Soundhave>>, 2> m_SoundHas;
 	private:
-		std::vector<Soundhave> havehandle;
-	private:
-		SoundPool(void) noexcept {}
+		// コンストラクタ
+		SoundPool(void) noexcept {}// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
 		SoundPool(const SoundPool&) = delete;
 		SoundPool(SoundPool&& o) = delete;
 		SoundPool& operator=(const SoundPool&) = delete;
 		SoundPool& operator=(SoundPool&& o) = delete;
-
-		~SoundPool(void) noexcept {}
+		// デストラクタはシングルトンなので呼ばれません
 	public:
-		void			SetVol(float vol) noexcept {
-			for (auto& h : this->havehandle) {
-				h.SetVol(vol);
-			}
-		}
-		void			StopAll() noexcept {
-			for (auto& h : this->havehandle) {
-				h.StopAll(0);
-			}
-		}
-	public:
-		size_t			Add(int ID_t, size_t buffersize = 1, std::string path_t = "", bool is3Dsound = true) noexcept {
-			for (size_t index = 0; auto & h : this->havehandle) {
-				if (h.Get_ID() == ID_t) {
-					h.Set(ID_t, buffersize, path_t, is3Dsound);
-					return index;
+		// 特定のIDにサウンドを追加
+		void			Add(SoundType Type, int Select, size_t buffersize, std::string path_t, bool is3Dsound = true) noexcept {
+			// 既に同じIDが登録されている場合何もしない
+			for (auto& h : this->m_SoundHas[static_cast<size_t>(Type)]) {
+				if (h->GetSoundID() == Select) {
+					return;
 				}
-				index++;
 			}
-			this->havehandle.resize(this->havehandle.size() + 1);
-			this->havehandle.back().Set(ID_t, buffersize, path_t, is3Dsound);
-			return this->havehandle.size() - 1;
+			//末尾に追加
+			this->m_SoundHas[static_cast<size_t>(Type)].emplace_back(std::make_unique<Soundhave>(Select, buffersize, path_t, Type, is3Dsound));
 		}
-		Soundhave& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
-		void			Delete(int ID_t) noexcept {
-			for (int i = 0, Max = static_cast<int>(this->havehandle.size()); i < Max; i++) {
-				auto& h = this->havehandle.at(static_cast<size_t>(i));
-				if (h.Get_ID() == ID_t) {
-					h.StopAll(0);
-					h.Delete();
-					std::swap(h, this->havehandle.back());
-					this->havehandle.pop_back();
-					i--;
-					Max--;
+		// 特定のIDのサウンドを取得
+		std::unique_ptr<Soundhave>& Get(SoundType Type, int Select) noexcept {
+			for (auto& h : this->m_SoundHas[static_cast<size_t>(Type)]) {
+				if (h->GetSoundID() == Select) {
+					return h;
+				}
+			}
+			return this->m_SoundHas[static_cast<size_t>(Type)].at(0);// 探したいサウンドがなかった　エラー処理は特にしていませんので注意
+		}
+		// 保持している音声すべての音量を反映
+		void			FlipVolume(void) noexcept {
+			for (auto& s : this->m_SoundHas) {
+				for (auto& h : s) {
+					h->FlipVolume();
+				}
+			}
+		}
+		// 
+		void			StopAll(SoundType Type) noexcept {
+			for (auto& h : this->m_SoundHas[static_cast<size_t>(Type)]) {
+				h->StopAll();
+			}
+		}
+		// 特定のIDのサウンドを探し出して削除
+		void			Delete(SoundType Type, int Select) noexcept {
+			for (auto& h : this->m_SoundHas[static_cast<size_t>(Type)]) {
+				if (h->GetSoundID() == Select) {
+					h.reset();
+					std::swap(h, this->m_SoundHas[static_cast<size_t>(Type)].back());
+					this->m_SoundHas[static_cast<size_t>(Type)].pop_back();
+					break;
 				}
 			}
 		}
 	};
-
-	// サウンドプール
-	class BGMPool : public SingletonBase<BGMPool> {
-	private:
-		friend class SingletonBase<BGMPool>;
-	private:
-		class BGMhave {
-			int ID{ 0 };
-			std::string path;
-			SoundHandle handle;
-			int Set_vol = 255;
-			float vol_rate = 1.f;
-		public:
-			BGMhave(void) noexcept {}
-			BGMhave(const BGMhave&) = delete;
-			BGMhave(BGMhave&& o) = delete;
-			BGMhave& operator=(const BGMhave&) = delete;
-			BGMhave& operator=(BGMhave&& o) = delete;
-		public:
-			// const auto&		GetHandles(void)const noexcept { return shandle; }
-			const auto& Get_ID(void)const noexcept { return ID; }
-			void			Set(int ID_t, std::string path_t, bool is3Dsound = false) noexcept {
-				if (path_t == "") {
-					return;
-				}
-				if (path_t == path) {
-					return;
-				}
-				this->ID = ID_t;
-				this->path = path_t;
-				SetCreate3DSoundFlag(is3Dsound ? TRUE : FALSE);
-				this->handle.Load(this->path);
-				SetCreate3DSoundFlag(FALSE);
-			}
-			bool			Check(void) noexcept {
-				return this->handle.CheckPlay();
-			}
-			void			Delete(void) noexcept {
-				this->handle.Dispose();
-			}
-			void			Stop(void) noexcept {
-				this->handle.Stop();
-			}
-			void			Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1) noexcept {
-				this->handle.Play(type_t, Flag_t);
-			}
-			void 			Play_3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
-				bool isplay = true;
-				{
-					// 距離内にいない場合鳴らさない
-					// float dist = (pos_t - GetCameraPosition()).size();
-					// isplay = (dist < radius);
-				}
-				if (isplay) {
-					this->handle.Play3D(pos_t, radius, type_t);
-				}
-			}
-			void			SetVol_Local(int vol) noexcept {
-				Set_vol = std::clamp(vol, 0, 255);
-				this->handle.SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-			}
-			void			SetVol(float vol) noexcept {
-				vol_rate = std::clamp(vol, 0.f, 1.f);
-				this->handle.SetVol(static_cast<int>(vol_rate * static_cast<float>(Set_vol)));
-			}
-		};
-	private:
-		BGMPool(void) noexcept {}
-		BGMPool(const BGMPool&) = delete;
-		BGMPool(BGMPool&& o) = delete;
-		BGMPool& operator=(const BGMPool&) = delete;
-		BGMPool& operator=(BGMPool&& o) = delete;
-
-		~BGMPool(void) noexcept {}
-	private:
-		std::vector<std::shared_ptr<BGMhave>> havehandle;
-	public:
-		void			SetVol(float vol) noexcept {
-			for (auto& h : this->havehandle) {
-				h->SetVol(vol);
-			}
-		}
-	public:
-		size_t						Add(int ID_t, std::string path_t = "", bool is3Dsound = false) noexcept {
-			for (size_t index = 0; auto & h : this->havehandle) {
-				if (h->Get_ID() == ID_t) {
-					h->Set(ID_t, path_t, is3Dsound);
-					return index;
-				}
-				index++;
-			}
-			this->havehandle.emplace_back(std::make_shared<BGMhave>());
-			this->havehandle.back()->Set(ID_t, path_t, is3Dsound);
-			return this->havehandle.size() - 1;
-		}
-		auto& Get(int ID_t) noexcept { return this->havehandle.at(Add(ID_t)); }
-		void						Delete(int ID_t) noexcept {
-			for (int i = 0, Max = static_cast<int>(this->havehandle.size()); i < Max; i++) {
-				auto& h = this->havehandle.at(static_cast<size_t>(i));
-				if (h->Get_ID() == ID_t) {
-					h->Stop();
-					h->Delete();
-					std::swap(h, this->havehandle.back());
-					this->havehandle.back().reset();
-					this->havehandle.pop_back();
-					i--;
-					Max--;
-				}
-			}
-		}
-		void						StopAll(void) noexcept {
-			for (auto& h : this->havehandle) {
-				h->Stop();
-			}
-		}
-	};
-
 };
