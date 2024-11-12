@@ -73,5 +73,120 @@ namespace DXLibRef {
 			this->m_CamShake = std::max(this->m_CamShake - DXLib_refParts->GetDeltaTime(), 0.f);
 		}
 	}
+	void CheckPCSpec::FindCPU(void) noexcept {
+		IsEnd = false;
+		std::vector<MatchScore> Tmp; Tmp.reserve(64);
+		{
+			CPUResult.clear();
+			if (IsFileExist("CommonData/PassMarkCPU.txt")) {
+				Tmp.clear();
+				std::array<std::string, 12> TmpString;
+				int HitCount = 0;
+				int border = 0;
+				FileStreamDX FileStream("CommonData/PassMarkCPU.txt");
+				while (true) {
+					if (FileStream.ComeEof()) { break; }
+					auto ALL = FileStream.SeekLineAndGetStr();
+					if (ALL == "") {
+						continue;
+					}
+					auto LEFT = FileStreamDX::getleft(ALL);
+					auto RIGHT = FileStreamDX::getright(ALL);
+					GetOnlyNumber(LEFT.c_str(), &TmpString);
+					HitCount = 0;
+					for (auto& s : CPUStr) {
+						if (s == "") {
+							continue;
+						}
+						for (auto& t : TmpString) {
+							if (t == "") {
+								continue;
+							}
+							if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
+								++HitCount;
+							}
+						}
+					}
+					if (HitCount > 0) {
+						border = std::max(HitCount, border);
+						Tmp.resize(Tmp.size() + 1);
+						Tmp.back().m_Name = LEFT;
+						Tmp.back().m_Score = std::stoi(RIGHT);
+						Tmp.back().m_HitCount = HitCount;
+					}
+				}
+				for (auto& n : Tmp) {
+					if (n.m_HitCount >= border) {
+						CPUResult.emplace_back(n);
+					}
+				}
+			}
+		}
+		{
+			GPUResult.clear();
+			if (IsFileExist("CommonData/PassMarkGPU.txt")) {
+				Tmp.clear();
+				std::array<std::string, 12> TmpString;
+				int HitCount = 0;
+				int border = 0;
+				FileStreamDX FileStream("CommonData/PassMarkGPU.txt");
+				while (true) {
+					if (FileStream.ComeEof()) { break; }
+					auto ALL = FileStream.SeekLineAndGetStr();
+					if (ALL == "") {
+						continue;
+					}
+					auto LEFT = FileStreamDX::getleft(ALL);
+					auto RIGHT = FileStreamDX::getright(ALL);
+					GetOnlyNumber(LEFT.c_str(), &TmpString);
+					HitCount = 0;
+					for (auto& s : GPUStr) {
+						if (s == "") {
+							continue;
+						}
+						for (auto& t : TmpString) {
+							if (t == "") {
+								continue;
+							}
+							if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
+								++HitCount;
+							}
+						}
+					}
+					if (HitCount > 0) {
+						border = std::max(HitCount, border);
+						Tmp.resize(Tmp.size() + 1);
+						Tmp.back().m_Name = LEFT;
+						Tmp.back().m_Score = std::stoi(RIGHT);
+						Tmp.back().m_HitCount = HitCount;
+					}
+				}
+				for (auto& n : Tmp) {
+					if (n.m_HitCount >= border) {
+						GPUResult.emplace_back(n);
+					}
+				}
+			}
+		}
+		IsEnd = true;
+	}
+	bool SaveDataClass::Load(void) noexcept {
+		m_data.clear();
+		if (!IsFileExist("Save/new.svf")) {
+			return false;
+		}
+		FileStreamDX FileStream("Save/new.svf");
+		while (true) {
+			if (FileStream.ComeEof()) { break; }
+			auto ALL = FileStream.SeekLineAndGetStr();
+			if (ALL == "") {
+				continue;
+			}
+			auto LEFT = FileStreamDX::getleft(ALL);
+			auto RIGHT = FileStreamDX::getright(ALL);
+			m_data.emplace_back(std::make_pair(LEFT, std::stoi(RIGHT)));
+		}
+		return true;
+	}
 	// 
 };

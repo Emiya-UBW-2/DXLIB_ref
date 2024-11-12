@@ -8,7 +8,7 @@ namespace DXLibRef {
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
 	// 
 	namespace WindowSystem {
-		void DrawData::Output() const noexcept {
+		void DrawData::Output(void) const noexcept {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			switch (m_type) {
 			case DrawType::Alpha:

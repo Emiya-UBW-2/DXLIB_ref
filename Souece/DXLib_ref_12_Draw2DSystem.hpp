@@ -305,8 +305,8 @@ namespace DXLibRef {
 			int			m_SizeX{ 0 };
 			int			m_SizeY{ 0 };
 		public:
-			const auto& GetPosX() const noexcept { return this->m_PosX; }
-			const auto& GetPosY() const noexcept { return this->m_PosY; }
+			const auto& GetPosX(void) const noexcept { return this->m_PosX; }
+			const auto& GetPosY(void) const noexcept { return this->m_PosY; }
 			void			Set(int posx, int posy, int sizex, int sizey) noexcept {
 				m_PosX = posx;
 				m_PosY = posy;
@@ -353,7 +353,7 @@ namespace DXLibRef {
 			void InputGraphHandleParam(int ID, const GraphHandle* param) noexcept { this->m_GraphHandleParam.at(ID) = param; }
 			void InputStringParam(std::string_view param) noexcept { this->m_string = param; }
 		public:
-			void Output() const noexcept;
+			void Output(void) const noexcept;
 		public:
 			void		operator=(const DrawData& tgt) noexcept {
 				this->m_type = tgt.m_type;
@@ -645,7 +645,7 @@ namespace DXLibRef {
 		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
 		// マウスでクリックできるボタン
 		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
-		// 文字の長さを取得
+		// 
 		template <typename... Args>
 		extern void SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
 			if (String == "") { return; }

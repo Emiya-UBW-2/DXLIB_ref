@@ -193,7 +193,7 @@ namespace DXLibRef {
 		const GraphHandle* GetOutBuffer(void) const noexcept { return &m_OutScreen; }
 	public:
 		void Init(void) noexcept;
-		void SetupBuffer() noexcept;
+		void SetupBuffer(void) noexcept;
 		void Execute(void) noexcept;
 		void Submit(char eye_type) noexcept;
 		void SetUpBackUI(std::function<void()> doingUI) noexcept;

@@ -49,17 +49,14 @@ namespace DXLibRef {
 		Path += Lang;
 		Path += ".txt";
 		this->havehandle.reserve(256);
-		int mdata = FileRead_open(Path.c_str(), FALSE);
+		FileStreamDX FileStream(Path.c_str());
 		while (true) {
-			if (FileRead_eof(mdata) != 0) {
-				break;
-			}
-			auto ALL = getparams::Getstr(mdata);
-			if (ALL == "") {
-				continue;
-			}
-			auto LEFT = getparams::getleft(ALL);
-			auto RIGHT = getparams::getright(ALL);
+			if (FileStream.ComeEof()) { break; }
+			auto ALL = FileStream.SeekLineAndGetStr();
+			if (ALL == "") { continue; }
+			//=の右側の文字をカンマ区切りとして識別する
+			auto LEFT = FileStreamDX::getleft(ALL);
+			auto RIGHT = FileStreamDX::getright(ALL);
 			LocalizeID ID = (LocalizeID)(std::stoi(LEFT));
 			bool IsHit = false;
 			for (auto& h : this->havehandle) {
@@ -76,6 +73,5 @@ namespace DXLibRef {
 				sprintfDx(this->havehandle.back().m_Str, RIGHT.c_str());
 			}
 		}
-		FileRead_close(mdata);
 	}
 };

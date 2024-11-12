@@ -4,7 +4,7 @@ namespace DXLibRef {
 	// シングルトンの実態定義
 	const SoundPool* SingletonBase<SoundPool>::m_Singleton = nullptr;
 	// 保持している音声すべての音量を設定
-	void Soundhave::FlipVolume() noexcept {
+	void Soundhave::FlipVolume(void) noexcept {
 		//BGMかSEかに合わせて取得するボリュームを変更
 		auto* OptionParts = OPTION::Instance();
 		float Vol = 1.0f;

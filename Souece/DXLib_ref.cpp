@@ -89,7 +89,6 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 
 			OptionWindowParts->Init();
-			m_CheckPCSpec.Set();
 
 			int xBase = (1366);
 			int yBase = (768);

@@ -632,7 +632,7 @@ namespace DXLibRef {
 			const auto& GetAssign(void) const noexcept { return this->m_assign; }
 			const auto& IsUse(void) const noexcept { return this->m_IsUse; }
 			const auto& GetKey(void) const noexcept { return this->m_Key; }
-			const auto IsEnableSelectReserve() const noexcept { return this->m_reserve != InvalidID; }
+			const auto IsEnableSelectReserve(void) const noexcept { return this->m_reserve != InvalidID; }
 		};
 	private:
 		std::array<PadsInfo, static_cast<int>(PADS::MAX)>		m_PadsInfo;						// ƒ{ƒ^ƒ““ü—Í‚ğ•Û

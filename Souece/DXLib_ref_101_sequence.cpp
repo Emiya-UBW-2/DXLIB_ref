@@ -80,7 +80,7 @@ namespace DXLibRef {
 		// 空
 		PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
 		// 遠距離
-		PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [&]() {
+		PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
 			auto* PostPassParts = PostPassEffect::Instance();
 			PostPassParts->DrawByPBR([this]() {
 				this->m_NowScenesPtr->CalcOnDraw();
@@ -89,7 +89,7 @@ namespace DXLibRef {
 			this->m_NowScenesPtr->MainDrawFront();
 			});
 		// 中間
-		PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [&]() {
+		PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [this]() {
 #if defined(_USE_EFFEKSEER_)
 			Effekseer_Sync3DSetting();
 #endif
@@ -104,7 +104,7 @@ namespace DXLibRef {
 			this->m_NowScenesPtr->MainDrawFront();
 			});
 		// 至近
-		PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [&]() {
+		PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
 #if defined(_USE_EFFEKSEER_)
 			Effekseer_Sync3DSetting();
 #endif
@@ -119,7 +119,8 @@ namespace DXLibRef {
 			this->m_NowScenesPtr->MainDrawFront();
 			});
 		// ポストプロセス
-		PostPassParts->DrawPostProcess(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
+		PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
+		PostPassParts->DrawPostProcess();
 	}
 	void SceneControl::DrawUICommon(void) const noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
@@ -211,9 +212,7 @@ namespace DXLibRef {
 						}
 					}
 				},
-				[this]() {
-					m_IsExitSelect = false;
-				},
+				[this]() { m_IsExitSelect = false; },
 				[]() {},
 				true
 			);
@@ -298,7 +297,7 @@ namespace DXLibRef {
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 #if defined(_USE_OPENVR_)
 				// UIをスクリーンに描画しておく
-				VRControl::Instance()->SetUpBackUI([&]() { DrawUICommon(); });
+				VRControl::Instance()->SetUpBackUI([this]() { DrawUICommon(); });
 				// VRに移す
 				for (char i = 0; i < 2; ++i) {
 					Camera3DInfo tmp_cam = WindowSizeParts->GetMainCamera();
@@ -316,7 +315,7 @@ namespace DXLibRef {
 				{
 					FillGraph(GetDrawScreen(), 0, 0, 0);
 					if (VRControl::Instance()->GetOutBuffer()) {
-						VRControl::Instance()->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2, 0.5f, 0, false);
+						VRControl::Instance()->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetUIY(BaseScreenWidth) / 2, WindowSizeParts->GetUIY(BaseScreenHeight) / 2, 0.5f, 0, false);
 					}
 				}
 #endif
@@ -344,7 +343,7 @@ namespace DXLibRef {
 			{
 				this->m_NowScenesPtr->MainDraw();
 			}
-			PostPassParts->DrawPostProcess(Camera3DInfo(), []() {}, []() {});			// ポストプロセス
+			PostPassParts->DrawPostProcess();		// ポストプロセス
 			// ディスプレイ描画
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{

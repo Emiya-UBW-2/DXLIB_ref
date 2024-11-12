@@ -105,7 +105,7 @@ namespace DXLibRef {
 			return Answer;
 		}
 		// サウンドをすべて停止
-		void			StopAll() noexcept {
+		void			StopAll(void) noexcept {
 			for (auto& h : handle) {
 				h.Stop();
 			}
@@ -118,7 +118,7 @@ namespace DXLibRef {
 		}
 	public:
 		// ミリ秒単位で総裁性時間を取得
-		LONGLONG		GetTotalTIme() noexcept { return handle[0].GetTotalTIme(); }
+		LONGLONG		GetTotalTIme(void) noexcept { return handle[0].GetTotalTIme(); }
 	};
 	// SoundTypeごとに分かれた音声管理クラス
 	class Soundhave {
@@ -138,7 +138,7 @@ namespace DXLibRef {
 			FlipVolume();
 		}
 		// デストラクタ
-		~Soundhave() noexcept {
+		~Soundhave(void) noexcept {
 			this->m_Handles.reset();
 		}
 	public:
@@ -160,7 +160,7 @@ namespace DXLibRef {
 			FlipVolume();
 		}
 		// 保持している音声すべての音量を反映
-		void			FlipVolume() noexcept;
+		void			FlipVolume(void) noexcept;
 	};
 	// SE,BGMのプール
 	class SoundPool : public SingletonBase<SoundPool> {

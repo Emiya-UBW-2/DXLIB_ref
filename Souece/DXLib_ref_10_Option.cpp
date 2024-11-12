@@ -40,13 +40,8 @@ namespace DXLibRef {
 
 		// SetOutApplicationLogValidFlag(FALSE);
 		{
-			int mdata = InvalidID;
-			bool NewData = true;
-			if (std::filesystem::is_regular_file("Save/Setting.txt")) {
-				mdata = FileRead_open("Save/Setting.txt", FALSE);
-				NewData = false;
-			}
-
+			FileStreamDX FileStream;
+			bool NewData = !IsFileExist("Save/Setting.txt");
 			if (NewData) {
 				WCHAR localeName[LOCALE_NAME_MAX_LENGTH];
 				int retVal = GetUserDefaultLocaleName(localeName, ARRAYSIZE(localeName));
@@ -54,8 +49,8 @@ namespace DXLibRef {
 					SetParamInt(EnumSaveParam::Language, (StrCmpW(localeName, L"ja-JP") == 0) ? 0 : 1);
 				}
 				// 共通設定項目
-				if (std::filesystem::is_regular_file("data/Setting.txt")) {
-					mdata = FileRead_open("data/Setting.txt", FALSE);
+				if (IsFileExist("data/Setting.txt")) {
+					FileStream.Open("data/Setting.txt");
 				}
 				else {
 					// デフォ値
@@ -86,16 +81,17 @@ namespace DXLibRef {
 					return;
 				}
 			}
+			else {
+				FileStream.Open("Save/Setting.txt");
+			}
+
 			while (true) {
-				if (FileRead_eof(mdata) != 0) {
-					break;
-				}
-				auto ALL = getparams::Getstr(mdata);
-				if (ALL == "") {
-					continue;
-				}
-				auto LEFT = getparams::getleft(ALL);
-				auto RIGHT = getparams::getright(ALL);
+				if (FileStream.ComeEof()) { break; }
+				auto ALL = FileStream.SeekLineAndGetStr();
+				if (ALL == "") { continue; }
+				//=の右側の文字をカンマ区切りとして識別する
+				auto LEFT = FileStreamDX::getleft(ALL);
+				auto RIGHT = FileStreamDX::getright(ALL);
 				for (size_t loop : std::views::iota(0, static_cast<int>(EnumSaveParam::Max))) {
 					if (LEFT != OptionStr[loop]) {
 						continue;
@@ -147,30 +143,23 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			FileRead_close(mdata);
 		}
 		{
-			int mdata = InvalidID;
-			if (std::filesystem::is_regular_file("CommonData/ProjectSetting.txt")) {
-				mdata = FileRead_open("CommonData/ProjectSetting.txt", FALSE);
-			}
-			else {
+			if (!IsFileExist("CommonData/ProjectSetting.txt")) {
 				SetParamBoolean(EnumProjectSettingParam::GodRay, true);
 				SetParamBoolean(EnumProjectSettingParam::PBR, true);
 				SetParamBoolean(EnumProjectSettingParam::Distortion, true);
 				SetParamBoolean(EnumProjectSettingParam::CubeMap, true);
 				return;
 			}
+			FileStreamDX FileStream("CommonData/ProjectSetting.txt");
 			while (true) {
-				if (FileRead_eof(mdata) != 0) {
-					break;
-				}
-				auto ALL = getparams::Getstr(mdata);
-				if (ALL == "") {
-					continue;
-				}
-				auto LEFT = getparams::getleft(ALL);
-				auto RIGHT = getparams::getright(ALL);
+				if (FileStream.ComeEof()) { break; }
+				auto ALL = FileStream.SeekLineAndGetStr();
+				if (ALL == "") { continue; }
+				//=の右側の文字をカンマ区切りとして識別する
+				auto LEFT = FileStreamDX::getleft(ALL);
+				auto RIGHT = FileStreamDX::getright(ALL);
 				for (size_t loop : std::views::iota(0, static_cast<int>(EnumProjectSettingParam::Max))) {
 					if (LEFT != ProjectSettingStr[loop]) {
 						continue;
@@ -198,7 +187,6 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			FileRead_close(mdata);
 		}
 		// SetOutApplicationLogValidFlag(TRUE);
 	}

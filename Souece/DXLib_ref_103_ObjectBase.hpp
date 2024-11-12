@@ -59,7 +59,6 @@ namespace DXLibRef {
 		float										m_DistanceToCam{ 0.f };
 		Vector3DX									m_ScreenPosition;
 		float										m_CameraSize{ 0.f };
-		ShaderUseClass* m_UseShader{ nullptr };
 	public:
 		auto& GetObj(void) noexcept { return this->m_obj; }
 		const auto& GetObj_const(void) const noexcept { return this->m_obj; }
@@ -94,7 +93,6 @@ namespace DXLibRef {
 			this->m_ScreenPosition = value;
 			this->m_CameraSize = size;
 		}
-		void				SetUseShader(ShaderUseClass* value) noexcept { this->m_UseShader = value; }
 		void				ResetMove(const Matrix3x3DX& RotMat, const Vector3DX& pos) noexcept {
 			this->m_move.SetVec(Vector3DX::zero());
 			this->m_move.SetMat(RotMat);

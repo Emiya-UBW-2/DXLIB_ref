@@ -82,10 +82,10 @@ namespace DXLibRef {
 			this->m_DispXSize_Border = DispXSize;
 			this->m_DispYSize_Border = DispYSize;
 		}
-		int DispXSize_Max = std::min(GetSizeXMax(), static_cast<int>(static_cast<float>(std::min<int>(BaseScreenWidth, GetSizeXMax())) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		int DispYSize_Max = std::min(GetSizeYMax(), static_cast<int>(static_cast<float>(std::min<int>(BaseScreenHeight, GetSizeYMax())) * std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale), 0.25f, 10.f)));
-		this->m_ScreenXSize = BaseScreenWidth * DispXSize_Max / this->m_DispXSize_Win;
-		this->m_ScreenYSize = BaseScreenHeight * DispYSize_Max / this->m_DispYSize_Win;
+		this->m_ScreenXSize = static_cast<int>(static_cast<float>(std::min(BaseScreenWidth, GetSizeXMax())) * OptionParts->GetParamFloat(EnumSaveParam::DrawScale))
+			* BaseScreenWidth / this->m_DispXSize_Win;
+		this->m_ScreenYSize = static_cast<int>(static_cast<float>(std::min(BaseScreenHeight, GetSizeYMax())) * OptionParts->GetParamFloat(EnumSaveParam::DrawScale))
+			* BaseScreenHeight / this->m_DispYSize_Win;
 	}
 	// 
 };

@@ -55,7 +55,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void VRControl::SetupBuffer() noexcept {
+	void VRControl::SetupBuffer(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* OptionParts = OPTION::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {

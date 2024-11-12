@@ -90,8 +90,12 @@ namespace DXLibRef {
 	}
 	// ファイルが存在するかチェック
 	static bool IsFileExist(const char* Path) noexcept {
+		return std::filesystem::is_regular_file(Path);
+		//DXLIB_Initを通ってからでないと動作しない
+		/*
 		FILEINFO FileInfo;
 		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
+		//*/
 	}
 	// クリップボードに画像をコピー
 	static auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {

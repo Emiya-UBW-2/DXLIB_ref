@@ -1156,10 +1156,8 @@ namespace DXLibRef {
 			SetRenderTargetToShader(2, InvalidID);
 		}
 	}
-	void PostPassEffect::DrawPostProcess(const Camera3DInfo& camInfo,
-		std::function<void()> setshadowdoing_rigid,
-		std::function<void()> setshadowdoing
-		) noexcept {
+
+	void PostPassEffect::SetDrawShadow(const Camera3DInfo& camInfo, std::function<void()> setshadowdoing_rigid, std::function<void()> setshadowdoing) noexcept {
 		auto* OptionParts = OPTION::Instance();
 		// âe
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
@@ -1171,6 +1169,8 @@ namespace DXLibRef {
 				m_ShadowDraw->Draw();
 			}
 		}
+	}
+	void PostPassEffect::DrawPostProcess(void) noexcept {
 		BufferScreen.SetDraw_Screen(false);
 		// êFñ°ï‚ê≥
 		BufferScreen.GraphFilter(DX_GRAPH_FILTER_LEVEL, InColorPerMin, InColorPerMax, static_cast<int>(InColorGamma * 100), 0, 255);

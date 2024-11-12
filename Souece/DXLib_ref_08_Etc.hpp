@@ -137,60 +137,6 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*クラス																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 文字列から数値を取り出す
-	class getparams {
-		static const int charLength = 512;
-	public:
-		// 文字列から=より右の値取得
-		static std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
-		// 文字列から=より右の値取得
-		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
-	public:
-		// 左辺の情報もとる
-		static std::string		getcmd(int p1, int* p2) noexcept {
-			char mstr[charLength]; /*tank*/
-			FileRead_gets(mstr, charLength, p1);
-			*p2 = std::stoi(getright(mstr));
-			return getleft(mstr);
-		}
-		// 1行そのまま取得
-		static auto						Getstr(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return std::string(mstr);
-		}
-		// =より右の値取得
-		static std::string		_str(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return getright(mstr);
-		}
-		static int			_int(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return std::stoi(getright(mstr));
-		}
-		static long int			_long(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return std::stol(getright(mstr));
-		}
-		static unsigned long int	_ulong(int p2) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p2);
-			return std::stoul(getright(mstr));
-		}
-		static float				_float(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return std::stof(getright(mstr));
-		}
-		static bool				_bool(int p1) noexcept {
-			char mstr[charLength] = "";
-			FileRead_gets(mstr, charLength, p1);
-			return (getright(mstr).find("true") != std::string::npos);
-		}
-	};
 	// モデルのフレーム情報保持
 	class frames {
 		int			m_FrameID{ InvalidID };
@@ -287,339 +233,6 @@ namespace DXLibRef {
 			this->matbuf = MatBuf_t;
 		}
 	};
-
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*シェーダー																																*/
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// シェーダーを使用する際の補助クラス
-	class ShaderUseClass {
-	public:
-		// 2Dにシェーダーを適用する際に使用する画面サイズの頂点情報
-		class ScreenVertex {
-			VERTEX3DSHADER Screen_vertex[6] = {};
-		public:
-			// 頂点データの取得
-			const auto* GetScreenVertex(void) noexcept { return Screen_vertex; }
-			// 頂点データの準備
-			void			SetScreenVertex(int dispx, int dispy) noexcept {
-				int xp1 = 0;
-				int yp1 = dispy;
-				int xp2 = dispx;
-				int yp2 = 0;
-				Screen_vertex[0].pos = VGet(static_cast<float>(xp1), static_cast<float>(yp1), 0.0f);
-				Screen_vertex[1].pos = VGet(static_cast<float>(xp2), static_cast<float>(yp1), 0.0f);
-				Screen_vertex[2].pos = VGet(static_cast<float>(xp1), static_cast<float>(yp2), 0.0f);
-				Screen_vertex[3].pos = VGet(static_cast<float>(xp2), static_cast<float>(yp2), 0.0f);
-				Screen_vertex[0].dif = GetColorU8(255, 255, 255, 255);
-				Screen_vertex[1].dif = GetColorU8(255, 255, 255, 255);
-				Screen_vertex[2].dif = GetColorU8(255, 255, 255, 255);
-				Screen_vertex[3].dif = GetColorU8(255, 255, 255, 255);
-				Screen_vertex[0].u = 0.0f; Screen_vertex[0].v = 0.0f;
-				Screen_vertex[1].u = 1.0f; Screen_vertex[1].v = 0.0f;
-				Screen_vertex[2].u = 0.0f; Screen_vertex[3].v = 1.0f;
-				Screen_vertex[3].u = 1.0f; Screen_vertex[2].v = 1.0f;
-				Screen_vertex[4] = Screen_vertex[2];
-				Screen_vertex[5] = Screen_vertex[1];
-			}
-		};
-
-		// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列
-		struct LIGHTCAMERA_MATRIX {
-			MATRIX ViewMatrix;
-			MATRIX ProjectionMatrix;
-		};
-	private:
-		// DXLIBから引っ張ってきたシェーダー用の定義
-		typedef float DX_D3D11_SHADER_FLOAT2[2];
-		typedef float DX_D3D11_SHADER_FLOAT4[4];
-
-		struct DX_D3D11_GS_CONST_BUFFER_BASE {
-			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4]{};											// ビュー　→　プロジェクション行列
-			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3]{};												// ワールド　→　ビュー行列
-		};
-		struct Wave {
-			DX_D3D11_SHADER_FLOAT2 dir{};
-			float amplitude{};
-			float waveLength{};
-		};
-		struct ImmutableCB {
-			Wave waves[20]{};
-		};
-	private:
-		// シェーダーハンドル
-		int m_VertexShaderhandle{ InvalidID };
-		int m_GeometryShaderhandle{ InvalidID };
-		int m_PixelShaderhandle{ InvalidID };
-		// シェーダーに渡す追加パラメーターを配するハンドル
-		std::array<int, 4> LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
-		std::array<int, 4> m_VertexShadercbhandle{};
-		int m_GeometryShaderMatcbhandle{ InvalidID };
-		int m_PixelShaderSendDispSizeHandle{ InvalidID };
-		std::array<int, 4> m_PixelShadercbhandle{};
-		ImmutableCB WaveData{};
-		int m_VertexShadercbWaveDataHandle{ InvalidID };
-	public:
-		ShaderUseClass(void) noexcept {
-			// シェーダーハンドル
-			m_VertexShaderhandle = InvalidID;
-			m_GeometryShaderhandle = InvalidID;
-			m_PixelShaderhandle = InvalidID;
-			// シェーダーに渡す追加パラメーターを配するハンドル
-			for (auto& h : m_VertexShadercbhandle) {
-				h = InvalidID;
-			}
-			m_GeometryShaderMatcbhandle = InvalidID;
-			m_PixelShaderSendDispSizeHandle = InvalidID;
-			for (auto& h : m_PixelShadercbhandle) {
-				h = InvalidID;
-			}
-		}
-		~ShaderUseClass(void) noexcept {
-			Dispose();
-		}
-	public:
-		// 初期化
-		void			Init(const char* VertexShader, const char* PixelShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// 頂点シェーダー周り
-			for (auto& h : m_VertexShadercbhandle) {
-				h = CreateShaderConstantBuffer(sizeof(float) * 4);
-			}
-			m_VertexShadercbWaveDataHandle = CreateShaderConstantBuffer(sizeof(ImmutableCB));
-			// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファの作成
-			for (auto& h : LightCameraMatrixConstantBufferHandle) {
-				h = CreateShaderConstantBuffer(sizeof(LIGHTCAMERA_MATRIX));
-			}
-			this->m_VertexShaderhandle = LoadVertexShader(VertexShader);		// 頂点シェーダーバイナリコードの読み込み
-			// ピクセルシェーダ―周り
-			this->m_PixelShaderSendDispSizeHandle = CreateShaderConstantBuffer(sizeof(float) * 4);
-			for (auto& h : m_PixelShadercbhandle) {
-				h = CreateShaderConstantBuffer(sizeof(float) * 4);
-			}
-			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);			// ピクセルシェーダーバイナリコードの読み込み
-		}
-		void			AddGeometryShader(const char* GeometryShader) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			this->m_GeometryShaderMatcbhandle = CreateShaderConstantBuffer(sizeof(DX_D3D11_GS_CONST_BUFFER_BASE));
-			this->m_GeometryShaderhandle = LoadGeometryShader(GeometryShader);
-		}
-		// 後始末
-		void			Dispose(void) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// 頂点シェーダー周り
-			for (auto& h : LightCameraMatrixConstantBufferHandle) {
-				DeleteShaderConstantBuffer(h);
-			}
-			for (auto& h : m_VertexShadercbhandle) {
-				DeleteShaderConstantBuffer(h);
-			}
-			DeleteShaderConstantBuffer(m_VertexShadercbWaveDataHandle);
-			DeleteShader(this->m_VertexShaderhandle);
-			// 
-			DeleteShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
-			DeleteShader(this->m_GeometryShaderhandle);
-			// ピクセルシェーダ―周り
-			DeleteShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);
-			for (auto& h : m_PixelShadercbhandle) {
-				DeleteShaderConstantBuffer(h);
-			}
-			DeleteShader(this->m_PixelShaderhandle);
-		}
-	public:
-		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetVertexCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// 設定したカメラのビュー行列と射影行列を取得しておく
-			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
-			LightCameraMatrixConst->ViewMatrix = View.get();
-			LightCameraMatrixConst->ProjectionMatrix = Projection.get();
-
-			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
-			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)), DX_SHADERTYPE_VERTEX, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
-		}
-		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_VertexShadercbhandle[0]);		// 頂点シェーダー用の定数バッファのアドレスを取得
-			f4->x = param1;
-			f4->y = param2;
-			f4->z = param3;
-			f4->w = param4;
-			UpdateShaderConstantBuffer(this->m_VertexShadercbhandle[0]);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_VertexShadercbhandle[0], DX_SHADERTYPE_VERTEX, Slot);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
-		}
-		// 
-		void CalcGWave() {
-			for (int i : std::views::iota(0, 20)) {
-				Wave& w = WaveData.waves[i];
-				float randomRad = static_cast<float>(GetRand(30) * DX_PI_F * 2 * 0.3f);
-				w.dir[0] = sinf(randomRad);
-				w.dir[1] = cosf(randomRad);
-				w.amplitude = (0.03f + powf(2.0f, static_cast<float>(GetRand(3)) * 2.0f) * 0.05f) * 0.05f * Scale3DRate;
-				w.waveLength = 1.0f + powf(2.f, 1.f + static_cast<float>(GetRand(3))) * 10.f;
-			}
-		}
-		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetVertexWave(void) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			ImmutableCB* f4 = (ImmutableCB*)GetBufferShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
-			*f4 = WaveData;
-			UpdateShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);								// 頂点シェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle, DX_SHADERTYPE_VERTEX, 5);		// 頂点シェーダーの定数バッファを定数バッファレジスタ４にセット
-		}
-		// シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			if (this->m_GeometryShaderhandle == InvalidID) { return; }
-			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
-
-			// ビュー変換用行列をセットする
-			LightCameraMatrixConst->ViewMatrix[0][0] = ViewMatrix->m[0][0];
-			LightCameraMatrixConst->ViewMatrix[0][1] = ViewMatrix->m[1][0];
-			LightCameraMatrixConst->ViewMatrix[0][2] = ViewMatrix->m[2][0];
-			LightCameraMatrixConst->ViewMatrix[0][3] = ViewMatrix->m[3][0];
-			LightCameraMatrixConst->ViewMatrix[1][0] = ViewMatrix->m[0][1];
-			LightCameraMatrixConst->ViewMatrix[1][1] = ViewMatrix->m[1][1];
-			LightCameraMatrixConst->ViewMatrix[1][2] = ViewMatrix->m[2][1];
-			LightCameraMatrixConst->ViewMatrix[1][3] = ViewMatrix->m[3][1];
-			LightCameraMatrixConst->ViewMatrix[2][0] = ViewMatrix->m[0][2];
-			LightCameraMatrixConst->ViewMatrix[2][1] = ViewMatrix->m[1][2];
-			LightCameraMatrixConst->ViewMatrix[2][2] = ViewMatrix->m[2][2];
-			LightCameraMatrixConst->ViewMatrix[2][3] = ViewMatrix->m[3][2];
-			// 投影変換用行列をセットする
-			LightCameraMatrixConst->ProjectionMatrix[0][0] = ProjectionMatrix->m[0][0];
-			LightCameraMatrixConst->ProjectionMatrix[0][1] = ProjectionMatrix->m[1][0];
-			LightCameraMatrixConst->ProjectionMatrix[0][2] = ProjectionMatrix->m[2][0];
-			LightCameraMatrixConst->ProjectionMatrix[0][3] = ProjectionMatrix->m[3][0];
-			LightCameraMatrixConst->ProjectionMatrix[1][0] = ProjectionMatrix->m[0][1];
-			LightCameraMatrixConst->ProjectionMatrix[1][1] = ProjectionMatrix->m[1][1];
-			LightCameraMatrixConst->ProjectionMatrix[1][2] = ProjectionMatrix->m[2][1];
-			LightCameraMatrixConst->ProjectionMatrix[1][3] = ProjectionMatrix->m[3][1];
-			LightCameraMatrixConst->ProjectionMatrix[2][0] = ProjectionMatrix->m[0][2];
-			LightCameraMatrixConst->ProjectionMatrix[2][1] = ProjectionMatrix->m[1][2];
-			LightCameraMatrixConst->ProjectionMatrix[2][2] = ProjectionMatrix->m[2][2];
-			LightCameraMatrixConst->ProjectionMatrix[2][3] = ProjectionMatrix->m[3][2];
-			LightCameraMatrixConst->ProjectionMatrix[3][0] = ProjectionMatrix->m[0][3];
-			LightCameraMatrixConst->ProjectionMatrix[3][1] = ProjectionMatrix->m[1][3];
-			LightCameraMatrixConst->ProjectionMatrix[3][2] = ProjectionMatrix->m[2][3];
-			LightCameraMatrixConst->ProjectionMatrix[3][3] = ProjectionMatrix->m[3][3];
-
-			UpdateShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
-			SetShaderConstantBuffer(this->m_GeometryShaderMatcbhandle, DX_SHADERTYPE_GEOMETRY, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
-		}
-		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
-		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// 設定したカメラのビュー行列と射影行列を取得しておく
-			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
-			LightCameraMatrixConst->ViewMatrix = View.get();
-			LightCameraMatrixConst->ProjectionMatrix = Projection.get();
-
-			UpdateShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)));
-			SetShaderConstantBuffer(LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4)), DX_SHADERTYPE_PIXEL, Slot);		// 影用深度記録画像を描画したときのカメラのビュー行列と射影行列を定数に設定する
-		}
-		// ピクセルシェーダ―の2番目のレジスタに画面サイズの情報をセット
-		void			SetPixelDispSize(int dispx, int dispy) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);	// ピクセルシェーダー用の定数バッファのアドレスを取得
-			dispsize->u = static_cast<float>(dispx);
-			dispsize->v = static_cast<float>(dispy);
-			UpdateShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);									// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle, DX_SHADERTYPE_PIXEL, 2);				// ピクセルシェーダー用の定数バッファを定数バッファレジスタ2にセット
-		}
-		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
-		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)));				// ピクセルシェーダー用の定数バッファのアドレスを取得
-			f4->x = param1;
-			f4->y = param2;
-			f4->z = param3;
-			f4->w = param4;
-			UpdateShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)));											// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
-			SetShaderConstantBuffer(this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3)), DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
-		}
-		// 3D空間に適用する場合の関数(引数に3D描画のラムダ式を代入)
-		void			Draw_lamda(std::function<void()> doing) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
-				doing();
-				return;
-			}
-			SetUseVertexShader(this->m_VertexShaderhandle);											// 使用する頂点シェーダーをセット
-			SetUsePixelShader(this->m_PixelShaderhandle);											// 使用するピクセルシェーダーをセット
-			SetUseGeometryShader(this->m_GeometryShaderhandle);										// 使用するジオメトリシェーダーをセット
-			MV1SetUseOrigShader(TRUE);
-			doing();
-			MV1SetUseOrigShader(FALSE);
-			SetUseVertexShader(InvalidID);
-			SetUsePixelShader(InvalidID);
-			SetUseGeometryShader(InvalidID);
-		}
-		// 2D画像に適用する場合の関数
-		void			Draw(ScreenVertex& Screenvertex) const noexcept {
-			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
-		}
-	};
-	// キューブマップ生成
-	class RealTimeCubeMap {
-	private:
-		GraphHandle dynamicCubeTex;		// 周囲を回る小さいモデルたちを映りこませるための描画対象にできるキューブマップテクスチャ
-		Vector3DX lookAt[6]{};	// 映りこむ周囲の環境を描画する際のカメラの注視点
-		Vector3DX up[6]{};		// 移りこむ周囲の環境を描画する際のカメラの上方向
-		int MIPLEVEL = 2;
-	public:
-		RealTimeCubeMap(void) noexcept {}
-		RealTimeCubeMap(const RealTimeCubeMap&) = delete;
-		RealTimeCubeMap(RealTimeCubeMap&& o) = delete;
-		RealTimeCubeMap& operator=(const RealTimeCubeMap&) = delete;
-		RealTimeCubeMap& operator=(RealTimeCubeMap&& o) = delete;
-
-		~RealTimeCubeMap(void) noexcept {}
-	public:
-		void Init(void) noexcept {
-			// 描画対象にできるキューブマップテクスチャを作成
-			SetCreateDrawValidGraphMipLevels(MIPLEVEL);
-			SetCubeMapTextureCreateFlag(TRUE);
-			dynamicCubeTex.Make(512, 512, true);
-			SetCubeMapTextureCreateFlag(FALSE);
-			SetCreateDrawValidGraphMipLevels(0);
-			// 映りこむ環境を描画する際に使用するカメラの注視点とカメラの上方向を設定
-			lookAt[0] = Vector3DX::right();
-			lookAt[1] = Vector3DX::left();
-			lookAt[2] = Vector3DX::up();
-			lookAt[3] = Vector3DX::down();
-			lookAt[4] = Vector3DX::forward();
-			lookAt[5] = Vector3DX::back();
-			up[0] = Vector3DX::up();
-			up[1] = Vector3DX::up();
-			up[2] = Vector3DX::back();
-			up[3] = Vector3DX::forward();
-			up[4] = Vector3DX::up();
-			up[5] = Vector3DX::up();
-		}
-
-		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) noexcept {
-			for (int i : std::views::iota(0, 6)) {		// 映りこむ環境を描画する面の数だけ繰り返し
-				for (int j : std::views::iota(0, MIPLEVEL)) {			// ミップマップの数だけ繰り返し
-					dynamicCubeTex.SetRenderTargetToShader(0, i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
-					ClearDrawScreen();										// クリア
-					{
-						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
-						SetCameraNearFar(0.5f * Scale3DRate, 1000.0f * Scale3DRate);									// Nearクリップ面とFarクリップ面の距離を設定
-						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[static_cast<size_t>(i)]).get(), up[static_cast<size_t>(i)].get());	// カメラの位置と注視点、カメラの上方向を設定
-						Doing();
-					}
-				}
-			}
-		}
-
-		void Dispose(void) noexcept {
-			dynamicCubeTex.Dispose();
-		}
-
-		const auto& GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
-	};
-
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 汎用セーブデータ
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -673,204 +286,11 @@ namespace DXLibRef {
 			}
 			outputfile.close();
 		}
-		bool Load(void) noexcept {
-
-			m_data.clear();
-
-			std::ifstream inputputfile("Save/new.svf");
-			if (!inputputfile) {
-				return false;
-			}
-			std::string line;
-			while (std::getline(inputputfile, line)) {
-				auto Start = line.find("=");
-				if (Start != std::string::npos) {
-					m_data.emplace_back(std::make_pair(line.substr(0, Start), std::stoi(line.substr(Start + 1))));
-				}
-			}
-			inputputfile.close();
-			return true;
-		}
+		bool Load(void) noexcept;
 		void Reset(void) noexcept {
 			m_data.clear();
 		}
 	};
-
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// PCの情報を走査
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	class CheckPCSpec {
-		struct MatchScore {
-			std::string		m_Name;
-			int				m_Score{ 0 };
-			int				m_HitCount{ 0 };
-		};
-	private:
-		bool IsEnd = false;
-		std::vector<MatchScore> CPUResult;
-		std::vector<MatchScore> GPUResult;
-
-		TCHAR CPUString[256]{ "" };
-		double FreeMemorySize{ 0 };
-		double TotalMemorySize{ 0 };
-		TCHAR GPUString[256]{ "" };
-
-		std::array<std::string, 12> CPUStr;
-		std::array<std::string, 12> GPUStr;
-		std::thread m_thread;
-	public:
-		static void GetOnlyNumber(const char* Target, std::array<std::string, 12>* String) noexcept {
-			int NumCount = 0;
-			for (auto& s : *String) {
-				s = "";
-			}
-			for (int i : std::views::iota(0, static_cast<int>(strlenDx(Target)))) {
-				if (!
-					(
-						Target[static_cast<size_t>(i)] == ' ' ||
-						Target[static_cast<size_t>(i)] == '-'
-						)
-					) {
-					String->at(static_cast<size_t>(NumCount)) += Target[static_cast<size_t>(i)];
-				}
-				else {
-					if (String->at(static_cast<size_t>(NumCount)) != "") {
-						++NumCount;
-						String->at(static_cast<size_t>(NumCount)) = "";
-					}
-				}
-			}
-		}
-	public:
-		void FindCPU(void) noexcept {
-			IsEnd = false;
-			std::vector<MatchScore> Tmp; Tmp.reserve(64);
-			{
-				CPUResult.clear();
-				std::ifstream inputputfile("CommonData/PassMarkCPU.txt");
-				if (inputputfile) {
-					Tmp.clear();
-					std::string ALL;
-					std::array<std::string, 12> TmpString;
-					int HitCount = 0;
-					int border = 0;
-					while (std::getline(inputputfile, ALL)) {
-						if (ALL == "") {
-							continue;
-						}
-						auto LEFT = getparams::getleft(ALL);
-						auto RIGHT = getparams::getright(ALL);
-						GetOnlyNumber(LEFT.c_str(), &TmpString);
-						HitCount = 0;
-						for (auto& s : CPUStr) {
-							if (s == "") {
-								continue;
-							}
-							for (auto& t : TmpString) {
-								if (t == "") {
-									continue;
-								}
-								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
-									++HitCount;
-								}
-							}
-						}
-						if (HitCount > 0) {
-							border = std::max(HitCount, border);
-							Tmp.resize(Tmp.size() + 1);
-							Tmp.back().m_Name = LEFT;
-							Tmp.back().m_Score = std::stoi(RIGHT);
-							Tmp.back().m_HitCount = HitCount;
-						}
-					}
-					inputputfile.close();
-					for (auto& n : Tmp) {
-						if (n.m_HitCount >= border) {
-							CPUResult.emplace_back(n);
-						}
-					}
-				}
-			}
-			{
-				GPUResult.clear();
-				std::ifstream inputputfile("CommonData/PassMarkGPU.txt");
-				if (inputputfile) {
-					Tmp.clear();
-					std::string ALL;
-					std::array<std::string, 12> TmpString;
-					int HitCount = 0;
-					int border = 0;
-					while (std::getline(inputputfile, ALL)) {
-						if (ALL == "") {
-							continue;
-						}
-						auto LEFT = getparams::getleft(ALL);
-						auto RIGHT = getparams::getright(ALL);
-						GetOnlyNumber(LEFT.c_str(), &TmpString);
-						HitCount = 0;
-						for (auto& s : GPUStr) {
-							if (s == "") {
-								continue;
-							}
-							for (auto& t : TmpString) {
-								if (t == "") {
-									continue;
-								}
-								if ((s.find(t) != std::string::npos) || (t.find(s) != std::string::npos)) {
-									++HitCount;
-								}
-							}
-						}
-						if (HitCount > 0) {
-							border = std::max(HitCount, border);
-							Tmp.resize(Tmp.size() + 1);
-							Tmp.back().m_Name = LEFT;
-							Tmp.back().m_Score = std::stoi(RIGHT);
-							Tmp.back().m_HitCount = HitCount;
-						}
-					}
-					inputputfile.close();
-					for (auto& n : Tmp) {
-						if (n.m_HitCount >= border) {
-							GPUResult.emplace_back(n);
-						}
-					}
-				}
-			}
-			IsEnd = true;
-		}
-	public:
-	public:
-		CheckPCSpec(void) noexcept {}
-		CheckPCSpec(const CheckPCSpec&) = delete;
-		CheckPCSpec(CheckPCSpec&& o) = delete;
-		CheckPCSpec& operator=(const CheckPCSpec&) = delete;
-		CheckPCSpec& operator=(CheckPCSpec&& o) = delete;
-		~CheckPCSpec(void) noexcept {
-			if (m_thread.joinable()) {
-				m_thread.detach();
-			}
-		}
-	public:
-		const auto* GetCPUDatas(void) const noexcept { return IsEnd ? &CPUResult : nullptr; }
-		const auto* GetGPUDatas(void) const noexcept { return IsEnd ? &GPUResult : nullptr; }
-		const auto& GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
-		const auto& GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
-	public:
-		void Set(void) noexcept {
-			GetPcInfo(NULL, NULL, CPUString, NULL, &FreeMemorySize, &TotalMemorySize, NULL, GPUString, NULL, NULL);
-			GetOnlyNumber(CPUString, &CPUStr);
-			GetOnlyNumber(GPUString, &GPUStr);
-		}
-		void StartSearch(void) noexcept {
-			if (m_thread.joinable()) {
-				m_thread.detach();
-			}
-			std::thread newThead(&CheckPCSpec::FindCPU, this);
-			m_thread.swap(newThead);
-		}
-	};
-
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// カメラシェイク
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -972,25 +392,25 @@ namespace DXLibRef {
 		int mdata = InvalidID;
 	public:
 		//コンストラクタ
-		FileStreamDX() noexcept {}
+		FileStreamDX(void) noexcept {}
 		//宣言時にファイルオープン版
 		FileStreamDX(const char* FilePath) noexcept { Open(FilePath); }
 		//デストラクタ
-		~FileStreamDX() noexcept { Close(); }
+		~FileStreamDX(void) noexcept { Close(); }
 	public:
 		//ファイルを開き、探索ポイントを始点に移動
 		void Open(const char* FilePath) noexcept { mdata = DxLib::FileRead_open(FilePath, FALSE); }
 		// 1行そのまま取得し、次の行に探索ポイントを移る
-		std::string SeekLineAndGetStr() const noexcept {
+		std::string SeekLineAndGetStr(void) const noexcept {
 			const int charLength = 512;
 			char mstr[charLength] = "";
 			DxLib::FileRead_gets(mstr, charLength, mdata);
 			return std::string(mstr);
 		}
 		// 探索ポイントが終端(EOF)で終わる
-		bool ComeEof() const noexcept { return DxLib::FileRead_eof(mdata) != 0; }
+		bool ComeEof(void) const noexcept { return DxLib::FileRead_eof(mdata) != 0; }
 		//　閉じる
-		void Close() noexcept {
+		void Close(void) noexcept {
 			if (mdata != InvalidID) {
 				DxLib::FileRead_close(mdata);
 				mdata = InvalidID;
@@ -1001,5 +421,81 @@ namespace DXLibRef {
 		static std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
 		// 文字列から=より右の値取得
 		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
+	};
+
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	// PCの情報を走査
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	class CheckPCSpec {
+		struct MatchScore {
+			std::string		m_Name;
+			int				m_Score{ 0 };
+			int				m_HitCount{ 0 };
+		};
+	private:
+		bool IsEnd = false;
+		std::vector<MatchScore> CPUResult;
+		std::vector<MatchScore> GPUResult;
+
+		TCHAR CPUString[256]{ "" };
+		double FreeMemorySize{ 0 };
+		double TotalMemorySize{ 0 };
+		TCHAR GPUString[256]{ "" };
+
+		std::array<std::string, 12> CPUStr;
+		std::array<std::string, 12> GPUStr;
+		std::thread m_thread;
+	public:
+		CheckPCSpec(void) noexcept {}
+		CheckPCSpec(const CheckPCSpec&) = delete;
+		CheckPCSpec(CheckPCSpec&& o) = delete;
+		CheckPCSpec& operator=(const CheckPCSpec&) = delete;
+		CheckPCSpec& operator=(CheckPCSpec&& o) = delete;
+		~CheckPCSpec(void) noexcept {
+			if (m_thread.joinable()) {
+				m_thread.detach();
+			}
+		}
+	public:
+		static void GetOnlyNumber(const char* Target, std::array<std::string, 12>* String) noexcept {
+			int NumCount = 0;
+			for (auto& s : *String) {
+				s = "";
+			}
+			for (int i : std::views::iota(0, static_cast<int>(strlenDx(Target)))) {
+				if (!
+					(
+						Target[static_cast<size_t>(i)] == ' ' ||
+						Target[static_cast<size_t>(i)] == '-'
+						)
+					) {
+					String->at(static_cast<size_t>(NumCount)) += Target[static_cast<size_t>(i)];
+				}
+				else {
+					if (String->at(static_cast<size_t>(NumCount)) != "") {
+						++NumCount;
+						String->at(static_cast<size_t>(NumCount)) = "";
+					}
+				}
+			}
+		}
+	public:
+		void FindCPU(void) noexcept;
+	public:
+		const auto* GetCPUDatas(void) const noexcept { return IsEnd ? &CPUResult : nullptr; }
+		const auto* GetGPUDatas(void) const noexcept { return IsEnd ? &GPUResult : nullptr; }
+		const auto& GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
+		const auto& GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
+	public:
+		void StartSearch(void) noexcept {
+			GetPcInfo(NULL, NULL, CPUString, NULL, &FreeMemorySize, &TotalMemorySize, NULL, GPUString, NULL, NULL);
+			GetOnlyNumber(CPUString, &CPUStr);
+			GetOnlyNumber(GPUString, &GPUStr);
+			if (m_thread.joinable()) {
+				m_thread.detach();
+			}
+			std::thread newThead(&CheckPCSpec::FindCPU, this);
+			m_thread.swap(newThead);
+		}
 	};
 }
