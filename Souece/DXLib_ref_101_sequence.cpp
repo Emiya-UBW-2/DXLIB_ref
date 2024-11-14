@@ -136,7 +136,7 @@ namespace DXLibRef {
 		m_FPSDrawer.DrawFPSCounter();
 		KeyGuideParts->Draw();
 		SideLogParts->Draw();
-		PopUp::Instance()->Draw(BaseScreenWidth / 2, WindowSizeParts->GetUIYMax() / 2);
+		PopUp::Instance()->Draw(BaseScreenWidth / 2, BaseScreenHeight / 2);
 #if defined(DEBUG)
 		DebugClass::Instance()->DebugWindow(BaseScreenWidth - (350), (150));
 #endif // DEBUG
