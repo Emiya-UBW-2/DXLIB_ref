@@ -358,6 +358,16 @@ namespace DXLibRef {
 		}
 	}
 	void SceneControl::ExitMainLoop(void) noexcept {
+		auto* PostPassParts = PostPassEffect::Instance();
+		{
+			PostPassParts->SetLevelFilter(0, 255, 1.f);
+			PostPassParts->SetAberrationPower(1.f);
+			PostPassParts->Set_is_Blackout(false);
+			PostPassParts->Set_Per_Blackout(0.f);
+			PostPassParts->Set_is_lens(false);
+			PostPassParts->Set_zoom_lens(1.f);
+		}
+		LightPool::Instance()->Dispose();
 		this->m_NowScenesPtr->Dispose();										// 今のシーンからの解放
 		if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// 今のシーンと次のシーンとが別のシーンなら
 			this->m_NowScenesPtr->Dispose_Load();								// ロードしていたデータを破棄
