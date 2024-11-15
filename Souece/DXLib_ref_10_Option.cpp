@@ -579,14 +579,14 @@ namespace DXLibRef {
 					Type = LocalizeParts->Get(1136);
 					break;
 				case WindowType::FullScreen:
-					Type = "フルスクリーン";// LocalizeParts->Get(1137)
+					Type = LocalizeParts->Get(1137);
 					break;
 				case WindowType::Max:
 				default:
 					break;
 				}
 				WindowSystem::SetMsg(xpos + (250), ypos + LineHeight / 2,
-					LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, Type.c_str());
+					LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, White, Black, Type.c_str());
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -944,7 +944,7 @@ namespace DXLibRef {
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
-		this->m_Elements.back().Init("Render Scale", 1137,
+		this->m_Elements.back().Init("Render Scale", 1138,
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* OptionWindowParts = OptionWindowClass::Instance();
