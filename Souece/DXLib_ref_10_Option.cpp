@@ -996,6 +996,8 @@ namespace DXLibRef {
 				auto* LocalizeParts = LocalizePool::Instance();
 				LocalizeParts->Dispose();
 				LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
+				auto* KeyGuideParts = KeyGuide::Instance();
+				KeyGuideParts->SetGuideFlip();
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -1015,6 +1017,8 @@ namespace DXLibRef {
 				auto* LocalizeParts = LocalizePool::Instance();
 				LocalizeParts->Dispose();
 				LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
+				auto* KeyGuideParts = KeyGuide::Instance();
+				KeyGuideParts->SetGuideFlip();
 			},
 			[]() {},
 			[]() {},
@@ -1031,6 +1035,8 @@ namespace DXLibRef {
 					auto* LocalizeParts = LocalizePool::Instance();
 					LocalizeParts->Dispose();
 					LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
+					auto* KeyGuideParts = KeyGuide::Instance();
+					KeyGuideParts->SetGuideFlip();
 				}
 
 				WindowSystem::SetMsg(xpos + (125), ypos + LineHeight / 2,

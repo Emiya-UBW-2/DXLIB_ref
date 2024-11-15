@@ -445,8 +445,9 @@ namespace DXLibRef {
 			Dispose();
 			// 絶対出すガイド
 			auto* Pad = PadControl::Instance();
-			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::Escape).GetAssign(), ControlType::PC), "終了");
-			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::INVENTORY).GetAssign(), Pad->GetControlType()), "ポーズ");
+			auto* LocalizeParts = LocalizePool::Instance();
+			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::Escape).GetAssign(), ControlType::PC), LocalizeParts->Get(9990));
+			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::INVENTORY).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9995));
 			// 追加のガイド
 			Guide_Pad();
 		}
