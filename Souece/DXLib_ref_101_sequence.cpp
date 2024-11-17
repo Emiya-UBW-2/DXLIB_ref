@@ -123,7 +123,6 @@ namespace DXLibRef {
 		PostPassParts->DrawPostProcess();
 	}
 	void SceneControl::DrawUICommon(void) const noexcept {
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* SideLogParts = SideLog::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		//
@@ -208,7 +207,7 @@ namespace DXLibRef {
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
 						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
 							// 終了フラグを立てる
-							this->m_IsEndGame = true;
+							SetEndGame();
 						}
 					}
 				},
@@ -238,7 +237,7 @@ namespace DXLibRef {
 						auto* Pad = PadControl::Instance();
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
 						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
-							this->m_IsEndGame = true;
+							SetEndGame();
 							StartMe();
 						}
 					}
@@ -357,7 +356,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void SceneControl::ExitMainLoop(void) noexcept {
+	void SceneControl::NextMainLoop(void) noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
 		{
 			PostPassParts->SetLevelFilter(0, 255, 1.f);
@@ -369,9 +368,15 @@ namespace DXLibRef {
 		}
 		LightPool::Instance()->Dispose();
 		this->m_NowScenesPtr->Dispose();										// 今のシーンからの解放
-		if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// 今のシーンと次のシーンとが別のシーンなら
+		if (this->IsEndGame()) {
 			this->m_NowScenesPtr->Dispose_Load();								// ロードしていたデータを破棄
 		}
-		this->m_NowScenesPtr = this->m_NowScenesPtr->Get_Next();	// 次のシーンへ遷移
+		else {
+			if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// 今のシーンと次のシーンとが別のシーンなら
+				this->m_NowScenesPtr->Dispose_Load();								// ロードしていたデータを破棄
+			}
+			this->m_NowScenesPtr = this->m_NowScenesPtr->Get_Next();	// 次のシーンへ遷移
+			Initialize();
+		}
 	}
 };

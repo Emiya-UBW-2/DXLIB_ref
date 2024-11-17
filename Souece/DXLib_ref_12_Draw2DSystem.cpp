@@ -72,7 +72,7 @@ namespace DXLibRef {
 				break;
 			case DrawType::RotaGraph:
 				if (m_GraphHandleParam.at(0)) {
-					float Scale = (float)(WindowSizeParts->GetUIY((int)(this->m_floatParam.at(0) * 100))) / 100.f;
+					float Scale = (float)(WindowSizeParts->GetUIY((int)(this->m_floatParam.at(0) * 10000))) / 10000.f;
 
 					if (Scale < 0.95f && 1.05f < Scale) {
 						auto prev = GetDrawMode();

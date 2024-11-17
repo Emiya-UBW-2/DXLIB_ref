@@ -138,12 +138,14 @@ namespace DXLibRef {
 		const auto&		IsExit(void) const noexcept { return m_IsExitSelect; }
 		const auto&		IsRestart(void) const noexcept { return m_IsRestartSelect; }
 		const auto		IsEndScene(void) const noexcept { return m_IsEndScene || m_IsEndGame; }
+
+		void			SetEndGame(void) noexcept { m_IsEndGame = true; }
 		void			ChangePause(bool value) noexcept;
 		void			SetFirstScene(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { m_NowScenesPtr = ptr; }
 	public:
 		void			Initialize(void) noexcept;
 		void			Update(void) noexcept;
 		void			DrawMainLoop(void) const noexcept;
-		void			ExitMainLoop(void) noexcept;
+		void			NextMainLoop(void) noexcept;
 	};
 };

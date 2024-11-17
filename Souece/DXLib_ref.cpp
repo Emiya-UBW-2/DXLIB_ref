@@ -307,50 +307,50 @@ namespace DXLibRef {
 #if defined(DEBUG)
 		auto* DebugParts = DebugClass::Instance();		// デバッグ
 #endif // DEBUG
+		//最初のシーンの初期化
+		SceneParts->Initialize();
 		// 繰り返し
 		while (true) {
-			SceneParts->Initialize();
-			while (true) {
-				if (!(ProcessMessage() == 0)) { break; }
-				StartCount();
+			if (!(ProcessMessage() == 0)) {
+				SceneParts->SetEndGame();
+			}
+			StartCount();
 #if defined(DEBUG)
-				clsDx();
-				DebugParts->SetStartPoint();
+			clsDx();
+			DebugParts->SetStartPoint();
 #endif // DEBUG
-				SceneParts->Update();
-				// 
+			SceneParts->Update();
+			// 
 #if defined(_USE_EFFEKSEER_)
-				if (!SceneParts->IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
-					Update_effect_was = m_StartTime;
-					UpdateEffekseer3D();
-				}
+			if (!SceneParts->IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
+				Update_effect_was = m_StartTime;
+				UpdateEffekseer3D();
+			}
 #endif
 #if defined(DEBUG)
-				DebugParts->SetPoint("-----DrawStart-----");
+			DebugParts->SetPoint("-----DrawStart-----");
 #endif // DEBUG
-				// シーンの描画を行う処理
-				SceneParts->DrawMainLoop();
-				// デバッグ
+			// シーンの描画を行う処理
+			SceneParts->DrawMainLoop();
+			// デバッグ
 #if defined(DEBUG)
-				DebugParts->SetEndPoint();
+			DebugParts->SetEndPoint();
 #endif // DEBUG
-				ScreenFlip();
-				WaitCount();
-				// 画面の反映
+			ScreenFlip();
+			WaitCount();
+			// 画面の反映
 #if defined(_USE_OPENVR_)
-				VRControl::Instance()->WaitSync();
+			VRControl::Instance()->WaitSync();
 #endif
-				// シーン/ゲームの終了判定が立っているのでループを抜ける
-				if (SceneParts->IsEndScene()) {
-					break;
-				}
+			// シーン/ゲームの終了判定が立っているのでループを抜ける
+			if (SceneParts->IsEndScene()) {
+				// シーンの終わりに通る処理
+				SceneParts->NextMainLoop();
 			}
 			// 終了フラグが立った場合即終了
 			if (SceneParts->IsEndGame()) {
 				break;
 			}
-			// シーンの終わりに通る処理
-			SceneParts->ExitMainLoop();
 		}
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Dispose();
