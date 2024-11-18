@@ -97,8 +97,8 @@ namespace DXLibRef {
 			const int height = (360);
 			const int border = height * 2 / 3;
 			// ”wŒi
-			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
-			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos, ypos, xpos + wide, ypos + height, White, true);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
 
 			{
 				const int xp = xpos;
@@ -139,26 +139,36 @@ namespace DXLibRef {
 			const int wide = (350);
 			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + (10);
 			// ”wŒi
-			WindowSystem::SetBox(xpos, ypos, xpos + wide, ypos + height, White);
-			WindowSystem::SetBox(xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos, ypos, xpos + wide, ypos + height, White, true);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
 
 			xpos += (2);
 			ypos += (2);
 			int i = 0;
 			// “à—e
-			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "AsyncCount :%d", GetASyncLoadNum());
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				White, Black, "AsyncCount :%d", GetASyncLoadNum());
 			++i;
-			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "Drawcall  :%d", GetDrawCallCount());
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				White, Black, "Drawcall  :%d", GetDrawCallCount());
 			++i;
-			WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, "FPS    :%5.2f fps", GetFPS());
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				White, Black, "FPS    :%5.2f fps", GetFPS());
 			++i;
 			for (size_t index : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
-				WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}
 			{
 				size_t index = static_cast<size_t>(PointMax);
-				WindowSystem::SetMsg(xpos, ypos + (i * LineHeight) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}
 		}

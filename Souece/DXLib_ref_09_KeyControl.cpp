@@ -8,6 +8,7 @@ namespace DXLibRef {
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
 	// 入力処理に基づいて更新
 	void			switchs::Update(bool key) noexcept {
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		//押したと記録
 		m_press = key;
 		//押したらカウントアップ、離したらカウントダウン
@@ -16,7 +17,7 @@ namespace DXLibRef {
 		m_repeat = trigger();//押した瞬間か、もしくは...
 		//押してから一定時間後、一定間隔でtrueに
 		if (m_press) {
-			m_repeatcount -= DXLib_ref::Instance()->GetDeltaTime();
+			m_repeatcount -= DXLib_refParts->GetDeltaTime();
 			if (m_repeatcount <= 0.f) {
 				m_repeatcount += m_RepeatTime;
 				m_repeat = true;

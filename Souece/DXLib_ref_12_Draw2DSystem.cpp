@@ -120,80 +120,6 @@ namespace DXLibRef {
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
 			return HitRectangleToRectangle(0, 0, BaseScreenWidth, BaseScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
 		}
-		// 箱
-		void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept {
-			DrawControl::Instance()->SetDrawBox(DrawLayer::Normal, xp1, yp1, xp2, yp2, colorSet, true);
-		}
-		// マウスでクリックできるボタン
-		bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept {
-			auto* Pad = PadControl::Instance();
-			bool MouseOver = IsActive && IntoMouse(xp1, yp1, xp2, yp2);
-			SetBox(xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : colorSet);
-			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
-		};
-		// オンオフできるボタン
-		bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
-			int xp3 = xp1 + EdgeSize;
-			int yp3 = yp1 + EdgeSize;
-			int xp4 = xp1 + LineHeight * 2 - EdgeSize;
-			int yp4 = yp1 + LineHeight - EdgeSize;
-
-			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4);
-			if (MouseOver && Pad->GetMouseClick().trigger()) {
-				switchturn ^= 1;
-				auto* SE = SoundPool::Instance();
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			}
-			unsigned int color = Gray25;
-			int Edge = (5);
-			SetBox(xp3 + Edge, yp3 + Edge, xp4 - Edge, yp4 - Edge, Black);
-			xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
-			SetBox(xp3 + Edge, yp3 + Edge, xp4 + Edge, yp4 - Edge, Gray50);
-			xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
-			xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
-			SetBox(xp3, yp3, xp4, yp4, color);
-			return switchturn;
-		}
-		// スライダー
-		int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept {
-			int xpmin = xmin + 1;
-			int xpmax = xmax - 1;
-
-			auto* Pad = PadControl::Instance();
-			bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
-			if (MouseOver && Pad->GetMouseClick().trigger()) {
-				auto* SE = SoundPool::Instance();
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			}
-			if (MouseOver && Pad->GetMouseClick().press()) {
-				value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
-			}
-
-			SetBox(xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen);
-			SetBox(xpmin, yp, xpmin + (xpmax - xpmin) * std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
-				MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green);
-			int xp = (xmin + (xmax - xmin) / 2);
-			SetMsg(xp, yp + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, "%03d", value);
-			return value;
-		}
-		// 0~valueMaxの選択制ボタン集
-		int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) noexcept {
-			int width = LineHeight;
-			int r = LineHeight / 3;
-			int xps = (xmax + xmin) / 2;
-			int yps = yp + LineHeight / 2;
-			for (int loop : std::views::iota(0, valueMax)) {
-				int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
-				if (SetClickBox(xp1 - r, yps - r, xp1 + r, yps + r, (value == loop) ? Green : DarkGreen, false, true)) {
-					auto* SE = SoundPool::Instance();
-					SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-
-					value = loop;
-				}
-			}
-			return value;
-		}
 	};
 	// 
 	void SideLog::SideLogData::UpdateActive(void) noexcept {
@@ -230,11 +156,13 @@ namespace DXLibRef {
 			if (d.ActivePer() > 0.f) {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
 				int yp = yp1 - (static_cast<int>(24.f * d.GetFlip()));
-				WindowSystem::SetBox(
-					xp1 - (6), yp + LineHeight,
-					xp1 - (6) + static_cast<int>(static_cast<float>(std::max(WindowSystem::GetMsgLen(LineHeight, d.GetMsg()), (200))) * d.ActivePer()), yp + LineHeight + (5),
-					Black);
-				WindowSystem::SetMsg(static_cast<int>(xp1), static_cast<int>(yp) + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, d.GetMsgColor(), Black, d.GetMsg());
+				int FontLen = FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(InvalidID, d.GetMsg());
+				DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal,
+					xp1 - 6, yp + LineHeight,
+					xp1 - 6 + static_cast<int>(static_cast<float>(std::max(FontLen, 200)) * d.ActivePer()), yp + LineHeight + 5,
+					Black, true);
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
@@ -299,13 +227,12 @@ namespace DXLibRef {
 		// 背景
 		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
-		WindowSystem::SetBox(xm1, ym1, xm2, ym2, Gray50);
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xm1, ym1, xm2, ym2, Gray50, true);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 
 		// タイトル
-		WindowSystem::SetMsg(
-			xm1 + (32), ym1 + LineHeight / 4 + LineHeight,
-			LineHeight * 2, FontHandle::FontXCenter::LEFT, White, Black, m_WindwoName);
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2,
+			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xm1 + (32), ym1 + LineHeight / 4, White, Black, m_WindwoName);
 		// 
 		if (m_Active) {
 			int xp1 = xm2 - (140);
@@ -321,7 +248,7 @@ namespace DXLibRef {
 			int xp2 = xm2 - (24);
 			int yp2 = ym2 - LineHeight;
 			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-			WindowSystem::SetBox(xp1, yp1, xp2, yp2, Gray50);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xp1, yp1, xp2, yp2, Gray50, true);
 			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 			if (m_Doing) {
 				m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);

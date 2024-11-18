@@ -14,8 +14,9 @@ namespace DXLibRef {
 		m_FPSAvgCount = 0;
 	}
 	void SceneControl::FPSDrawer::Update(void) noexcept {
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		// m_FPSAvgCountの番号に対して今のフレームレートを保存
-		FPSAvgs.at(m_FPSAvgCount) = DXLib_ref::Instance()->GetFps();
+		FPSAvgs.at(m_FPSAvgCount) = DXLib_refParts->GetFps();
 		// 保存する場所をずらす
 		++m_FPSAvgCount %= FPSAvgs.size();
 		// 保存している過去のFPS値の平均をとる
@@ -50,8 +51,9 @@ namespace DXLibRef {
 	}
 	// ポーズ画面
 	void SceneControl::PauseDrawer::Update(void) noexcept {
+		auto* DXLib_refParts = DXLib_ref::Instance();
 		// ポーズ画面では点滅の演算を行う
-		m_PauseFlashCount += DXLib_ref::Instance()->GetDeltaTime();
+		m_PauseFlashCount += DXLib_refParts->GetDeltaTime();
 		// 1秒経ったら0秒にリセットする
 		if (m_PauseFlashCount > 1.f) {
 			m_PauseFlashCount -= 1.f;
@@ -189,6 +191,7 @@ namespace DXLibRef {
 			m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					// タイトル
@@ -196,7 +199,8 @@ namespace DXLibRef {
 						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
-						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(101));
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(101));
 					}
 					// 
 					{
@@ -220,6 +224,7 @@ namespace DXLibRef {
 			m_IsRestartSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 					int xp1, yp1;
 					// タイトル
@@ -227,7 +232,8 @@ namespace DXLibRef {
 						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
-						WindowSystem::SetMsg(xp1, yp1 + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(2101));
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(2101));
 					}
 					// 
 					{
@@ -256,7 +262,7 @@ namespace DXLibRef {
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Execute();
 #endif
-		PostPassParts->Update();
+		PostPassParts->UpdateActive();
 		CameraShake::Instance()->Update();
 		SideLogParts->Update();
 		PopUpParts->Update();
@@ -295,26 +301,27 @@ namespace DXLibRef {
 		if (this->m_NowScenesPtr->Get3DActive()) {
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 #if defined(_USE_OPENVR_)
+				auto* VRParts = VRControl::Instance();
 				// UIをスクリーンに描画しておく
-				VRControl::Instance()->SetUpBackUI([this]() { DrawUICommon(); });
+				VRParts->SetUpBackUI([this]() { DrawUICommon(); });
 				// VRに移す
 				for (char i = 0; i < 2; ++i) {
 					Camera3DInfo tmp_cam = WindowSizeParts->GetMainCamera();
 					tmp_cam.SetCamPos(
-						tmp_cam.GetCamPos() + VRControl::Instance()->GetEyePosition(i),
-						tmp_cam.GetCamVec() + VRControl::Instance()->GetEyePosition(i),
+						tmp_cam.GetCamPos() + VRParts->GetEyePosition(i),
+						tmp_cam.GetCamVec() + VRParts->GetEyePosition(i),
 						tmp_cam.GetCamUp()
 					);
 					Draw3DMain(tmp_cam);
 					// それぞれの目に内容を送信
-					VRControl::Instance()->SubmitDraw(i, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
+					VRParts->SubmitDraw(i, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
 				}
 				// ディスプレイ描画
 				GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
 				{
 					FillGraph(GetDrawScreen(), 0, 0, 0);
-					if (VRControl::Instance()->GetOutBuffer()) {
-						VRControl::Instance()->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetUIY(BaseScreenWidth) / 2, WindowSizeParts->GetUIY(BaseScreenHeight) / 2, 0.5f, 0, false);
+					if (VRParts->GetOutBuffer()) {
+						VRParts->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetUIY(BaseScreenWidth) / 2, WindowSizeParts->GetUIY(BaseScreenHeight) / 2, 0.5f, 0, false);
 					}
 				}
 #endif

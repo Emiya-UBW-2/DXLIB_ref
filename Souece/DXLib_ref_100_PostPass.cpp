@@ -14,15 +14,13 @@ namespace DXLibRef {
 	public:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			int xsize = WindowSizeParts->GetScreenXMax();
-			int ysize = WindowSizeParts->GetScreenYMax();
-			m_ScreenVertex.SetScreenVertex(xsize, ysize);
+			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 			m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
 			m_ShaderBlur.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_BilateralBlur.pso");
 			auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 			SetCreateDrawValidGraphZBufferBitDepth(24);
-			SSRScreen.Make(xsize, ysize, true);
-			SSRScreen2.Make(xsize, ysize, true);
+			SSRScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			SSRScreen2.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 			SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		}
 		void Dispose_Sub(void) noexcept override {
@@ -1041,14 +1039,14 @@ namespace DXLibRef {
 
 		m_ShadowDraw = std::make_unique<ShadowDraw>();
 		// シェーダー
-		m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
-		m_PBR_Shader.AddGeometryShader("CommonData/shader/GS_PBR3D.pso");
+		auto* OptionParts = OPTION::Instance();
+		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
+			m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
+			m_PBR_Shader.AddGeometryShader("CommonData/shader/GS_PBR3D.pso");
+		}
 	}
 	PostPassEffect::~PostPassEffect(void) noexcept {
-		// Gバッファ
-		if (!m_IsActiveGBuffer) {
-			DisposeGBuffer();
-		}
+		ResetAllBuffer();
 		// ポストエフェクト
 		for (auto& P : m_PostPass) {
 			P.reset();
@@ -1057,71 +1055,32 @@ namespace DXLibRef {
 
 		m_ShadowDraw->Dispose();
 		m_ShadowDraw.reset();
-		if (m_IsCubeMap) {
-			m_RealTimeCubeMap.Dispose();
+		auto* OptionParts = OPTION::Instance();
+		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
+			m_PBR_Shader.Dispose();
 		}
-		m_PBR_Shader.Dispose();
 	}
 	void PostPassEffect::Init(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
-		for (auto& P : m_PostPass) {
-			P->Init();
-		}
-		// Gバッファ
-		bool ActiveGBuffer = false;
-		for (auto& P : m_PostPass) {
-			if (P->IsActive()) {
-				ActiveGBuffer = true;
-			}
-		}
-		m_IsActiveGBuffer = ActiveGBuffer;
-		if (m_IsActiveGBuffer) {
-			LoadGBuffer();
-		}
+		UpdateActive();
 		// 影生成
 		m_ShadowDraw->SetActive();
-		// キューブマップ
-		m_IsCubeMap = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap);
-		if (m_IsCubeMap) {
-			m_RealTimeCubeMap.Init();
-		}
 	}
-	// 
-	void PostPassEffect::Update(void) noexcept {
+	void PostPassEffect::UpdateActive(void) noexcept {
 		auto* OptionParts = OPTION::Instance();
-
 		bool ActiveGBuffer = false;
 		for (auto& P : m_PostPass) {
 			if (P->IsActive()) {
 				ActiveGBuffer = true;
+				break;
 			}
 		}
-		if (m_IsActiveGBuffer != ActiveGBuffer) {
-			m_IsActiveGBuffer = ActiveGBuffer;
-			if (m_IsActiveGBuffer) {
-				LoadGBuffer();
-			}
-			else {
-				DisposeGBuffer();
-			}
-		}
+		UpdateActiveGBuffer(ActiveGBuffer);
 		for (auto& P : m_PostPass) {
 			P->UpdateActive(P->IsActive());
 		}
-
-		{
-			bool Now = (OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap);
-			if (Now != m_IsCubeMap) {
-				m_IsCubeMap = Now;
-				if (m_IsCubeMap) {
-					m_RealTimeCubeMap.Init();
-				}
-				else {
-					m_RealTimeCubeMap.Dispose();
-				}
-			}
-		}
+		UpdateActiveCubeMap((OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap));
 	}
+	// 
 	void PostPassEffect::SetCamMat(const Camera3DInfo& camInfo) noexcept {
 		m_CamInfo = camInfo;
 		m_CamViewMat = m_CamInfo.GetViewMatrix();
@@ -1183,19 +1142,11 @@ namespace DXLibRef {
 		}
 	}
 	void PostPassEffect::ResetAllBuffer(void) noexcept {
-		bool ActiveGBuffer = false;
-		if (m_IsActiveGBuffer != ActiveGBuffer) {
-			m_IsActiveGBuffer = ActiveGBuffer;
-			if (m_IsActiveGBuffer) {
-				LoadGBuffer();
-			}
-			else {
-				DisposeGBuffer();
-			}
-		}
+		UpdateActiveGBuffer(false);
 		for (auto& P : m_PostPass) {
 			P->UpdateActive(false);
 		}
+		UpdateActiveCubeMap(false);
 	}
 	void PostPassEffect::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept {
 		auto* OptionParts = OPTION::Instance();

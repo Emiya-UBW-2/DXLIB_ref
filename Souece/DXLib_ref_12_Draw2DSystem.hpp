@@ -299,29 +299,6 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	namespace WindowSystem {
 		// 
-		class Rect2D {
-			int			m_PosX{ 0 };
-			int			m_PosY{ 0 };
-			int			m_SizeX{ 0 };
-			int			m_SizeY{ 0 };
-		public:
-			const auto& GetPosX(void) const noexcept { return this->m_PosX; }
-			const auto& GetPosY(void) const noexcept { return this->m_PosY; }
-			void			Set(int posx, int posy, int sizex, int sizey) noexcept {
-				m_PosX = posx;
-				m_PosY = posy;
-				m_SizeX = sizex;
-				m_SizeY = sizey;
-			}
-		public:
-			bool			IsHit(const Rect2D& target) const noexcept {
-				return (
-					((this->m_PosX >= target.m_PosX && this->m_PosX < (target.m_PosX + target.m_SizeX)) || (target.m_PosX > this->m_PosX && target.m_PosX <= (this->m_PosX + this->m_SizeX))) &&
-					((this->m_PosY >= target.m_PosY && this->m_PosY < (target.m_PosY + target.m_SizeY)) || (target.m_PosY > this->m_PosY && target.m_PosY <= (this->m_PosY + this->m_SizeY)))
-					);
-			}
-		};
-		// 
 		enum class DrawType : int {
 			Alpha,
 			Add,
@@ -388,11 +365,6 @@ namespace DXLibRef {
 
 			Max,
 		};
-		// 文字
-		template <typename... Args>
-		extern int GetMsgLen(int ySize, std::string_view String, Args&&... args) noexcept {
-			return FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, ySize, 3)->GetStringWidth(InvalidID, ((std::string)String).c_str(), args...);
-		}
 		// 
 		class DrawControl : public SingletonBase<DrawControl> {
 		private:
@@ -641,36 +613,18 @@ namespace DXLibRef {
 				m_BufferScreen.DrawGraph(0, 0, true);
 			}
 		};
-		// 箱
-		extern void SetBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet) noexcept;
-		// マウスでクリックできるボタン
-		extern bool SetClickBox(int xp1, int yp1, int xp2, int yp2, unsigned int colorSet, bool IsRepeat, bool IsActive) noexcept;
-		// 
-		template <typename... Args>
-		extern void SetMsg(int xp1, int yp1, int ySize, FontHandle::FontXCenter FontX, unsigned int Color, unsigned int EdleColor, std::string_view String, Args&&... args) noexcept {
-			if (String == "") { return; }
-			DrawControl::Instance()->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, ySize,
-				FontX, FontHandle::FontYCenter::MIDDLE, xp1, yp1, Color, EdleColor, ((std::string)String).c_str(), args...);
-		}
 		// クリックできる文字付のボックス
 		template <typename... Args>
 		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, bool IsActive, std::string_view String, Args&&... args) noexcept {
-			bool ret = SetClickBox(xp1, yp1, xp2, yp2, defaultcolor, IsRepeat, IsActive);
-			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
-			return ret;
+			auto* DrawCtrls = DrawControl::Instance();
+			auto* Pad = PadControl::Instance();
+			bool MouseOver = IsActive && IntoMouse(xp1, yp1, xp2, yp2);
+			DrawCtrls->SetDrawBox(DrawLayer::Normal, xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : defaultcolor, true);
+			DrawCtrls->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, std::min(StringYSizeMax, yp2 - yp1),
+				FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, (xp1 + xp2) / 2, (yp1 + yp2) / 2, White, Black,
+				((std::string)String).c_str(), args...);
+			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
 		}
-		// 文字付のボックス
-		template <typename... Args>
-		extern void SetMsgBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, std::string_view String, Args&&... args) noexcept {
-			SetBox(xp1, yp1, xp2, yp2, defaultcolor);
-			SetMsg((xp1 + xp2) / 2, (yp1 + yp2) / 2, std::min(StringYSizeMax, yp2 - yp1), FontHandle::FontXCenter::MIDDLE, White, Black, String, args...);
-		}
-		// オンオフできるボタン
-		extern bool CheckBox(int xp1, int yp1, bool switchturn) noexcept;
-		// スライダー
-		extern int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept;
-		// 0~valueMaxの選択制ボタン集
-		extern int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) noexcept;
 		// 
 		/*
 		class ScrollBoxClass {
@@ -680,6 +634,7 @@ namespace DXLibRef {
 		public:
 			const auto&		GetNowScrollYPer(void) const noexcept { return this->m_NowScrollYPer; }
 			void			ScrollBox(int xp1, int yp1, int xp2, int yp2, float TotalPer, bool IsActive) noexcept {
+				auto* DrawCtrls = DrawControl::Instance();
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				auto* Pad = PadControl::Instance();
 				unsigned int color = Gray25;
@@ -739,8 +694,8 @@ namespace DXLibRef {
 						}
 					}
 				}
-				SetBox(xp2 - (24), yp1, xp2, yp2, Gray50);
-				SetBox(xp2 - (24) + (1), Yp_s, xp2 - (1), Yp_e, color);
+				DrawCtrls->SetDrawBox(DrawLayer::Normal, xp2 - (24), yp1, xp2, yp2, Gray50, true);
+				DrawCtrls->SetDrawBox(DrawLayer::Normal, xp2 - (24) + (1), Yp_s, xp2 - (1), Yp_e, color, true);
 			}
 		}
 		//*/

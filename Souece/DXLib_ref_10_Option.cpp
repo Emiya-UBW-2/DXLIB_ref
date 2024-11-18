@@ -6,6 +6,81 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	const OPTION* SingletonBase<OPTION>::m_Singleton = nullptr;
 
+	// オンオフできるボタン
+	static bool CheckBox(int xp1, int yp1, bool switchturn) noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		int xp3 = xp1 + EdgeSize;
+		int yp3 = yp1 + EdgeSize;
+		int xp4 = xp1 + LineHeight * 2 - EdgeSize;
+		int yp4 = yp1 + LineHeight - EdgeSize;
+
+		auto* Pad = PadControl::Instance();
+		bool MouseOver = IntoMouse(xp3, yp3, xp4, yp4);
+		if (MouseOver && Pad->GetMouseClick().trigger()) {
+			switchturn ^= 1;
+			auto* SE = SoundPool::Instance();
+			SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+		}
+		unsigned int color = Gray25;
+		int Edge = (5);
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xp3 + Edge, yp3 + Edge, xp4 - Edge, yp4 - Edge, Black, true);
+		xp4 = xp1 + LineHeight * (switchturn ? 1 : 0) - EdgeSize;
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xp3 + Edge, yp3 + Edge, xp4 + Edge, yp4 - Edge, Gray50, true);
+		xp3 = xp1 + LineHeight * (switchturn ? 1 : 0) + EdgeSize;
+		xp4 = xp1 + LineHeight * (switchturn ? 2 : 1) - EdgeSize;
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xp3, yp3, xp4, yp4, color, true);
+		return switchturn;
+	}
+	// スライダー
+	static int UpDownBar(int xmin, int xmax, int yp, int value, int valueMin, int valueMax) noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		int xpmin = xmin + 1;
+		int xpmax = xmax - 1;
+
+		auto* Pad = PadControl::Instance();
+		bool MouseOver = IntoMouse(xpmin - 5, yp, xpmin + (xpmax - xpmin) + 5, yp + LineHeight);
+		if (MouseOver && Pad->GetMouseClick().trigger()) {
+			auto* SE = SoundPool::Instance();
+			SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+		}
+		if (MouseOver && Pad->GetMouseClick().press()) {
+			value = std::clamp(((valueMax - valueMin) * (Pad->GetMS_X() - xpmin) / (xpmax - xpmin)) + valueMin, valueMin, valueMax);
+		}
+
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpmin, yp, xpmin + (xpmax - xpmin), yp + LineHeight, DarkGreen, true);
+		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpmin, yp, xpmin + (xpmax - xpmin) * std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
+			MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green, true);
+		int xp = (xmin + (xmax - xmin) / 2);
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+			FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xp, yp,
+			White, Black, "%03d", value);
+		return value;
+	}
+	// 0~valueMaxの選択制ボタン集
+	static int UpDownBox(int xmin, int xmax, int yp, int value, int valueMax) noexcept {
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		auto* Pad = PadControl::Instance();
+		auto* SE = SoundPool::Instance();
+		int width = LineHeight;
+		int r = LineHeight / 3;
+		int xps = (xmax + xmin) / 2;
+		int yps = yp + LineHeight / 2;
+		for (int loop : std::views::iota(0, valueMax)) {
+			int xp1 = xps + loop * width - width * (valueMax - 1) / 2;
+
+			bool MouseOver = IntoMouse(xp1 - r, yps - r, xp1 + r, yps + r);
+			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal,
+				xp1 - r, yps - r, xp1 + r, yps + r,
+				MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : ((value == loop) ? Green : DarkGreen), true);
+			if (MouseOver && Pad->GetMouseClick().trigger()) {
+				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+
+				value = loop;
+			}
+		}
+		return value;
+	}
+
 	void			OPTION::Load(void) noexcept {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GraphicsPreset)).SetEnumParamType(EnumParamType::Int);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);// DirectXVer
@@ -231,7 +306,10 @@ namespace DXLibRef {
 	// 
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		ypos += (static_cast<int>(selanim));
-		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, isMine ? White : Gray50, Black, m_Name);
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos,
+			isMine ? White : Gray50, Black, m_Name);
 		m_Draw(xpos + (720 - 324), ypos, isMine);
 	}
 	// 
@@ -298,60 +376,108 @@ namespace DXLibRef {
 	}
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
-		WindowSystem::SetMsg(xpos, ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::LEFT, White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
+		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos,
+			White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
+	}
+	//
+	void OptionWindowClass::OptionTabsInfo::BoolChange(EnumSaveParam SaveParam) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* SE = SoundPool::Instance();
+		OptionParts->ChangeParamBoolean(SaveParam);
+		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+		auto* PostPassParts = PostPassEffect::Instance();
+		PostPassParts->UpdateActive();
+	}
+	bool OptionWindowClass::OptionTabsInfo::BoolDraw(int xpos, int ypos, EnumSaveParam SaveParam) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto prev = OptionParts->GetParamBoolean(SaveParam);
+		OptionParts->SetParamBoolean(SaveParam, CheckBox(xpos, ypos, OptionParts->GetParamBoolean(SaveParam)));
+		if (prev != OptionParts->GetParamBoolean(SaveParam)) {
+			auto* PostPassParts = PostPassEffect::Instance();
+			PostPassParts->UpdateActive();
+			return true;
+		}
+		return false;
+	}
+	void OptionWindowClass::OptionTabsInfo::IntChange(EnumSaveParam SaveParam, int Pow, int Min, int Max) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* SE = SoundPool::Instance();
+		OptionParts->SetParamInt(SaveParam, std::clamp(OptionParts->GetParamInt(SaveParam) + Pow, Min, Max));
+		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+		auto* PostPassParts = PostPassEffect::Instance();
+		PostPassParts->UpdateActive();
+	}
+	bool OptionWindowClass::OptionTabsInfo::IntUpDownBoxDraw(int xpos, int ypos, EnumSaveParam SaveParam, int Max) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto prev = OptionParts->GetParamInt(SaveParam);
+		OptionParts->SetParamInt(SaveParam, UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(SaveParam), Max));
+		if (prev != OptionParts->GetParamInt(SaveParam)) {
+			auto* PostPassParts = PostPassEffect::Instance();
+			PostPassParts->UpdateActive();
+			return true;
+		}
+		return false;
+	}
+	void OptionWindowClass::OptionTabsInfo::FloatChange(EnumSaveParam SaveParam, float Pow, float Min, float Max) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		auto* SE = SoundPool::Instance();
+		OptionParts->SetParamFloat(SaveParam, std::clamp(OptionParts->GetParamFloat(SaveParam) + Pow, Min, Max));
+		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+	}
+	bool OptionWindowClass::OptionTabsInfo::FloatUpDownBarDraw(int xpos, int ypos, EnumSaveParam SaveParam, float Min, float Max, int Scale) noexcept {
+		auto* OptionParts = OPTION::Instance();
+		int prev = static_cast<int>(OptionParts->GetParamFloat(SaveParam) * Scale + 0.5f);
+		int value = UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(SaveParam) * Scale + 0.5f), (int)(Min * Scale + 0.5f), (int)(Max * Scale + 0.5f));
+		OptionParts->SetParamFloat(SaveParam, static_cast<float>(value) / Scale);
+		if (prev != value) {
+			return true;
+		}
+		return false;
 	}
 	// 
 	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("BGM", 1110,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
+			[this]() {
+				FloatChange(EnumSaveParam::BGM, -0.1f, 0.f, 1.f);
 				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) - 0.1f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				SE->FlipVolume();
 			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
+			[this]() {
+				FloatChange(EnumSaveParam::BGM, 0.1f, 0.f, 1.f);
 				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::BGM, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::BGM) + 0.1f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				SE->FlipVolume();
 			},
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::BGM) * 100.f + 0.5f), 0, 100);
-				OptionParts->SetParamFloat(EnumSaveParam::BGM, static_cast<float>(value) / 100.f);
-				SE->FlipVolume();
+			[this](int xpos, int ypos, bool) {
+				if (FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::BGM, 0.f, 1.f, 100)) {
+					auto* SE = SoundPool::Instance();
+					SE->FlipVolume();
+				}
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("SE", 1111,
-			[]() {
+			[this]() {
+				FloatChange(EnumSaveParam::SE, -0.1f, 0.f, 1.f);
 				auto* SE = SoundPool::Instance();
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) - 0.1f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				SE->FlipVolume();
 			},
-			[]() {
+			[this]() {
+				FloatChange(EnumSaveParam::SE, 0.1f, 0.f, 1.f);
 				auto* SE = SoundPool::Instance();
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::SE, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::SE) + 0.1f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				SE->FlipVolume();
 			},
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* SE = SoundPool::Instance();
-				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::SE) * 100.f + 0.5f), 0, 100);
-				OptionParts->SetParamFloat(EnumSaveParam::SE, static_cast<float>(value) / 100.f);
-				SE->FlipVolume();
+			[this](int xpos, int ypos, bool) {
+				if (FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::SE, 0.f, 1.f, 100)) {
+					auto* SE = SoundPool::Instance();
+					SE->FlipVolume();
+				}
 			}
 		);
 	}
@@ -363,11 +489,9 @@ namespace DXLibRef {
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Graphics Preset", 1120,
-			[]() {
+			[this]() {
+				IntChange(EnumSaveParam::GraphicsPreset, -1, 0, 4);
 				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) - 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 				case 0:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -420,12 +544,12 @@ namespace DXLibRef {
 
 					break;
 				}
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->UpdateActive();
 			},
-			[]() {
+			[this]() {
+				IntChange(EnumSaveParam::GraphicsPreset, 1, 0, 4);
 				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, std::clamp(OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset) + 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 				case 0:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -478,14 +602,14 @@ namespace DXLibRef {
 
 					break;
 				}
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->UpdateActive();
 			},
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				auto prev = OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset);
-				OptionParts->SetParamInt(EnumSaveParam::GraphicsPreset, WindowSystem::UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset), 4));
-				if (prev != OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
+			[this](int xpos, int ypos, bool) {
+				if (IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::GraphicsPreset, 4)) {
+					auto* OptionParts = OPTION::Instance();
 					switch (OptionParts->GetParamInt(EnumSaveParam::GraphicsPreset)) {
 					case 0:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
@@ -538,38 +662,33 @@ namespace DXLibRef {
 
 						break;
 					}
+					auto* PostPassParts = PostPassEffect::Instance();
+					PostPassParts->UpdateActive();
 				}
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Window Mode", 1121,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) - 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+			[this]() {
+				IntChange(EnumSaveParam::WindowMode, -1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max));
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				WindowSizeParts->SetWindowOrBorderless();
 			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::WindowMode, std::clamp(OptionParts->GetParamInt(EnumSaveParam::WindowMode) + 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max)));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+			[this]() {
+				IntChange(EnumSaveParam::WindowMode, 1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max));
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				WindowSizeParts->SetWindowOrBorderless();
 			},
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* LocalizeParts = LocalizePool::Instance();
-				auto* OptionParts = OPTION::Instance();
-				auto* WindowSizeParts = WindowSizeControl::Instance();
-				auto prev = OptionParts->GetParamInt(EnumSaveParam::WindowMode);
-				OptionParts->SetParamInt(EnumSaveParam::WindowMode, WindowSystem::UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::WindowMode), static_cast<int>(WindowType::Max)));
-				if (prev != OptionParts->GetParamInt(EnumSaveParam::WindowMode)) {
+			[this](int xpos, int ypos, bool) {
+				if (IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::WindowMode, static_cast<int>(WindowType::Max))) {
+					auto* WindowSizeParts = WindowSizeControl::Instance();
 					WindowSizeParts->SetWindowOrBorderless();
 				}
+				auto* LocalizeParts = LocalizePool::Instance();
+				auto* OptionParts = OPTION::Instance();
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 				std::string Type;
 				switch (static_cast<WindowType>(OptionParts->GetParamInt(EnumSaveParam::WindowMode))) {
 				case WindowType::Window:
@@ -585,48 +704,40 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				WindowSystem::SetMsg(xpos + (250), ypos + LineHeight / 2,
-					LineHeight * 2 / 3, FontHandle::FontXCenter::RIGHT, White, Black, Type.c_str());
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+					FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + (250), ypos,
+					White, Black, Type.c_str());
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("V Sync", 1123,
 			[this]() {
+				BoolChange(EnumSaveParam::vsync);
 				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::vsync);
+				auto* DXLib_refParts = DXLib_ref::Instance();
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
-				auto* DXLib_refParts = DXLib_ref::Instance();
 				DXLib_refParts->SetWaitVSync();// 垂直同期
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[this]() {
+				BoolChange(EnumSaveParam::vsync);
 				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::vsync);
+				auto* DXLib_refParts = DXLib_ref::Instance();
 				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 				}
-				auto* DXLib_refParts = DXLib_ref::Instance();
 				DXLib_refParts->SetWaitVSync();// 垂直同期
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			},
 			[]() {},
 			[]() {},
 			[this](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				auto prev = OptionParts->GetParamBoolean(EnumSaveParam::vsync);
-				OptionParts->SetParamBoolean(EnumSaveParam::vsync, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::vsync)));
-				if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
-					OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
-				}
-				if (prev != OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
+				if (BoolDraw(xpos, ypos, EnumSaveParam::vsync)) {
+					auto* OptionParts = OPTION::Instance();
+					auto* DXLib_refParts = DXLib_ref::Instance();
 					if (OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 						OptionParts->SetParamInt(EnumSaveParam::FpsLimit, RefreshRate);
 					}
-					auto* DXLib_refParts = DXLib_ref::Instance();
 					DXLib_refParts->SetWaitVSync();// 垂直同期
 				}
 			}
@@ -693,10 +804,12 @@ namespace DXLibRef {
 						ret = i;
 					}
 				}
-				int value = WindowSystem::UpDownBox(xpos, xpos + (200), ypos, ret, FrameLimitsNum);
+				int value = UpDownBox(xpos, xpos + (200), ypos, ret, FrameLimitsNum);
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
-				WindowSystem::SetMsg(xpos + (250), ypos + LineHeight / 2,
-					LineHeight, FontHandle::FontXCenter::RIGHT, White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + (250), ypos,
+					White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
@@ -708,6 +821,8 @@ namespace DXLibRef {
 				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->UpdateActive();
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -716,6 +831,8 @@ namespace DXLibRef {
 				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, 1 - OptionParts->GetParamInt(EnumSaveParam::DirectXVer));
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->UpdateActive();
 			},
 			[]() {},
 			[]() {},
@@ -723,253 +840,120 @@ namespace DXLibRef {
 				auto* OptionWindowParts = OptionWindowClass::Instance();
 				auto* OptionParts = OPTION::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::DirectXVer);
-				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1)) ? 1 : 0);
+				OptionParts->SetParamInt(EnumSaveParam::DirectXVer, CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::DirectXVer) == 1)) ? 1 : 0);
 				if (prev != OptionParts->GetParamInt(EnumSaveParam::DirectXVer)) {
 					OptionWindowParts->SetRestart();
+					auto* PostPassParts = PostPassEffect::Instance();
+					PostPassParts->UpdateActive();
 				}
-				WindowSystem::SetMsg(xpos + (100), ypos + LineHeight / 2,
-					LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+					White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("AntiAlias", 1126,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::AA);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::AA); },
+			[this]() { BoolChange(EnumSaveParam::AA); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::AA, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::AA)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::AA); }
 		);
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("SSAO", 1127,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::SSAO);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::SSAO); },
+			[this]() { BoolChange(EnumSaveParam::SSAO); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::SSAO, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::SSAO)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::SSAO); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Reflection", 1128,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) - 1, 0, 3));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::Reflection, std::clamp(OptionParts->GetParamInt(EnumSaveParam::Reflection) + 1, 0, 3));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { IntChange(EnumSaveParam::Reflection, -1, 0, 3); },
+			[this]() { IntChange(EnumSaveParam::Reflection, 1, 0, 3); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::Reflection, WindowSystem::UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::Reflection), 3));
-			}
+			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::Reflection, 3); }
 		);
 
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Shadow", 1129,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) - 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::shadow, std::clamp(OptionParts->GetParamInt(EnumSaveParam::shadow) + 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { IntChange(EnumSaveParam::shadow, -1, 0, 4); },
+			[this]() { IntChange(EnumSaveParam::shadow, 1, 0, 4); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::shadow, WindowSystem::UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::shadow), 4));
-			}
+			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::shadow, 4); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Object Level", 1130,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) - 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, std::clamp(OptionParts->GetParamInt(EnumSaveParam::ObjLevel) + 1, 0, 4));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { IntChange(EnumSaveParam::ObjLevel, -1, 0, 4); },
+			[this]() { IntChange(EnumSaveParam::ObjLevel, 1, 0, 4); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::ObjLevel, WindowSystem::UpDownBox(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::ObjLevel), 4));
-			}
+			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::ObjLevel, 4); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Bloom Effect", 1131,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::bloom);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::bloom); },
+			[this]() { BoolChange(EnumSaveParam::bloom); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::bloom, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::bloom)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::bloom); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Screen Effect", 1132,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::ScreenEffect);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::ScreenEffect); },
+			[this]() { BoolChange(EnumSaveParam::ScreenEffect); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::ScreenEffect); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("DoF", 1133,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::DoF);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::DoF); },
+			[this]() { BoolChange(EnumSaveParam::DoF); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::DoF, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::DoF)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::DoF); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("MotionBlur", 1134,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::MotionBlur);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::MotionBlur); },
+			[this]() { BoolChange(EnumSaveParam::MotionBlur); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::MotionBlur, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::MotionBlur); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Fov", 1122,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) - 5, 45, 110));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::fov, std::clamp(OptionParts->GetParamInt(EnumSaveParam::fov) + 5, 45, 110));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { IntChange(EnumSaveParam::fov, -5, 45, 110); },
+			[this]() { IntChange(EnumSaveParam::fov, 5, 45, 110); },
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamInt(EnumSaveParam::fov, WindowSystem::UpDownBar(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
+				OptionParts->SetParamInt(EnumSaveParam::fov, UpDownBar(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Render Scale", 1138,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
+			[this]() {
+				FloatChange(EnumSaveParam::DrawScale, -0.1f, 0.25f, 1.f);
 				auto* OptionWindowParts = OptionWindowClass::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) - 0.1f, 0.25f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
+			[this]() {
+				FloatChange(EnumSaveParam::DrawScale, 0.1f, 0.25f, 1.f);
 				auto* OptionWindowParts = OptionWindowClass::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) + 0.1f, 0.25f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 				OptionWindowParts->SetRestart();
 			},
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionWindowParts = OptionWindowClass::Instance();
-				auto* OptionParts = OPTION::Instance();
-				int prev = static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) * 100.f + 0.5f);
-				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::DrawScale) * 100.f + 0.5f), 25, 100);
-				OptionParts->SetParamFloat(EnumSaveParam::DrawScale, static_cast<float>(value) / 100.f);
-				if (prev != value) {
+			[this](int xpos, int ypos, bool) {
+				if (FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::DrawScale, 0.25f, 1.f, 100)) {
+					auto* OptionWindowParts = OptionWindowClass::Instance();
 					OptionWindowParts->SetRestart();
 				}
 			}
@@ -1025,7 +1009,7 @@ namespace DXLibRef {
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::Language);
-				if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == static_cast<int>(LanguageType::Eng)))) {
+				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == static_cast<int>(LanguageType::Eng)))) {
 					OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
 				}
 				else {
@@ -1039,74 +1023,35 @@ namespace DXLibRef {
 					KeyGuideParts->SetGuideFlip();
 				}
 
-				WindowSystem::SetMsg(xpos + (125), ypos + LineHeight / 2,
-					LineHeight, FontHandle::FontXCenter::MIDDLE, White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (125), ypos,
+					White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 			}
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("X sensing", 1140,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) - 0.01f, 0.01f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) + 0.01f, 0.01f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { FloatChange(EnumSaveParam::Xsensing, -0.01f, 0.01f, 1.f); },
+			[this]() { FloatChange(EnumSaveParam::Xsensing, 0.01f, 0.01f, 1.f); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Xsensing) * 100.f + 0.5f), 10, 100);
-				OptionParts->SetParamFloat(EnumSaveParam::Xsensing, static_cast<float>(value) / 100.f);
-			}
+			[this](int xpos, int ypos, bool) { FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::Xsensing, 0.01f, 1.f, 100); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("Y sensing", 1141,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) - 0.01f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, std::clamp(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) + 0.01f, 0.f, 1.f));
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { FloatChange(EnumSaveParam::Ysensing, -0.01f, 0.01f, 1.f); },
+			[this]() { FloatChange(EnumSaveParam::Ysensing, 0.01f, 0.01f, 1.f); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				int value = WindowSystem::UpDownBar(xpos, xpos + (200), ypos, static_cast<int>(OptionParts->GetParamFloat(EnumSaveParam::Ysensing) * 100.f + 0.5f), 10, 100);
-				OptionParts->SetParamFloat(EnumSaveParam::Ysensing, static_cast<float>(value) / 100.f);
-			}
+			[this](int xpos, int ypos, bool) { FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::Ysensing, 0.01f, 1.f, 100); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("HeadBobbing", 1142,
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
-			[]() {
-				auto* OptionParts = OPTION::Instance();
-				auto* SE = SoundPool::Instance();
-				OptionParts->ChangeParamBoolean(EnumSaveParam::HeadBobbing);
-				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
-			},
+			[this]() { BoolChange(EnumSaveParam::HeadBobbing); },
+			[this]() { BoolChange(EnumSaveParam::HeadBobbing); },
 			[]() {},
 			[]() {},
-			[](int xpos, int ypos, bool) {
-				auto* OptionParts = OPTION::Instance();
-				OptionParts->SetParamBoolean(EnumSaveParam::HeadBobbing, WindowSystem::CheckBox(xpos, ypos, OptionParts->GetParamBoolean(EnumSaveParam::HeadBobbing)));
-			}
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::HeadBobbing); }
 		);
 		this->m_Elements.resize(this->m_Elements.size() + 1);
 		this->m_Elements.back().Init("GamePadType", 1144,
@@ -1146,7 +1091,8 @@ namespace DXLibRef {
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
-				if (WindowSystem::CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::PS4)))) {
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::PS4)))) {
 					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
 				}
 				else {
@@ -1154,12 +1100,14 @@ namespace DXLibRef {
 				}
 				ypos -= LineHeight * 1 / 6;
 				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
-					WindowSystem::SetMsg(xpos + (125), ypos + LineHeight / 3,
-						LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "XInput");
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+						FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+						White, Black, "XInput");
 				}
 				else {
-					WindowSystem::SetMsg(xpos + (125), ypos + LineHeight / 3,
-						LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "DirectInput");
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+						FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+						White, Black, "DirectInput");
 				}
 
 				if (GetJoypadNum() > 0) {
@@ -1171,13 +1119,15 @@ namespace DXLibRef {
 					case DX_PADTYPE_SWITCH_JOY_CON_R:
 					case DX_PADTYPE_SWITCH_PRO_CTRL:
 					case DX_PADTYPE_SWITCH_HORI_PAD:
-						WindowSystem::SetMsg(xpos + (125), ypos + LineHeight * 3 / 3,
-							LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:DirectInput");
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+							FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
+							White, Black, "推奨:DirectInput");
 						break;
 					case DX_PADTYPE_XBOX_360:
 					case DX_PADTYPE_XBOX_ONE:
-						WindowSystem::SetMsg(xpos + (125), ypos + LineHeight * 3 / 3,
-							LineHeight * 2 / 3, FontHandle::FontXCenter::MIDDLE, White, Black, "推奨:XInput");
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
+							FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
+							White, Black, "推奨:XInput");
 						break;
 					default:
 						break;
@@ -1224,7 +1174,10 @@ namespace DXLibRef {
 				if (isMine && Pad->GetMouseClick().trigger()) {
 					Pad->ResetAssign();
 				}
-				WindowSystem::SetMsg(xpos + (100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+					isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
 		if (Pad->GetPadsInfo(PADS::MOVE_W).IsUse()) {
@@ -1545,7 +1498,10 @@ namespace DXLibRef {
 					Pad->FlipAssign();
 					Pad->Save();
 				}
-				WindowSystem::SetMsg(xpos + (100), ypos + LineHeight / 2, LineHeight, FontHandle::FontXCenter::MIDDLE, isMine ? White : Gray25, Black, "LMB Click");
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
+					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+					isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
 	}

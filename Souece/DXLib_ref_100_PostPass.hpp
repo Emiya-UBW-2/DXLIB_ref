@@ -367,64 +367,6 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*ポストプロセス																															*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	class Gbuffer {
-	private:
-		GraphHandle ColorScreen;	// そのまま透過なしにしたスクリーン
-		GraphHandle NormalScreen;	// 法線のGバッファ
-		GraphHandle	DepthScreen;	// 深度のGバッファ
-		bool		m_IsActiveGBuffer{ false };
-	public:
-		std::array<GraphHandle, 3>		BufScreen;//等倍サイズの処理パス
-		std::array<GraphHandle, 1>		SubBufScreen;//1/4サイズの処理パス
-	private:
-		void LoadGBuffer(void) noexcept {}
-	public:
-		const auto& IsActive(void) const noexcept { return m_IsActiveGBuffer; }
-		const auto& GetColorScreen(void) const noexcept { return ColorScreen; }
-		const auto& GetNormalScreen(void) const noexcept { return NormalScreen; }
-		const auto& GetDepthScreen(void) const noexcept { return DepthScreen; }
-	public:
-		void SetupGBuffer(void) noexcept {
-			if (m_IsActiveGBuffer) {
-				NormalScreen.SetRenderTargetToShader(1);
-				DepthScreen.SetRenderTargetToShader(2);
-			}
-		}
-		void SetupColorBuffer(const GraphHandle& BufferScreen) noexcept {
-			ColorScreen.GraphFilterBlt(BufferScreen, DX_GRAPH_FILTER_DOWN_SCALE, 1);
-		}
-		void UpdateActive(bool value) noexcept {
-			if (m_IsActiveGBuffer != value) {
-				m_IsActiveGBuffer = value;
-				if (m_IsActiveGBuffer) {
-					LoadGBuffer();
-				}
-				else {
-					ColorScreen.Dispose();
-					NormalScreen.Dispose();
-					DepthScreen.Dispose();
-					for (auto& buf : BufScreen) {
-						buf.Dispose();
-					}
-					for (auto& buf : SubBufScreen) {
-						buf.Dispose();
-					}
-				}
-			}
-		}
-		void ResetBuffer(void) noexcept {
-			if (!m_IsActiveGBuffer) { return; }
-			// リセット替わり
-			ColorScreen.SetDraw_Screen();
-			NormalScreen.SetDraw_Screen();
-			NormalScreen.FillGraph(128, 128, 255);
-			DepthScreen.SetDraw_Screen();
-			DepthScreen.FillGraph(255, 0, 0);
-		}
-		void Dispose(void) noexcept {
-			UpdateActive(false);
-		}
-	};
 	// ベース
 	class PostPassBase {
 	protected:
@@ -439,12 +381,6 @@ namespace DXLibRef {
 		virtual void SetEffect_Sub(GraphHandle*, GraphHandle*, GraphHandle*, GraphHandle*) noexcept {}
 	public:
 		bool IsActive(void) noexcept { return IsActive_Sub(); }
-		void Init(void) noexcept {
-			m_PrevActive = IsActive_Sub();
-			if (m_PrevActive) {
-				Load_Sub();
-			}
-		}
 		void UpdateActive(bool active) noexcept {
 			if (m_PrevActive != active) {
 				m_PrevActive = active;
@@ -456,13 +392,8 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void Dispose(void) noexcept {
-			if (IsActive_Sub()) {
-				Dispose_Sub();
-			}
-		}
 		void SetEffect(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept {
-			if (IsActive_Sub()) {
+			if (IsActive()) {
 				SetEffect_Sub(TargetGraph, ColorGraph, NormalPtr, DepthPtr);
 			}
 		}
@@ -517,55 +448,51 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<PostPassEffect>;
 	private:
-
 		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
-		bool										m_IsActiveGBuffer{ true };
-		GraphHandle BufferScreen;	// 描画スクリーン
-
-		GraphHandle ColorScreen;	// そのまま透過なしにしたスクリーン
-		GraphHandle NormalScreen;	// 法線のGバッファ
-		GraphHandle	DepthScreen;	// 深度のGバッファ
+		//
+		bool						m_IsActiveGBuffer{ false };
+		GraphHandle					BufferScreen;	// 描画スクリーン
+		GraphHandle					ColorScreen;	// そのまま透過なしにしたスクリーン
+		GraphHandle					NormalScreen;	// 法線のGバッファ
+		GraphHandle					DepthScreen;	// 深度のGバッファ
 		// 
-		float near_DoF = 0.f;
-		float far_DoF = 0.f;
-		float near_DoFMax = 0.f;
-		float far_DoFMin = 0.f;
-		// 
-		int InColorPerMin = 20;
-		int InColorPerMax = 255;
-		float InColorGamma = 1.1f;
+		float						near_DoF = 0.f;
+		float						far_DoF = 0.f;
+		float						near_DoFMax = 0.f;
+		float						far_DoFMin = 0.f;
+		int							InColorPerMin = 20;
+		int							InColorPerMax = 255;
+		float						InColorGamma = 1.1f;
 		Matrix4x4DX					m_CamViewMat{};
 		Matrix4x4DX					m_CamProjectionMat{};
 		Camera3DInfo				m_CamInfo{};
-
 		std::array<shaderparam, 2>	m_Shader2D;
 		float						m_AberrationPower{ 1.f };
-
 		float						m_DistortionPer{ 120.f };
 		float						m_GodRayPer{ 0.5f };
-
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
-
-		bool						m_IsCubeMap{ true };
+		bool						m_IsCubeMap{ false };
 		RealTimeCubeMap				m_RealTimeCubeMap;
-
 		ShaderUseClass				m_PBR_Shader;
 	public:
-		const auto& GetCamViewMat(void) const noexcept { return m_CamViewMat; }
-		const auto& GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
-	public:
-		const auto& GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
-		const auto& GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
-	public:
 		auto& GetBufferScreen(void) noexcept { return BufferScreen; }
-
-		auto& Get_near_DoF(void) noexcept { return near_DoF; }
-		auto& Get_far_DoF(void) noexcept { return far_DoF; }
-		auto& Get_near_DoFMax(void) noexcept { return near_DoFMax; }
-		auto& Get_far_DoFMin(void) noexcept { return far_DoFMin; }
-
+	public:
+		const auto&		GetCamViewMat(void) const noexcept { return m_CamViewMat; }
+		const auto&		GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
+		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
+		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
+		const auto&		Get_near_DoF(void) const noexcept { return near_DoF; }
+		const auto&		Get_far_DoF(void) const noexcept { return far_DoF; }
+		const auto&		Get_near_DoFMax(void) const noexcept { return near_DoFMax; }
+		const auto&		Get_far_DoFMin(void) const noexcept { return far_DoFMin; }
 		const auto&		is_lens(void) const noexcept { return m_Shader2D.at(0).use; }
 		const auto&		zoom_lens(void) const noexcept { return m_Shader2D.at(0).param.at(3); }
+		const auto&		GetLensParam(void) const noexcept { return m_Shader2D.at(0); }
+		const auto&		GetBlackoutParam(void) const noexcept { return m_Shader2D.at(1); }
+		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
+		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
+		const auto&		GetDistortionPer(void) const noexcept { return m_DistortionPer; }
+	public:
 		void			Set_is_lens(bool value) noexcept { m_Shader2D.at(0).use = value; }
 		void			Set_xp_lens(float value) noexcept { m_Shader2D.at(0).param.at(0) = value; }
 		void			Set_yp_lens(float value) noexcept { m_Shader2D.at(0).param.at(1) = value; }
@@ -573,26 +500,17 @@ namespace DXLibRef {
 		void			Set_zoom_lens(float value) noexcept { m_Shader2D.at(0).param.at(3) = value; }
 		void			Set_is_Blackout(bool value) noexcept { m_Shader2D.at(1).use = value; }
 		void			Set_Per_Blackout(float value) noexcept { m_Shader2D.at(1).param.at(0) = value; }
-		const auto&		GetLensParam(void) const noexcept { return m_Shader2D.at(0); }
-		const auto&		GetBlackoutParam(void) const noexcept { return m_Shader2D.at(1); }
-
-		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
-
-		const auto& GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
-
-		const auto& GetDistortionPer(void) const noexcept { return m_DistortionPer; }
 		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
-	public:
 		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
-		void Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
+		void			Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
 			near_DoF = near_d;
 			far_DoF = far_d;
 			near_DoFMax = near_m;
 			far_DoFMin = far_m;
 		}
-		void SetLevelFilter(int inMin, int inMax, float gamma) noexcept {
+		void			SetLevelFilter(int inMin, int inMax, float gamma) noexcept {
 			InColorPerMin = std::clamp(inMin, 0, 255);
 			InColorPerMax = std::clamp(inMax, 0, 255);
 			InColorGamma = std::max(1.f, gamma);
@@ -607,9 +525,9 @@ namespace DXLibRef {
 		~PostPassEffect(void) noexcept;
 	public:
 		void			Init(void) noexcept;
-		void			Update(void) noexcept;
+		void			UpdateActive(void) noexcept;
 		void			SetCamMat(const Camera3DInfo& camInfo) noexcept;
-		void ResetBuffer(void) noexcept;
+		void			ResetBuffer(void) noexcept;
 		void			DrawGBuffer(float near_len, float far_len, std::function<void()> done) noexcept;
 		void			SetDrawShadow(const Camera3DInfo& camInfo,
 			std::function<void()> setshadowdoing_rigid,
@@ -626,5 +544,29 @@ namespace DXLibRef {
 	private:
 		void LoadGBuffer(void) noexcept;
 		void DisposeGBuffer(void) noexcept;
+
+		void UpdateActiveGBuffer(bool ActiveGBuffer) noexcept {
+			if (m_IsActiveGBuffer != ActiveGBuffer) {
+				m_IsActiveGBuffer = ActiveGBuffer;
+				if (m_IsActiveGBuffer) {
+					LoadGBuffer();
+				}
+				else {
+					DisposeGBuffer();
+				}
+			}
+		}
+
+		void UpdateActiveCubeMap(bool ActiveCubeMap) noexcept {
+			if (ActiveCubeMap != m_IsCubeMap) {
+				m_IsCubeMap = ActiveCubeMap;
+				if (m_IsCubeMap) {
+					m_RealTimeCubeMap.Init();
+				}
+				else {
+					m_RealTimeCubeMap.Dispose();
+				}
+			}
+		}
 	};
 };

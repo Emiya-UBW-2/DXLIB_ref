@@ -322,6 +322,13 @@ namespace DXLibRef {
 			void Draw(int xpos, int ypos, int xsize, bool isActive, int* TabSel, int* select) noexcept;
 
 			void DrawInfo(int xpos, int ypos, int select) noexcept;
+		protected:
+			void BoolChange(EnumSaveParam SaveParam) noexcept;
+			bool BoolDraw(int xpos, int ypos, EnumSaveParam SaveParam) noexcept;
+			void IntChange(EnumSaveParam SaveParam, int Pow, int Min, int Max) noexcept;
+			bool IntUpDownBoxDraw(int xpos, int ypos, EnumSaveParam SaveParam, int Max) noexcept;
+			void FloatChange(EnumSaveParam SaveParam, float Pow, float Min, float Max) noexcept;
+			bool FloatUpDownBarDraw(int xpos, int ypos, EnumSaveParam SaveParam, float Min, float Max, int Scale) noexcept;
 		};
 
 		class SoundTabsInfo :public OptionTabsInfo {
