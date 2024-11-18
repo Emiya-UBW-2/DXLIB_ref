@@ -165,6 +165,7 @@ namespace DXLibRef {
 		auto* PostPassParts = PostPassEffect::Instance();
 		KeyGuideParts->Dispose();
 		PostPassParts->ResetAllBuffer();
+		PostPassParts->UpdateActive();
 		//
 		this->m_NowScenesPtr->Load();
 		//
@@ -185,7 +186,6 @@ namespace DXLibRef {
 		auto* OptionWindowParts = OptionWindowClass::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* SideLogParts = SideLog::Instance();
-		auto* PostPassParts = PostPassEffect::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
 		if (Pad->GetPadsInfo(PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
@@ -262,7 +262,6 @@ namespace DXLibRef {
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Execute();
 #endif
-		PostPassParts->UpdateActive();
 		CameraShake::Instance()->Update();
 		SideLogParts->Update();
 		PopUpParts->Update();
