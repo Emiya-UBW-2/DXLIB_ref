@@ -13,8 +13,7 @@ namespace DXLibRef {
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (win32fdt.cFileName[0] != '.') {
-					pData->resize(pData->size() + 1);
-					pData->back() = win32fdt;
+					pData->emplace_back(win32fdt);
 				}
 
 			} while (FindNextFile(hFind, &win32fdt));

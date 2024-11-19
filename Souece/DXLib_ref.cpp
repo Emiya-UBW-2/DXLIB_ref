@@ -62,7 +62,7 @@ namespace DXLibRef {
 
 		// 
 		SoundPool::Create();							// サウンド
-		FontPool::Create();
+		FontSystem::FontPool::Create();
 		KeyGuide::Create();
 		PadControl::Create();							// キー
 		OptionWindowClass::Create();
@@ -118,8 +118,8 @@ namespace DXLibRef {
 
 					PopUpParts->Draw(Width / 2 + Edge, Height / 2 + Edge);
 
-					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, 12,
-						FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, Edge + Edge, Height + Edge + Edge,
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, 12,
+						FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::MIDDLE, Edge + Edge, Height + Edge + Edge,
 						Green, Black, LocalizeParts->Get(109));
 
 					int xp = Width + Edge + Edge;
@@ -131,8 +131,8 @@ namespace DXLibRef {
 					if (m_CheckPCSpec.GetCPUDatas()) {
 						int MouseOverID = InvalidID;
 						// CPU
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 							White, DarkGreen, LocalizeParts->Get(2001)); yp += LineHeight;
 						for (auto& c : *m_CheckPCSpec.GetCPUDatas()) {
 							int TextID = 0;
@@ -164,30 +164,30 @@ namespace DXLibRef {
 									break;
 								}
 							}
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp + Edge, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp + Edge, yp,
 								White, DarkGreen, "[%s]", c.m_Name.c_str());
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
 								Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp, 
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp, 
 								White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 							yp += LineHeight;
 						}
 						if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 								Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
 						}
 						// Mem
 						{
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 								White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
 
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xBase - Edge, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
 								White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
 							int TextID = 0;
 							unsigned int Color = White;
@@ -211,14 +211,14 @@ namespace DXLibRef {
 									break;
 								}
 							}
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
 								Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
 							yp += LineHeight;
 						}
 						// GPU
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 							White, DarkGreen, LocalizeParts->Get(2021)); yp += LineHeight;
 						for (auto& c : *m_CheckPCSpec.GetGPUDatas()) {
 							int TextID = 0;
@@ -250,20 +250,20 @@ namespace DXLibRef {
 									break;
 								}
 							}
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 3 / 4,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE, xp + Edge, yp + LineHeight / 2,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 3 / 4,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::MIDDLE, xp + Edge, yp + LineHeight / 2,
 								White, DarkGreen, "%s", c.m_Name.c_str());
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
 								Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp, 
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp, 
 								White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 							yp += LineHeight;
 						}
 						if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 								Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
 						}
 						// DirectX
@@ -276,17 +276,17 @@ namespace DXLibRef {
 						if (IntoMouse(xp + Edge, yp, xBase - Edge, yp + LineHeight * 2)) {
 							MouseOverID = 2048;
 						}
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp, yp,
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 							White, DarkGreen, LocalizeParts->Get(2035));
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xBase - Edge, yp, 
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp, 
 							White, DarkGreen, "DirectX%s", DirectXVerStr[NowSet]); yp += LineHeight;
 						if (MouseOverID != InvalidID) {
 							xp = Pad->GetMS_X();
 							yp = Pad->GetMS_Y();
-							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-								FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::BOTTOM, xp, yp,
+							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::BOTTOM, xp, yp,
 								Green, DarkGreen, LocalizeParts->Get(MouseOverID));
 						}
 					}
@@ -303,6 +303,7 @@ namespace DXLibRef {
 				WaitCount();
 			}
 			OptionParts->Save();
+			WindowSystem::DrawControl::Instance()->Dispose();
 #if defined(_USE_EFFEKSEER_)
 			Effkseer_End();
 #endif
@@ -389,6 +390,7 @@ namespace DXLibRef {
 				break;
 			}
 		}
+		WindowSystem::DrawControl::Instance()->Dispose();
 #if defined(_USE_OPENVR_)
 		VRParts->Dispose();
 #endif
@@ -397,7 +399,7 @@ namespace DXLibRef {
 #endif
 		DxLib_End();
 	}
-
+	//
 	void			DXLib_ref::SetWaitVSync(void) noexcept {
 		// 垂直同期
 		auto* OptionParts = OPTION::Instance();

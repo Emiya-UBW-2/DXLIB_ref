@@ -250,8 +250,6 @@ namespace DXLibRef {
 		SaveDataClass(SaveDataClass&& o) = delete;
 		SaveDataClass& operator=(const SaveDataClass&) = delete;
 		SaveDataClass& operator=(SaveDataClass&& o) = delete;
-
-		~SaveDataClass(void) noexcept {}
 	public:
 		SaveParam* GetData(std::string_view Name) noexcept {
 			for (auto& d : m_data) {
@@ -318,8 +316,6 @@ namespace DXLibRef {
 		CameraShake(CameraShake&& o) = delete;
 		CameraShake& operator=(const CameraShake&) = delete;
 		CameraShake& operator=(CameraShake&& o) = delete;
-
-		~CameraShake(void) noexcept {}
 	public:
 		void Update(void) noexcept;
 	};

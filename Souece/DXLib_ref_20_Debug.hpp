@@ -22,8 +22,6 @@ namespace DXLibRef {
 		DebugClass(DebugClass&& o) = delete;
 		DebugClass& operator=(const DebugClass&) = delete;
 		DebugClass& operator=(DebugClass&& o) = delete;
-
-		~DebugClass(void) noexcept {}
 	public:
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;

@@ -13,17 +13,17 @@ namespace DXLibRef {
 			switch (m_type) {
 			case DrawType::Alpha:
 				if (this->m_intParam.at(0) < 255) {
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam.at(0));
+					DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam.at(0));
 				}
 				else {
-					SetDrawBlendMode(DX_BLENDMODE_NOBLEND, this->m_intParam.at(0));
+					DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, this->m_intParam.at(0));
 				}
 				break;
 			case DrawType::Add:
-				SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam.at(0));
+				DxLib::SetDrawBlendMode(DX_BLENDMODE_ADD, this->m_intParam.at(0));
 				break;
 			case DrawType::Bright:
-				SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
+				DxLib::SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
 				break;
 			case DrawType::Box:
 				DxLib::DrawBox(
@@ -50,10 +50,8 @@ namespace DXLibRef {
 					(this->m_intParam.at(4) >= 2) ? WindowSizeParts->GetUIY(this->m_intParam.at(4)) : this->m_intParam.at(4));
 				break;
 			case DrawType::String:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0),
-					WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawString(
-						InvalidID,
-						(FontHandle::FontXCenter)m_intParam.at(2), (FontHandle::FontYCenter)m_intParam.at(3),
+				FontSystem::FontPool::Instance()->Get((FontSystem::FontType)m_intParam.at(0), WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawString(
+						(FontSystem::FontXCenter)m_intParam.at(2), (FontSystem::FontYCenter)m_intParam.at(3),
 						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
 						m_UintParam.at(0),
 						m_UintParam.at(1),
@@ -61,9 +59,8 @@ namespace DXLibRef {
 					);
 				break;
 			case DrawType::StringAutoFit:
-				FontPool::Instance()->Get((FontPool::FontType)m_intParam.at(0),
-					WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawStringAutoFit(
-						WindowSizeParts->GetUIY(m_intParam.at(2)), WindowSizeParts->GetUIY(m_intParam.at(3)),
+				FontSystem::FontPool::Instance()->Get((FontSystem::FontType)m_intParam.at(0), WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawStringAutoFit(
+					WindowSizeParts->GetUIY(m_intParam.at(2)), WindowSizeParts->GetUIY(m_intParam.at(3)),
 						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
 						m_UintParam.at(0),
 						m_UintParam.at(1),
@@ -76,11 +73,11 @@ namespace DXLibRef {
 
 					if (Scale < 0.95f && 1.05f < Scale) {
 						auto prev = GetDrawMode();
-						SetDrawMode(DX_DRAWMODE_BILINEAR);
+						DxLib::SetDrawMode(DX_DRAWMODE_BILINEAR);
 						m_GraphHandleParam.at(0)->DrawRotaGraph(
 							WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 							Scale, this->m_floatParam.at(1), this->m_boolParam.at(0));
-						SetDrawMode(prev);
+						DxLib::SetDrawMode(prev);
 					}
 					else {
 						m_GraphHandleParam.at(0)->DrawRotaGraph(
@@ -92,14 +89,14 @@ namespace DXLibRef {
 			case DrawType::ExtendGraph:
 				if (m_GraphHandleParam.at(0)) {
 					auto prev = GetDrawMode();
-					SetDrawMode(DX_DRAWMODE_BILINEAR);
+					DxLib::SetDrawMode(DX_DRAWMODE_BILINEAR);
 					m_GraphHandleParam.at(0)->DrawExtendGraph(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_boolParam.at(0));
-					SetDrawMode(prev);
+					DxLib::SetDrawMode(prev);
 				}
 				break;
 			case DrawType::CircleGauge:
 				if (m_GraphHandleParam.at(0)) {
-					DrawCircleGauge(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+					DxLib::DrawCircleGauge(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 						(double)this->m_floatParam.at(0),
 						m_GraphHandleParam.at(0)->get(),
 						(double)this->m_floatParam.at(1),
@@ -119,6 +116,71 @@ namespace DXLibRef {
 		}
 		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
 			return HitRectangleToRectangle(0, 0, BaseScreenWidth, BaseScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
+		}
+		void DrawControl::ClearList(void) noexcept {
+			for (size_t index = 0; auto & d : this->m_DrawDatas) {
+				auto& pd = this->m_PrevDrawDatas.at(index);
+				pd.clear();
+				for (auto& d2 : d) {
+					pd.emplace_back(d2);
+				}
+				index++;
+			}
+			for (auto& d : this->m_DrawDatas) {
+				d.clear();
+			}
+		}
+		void DrawControl::Draw(void) noexcept {
+			auto* DrawCtrls = WindowSystem::DrawControl::Instance();
+			bool IsHit = false;
+			// 同じかどうかチェック
+			for (size_t index = 0; auto & d : this->m_DrawDatas) {
+				auto& pd = this->m_PrevDrawDatas.at(index);
+				if (pd.size() == d.size()) {
+					for (size_t index2 = 0; auto & d2 : d) {
+						auto& pd2 = pd.at(index2);
+						if (!(pd2 == d2)) {
+							IsHit = true;
+							break;
+						}
+						index2++;
+					}
+				}
+				else {
+					IsHit = true;
+				}
+				index++;
+			}
+			// 
+			if (IsHit) {
+				{
+					auto NowScreen = GetDrawScreen();
+					m_BufferScreen.SetDraw_Screen(true);
+					{
+						for (auto& d : this->m_DrawDatas) {
+							for (auto& d2 : d) {
+								d2.Output();
+							}
+							DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
+							SetDrawBright(255, 255, 255);
+						}
+					}
+					GraphHandle::SetDraw_Screen(NowScreen, false);
+				}
+			}
+			// 前に描画したものをそのまま出す
+			m_BufferScreen.DrawGraph(0, 0, true);
+		}
+		void DrawControl::Dispose(void) noexcept {
+			for (auto& d : this->m_DrawDatas) {
+				d.clear();
+			}
+			this->m_DrawDatas.clear();
+
+			for (auto& d : this->m_PrevDrawDatas) {
+				d.clear();
+			}
+			this->m_PrevDrawDatas.clear();
 		}
 	};
 	// 
@@ -156,13 +218,13 @@ namespace DXLibRef {
 			if (d.ActivePer() > 0.f) {
 				DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * d.ActivePer()), 0, 255));
 				int yp = yp1 - (static_cast<int>(24.f * d.GetFlip()));
-				int FontLen = FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(InvalidID, d.GetMsg());
+				int FontLen = FontSystem::FontPool::Instance()->Get(FontSystem::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(d.GetMsg());
 				DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal,
 					xp1 - 6, yp + LineHeight,
 					xp1 - 6 + static_cast<int>(static_cast<float>(std::max(FontLen, 200)) * d.ActivePer()), yp + LineHeight + 5,
 					Black, true);
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp1, yp, d.GetMsgColor(), Black, d.GetMsg());
 			}
 		}
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
@@ -178,7 +240,7 @@ namespace DXLibRef {
 				auto* Pad = PadControl::Instance();
 				auto* KeyGuideParts = KeyGuide::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
-				KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::RELOAD).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9991));
+				KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::RELOAD).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9991));
 				if (m_GuideDoing) {
 					m_GuideDoing();
 				}
@@ -231,8 +293,8 @@ namespace DXLibRef {
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 
 		// タイトル
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2,
-			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xm1 + (32), ym1 + LineHeight / 4, White, Black, m_WindwoName);
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2,
+			FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xm1 + (32), ym1 + LineHeight / 4, White, Black, m_WindwoName);
 		// 
 		if (m_Active) {
 			int xp1 = xm2 - (140);
@@ -304,14 +366,10 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	int KeyGuide::KeyGuideGraph::GetDrawSize(void) const noexcept {
-		return (xsize * 24 / ysize) + 3;
-	}
-	int KeyGuide::KeyGuideGraph::Draw(int x, int y) const noexcept {
+	int KeyGuide::KeyGuideGraph::GetDrawSize(void) const noexcept { return (xsize * 24 / ysize) + 3; }
+	void KeyGuide::KeyGuideGraph::Draw(int x, int y) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal,
-			&GuideImg, x, y, x + (xsize * 24 / ysize), y + 24, true);
-		return GetDrawSize();
+		DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal, &GuideImg, x, y, x + (xsize * 24 / ysize), y + 24, true);
 	}
 	// --------------------------------------------------------------------------------------------------
 	// 
@@ -319,18 +377,23 @@ namespace DXLibRef {
 	int KeyGuide::KeyGuideOnce::GetDrawSize(void) const noexcept {
 		int ofs = (m_GuideGraph) ? m_GuideGraph->GetDrawSize() : 0;
 		if (GuideString != "") {
-			ofs += FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(InvalidID, GuideString) + 12;
+			ofs += FontSystem::FontPool::Instance()->Get(FontSystem::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(GuideString) + 12;
 		}
 		return ofs;
 	}
-	int KeyGuide::KeyGuideOnce::Draw(int x, int y) const noexcept {
+	void KeyGuide::KeyGuideOnce::Draw(int x, int y) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		int ofs = (m_GuideGraph) ? m_GuideGraph->Draw(x, y) : 0;
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-			LineHeight, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::MIDDLE,
-			x + ofs, y + 24 / 2,
-			White, Black, GuideString);
-		return GetDrawSize();
+		int ofs = 0;
+		if (m_GuideGraph) {
+			m_GuideGraph->Draw(x, y);
+			ofs = m_GuideGraph->GetDrawSize();
+		}
+		if (GuideString != "") {
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+				LineHeight, FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::MIDDLE,
+				x + ofs, y + 24 / 2,
+				White, Black, GuideString);
+		}
 	}
 	// --------------------------------------------------------------------------------------------------
 	// 
@@ -380,13 +443,14 @@ namespace DXLibRef {
 		}
 	}
 	void KeyGuide::Draw(void) const noexcept {
-		int xp = 0;
+		int x = 32;
 		int y = BaseScreenHeight - (21 + 16);
 		for (const auto& k : m_Key) {
-			xp += k->Draw(32 + xp, y);
+			k->Draw(x, y);
+			x += k->GetDrawSize();
 			//次の行へ移行
-			if (xp > BaseScreenWidth / 2) {
-				xp = 0;
+			if (x > BaseScreenWidth / 2) {
+				x = 32;
 				y -= 28;
 			}
 		}

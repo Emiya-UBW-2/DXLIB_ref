@@ -109,7 +109,7 @@ namespace DXLibRef {
 					}
 					if (HitCount > 0) {
 						border = std::max(HitCount, border);
-						Tmp.resize(Tmp.size() + 1);
+						Tmp.emplace_back();
 						Tmp.back().m_Name = LEFT;
 						Tmp.back().m_Score = std::stoi(RIGHT);
 						Tmp.back().m_HitCount = HitCount;
@@ -155,7 +155,7 @@ namespace DXLibRef {
 					}
 					if (HitCount > 0) {
 						border = std::max(HitCount, border);
-						Tmp.resize(Tmp.size() + 1);
+						Tmp.emplace_back();
 						Tmp.back().m_Name = LEFT;
 						Tmp.back().m_Score = std::stoi(RIGHT);
 						Tmp.back().m_HitCount = HitCount;

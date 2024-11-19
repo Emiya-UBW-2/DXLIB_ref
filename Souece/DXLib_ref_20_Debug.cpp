@@ -146,28 +146,28 @@ namespace DXLibRef {
 			ypos += (2);
 			int i = 0;
 			// “à—e
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
 				White, Black, "AsyncCount :%d", GetASyncLoadNum());
 			++i;
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
 				White, Black, "Drawcall  :%d", GetDrawCallCount());
 			++i;
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-				FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
 				White, Black, "FPS    :%5.2f fps", GetFPS());
 			++i;
 			for (size_t index : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
 					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}
 			{
 				size_t index = static_cast<size_t>(PointMax);
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
 					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
 				++i;
 			}

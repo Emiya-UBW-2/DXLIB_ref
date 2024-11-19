@@ -42,8 +42,6 @@ namespace DXLibRef {
 		LightPool(LightPool&& o) = delete;
 		LightPool& operator=(const LightPool&) = delete;
 		LightPool& operator=(LightPool&& o) = delete;
-
-		~LightPool(void) noexcept {}
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			int prev = now;

@@ -200,7 +200,7 @@ namespace DXLibRef {
 		float CenterY = static_cast<float>(y1) + ys * YCenter;
 
 		auto SetUpPoint = [&](float xper, float yper, int xc, int yc) {
-			Vertex.resize(Vertex.size() + 1);
+			Vertex.emplace_back();
 			Vertex.back().pos = VGet(
 				static_cast<float>(x1) + xs * xper - CenterX,
 				static_cast<float>(y1) + ys * yper - CenterY,
@@ -376,21 +376,9 @@ namespace DXLibRef {
 			GraphHandle				m_BufferScreen;
 		private:
 			DrawControl(void) noexcept;
-			~DrawControl(void) noexcept {
-				for (auto& d : this->m_DrawDatas) {
-					d.clear();
-				}
-				this->m_DrawDatas.clear();
-
-				for (auto& d : this->m_PrevDrawDatas) {
-					d.clear();
-				}
-				this->m_PrevDrawDatas.clear();
-
-			}
-
+		private:
 			DrawData* GetBack(DrawLayer Layer) noexcept {
-				this->m_DrawDatas.at(static_cast<int>(Layer)).resize(this->m_DrawDatas.at(static_cast<int>(Layer)).size() + 1);
+				this->m_DrawDatas.at(static_cast<int>(Layer)).emplace_back();
 				return &this->m_DrawDatas.at(static_cast<int>(Layer)).back();
 			}
 		public:
@@ -489,17 +477,17 @@ namespace DXLibRef {
 			}
 			// 
 			template <typename... Args>
-			void	SetString(DrawLayer Layer, FontPool::FontType type, int fontSize, FontHandle::FontXCenter FontX, FontHandle::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
+			void	SetString(DrawLayer Layer, FontSystem::FontType type, int fontSize, FontSystem::FontXCenter FontX, FontSystem::FontYCenter FontY, int x, int y, unsigned int Color, unsigned int EdgeColor, const std::string& Str, Args&&... args) noexcept {
 				if (Str == "") { return; }
-				int xSize = FontPool::Instance()->Get(FontPool::FontType::MS_Gothic, fontSize, 3)->GetStringWidth(InvalidID, Str.c_str(), args...);
+				int xSize = FontSystem::FontPool::Instance()->Get(FontSystem::FontType::MS_Gothic, fontSize, 3)->GetStringWidth(Str.c_str(), args...);
 				switch (FontX) {
-				case FontHandle::FontXCenter::LEFT:
+				case FontSystem::FontXCenter::LEFT:
 					if (!IsDrawOnWindow((x), (y - fontSize), (x + xSize), (y + fontSize))) { return; }				// 画面外は表示しない
 					break;
-				case FontHandle::FontXCenter::MIDDLE:
+				case FontSystem::FontXCenter::MIDDLE:
 					if (!IsDrawOnWindow((x - xSize / 2), (y - fontSize), (x + xSize / 2), (y + fontSize))) { return; }				// 画面外は表示しない
 					break;
-				case FontHandle::FontXCenter::RIGHT:
+				case FontSystem::FontXCenter::RIGHT:
 					if (!IsDrawOnWindow((x - xSize), (y - fontSize), (x), (y + fontSize))) { return; }				// 画面外は表示しない
 					break;
 				default:
@@ -523,7 +511,7 @@ namespace DXLibRef {
 				Back->InputStringParam(ptr);
 			}
 			// 
-			const auto	SetStringAutoFit(DrawLayer Layer, FontPool::FontType type, int fontSize, int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& Str) noexcept {
+			const auto	SetStringAutoFit(DrawLayer Layer, FontSystem::FontType type, int fontSize, int x1, int y1, int x2, int y2, unsigned int Color, unsigned int EdgeColor, const std::string& Str) noexcept {
 				if (Str == "") { return 0.f; }
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::StringAutoFit);
@@ -536,7 +524,7 @@ namespace DXLibRef {
 				Back->InputUintParam(0, Color);
 				Back->InputUintParam(1, EdgeColor);
 				Back->InputStringParam(Str);
-				return FontPool::Instance()->Get((FontPool::FontType)type, fontSize, 3)->DrawStringAutoFit(
+				return FontSystem::FontPool::Instance()->Get((FontSystem::FontType)type, fontSize, 3)->DrawStringAutoFit(
 					x1 + BaseScreenWidth, y1 + BaseScreenHeight,
 					x2 + BaseScreenWidth, y2 + BaseScreenHeight,
 					Color,
@@ -557,61 +545,9 @@ namespace DXLibRef {
 			}
 			// 
 		public:
-			void	ClearList(void) noexcept {
-				for (size_t index = 0; auto & d : this->m_DrawDatas) {
-					auto& pd = this->m_PrevDrawDatas.at(index);
-					pd.clear();
-					for (auto& d2 : d) {
-						pd.resize(pd.size() + 1);
-						pd.back() = d2;
-					}
-					index++;
-				}
-				for (auto& d : this->m_DrawDatas) {
-					d.clear();
-				}
-			}
-			void	Draw(void) noexcept {
-				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				bool IsHit = false;
-				// 同じかどうかチェック
-				for (size_t index = 0; auto & d : this->m_DrawDatas) {
-					auto& pd = this->m_PrevDrawDatas.at(index);
-					if (pd.size() == d.size()) {
-						for (size_t index2 = 0; auto & d2 : d) {
-							auto& pd2 = pd.at(index2);
-							if (!(pd2 == d2)) {
-								IsHit = true;
-								break;
-							}
-							index2++;
-						}
-					}
-					else {
-						IsHit = true;
-					}
-					index++;
-				}
-				// 
-				if (IsHit) {
-					{
-						auto NowScreen = GetDrawScreen();
-						m_BufferScreen.SetDraw_Screen(true);
-						{
-							for (auto& d : this->m_DrawDatas) {
-								for (auto& d2 : d) {
-									d2.Output();
-								}
-								DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-								SetDrawBright(255, 255, 255);
-							}
-						}
-						GraphHandle::SetDraw_Screen(NowScreen, false);
-					}
-				}
-				// 前に描画したものをそのまま出す
-				m_BufferScreen.DrawGraph(0, 0, true);
-			}
+			void	ClearList(void) noexcept;
+			void	Draw(void) noexcept;
+			void	Dispose(void) noexcept;
 		};
 		// クリックできる文字付のボックス
 		template <typename... Args>
@@ -620,8 +556,8 @@ namespace DXLibRef {
 			auto* Pad = PadControl::Instance();
 			bool MouseOver = IsActive && IntoMouse(xp1, yp1, xp2, yp2);
 			DrawCtrls->SetDrawBox(DrawLayer::Normal, xp1, yp1, xp2, yp2, MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : defaultcolor, true);
-			DrawCtrls->SetString(DrawLayer::Normal, FontPool::FontType::MS_Gothic, std::min(StringYSizeMax, yp2 - yp1),
-				FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, (xp1 + xp2) / 2, (yp1 + yp2) / 2, White, Black,
+			DrawCtrls->SetString(DrawLayer::Normal, FontSystem::FontType::MS_Gothic, std::min(StringYSizeMax, yp2 - yp1),
+				FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, (xp1 + xp2) / 2, (yp1 + yp2) / 2, White, Black,
 				((std::string)String).c_str(), args...);
 			return (MouseOver && (IsRepeat ? Pad->GetMouseClick().repeat() : Pad->GetMouseClick().trigger()));
 		}
@@ -758,8 +694,6 @@ namespace DXLibRef {
 		SideLog(SideLog&& o) = delete;
 		SideLog& operator=(const SideLog&) = delete;
 		SideLog& operator=(SideLog&& o) = delete;
-
-		~SideLog(void) noexcept {}
 	public:
 		template <typename... Args>
 		void Add(float second, float startSec, unsigned int Color, const char* Mes, Args&&... args) noexcept {
@@ -838,8 +772,6 @@ namespace DXLibRef {
 		PopUp(PopUp&& o) = delete;
 		PopUp& operator=(const PopUp&) = delete;
 		PopUp& operator=(PopUp&& o) = delete;
-
-		~PopUp(void) noexcept {}
 	public:
 		auto IsActivePop(void) const noexcept { return (NowSel != LastSel); }
 	public:
@@ -893,7 +825,7 @@ namespace DXLibRef {
 			}
 			void Dispose(void) noexcept { GuideImg.Dispose(); }
 			int GetDrawSize(void) const noexcept;
-			int Draw(int x, int y) const noexcept;
+			void Draw(int x, int y) const noexcept;
 		};
 		class KeyGuideOnce {
 			std::shared_ptr<KeyGuideGraph> m_GuideGraph;
@@ -918,17 +850,15 @@ namespace DXLibRef {
 				GuideString = "";
 			}
 			int GetDrawSize(void) const noexcept;
-			int Draw(int x, int y) const noexcept;
+			void Draw(int x, int y) const noexcept;
 		};
 	private:
-		bool													m_IsFlipGuide{ true };				// ガイドのコントロール
-		GraphHandle												m_GuideBaseImage;						//分割前の画像
-		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;	//分割後の画像
-		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;
+		bool													m_IsFlipGuide{ true };				// ガイドの更新フラグ
+		GraphHandle												m_GuideBaseImage;					// 分割前の画像
+		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;				// 分割後の画像
+		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;								// ガイド
 	public:
-		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }
-	public:
-		const int GetIDtoOffset(int ID, ControlType controlType) const noexcept {
+		static const int GetIDtoOffset(int ID, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
 				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
@@ -956,6 +886,8 @@ namespace DXLibRef {
 			}
 			return InvalidID;
 		}
+	public:
+		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }
 		void ChangeGuide(std::function<void()>Guide_Pad) noexcept;
 		void AddGuide(int graphOffset, const std::string& GuideStr) noexcept {
 			m_Key.emplace_back(std::make_unique<KeyGuideOnce>());
@@ -969,11 +901,10 @@ namespace DXLibRef {
 			m_Key.clear();
 		}
 	public:
+		//ガイド表示の描画
 		void Draw(void) const noexcept;
-		void DrawButton(int x, int y, int graphOffset) const noexcept {
-			m_DerivationGuideImage.at(graphOffset)->Draw(x, y);
-		}
-
+		//キー単体の描画
+		void DrawButton(int x, int y, int graphOffset) const noexcept { m_DerivationGuideImage.at(graphOffset)->Draw(x, y); }
 		int GetDrawSize(int graphOffset) const noexcept { return m_DerivationGuideImage.at(graphOffset)->GetDrawSize(); }
 	};
 }

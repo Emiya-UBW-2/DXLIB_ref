@@ -51,8 +51,8 @@ namespace DXLibRef {
 		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpmin, yp, xpmin + (xpmax - xpmin) * std::clamp(value - valueMin, 0, valueMax - valueMin) / (valueMax - valueMin), yp + LineHeight,
 			MouseOver ? (Pad->GetMouseClick().press() ? Gray25 : White) : Green, true);
 		int xp = (xmin + (xmax - xmin) / 2);
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-			FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xp, yp,
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+			FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xp, yp,
 			White, Black, "%03d", value);
 		return value;
 	}
@@ -307,8 +307,8 @@ namespace DXLibRef {
 	void OptionWindowClass::OptionElementsInfo::Draw(int xpos, int ypos, bool isMine) const noexcept {
 		ypos += (static_cast<int>(selanim));
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos,
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+			FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos,
 			isMine ? White : Gray50, Black, m_Name);
 		m_Draw(xpos + (720 - 324), ypos, isMine);
 	}
@@ -377,8 +377,8 @@ namespace DXLibRef {
 	void OptionWindowClass::OptionTabsInfo::DrawInfo(int xpos, int ypos, int select) noexcept {
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-			FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos, ypos,
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+			FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos,
 			White, Black, LocalizeParts->Get(m_Elements.at(static_cast<size_t>(select)).GetInfoTextID()));
 	}
 	//
@@ -438,7 +438,7 @@ namespace DXLibRef {
 	}
 	// 
 	void OptionWindowClass::SoundTabsInfo::Init_Sub(void) noexcept {
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("BGM", 1110,
 			[this]() {
 				FloatChange(EnumSaveParam::BGM, -0.1f, 0.f, 1.f);
@@ -459,7 +459,7 @@ namespace DXLibRef {
 				}
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("SE", 1111,
 			[this]() {
 				FloatChange(EnumSaveParam::SE, -0.1f, 0.f, 1.f);
@@ -487,7 +487,7 @@ namespace DXLibRef {
 		RefreshRate = GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Graphics Preset", 1120,
 			[this]() {
 				IntChange(EnumSaveParam::GraphicsPreset, -1, 0, 4);
@@ -667,7 +667,7 @@ namespace DXLibRef {
 				}
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Window Mode", 1121,
 			[this]() {
 				IntChange(EnumSaveParam::WindowMode, -1, static_cast<int>(WindowType::None), static_cast<int>(WindowType::Max));
@@ -704,12 +704,12 @@ namespace DXLibRef {
 				default:
 					break;
 				}
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-					FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + (250), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+					FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xpos + (250), ypos,
 					White, Black, Type.c_str());
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("V Sync", 1123,
 			[this]() {
 				BoolChange(EnumSaveParam::vsync);
@@ -742,7 +742,7 @@ namespace DXLibRef {
 				}
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("FPS Limit", 1124,
 			[this]() {
 				auto* OptionParts = OPTION::Instance();
@@ -807,12 +807,12 @@ namespace DXLibRef {
 				int value = UpDownBox(xpos, xpos + (200), ypos, ret, FrameLimitsNum);
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + (250), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xpos + (250), ypos,
 					White, Black, "%d", OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("DirectX Version", 1125,
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -847,12 +847,12 @@ namespace DXLibRef {
 					PostPassParts->UpdateActive();
 				}
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+					FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + (100), ypos,
 					White, Black, DirectXVerStr[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("AntiAlias", 1126,
 			[this]() { BoolChange(EnumSaveParam::AA); },
 			[this]() { BoolChange(EnumSaveParam::AA); },
@@ -861,7 +861,7 @@ namespace DXLibRef {
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::AA); }
 		);
 
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("SSAO", 1127,
 			[this]() { BoolChange(EnumSaveParam::SSAO); },
 			[this]() { BoolChange(EnumSaveParam::SSAO); },
@@ -869,7 +869,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::SSAO); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Reflection", 1128,
 			[this]() { IntChange(EnumSaveParam::Reflection, -1, 0, 3); },
 			[this]() { IntChange(EnumSaveParam::Reflection, 1, 0, 3); },
@@ -878,7 +878,7 @@ namespace DXLibRef {
 			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::Reflection, 3); }
 		);
 
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Shadow", 1129,
 			[this]() { IntChange(EnumSaveParam::shadow, -1, 0, 4); },
 			[this]() { IntChange(EnumSaveParam::shadow, 1, 0, 4); },
@@ -886,7 +886,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::shadow, 4); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Object Level", 1130,
 			[this]() { IntChange(EnumSaveParam::ObjLevel, -1, 0, 4); },
 			[this]() { IntChange(EnumSaveParam::ObjLevel, 1, 0, 4); },
@@ -894,7 +894,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::ObjLevel, 4); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Bloom Effect", 1131,
 			[this]() { BoolChange(EnumSaveParam::bloom); },
 			[this]() { BoolChange(EnumSaveParam::bloom); },
@@ -902,7 +902,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::bloom); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Screen Effect", 1132,
 			[this]() { BoolChange(EnumSaveParam::ScreenEffect); },
 			[this]() { BoolChange(EnumSaveParam::ScreenEffect); },
@@ -910,7 +910,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::ScreenEffect); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("DoF", 1133,
 			[this]() { BoolChange(EnumSaveParam::DoF); },
 			[this]() { BoolChange(EnumSaveParam::DoF); },
@@ -918,7 +918,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::DoF); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("MotionBlur", 1134,
 			[this]() { BoolChange(EnumSaveParam::MotionBlur); },
 			[this]() { BoolChange(EnumSaveParam::MotionBlur); },
@@ -926,7 +926,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::MotionBlur); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Fov", 1122,
 			[this]() { IntChange(EnumSaveParam::fov, -5, 45, 110); },
 			[this]() { IntChange(EnumSaveParam::fov, 5, 45, 110); },
@@ -937,7 +937,7 @@ namespace DXLibRef {
 				OptionParts->SetParamInt(EnumSaveParam::fov, UpDownBar(xpos, xpos + (200), ypos, OptionParts->GetParamInt(EnumSaveParam::fov), 45, 110));
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Render Scale", 1138,
 			[this]() {
 				FloatChange(EnumSaveParam::DrawScale, -0.1f, 0.25f, 1.f);
@@ -960,7 +960,7 @@ namespace DXLibRef {
 		);
 	}
 	void OptionWindowClass::ElseTabsInfo::Init_Sub(void) noexcept {
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Language", 1145,
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -1024,12 +1024,12 @@ namespace DXLibRef {
 				}
 
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (125), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + (125), ypos,
 					White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
 			}
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("X sensing", 1140,
 			[this]() { FloatChange(EnumSaveParam::Xsensing, -0.01f, 0.01f, 1.f); },
 			[this]() { FloatChange(EnumSaveParam::Xsensing, 0.01f, 0.01f, 1.f); },
@@ -1037,7 +1037,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::Xsensing, 0.01f, 1.f, 100); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Y sensing", 1141,
 			[this]() { FloatChange(EnumSaveParam::Ysensing, -0.01f, 0.01f, 1.f); },
 			[this]() { FloatChange(EnumSaveParam::Ysensing, 0.01f, 0.01f, 1.f); },
@@ -1045,7 +1045,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::Ysensing, 0.01f, 1.f, 100); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("HeadBobbing", 1142,
 			[this]() { BoolChange(EnumSaveParam::HeadBobbing); },
 			[this]() { BoolChange(EnumSaveParam::HeadBobbing); },
@@ -1053,7 +1053,7 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::HeadBobbing); }
 		);
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("GamePadType", 1144,
 			[]() {
 				auto* OptionParts = OPTION::Instance();
@@ -1100,13 +1100,13 @@ namespace DXLibRef {
 				}
 				ypos -= LineHeight * 1 / 6;
 				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
-					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-						FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
 						White, Black, "XInput");
 				}
 				else {
-					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-						FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
 						White, Black, "DirectInput");
 				}
 
@@ -1119,14 +1119,14 @@ namespace DXLibRef {
 					case DX_PADTYPE_SWITCH_JOY_CON_R:
 					case DX_PADTYPE_SWITCH_PRO_CTRL:
 					case DX_PADTYPE_SWITCH_HORI_PAD:
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-							FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+							FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
 							White, Black, "推奨:DirectInput");
 						break;
 					case DX_PADTYPE_XBOX_360:
 					case DX_PADTYPE_XBOX_ONE:
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight * 2 / 3,
-							FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
+							FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight * 3 / 3,
 							White, Black, "推奨:XInput");
 						break;
 					default:
@@ -1140,22 +1140,22 @@ namespace DXLibRef {
 		auto* Pad = PadControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
-		if (KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()) != InvalidID) {
-			int Size = KeyGuideParts->GetDrawSize(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
-			KeyGuideParts->DrawButton(xpos + 50 - Size, ypos + LineHeight / 2 - 24 / 2, KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
+		if (KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()) != InvalidID) {
+			int Size = KeyGuideParts->GetDrawSize(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
+			KeyGuideParts->DrawButton(xpos + 50 - Size, ypos + LineHeight / 2 - 24 / 2, KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
 		}
 		else {
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-				LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP, xpos + 50, ypos, isMine ? Red : Red25, Black, "None");
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+				LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xpos + 50, ypos, isMine ? Red : Red25, Black, "None");
 		}
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-			LineHeight, FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + 75, ypos, isMine ? White : Gray25, Black, "->");
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+			LineHeight, FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + 75, ypos, isMine ? White : Gray25, Black, "->");
 		if (Pad->GetPadsInfo(Sel).IsEnableSelectReserve()) {
-			KeyGuideParts->DrawButton(xpos + 100, ypos + LineHeight / 2 - 24 / 2, KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
+			KeyGuideParts->DrawButton(xpos + 100, ypos + LineHeight / 2 - 24 / 2, KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
 		}
 		else {
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-				LineHeight, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xpos + 100, ypos, isMine ? Red : Red25, Black, "None");
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+				LineHeight, FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos + 100, ypos, isMine ? Red : Red25, Black, "None");
 		}
 	}
 	void OptionWindowClass::ControlTabsInfo::Init_Sub(void) noexcept {
@@ -1163,7 +1163,7 @@ namespace DXLibRef {
 		auto* LocalizeParts = LocalizePool::Instance();
 		const int KeyInfo = 1151;
 
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Reset", 1150,
 			[]() {},
 			[]() {},
@@ -1175,13 +1175,13 @@ namespace DXLibRef {
 					Pad->ResetAssign();
 				}
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + (100), ypos,
 					isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
 		if (Pad->GetPadsInfo(PADS::MOVE_W).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1197,7 +1197,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::MOVE_S).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1213,7 +1213,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::MOVE_A).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1229,7 +1229,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::MOVE_D).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1246,7 +1246,7 @@ namespace DXLibRef {
 		}
 
 		if (Pad->GetPadsInfo(PADS::LEAN_L).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1262,7 +1262,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::LEAN_R).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1278,7 +1278,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::RELOAD).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1294,7 +1294,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::INTERACT).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1310,7 +1310,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::THROW).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1326,7 +1326,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::MELEE).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1342,7 +1342,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::JUMP).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1358,7 +1358,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::RUN).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1374,7 +1374,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::WALK).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1390,7 +1390,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::SHOT).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1406,7 +1406,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::AIM).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1422,7 +1422,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::ULT).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1438,7 +1438,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::SQUAT).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1454,7 +1454,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::PRONE).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1470,7 +1470,7 @@ namespace DXLibRef {
 			);
 		}
 		if (Pad->GetPadsInfo(PADS::CHECK).IsUse()) {
-			this->m_Elements.resize(this->m_Elements.size() + 1);
+			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
 				[]() {},
 				[]() {},
@@ -1486,7 +1486,7 @@ namespace DXLibRef {
 			);
 		}
 
-		this->m_Elements.resize(this->m_Elements.size() + 1);
+		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Save", 1152,
 			[]() {},
 			[]() {},
@@ -1499,8 +1499,8 @@ namespace DXLibRef {
 					Pad->Save();
 				}
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-					FontHandle::FontXCenter::MIDDLE, FontHandle::FontYCenter::TOP, xpos + (100), ypos,
+				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+					FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + (100), ypos,
 					isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
@@ -1569,15 +1569,15 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::INTERACT).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9992));
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::INTERACT).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9992));
 
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_L).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_R).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9994));
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_W).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_A).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_S).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_D).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuideParts->GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_STICK).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9993));
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_L).GetAssign(), Pad->GetControlType()), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_R).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9994));
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_W).GetAssign(), Pad->GetControlType()), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_A).GetAssign(), Pad->GetControlType()), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_S).GetAssign(), Pad->GetControlType()), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_D).GetAssign(), Pad->GetControlType()), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_STICK).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9993));
 				},
 				true
 			);

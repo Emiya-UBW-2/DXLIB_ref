@@ -24,11 +24,6 @@ namespace DXLibRef {
 		ObjectManager(ObjectManager&& o) = delete;
 		ObjectManager& operator=(const ObjectManager&) = delete;
 		ObjectManager& operator=(ObjectManager&& o) = delete;
-
-		~ObjectManager(void) noexcept {
-			DeleteAll();
-			this->m_Object.shrink_to_fit();
-		}
 	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;

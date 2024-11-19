@@ -135,8 +135,6 @@ namespace DXLibRef {
 		OPTION(OPTION&& o) = delete;
 		OPTION& operator=(const OPTION&) = delete;
 		OPTION& operator=(OPTION&& o) = delete;
-
-		~OPTION(void) noexcept {}
 	private:
 		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
 		std::array<SaveParams, static_cast<int>(EnumProjectSettingParam::Max)> m_ProjectSettingParams;
@@ -405,8 +403,6 @@ namespace DXLibRef {
 		OptionWindowClass(OptionWindowClass&& o) = delete;
 		OptionWindowClass& operator=(const OptionWindowClass&) = delete;
 		OptionWindowClass& operator=(OptionWindowClass&& o) = delete;
-
-		~OptionWindowClass(void) noexcept {}
 	public:
 		void Init(void) noexcept;
 		void Update(void)noexcept;

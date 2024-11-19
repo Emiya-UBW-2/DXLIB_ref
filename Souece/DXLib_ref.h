@@ -141,8 +141,6 @@ namespace DXLibRef {
 		DXLib_ref(DXLib_ref&& o) = delete;
 		DXLib_ref& operator=(const DXLib_ref&) = delete;
 		DXLib_ref& operator=(DXLib_ref&& o) = delete;
-
-		~DXLib_ref(void) noexcept {}
 	private:
 		void		StartCount(void) noexcept;			// ループの最初に通す
 		bool		WaitCount(void) const noexcept;		// 表画面に反映し、垂直同期または一定のFPSまで待機する

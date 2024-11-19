@@ -11,7 +11,7 @@ namespace DXLibRef {
 		ShaderUseClass		m_ShaderBlur;										// シェーダー
 		GraphHandle SSRScreen;		// 描画スクリーン
 		GraphHandle SSRScreen2;		// 描画スクリーン
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
@@ -93,7 +93,7 @@ namespace DXLibRef {
 		PostPassSSR& operator=(PostPassSSR&& o) = delete;
 
 		virtual ~PostPassSSR(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			int xsize = WindowSizeParts->GetScreenXMax() / EXTEND;
@@ -188,7 +188,7 @@ namespace DXLibRef {
 		PostPassDoF& operator=(PostPassDoF&& o) = delete;
 
 		virtual ~PostPassDoF(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			DoFScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
@@ -203,7 +203,6 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::DoF);
 		}
-	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
@@ -238,7 +237,7 @@ namespace DXLibRef {
 		PostPassBloom& operator=(PostPassBloom&& o) = delete;
 
 		virtual ~PostPassBloom(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			GaussScreen_.Make(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND, true);
@@ -280,7 +279,7 @@ namespace DXLibRef {
 		PostPassAberration& operator=(PostPassAberration&& o) = delete;
 
 		virtual ~PostPassAberration(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			for (auto& buf : BufScreen) {
@@ -391,7 +390,7 @@ namespace DXLibRef {
 		PostPassMotionBlur& operator=(PostPassMotionBlur&& o) = delete;
 
 		virtual ~PostPassMotionBlur(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			m_BlurScreen.Init(96, -6, -6, 6, 6);
 		}
@@ -402,7 +401,6 @@ namespace DXLibRef {
 			auto* OptionParts = OPTION::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur);
 		}
-	public:
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			GraphHandle* buf = m_BlurScreen.PostRenderBlurScreen([&]() {
 				TargetGraph->DrawGraph(0, 0, false);
@@ -428,7 +426,7 @@ namespace DXLibRef {
 		PostPassCornerBlur& operator=(PostPassCornerBlur&& o) = delete;
 
 		virtual ~PostPassCornerBlur(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			AberrationScreen.Make(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND, true);
@@ -451,6 +449,7 @@ namespace DXLibRef {
 				}
 			}
 			BufScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			BufScreen.SetDraw_Screen();
 		}
 		void Dispose_Sub(void) noexcept override {
 			AberrationScreen.Dispose();
@@ -486,7 +485,7 @@ namespace DXLibRef {
 		PostPassVignette& operator=(PostPassVignette&& o) = delete;
 
 		virtual ~PostPassVignette(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			{
@@ -507,6 +506,7 @@ namespace DXLibRef {
 				}
 			}
 			BufScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			BufScreen.SetDraw_Screen();
 		}
 		void Dispose_Sub(void) noexcept override {
 			bkScreen.Dispose();
@@ -683,7 +683,7 @@ namespace DXLibRef {
 			// 中心の盛り上がって見える部分を描画
 			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
 		}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			BufScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
@@ -716,7 +716,7 @@ namespace DXLibRef {
 	private:
 		ShaderUseClass::ScreenVertex	m_ScreenVertex;
 		ShaderUseClass		m_Shader;
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
@@ -761,7 +761,7 @@ namespace DXLibRef {
 		PostPassGodRay& operator=(PostPassGodRay&& o) = delete;
 
 		virtual ~PostPassGodRay(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND);
@@ -837,7 +837,7 @@ namespace DXLibRef {
 		PostPassScope& operator=(PostPassScope&& o) = delete;
 
 		virtual ~PostPassScope(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
@@ -873,7 +873,7 @@ namespace DXLibRef {
 		PostPassBlackout& operator=(PostPassBlackout&& o) = delete;
 
 		virtual ~PostPassBlackout(void) noexcept {}
-	public:
+	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
@@ -1045,7 +1045,12 @@ namespace DXLibRef {
 			m_PBR_Shader.AddGeometryShader("CommonData/shader/GS_PBR3D.pso");
 		}
 	}
-	PostPassEffect::~PostPassEffect(void) noexcept {
+	void PostPassEffect::Init(void) noexcept {
+		UpdateActive();
+		// 影生成
+		m_ShadowDraw->SetActive();
+	}
+	void PostPassEffect::Dispose(void) noexcept {
 		ResetAllBuffer();
 		// ポストエフェクト
 		for (auto& P : m_PostPass) {
@@ -1059,11 +1064,6 @@ namespace DXLibRef {
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 			m_PBR_Shader.Dispose();
 		}
-	}
-	void PostPassEffect::Init(void) noexcept {
-		UpdateActive();
-		// 影生成
-		m_ShadowDraw->SetActive();
 	}
 	void PostPassEffect::UpdateActive(void) noexcept {
 		auto* OptionParts = OPTION::Instance();

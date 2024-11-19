@@ -5,39 +5,41 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	const FontPool* SingletonBase<FontPool>::m_Singleton = nullptr;
+	const FontSystem::FontPool* SingletonBase<FontSystem::FontPool>::m_Singleton = nullptr;
 	const LocalizePool* SingletonBase<LocalizePool>::m_Singleton = nullptr;
 
-	void FontPool::Fonthave::Set(FontType type, int fontSize, int edgeSize) noexcept {
-		this->m_Type = type;
-		this->m_EdgeSize = edgeSize;
-		this->m_CustomSize = fontSize;
-		if (fontSize <= 16) {
-			this->m_commonsize = 16;
-		}
-		else if (fontSize <= 24) {
-			this->m_commonsize = 24;
-		}
-		else {
-			this->m_commonsize = 32;
-		}
+	namespace FontSystem {
+		Fonthave::Fonthave(FontType type, int fontSize, int edgeSize) noexcept {
+			this->m_Type = type;
+			this->m_EdgeSize = edgeSize;
+			this->m_CustomSize = fontSize;
+			if (fontSize <= 16) {
+				this->m_CommonSize = 16;
+			}
+			else if (fontSize <= 24) {
+				this->m_CommonSize = 24;
+			}
+			else {
+				this->m_CommonSize = 32;
+			}
 
-		std::string Str;
+			std::string Str;
 
-		switch (this->m_Type) {
-		case FontType::MS_Gothic:
-			Str = "CommonData/Font/MSG_";
-			break;
-		case FontType::DIZ_UD_Gothic:
-			Str = "CommonData/Font/BIZUDG_";
-			break;
-		default:
-			break;
+			switch (this->m_Type) {
+			case FontType::MS_Gothic:
+				Str = "CommonData/Font/MSG_";
+				break;
+			case FontType::DIZ_UD_Gothic:
+				Str = "CommonData/Font/BIZUDG_";
+				break;
+			default:
+				break;
+			}
+			Str += std::to_string(this->m_CommonSize);
+			Str += ".dft";
+			this->m_scaleType = DX_DRAWMODE_BILINEAR;
+			this->m_Handle.Load(Str, this->m_EdgeSize);
 		}
-		Str += std::to_string(this->m_commonsize);
-		Str += ".dft";
-		this->m_scaleType = DX_DRAWMODE_BILINEAR;
-		this->m_Handle.Load(Str, this->m_EdgeSize);
 	}
 
 	LocalizePool::LocalizePool(void) noexcept {
@@ -68,9 +70,7 @@ namespace DXLibRef {
 				}
 			}
 			if (!IsHit) {
-				this->havehandle.resize(this->havehandle.size() + 1);
-				this->havehandle.back().m_ID = (LocalizeID)(std::stoi(LEFT));
-				sprintfDx(this->havehandle.back().m_Str, RIGHT.c_str());
+				this->havehandle.emplace_back((LocalizeID)(std::stoi(LEFT)), RIGHT.c_str());
 			}
 		}
 	}

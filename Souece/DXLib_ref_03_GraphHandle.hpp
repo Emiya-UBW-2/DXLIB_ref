@@ -63,7 +63,7 @@ namespace DXLibRef {
 		}
 	};
 	class GraphHandle : public DXHandle {
-	public:
+	protected:
 		void	Dispose_Sub(void) noexcept override {
 			DeleteGraph(DXHandle::get());
 		}
@@ -196,7 +196,7 @@ namespace DXLibRef {
 
 			Handles->clear();
 			for (int i : std::views::iota(0, AllNum)) {
-				Handles->resize(Handles->size() + 1);
+				Handles->emplace_back();
 				Handles->back().SetHandleDirect(HandleArray[static_cast<size_t>(i)]);
 			}
 			delete[] HandleArray;

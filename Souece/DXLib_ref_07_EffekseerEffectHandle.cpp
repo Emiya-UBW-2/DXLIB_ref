@@ -14,11 +14,11 @@ namespace DXLibRef {
 		for (const auto& d : data_t) {
 			std::string p = d.cFileName;
 			if (p.find(".efk") != std::string::npos && p.find(".efkproj") == std::string::npos) {
-				effsorce.resize(effsorce.size() + 1);
+				effsorce.emplace_back();
 				effsorce.back().load("data/effect/" + p);
 			}
 		}
-		effsorce.resize(effsorce.size() + 1);
+		effsorce.emplace_back();
 		effsorce.back().load("data/effect/gndsmk.efk");								// 戦車用エフェクト
 	}
 #endif

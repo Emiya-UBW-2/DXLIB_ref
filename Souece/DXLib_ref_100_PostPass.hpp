@@ -521,10 +521,9 @@ namespace DXLibRef {
 		PostPassEffect(PostPassEffect&& o) = delete;
 		PostPassEffect& operator=(const PostPassEffect&) = delete;
 		PostPassEffect& operator=(PostPassEffect&& o) = delete;
-
-		~PostPassEffect(void) noexcept;
 	public:
 		void			Init(void) noexcept;
+		void			Dispose(void) noexcept;
 		void			UpdateActive(void) noexcept;
 		void			SetCamMat(const Camera3DInfo& camInfo) noexcept;
 		void			ResetBuffer(void) noexcept;

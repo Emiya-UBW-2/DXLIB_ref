@@ -41,12 +41,12 @@ namespace DXLibRef {
 			color = Red;// まったくFPSが出ていない
 		}
 		// FPS値の表示
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-			LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
 			BaseScreenWidth - 8, 8, color, Black, "%5.2f FPS", m_FPSAvg);
 		// ドローコール(DirectXに何回描画指示を送ったか)の表示
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-			LineHeight, FontHandle::FontXCenter::RIGHT, FontHandle::FontYCenter::TOP,
+		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
 			BaseScreenWidth - 8, 8 + 20, White, Black, "%d Drawcall", GetDrawCallCount());
 	}
 	// ポーズ画面
@@ -68,8 +68,8 @@ namespace DXLibRef {
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 		// カウントが0.5秒以上であれば Pause の文字を表示
 		if (m_PauseFlashCount > 0.5f) {
-			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic,
-				36, FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP,
+			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
+				36, FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP,
 				16, 16, Green, Black, "Pause");
 		}
 	}
@@ -199,8 +199,8 @@ namespace DXLibRef {
 						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(101));
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(101));
 					}
 					// 
 					{
@@ -232,8 +232,8 @@ namespace DXLibRef {
 						xp1 = xmin + (24);
 						yp1 = ymin + LineHeight;
 
-						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontPool::FontType::MS_Gothic, LineHeight,
-							FontHandle::FontXCenter::LEFT, FontHandle::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(2101));
+						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(2101));
 					}
 					// 
 					{
