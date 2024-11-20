@@ -8,6 +8,7 @@ namespace DXLibRef {
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
 	// 
 	namespace WindowSystem {
+		//
 		void DrawData::Output(void) const noexcept {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			switch (m_type) {
@@ -26,10 +27,22 @@ namespace DXLibRef {
 				DxLib::SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
 				break;
 			case DrawType::Box:
-				DxLib::DrawBox(
-					WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
-					WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
-					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
+				if (this->m_intParam.at(4) == 1 || (m_boolParam.at(0))) {
+					DxLib::DrawBox(
+						WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+						WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
+						this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
+				}
+				else {
+					int p1x = WindowSizeParts->GetUIY(this->m_intParam.at(0));
+					int p1y = WindowSizeParts->GetUIY(this->m_intParam.at(1));
+					int p2x = WindowSizeParts->GetUIY(this->m_intParam.at(2));
+					int p2y = WindowSizeParts->GetUIY(this->m_intParam.at(3));
+					DxLib::DrawLine(p1x, p1y, p1x, p2y, this->m_UintParam.at(0), this->m_intParam.at(4));
+					DxLib::DrawLine(p1x, p1y, p2x, p1y, this->m_UintParam.at(0), this->m_intParam.at(4));
+					DxLib::DrawLine(p1x, p2y, p2x, p2y, this->m_UintParam.at(0), this->m_intParam.at(4));
+					DxLib::DrawLine(p2x, p1y, p2x, p2y, this->m_UintParam.at(0), this->m_intParam.at(4));
+				}
 				break;
 			case DrawType::Quadrangle:
 				DxLib::DrawQuadrangle(
@@ -103,10 +116,23 @@ namespace DXLibRef {
 						(double)(this->m_floatParam.at(2) * (float)(WindowSizeParts->GetUIY(100)) / 100.f));
 				}
 				break;
+			case DrawType::NineSliceGraph:
+				if (m_GraphHandleParam.at(0)) {
+					Draw9SliceGraph(
+						WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
+						WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
+						WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+						WindowSizeParts->GetUIY(this->m_intParam.at(6)), WindowSizeParts->GetUIY(this->m_intParam.at(7)),
+						this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_floatParam.at(2),
+						m_GraphHandleParam.at(0)->get(),this->m_boolParam.at(0), this->m_boolParam.at(1)
+					);
+				}
+				break;
 			default:
 				break;
 			}
 		}
+		//
 		DrawControl::DrawControl(void) noexcept {
 			this->m_DrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
 			this->m_PrevDrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
@@ -131,7 +157,6 @@ namespace DXLibRef {
 			}
 		}
 		void DrawControl::Draw(void) noexcept {
-			auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 			bool IsHit = false;
 			// 同じかどうかチェック
 			for (size_t index = 0; auto & d : this->m_DrawDatas) {
@@ -148,25 +173,24 @@ namespace DXLibRef {
 				}
 				else {
 					IsHit = true;
+					break;
 				}
 				index++;
 			}
 			// 
 			if (IsHit) {
+				auto NowScreen = GetDrawScreen();
+				m_BufferScreen.SetDraw_Screen(true);
 				{
-					auto NowScreen = GetDrawScreen();
-					m_BufferScreen.SetDraw_Screen(true);
-					{
-						for (auto& d : this->m_DrawDatas) {
-							for (auto& d2 : d) {
-								d2.Output();
-							}
-							DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-							SetDrawBright(255, 255, 255);
+					for (auto& d : this->m_DrawDatas) {
+						for (auto& d2 : d) {
+							d2.Output();
 						}
+						DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+						DxLib::SetDrawBright(255, 255, 255);
 					}
-					GraphHandle::SetDraw_Screen(NowScreen, false);
 				}
+				GraphHandle::SetDraw_Screen(NowScreen, false);
 			}
 			// 前に描画したものをそのまま出す
 			m_BufferScreen.DrawGraph(0, 0, true);
@@ -237,10 +261,9 @@ namespace DXLibRef {
 		KeyGuideParts->SetGuideFlip();
 		KeyGuideParts->ChangeGuide(
 			[this]() {
-				auto* Pad = PadControl::Instance();
 				auto* KeyGuideParts = KeyGuide::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
-				KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::RELOAD).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9991));
+				KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::RELOAD), LocalizeParts->Get(9991));
 				if (m_GuideDoing) {
 					m_GuideDoing();
 				}
@@ -317,7 +340,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-
+	//
 	void PopUp::Add(const char* WindowName, int sizex, int sizey,
 		std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
 		std::function<void()> ExitDoing,
@@ -371,9 +394,7 @@ namespace DXLibRef {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		DrawCtrls->SetDrawExtendGraph(WindowSystem::DrawLayer::Normal, &GuideImg, x, y, x + (xsize * 24 / ysize), y + 24, true);
 	}
-	// --------------------------------------------------------------------------------------------------
 	// 
-	// --------------------------------------------------------------------------------------------------
 	int KeyGuide::KeyGuideOnce::GetDrawSize(void) const noexcept {
 		int ofs = (m_GuideGraph) ? m_GuideGraph->GetDrawSize() : 0;
 		if (GuideString != "") {
@@ -395,9 +416,7 @@ namespace DXLibRef {
 				White, Black, GuideString);
 		}
 	}
-	// --------------------------------------------------------------------------------------------------
 	// 
-	// --------------------------------------------------------------------------------------------------
 	KeyGuide::KeyGuide(void) noexcept {
 		SetGuideFlip();
 		m_GuideBaseImage.Load("CommonData/key/OutputFont.png");
@@ -437,7 +456,7 @@ namespace DXLibRef {
 			auto* Pad = PadControl::Instance();
 			auto* LocalizeParts = LocalizePool::Instance();
 			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::Escape).GetAssign(), ControlType::PC), LocalizeParts->Get(9990));
-			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::INVENTORY).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9995));
+			AddGuide(GetPADStoOffset(PADS::INVENTORY), LocalizeParts->Get(9995));
 			// 追加のガイド
 			Guide_Pad();
 		}

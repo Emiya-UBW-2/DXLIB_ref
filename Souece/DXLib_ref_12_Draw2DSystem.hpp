@@ -49,18 +49,6 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 描画
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 縁ぬき四角
-	static void DrawBoxLine_2D(int p1x, int p1y, int p2x, int p2y, const unsigned int& color, int thickness = 1) noexcept {
-		if (thickness == 1) {
-			DxLib::DrawBox(p1x, p1y, p2x, p2y, color, FALSE);
-		}
-		else {
-			DxLib::DrawLine(p1x, p1y, p1x, p2y, color, thickness);
-			DxLib::DrawLine(p1x, p1y, p2x, p1y, color, thickness);
-			DxLib::DrawLine(p1x, p2y, p2x, p2y, color, thickness);
-			DxLib::DrawLine(p2x, p1y, p2x, p2y, color, thickness);
-		}
-	}
 	// グラデーションのある矩形を描画
 	static void DrawGradationBox_2D(int x1, int y1, int x2, int y2, COLOR_U8 color1, COLOR_U8 color2, const unsigned char UorL = 255) noexcept {
 		VERTEX2D Vertex[6]{};
@@ -312,13 +300,14 @@ namespace DXLibRef {
 			RotaGraph,
 			ExtendGraph,
 			CircleGauge,
+			NineSliceGraph,
 		};
 		class DrawData {
 			DrawType								m_type{ DrawType::Box };
 			std::array<int, 8>						m_intParam{};
 			std::array<unsigned int, 2>				m_UintParam{};
 			std::array<float, 6>					m_floatParam{};
-			std::array<bool, 1>						m_boolParam{};
+			std::array<bool, 2>						m_boolParam{};
 			std::array<const GraphHandle*, 1>		m_GraphHandleParam{};
 			std::string								m_string;
 		public:
@@ -357,9 +346,6 @@ namespace DXLibRef {
 		enum class DrawLayer : int {
 			BackGround,
 			Back,
-			Back2,
-			Back3,
-			Back4,
 			Normal,
 			Front,
 
@@ -404,7 +390,7 @@ namespace DXLibRef {
 				Back->InputintParam(2, valueB);
 			}
 			// 
-			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill) noexcept {
+			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill, int thickness = 1) noexcept {
 				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// 画面外は表示しない
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Box);
@@ -414,6 +400,7 @@ namespace DXLibRef {
 				Back->InputintParam(3, y2);
 				Back->InputUintParam(0, color1);
 				Back->InputboolParam(0, IsFill);
+				Back->InputintParam(4, thickness);
 			}
 			// 
 			void	SetDrawQuadrangle(DrawLayer Layer, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned int color1, bool IsFill) noexcept {
@@ -542,6 +529,30 @@ namespace DXLibRef {
 				Back->InputfloatParam(0, Percent);
 				Back->InputfloatParam(1, StartPercent);
 				Back->InputfloatParam(2, Scale);
+			}
+
+			void NineSliceGraph(DrawLayer Layer, const GraphHandle* pGraphHandle,
+				int x1, int y1, int x2, int y2,
+				int xminp, int yminp, int xmaxp, int ymaxp,
+				float XCenter, float YCenter, float Angle,
+				bool TransFlag, bool TilingFlag) noexcept {
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// 画面外は表示しない
+				DrawData* Back = GetBack(Layer);
+				Back->InputType(DrawType::NineSliceGraph);
+				Back->InputGraphHandleParam(0, pGraphHandle);
+				Back->InputintParam(0, x1);
+				Back->InputintParam(1, y1);
+				Back->InputintParam(2, x2);
+				Back->InputintParam(3, y2);
+				Back->InputintParam(4, xminp);
+				Back->InputintParam(5, yminp);
+				Back->InputintParam(6, xmaxp);
+				Back->InputintParam(7, ymaxp);
+				Back->InputfloatParam(0, XCenter);
+				Back->InputfloatParam(1, YCenter);
+				Back->InputfloatParam(2, Angle);
+				Back->InputboolParam(0, TransFlag);
+				Back->InputboolParam(1, TilingFlag);
 			}
 			// 
 		public:
@@ -885,6 +896,11 @@ namespace DXLibRef {
 				break;
 			}
 			return InvalidID;
+		}
+
+		static const int GetPADStoOffset(PADS PAD) noexcept {
+			auto* Pad = PadControl::Instance();
+			return GetIDtoOffset(Pad->GetPadsInfo(PAD).GetAssign(), Pad->GetControlType());
 		}
 	public:
 		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }

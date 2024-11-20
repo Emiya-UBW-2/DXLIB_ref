@@ -278,7 +278,7 @@ namespace DXLibRef {
 		LocalizePool& operator=(const LocalizePool&) = delete;
 		LocalizePool& operator=(LocalizePool&& o) = delete;
 	public:
-		void Load(const char* Lang) noexcept;
+		void Load(void) noexcept;
 		void Dispose(void) noexcept {
 			this->havehandle.clear();
 			this->havehandle.shrink_to_fit();

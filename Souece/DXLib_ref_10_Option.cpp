@@ -965,6 +965,8 @@ namespace DXLibRef {
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
+				auto* LocalizeParts = LocalizePool::Instance();
+				auto* KeyGuideParts = KeyGuide::Instance();
 				switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 				case LanguageType::Eng:
 					OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
@@ -977,15 +979,14 @@ namespace DXLibRef {
 				}
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 
-				auto* LocalizeParts = LocalizePool::Instance();
-				LocalizeParts->Dispose();
-				LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
-				auto* KeyGuideParts = KeyGuide::Instance();
+				LocalizeParts->Load();
 				KeyGuideParts->SetGuideFlip();
 			},
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
+				auto* LocalizeParts = LocalizePool::Instance();
+				auto* KeyGuideParts = KeyGuide::Instance();
 				switch ((LanguageType)OptionParts->GetParamInt(EnumSaveParam::Language)) {
 				case LanguageType::Eng:
 					OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
@@ -998,16 +999,16 @@ namespace DXLibRef {
 				}
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 
-				auto* LocalizeParts = LocalizePool::Instance();
-				LocalizeParts->Dispose();
-				LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
-				auto* KeyGuideParts = KeyGuide::Instance();
+				LocalizeParts->Load();
 				KeyGuideParts->SetGuideFlip();
 			},
 			[]() {},
 			[]() {},
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
+				auto* LocalizeParts = LocalizePool::Instance();
+				auto* KeyGuideParts = KeyGuide::Instance();
+				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 				auto prev = OptionParts->GetParamInt(EnumSaveParam::Language);
 				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::Language) == static_cast<int>(LanguageType::Eng)))) {
 					OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Eng));
@@ -1016,14 +1017,10 @@ namespace DXLibRef {
 					OptionParts->SetParamInt(EnumSaveParam::Language, static_cast<int>(LanguageType::Jpn));
 				}
 				if (prev != OptionParts->GetParamInt(EnumSaveParam::Language)) {
-					auto* LocalizeParts = LocalizePool::Instance();
-					LocalizeParts->Dispose();
-					LocalizeParts->Load(LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
-					auto* KeyGuideParts = KeyGuide::Instance();
+					LocalizeParts->Load();
 					KeyGuideParts->SetGuideFlip();
 				}
 
-				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 					FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + (125), ypos,
 					White, Black, LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)]);
@@ -1140,9 +1137,9 @@ namespace DXLibRef {
 		auto* Pad = PadControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
-		if (KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()) != InvalidID) {
-			int Size = KeyGuideParts->GetDrawSize(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
-			KeyGuideParts->DrawButton(xpos + 50 - Size, ypos + LineHeight / 2 - 24 / 2, KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetAssign(), Pad->GetControlType()));
+		if (KeyGuide::GetPADStoOffset(Sel) != InvalidID) {
+			int Size = KeyGuideParts->GetDrawSize(KeyGuide::GetPADStoOffset(Sel));
+			KeyGuideParts->DrawButton(xpos + 50 - Size, ypos + LineHeight / 2 - 24 / 2, KeyGuide::GetPADStoOffset(Sel));
 		}
 		else {
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
@@ -1566,18 +1563,17 @@ namespace DXLibRef {
 				[this]() {m_Active = false; },
 				[]() {
 					auto* KeyGuideParts = KeyGuide::Instance();
-					auto* Pad = PadControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::INTERACT).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9992));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::INTERACT), LocalizeParts->Get(9992));
 
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_L).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::LEAN_R).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9994));
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_W).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_A).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_S).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_D).GetAssign(), Pad->GetControlType()), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(PADS::MOVE_STICK).GetAssign(), Pad->GetControlType()), LocalizeParts->Get(9993));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::LEAN_L), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::LEAN_R), LocalizeParts->Get(9994));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_W), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_A), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_S), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_D), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_STICK), LocalizeParts->Get(9993));
 				},
 				true
 			);
