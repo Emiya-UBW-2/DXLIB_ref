@@ -542,7 +542,7 @@ namespace DXLibRef {
 			std::function<void()> setshadowdoing_rigid,
 			std::function<void()> setshadowdoing) noexcept;
 		void			DrawPostProcess(void) noexcept;
-		void ResetAllBuffer(void) noexcept;
+		void			ResetAllBuffer(void) noexcept;
 
 		bool			UpdateShadowActive(void) noexcept { return m_ShadowDraw->UpdateActive(); }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec) noexcept { m_ShadowDraw->SetVec(AmbientLightVec); }

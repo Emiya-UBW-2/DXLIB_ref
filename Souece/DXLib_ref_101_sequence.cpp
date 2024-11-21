@@ -74,54 +74,66 @@ namespace DXLibRef {
 		}
 	}
 	//
-	void SceneControl::Draw3DMain(const Camera3DInfo& camInfo) const noexcept {
+	void SceneControl::DrawMain(const Camera3DInfo& camInfo, bool Is3D) const noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
-		PostPassParts->SetCamMat(camInfo);
 		// 全ての画面を初期化
 		PostPassParts->ResetBuffer();
-		// 空
-		PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
-		// 遠距離
-		PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
-			auto* PostPassParts = PostPassEffect::Instance();
-			PostPassParts->DrawByPBR([this]() {
-				this->m_NowScenesPtr->CalcOnDraw();
-				this->m_NowScenesPtr->MainDraw();
+		if (Is3D) {
+			// カメラ
+			PostPassParts->SetCamMat(camInfo);
+			// 空
+			PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
+			// 遠距離
+			PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->DrawByPBR([this]() {
+					this->m_NowScenesPtr->CalcOnDraw();
+					this->m_NowScenesPtr->MainDraw();
+					});
+				this->m_NowScenesPtr->MainDrawFront();
 				});
-			this->m_NowScenesPtr->MainDrawFront();
-			});
-		// 中間
-		PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [this]() {
+			// 中間
+			PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [this]() {
 #if defined(_USE_EFFEKSEER_)
-			Effekseer_Sync3DSetting();
+				Effekseer_Sync3DSetting();
 #endif
-			auto* PostPassParts = PostPassEffect::Instance();
-			PostPassParts->DrawByPBR([this]() {
-				this->m_NowScenesPtr->CalcOnDraw();
-				this->m_NowScenesPtr->MainDraw();
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->DrawByPBR([this]() {
+					this->m_NowScenesPtr->CalcOnDraw();
+					this->m_NowScenesPtr->MainDraw();
+					});
+#if defined(_USE_EFFEKSEER_)
+				DrawEffekseer3D();
+#endif
+				this->m_NowScenesPtr->MainDrawFront();
 				});
+			// 至近
+			PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
 #if defined(_USE_EFFEKSEER_)
-			DrawEffekseer3D();
+				Effekseer_Sync3DSetting();
 #endif
-			this->m_NowScenesPtr->MainDrawFront();
-			});
-		// 至近
-		PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
+				auto* PostPassParts = PostPassEffect::Instance();
+				PostPassParts->DrawByPBR([this]() {
+					this->m_NowScenesPtr->CalcOnDraw();
+					this->m_NowScenesPtr->MainDraw();
+					});
 #if defined(_USE_EFFEKSEER_)
-			Effekseer_Sync3DSetting();
+				DrawEffekseer3D();
 #endif
-			auto* PostPassParts = PostPassEffect::Instance();
-			PostPassParts->DrawByPBR([this]() {
-				this->m_NowScenesPtr->CalcOnDraw();
-				this->m_NowScenesPtr->MainDraw();
+				this->m_NowScenesPtr->MainDrawFront();
 				});
-#if defined(_USE_EFFEKSEER_)
-			DrawEffekseer3D();
-#endif
-			this->m_NowScenesPtr->MainDrawFront();
-			});
+			// 影
+			PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
+		}
+		else {
+			// 2D描画
+			PostPassParts->GetBufferScreen().SetDraw_Screen();
+			{
+				this->m_NowScenesPtr->MainDraw();
+			}
+			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);	// Dofを無効化
+		}
 		// ポストプロセス
-		PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
 		PostPassParts->DrawPostProcess();
 	}
 	void SceneControl::DrawUICommon(void) const noexcept {
@@ -163,6 +175,7 @@ namespace DXLibRef {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
+		auto* CameraParts = Camera3D::Instance();
 		KeyGuideParts->Dispose();
 		PostPassParts->ResetAllParams();
 		PostPassParts->ResetAllBuffer();
@@ -172,7 +185,7 @@ namespace DXLibRef {
 		//
 		SetUseMaskScreenFlag(FALSE);// ←一部画面でエフェクトが出なくなるため入れる
 		// カメラの初期設定
-		WindowSizeParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
+		CameraParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
 		// 環境光と影の初期化
 		WindowSizeParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
 		this->m_NowScenesPtr->Set();
@@ -181,12 +194,12 @@ namespace DXLibRef {
 		m_FPSDrawer.Initialize();
 	}
 	void SceneControl::Update(void) noexcept {
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionPopup::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* SideLogParts = SideLog::Instance();
+		auto* CameraParts = Camera3D::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
 		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
@@ -259,11 +272,11 @@ namespace DXLibRef {
 		Pad->Update();
 		m_IsEndScene = !this->m_NowScenesPtr->Update();		// 更新
 		OptionWindowParts->Update();
-		Set3DSoundListenerPosAndFrontPosAndUpVec(WindowSizeParts->SetMainCamera().GetCamPos().get(), WindowSizeParts->SetMainCamera().GetCamVec().get(), WindowSizeParts->SetMainCamera().GetCamUp().get());		// 音位置指定
+		Set3DSoundListenerPosAndFrontPosAndUpVec(CameraParts->SetMainCamera().GetCamPos().get(), CameraParts->SetMainCamera().GetCamVec().get(), CameraParts->SetMainCamera().GetCamUp().get());		// 音位置指定
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Execute();
 #endif
-		CameraShake::Instance()->Update();
+		Camera3D::Instance()->Update();
 		SideLogParts->Update();
 		PopUpParts->Update();
 		// ポーズ画面の更新
@@ -281,9 +294,10 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
+		auto* CameraParts = Camera3D::Instance();
 		if (this->m_NowScenesPtr->Get3DActive()) {
 			// キューブマップをセット
-			Vector3DX Pos = WindowSizeParts->SetMainCamera().GetCamPos(); Pos.y *= -1.f;
+			Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos(); Pos.y *= -1.f;
 			PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
 			// 影をセット
 			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop()) {
@@ -294,7 +308,7 @@ namespace DXLibRef {
 			}
 			PostPassParts->Update_Shadow(
 				[this] { this->m_NowScenesPtr->ShadowDraw(); },
-				WindowSizeParts->SetMainCamera().GetCamPos(),
+				CameraParts->GetMainCamera().GetCamPos(),
 				this->m_NowScenesPtr->GetShadowScale(), false);
 		}
 		// 画面に反映
@@ -306,13 +320,13 @@ namespace DXLibRef {
 				VRParts->SetUpBackUI([this]() { DrawUICommon(); });
 				// VRに移す
 				for (char i = 0; i < 2; ++i) {
-					Camera3DInfo tmp_cam = WindowSizeParts->GetMainCamera();
+					Camera3DInfo tmp_cam = CameraParts->GetMainCamera();
 					tmp_cam.SetCamPos(
 						tmp_cam.GetCamPos() + VRParts->GetEyePosition(i),
 						tmp_cam.GetCamVec() + VRParts->GetEyePosition(i),
 						tmp_cam.GetCamUp()
 					);
-					Draw3DMain(tmp_cam);
+					DrawMain(tmp_cam, true);
 					// それぞれの目に内容を送信
 					VRParts->SubmitDraw(i, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
 				}
@@ -327,29 +341,13 @@ namespace DXLibRef {
 #endif
 			}
 			else {
-				Draw3DMain(WindowSizeParts->GetMainCamera());
-				// ディスプレイ描画
-				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
-				{
-					int Prev = GetDrawMode();
-					SetDrawMode(DX_DRAWMODE_BILINEAR);
-					PostPassParts->GetBufferScreen().DrawExtendGraph(0, 0, WindowSizeParts->GetUIY(BaseScreenWidth), WindowSizeParts->GetUIY(BaseScreenHeight), false);
-					SetDrawMode(Prev);
-					//
-					DrawUICommon();
-					DrawUIFront();
-				}
+				DrawMain(CameraParts->GetMainCamera(), true);
 			}
 		}
 		else {
-			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);			// Dofを無効化
-			PostPassParts->ResetBuffer();			// 全ての画面を初期化
-			// 2D描画
-			PostPassParts->GetBufferScreen().SetDraw_Screen();
-			{
-				this->m_NowScenesPtr->MainDraw();
-			}
-			PostPassParts->DrawPostProcess();		// ポストプロセス
+			DrawMain(CameraParts->GetMainCamera(), false);
+		}
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// ディスプレイ描画
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{

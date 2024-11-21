@@ -20,7 +20,6 @@ namespace DXLibRef {
 
 		Vector3DX					m_LightVec;
 		COLOR_F						m_LightColorF{ GetColorF(0, 0, 0, 0) };
-		Camera3DInfo				m_MainCamera;							// カメラ
 	public:// ゲッター
 		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		// UI以外のスクリーン空間
@@ -38,9 +37,6 @@ namespace DXLibRef {
 		// UI用(1920,1080の場合)
 		const auto& GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
 		const auto& GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
-		// 
-		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
-		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
 	public:
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;

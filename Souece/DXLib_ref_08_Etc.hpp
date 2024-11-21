@@ -290,37 +290,6 @@ namespace DXLibRef {
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// カメラシェイク
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	class CameraShake : public SingletonBase<CameraShake> {
-	private:
-		friend class SingletonBase<CameraShake>;
-	private:
-		bool						m_SendCamShake{ false };
-		float						m_SendCamShakeTime{ 1.f };
-		float						m_SendCamShakePower{ 1.f };
-		float						m_CamShake{ 0.f };
-		Vector3DX					m_CamShake1;
-		Vector3DX					m_CamShake2;
-	public:
-		const auto& GetCamShake(void) const noexcept { return m_CamShake2; }
-	public:
-		void			SetCamShake(float time, float power) noexcept {
-			this->m_SendCamShake = true;
-			this->m_SendCamShakeTime = time;
-			this->m_SendCamShakePower = power;
-		}
-	private:
-		CameraShake(void) noexcept {}
-		CameraShake(const CameraShake&) = delete;
-		CameraShake(CameraShake&& o) = delete;
-		CameraShake& operator=(const CameraShake&) = delete;
-		CameraShake& operator=(CameraShake&& o) = delete;
-	public:
-		void Update(void) noexcept;
-	};
-
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*UDP通信																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class UDPNetWorkDX {

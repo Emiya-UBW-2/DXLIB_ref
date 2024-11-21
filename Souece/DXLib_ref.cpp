@@ -325,7 +325,7 @@ namespace DXLibRef {
 #endif
 		ObjectManager::Create();
 		SideLog::Create();
-		CameraShake::Create();
+		Camera3D::Create();
 		LightPool::Create();
 		// シェーダー
 		PostPassEffect::Create();

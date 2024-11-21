@@ -115,6 +115,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #include "DXLib_ref_12_Draw2DSystem.hpp"
 #include "DXLib_ref_13_Localize.hpp"
 #include "DXLib_ref_14_Popup.hpp"
+#include "DXLib_ref_15_Camera.hpp"
 #include "DXLib_ref_20_Debug.hpp"
 #include "DXLib_ref_30_Box2D.hpp"
 #include "DXLib_ref_31_VR.hpp"

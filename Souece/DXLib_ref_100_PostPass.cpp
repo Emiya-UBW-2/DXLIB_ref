@@ -37,6 +37,7 @@ namespace DXLibRef {
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
+			auto* CameraParts = Camera3D::Instance();
 			// SSRシェーダーを適用
 			SSRScreen2.SetDraw_Screen(false);
 			{
@@ -44,7 +45,7 @@ namespace DXLibRef {
 				NormalPtr->SetUseTextureToShader(1);
 				DepthPtr->SetUseTextureToShader(2);
 				m_ShaderSSAO.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
-				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(WindowSizeParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
+				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(CameraParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 
 				m_ShaderSSAO.Draw(m_ScreenVertex);
 
@@ -141,6 +142,7 @@ namespace DXLibRef {
 			auto* OptionParts = OptionManager::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
+			auto* CameraParts = Camera3D::Instance();
 
 			SSRColorScreen.GraphFilterBlt(*ColorGraph, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			SSRNormalScreen.GraphFilterBlt(*NormalPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
@@ -157,7 +159,7 @@ namespace DXLibRef {
 					bkScreen2.SetUseTextureToShader(3);
 				}
 				bkScreen2.SetUseTextureToShader(4);
-				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), Scale3DRate, std::tan(WindowSizeParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
+				m_Shader.SetPixelParam(3, static_cast<float>(RayInterval), Scale3DRate, std::tan(CameraParts->GetMainCamera().GetCamFov() / 2.f), DepthThreshold);
 				m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat(), PostPassParts->GetCamProjectionMat());
 				m_Shader.SetPixelParam(5, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::Reflection)), OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap) ? 1.f : 0.f, 0.f, 0.f);
 				{
@@ -785,6 +787,7 @@ namespace DXLibRef {
 			auto* OptionParts = OptionManager::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
+			auto* CameraParts = Camera3D::Instance();
 			SSRDepthScreen.GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 
 			m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat().inverse(), PostPassParts->GetCamProjectionMat().inverse());
@@ -810,7 +813,7 @@ namespace DXLibRef {
 					default:
 						break;
 					}
-					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(WindowSizeParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
+					m_Shader.SetPixelParam(3, Power, 0.f, std::tan(CameraParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 					m_Shader.Draw(m_ScreenVertex);
 				}
 				SetUseTextureToShader(0, InvalidID);
