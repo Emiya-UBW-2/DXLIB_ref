@@ -338,7 +338,7 @@ namespace DXLibRef {
 		VRParts->SetupBuffer();
 #endif
 		//
-		Update_effect_was = GetNowHiPerformanceCount();
+		m_Update_effect_was = GetNowHiPerformanceCount();
 	}
 	void			DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
@@ -360,8 +360,8 @@ namespace DXLibRef {
 			SceneParts->Update();
 			// 
 #if defined(_USE_EFFEKSEER_)
-			if (!SceneParts->IsPause() && ((m_StartTime - Update_effect_was) >= 1000000 / 60)) {
-				Update_effect_was = m_StartTime;
+			if (!SceneParts->IsPause() && ((m_StartTime - m_Update_effect_was) >= 1000000 / 60)) {
+				m_Update_effect_was = m_StartTime;
 				UpdateEffekseer3D();
 			}
 #endif

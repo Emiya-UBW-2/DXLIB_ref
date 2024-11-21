@@ -6,11 +6,11 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 継承クラス
 	class PostPassSSAO : public PostPassBase {
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;				// 頂点データ
-		ShaderUseClass		m_ShaderSSAO;										// シェーダー
-		ShaderUseClass		m_ShaderBlur;										// シェーダー
-		GraphHandle SSRScreen;		// 描画スクリーン
-		GraphHandle SSRScreen2;		// 描画スクリーン
+		ShaderUseClass::ScreenVertex	m_ScreenVertex;	// 頂点データ
+		ShaderUseClass					m_ShaderSSAO;	// シェーダー
+		ShaderUseClass					m_ShaderBlur;	// シェーダー
+		GraphHandle						SSRScreen;		// 描画スクリーン
+		GraphHandle						SSRScreen2;		// 描画スクリーン
 	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();

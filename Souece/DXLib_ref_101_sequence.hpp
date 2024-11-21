@@ -9,13 +9,13 @@ namespace DXLibRef {
 	private:
 		bool			m_IsFirstLoop{ true };			// 初回チェック
 		bool			m_IsLoading{ false };
-		std::array<std::shared_ptr<TEMPSCENE>, 10> Next_ptr{ nullptr };
+		std::array<std::shared_ptr<TEMPSCENE>, 10> m_pNextSceneList{ nullptr };
 		size_t			m_Next_Select{ 0 };
 		bool			m_Is3DActive{ true };
 		float			m_ShadowScale{ 1.f };
 	public:
-		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { Next_ptr.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
-		auto&		Get_Next(void) noexcept { return Next_ptr.at(this->m_Next_Select); }
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { m_pNextSceneList.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
+		auto&		Get_Next(void) noexcept { return m_pNextSceneList.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
 		void		SetShadowScale(float value) noexcept { m_ShadowScale = value; }
@@ -95,7 +95,7 @@ namespace DXLibRef {
 	private:
 		// FPS表示用クラス
 		class FPSDrawer {
-			std::array<float, 60>		FPSAvgs{};
+			std::array<float, 60>		m_FPSAvgs{};
 			size_t						m_FPSAvgCount{ 0 };
 			float						m_FPSAvg{ 0.f };
 		public:

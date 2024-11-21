@@ -8,7 +8,7 @@ namespace DXLibRef {
 	// FPS表示
 	void SceneControl::FPSDrawer::Initialize(void) noexcept {
 		// 各々の数値を初期化
-		for (auto& f : FPSAvgs) {
+		for (auto& f : m_FPSAvgs) {
 			f = FrameRate;
 		}
 		m_FPSAvgCount = 0;
@@ -16,15 +16,15 @@ namespace DXLibRef {
 	void SceneControl::FPSDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		// m_FPSAvgCountの番号に対して今のフレームレートを保存
-		FPSAvgs.at(m_FPSAvgCount) = DXLib_refParts->GetFps();
+		m_FPSAvgs.at(m_FPSAvgCount) = DXLib_refParts->GetFps();
 		// 保存する場所をずらす
-		++m_FPSAvgCount %= FPSAvgs.size();
+		++m_FPSAvgCount %= m_FPSAvgs.size();
 		// 保存している過去のFPS値の平均をとる
 		m_FPSAvg = 0.f;
-		for (auto& f : FPSAvgs) {
+		for (auto& f : m_FPSAvgs) {
 			m_FPSAvg += f;
 		}
-		m_FPSAvg = m_FPSAvg / static_cast<float>(FPSAvgs.size());
+		m_FPSAvg = m_FPSAvg / static_cast<float>(m_FPSAvgs.size());
 	}
 	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
@@ -164,6 +164,7 @@ namespace DXLibRef {
 		auto* KeyGuideParts = KeyGuide::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		KeyGuideParts->Dispose();
+		PostPassParts->ResetAllParams();
 		PostPassParts->ResetAllBuffer();
 		PostPassParts->UpdateActive();
 		//
@@ -187,7 +188,7 @@ namespace DXLibRef {
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* SideLogParts = SideLog::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
-		if (Pad->GetPadsInfo(PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
+		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
 			m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
@@ -209,7 +210,7 @@ namespace DXLibRef {
 
 						auto* Pad = PadControl::Instance();
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
-						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
+						if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || ret) {
 							// 終了フラグを立てる
 							SetEndGame();
 						}
@@ -242,7 +243,7 @@ namespace DXLibRef {
 
 						auto* Pad = PadControl::Instance();
 						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
-						if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || ret) {
+						if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || ret) {
 							SetEndGame();
 							StartMe();
 						}
@@ -270,7 +271,7 @@ namespace DXLibRef {
 			m_PauseDrawer.Update();
 		}
 		// ポーズ入力によるオンオフ
-		if (Pad->GetPadsInfo(PADS::INVENTORY).GetKey().trigger()) {
+		if (Pad->GetPadsInfo(Controls::PADS::INVENTORY).GetKey().trigger()) {
 			ChangePause(!IsPause());
 		}
 		// FPS表示機能の更新
@@ -363,15 +364,6 @@ namespace DXLibRef {
 		}
 	}
 	void SceneControl::NextMainLoop(void) noexcept {
-		auto* PostPassParts = PostPassEffect::Instance();
-		{
-			PostPassParts->SetLevelFilter(0, 255, 1.f);
-			PostPassParts->SetAberrationPower(1.f);
-			PostPassParts->Set_is_Blackout(false);
-			PostPassParts->Set_Per_Blackout(0.f);
-			PostPassParts->Set_is_lens(false);
-			PostPassParts->Set_zoom_lens(1.f);
-		}
 		LightPool::Instance()->Dispose();
 		this->m_NowScenesPtr->Dispose();										// 今のシーンからの解放
 		if (this->IsEndGame()) {

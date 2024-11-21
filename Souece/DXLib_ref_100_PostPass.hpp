@@ -515,6 +515,14 @@ namespace DXLibRef {
 			InColorPerMax = std::clamp(inMax, 0, 255);
 			InColorGamma = std::max(1.f, gamma);
 		}
+		void			ResetAllParams(void) noexcept {
+			SetLevelFilter(0, 255, 1.f);
+			SetAberrationPower(1.f);
+			Set_is_Blackout(false);
+			Set_Per_Blackout(0.f);
+			Set_is_lens(false);
+			Set_zoom_lens(1.f);
+		}
 	private:
 		PostPassEffect(void) noexcept;
 		PostPassEffect(const PostPassEffect&) = delete;

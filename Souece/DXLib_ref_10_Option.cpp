@@ -197,7 +197,7 @@ namespace DXLibRef {
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
 							for (size_t i : std::views::iota(1, 3)) {
-								if (RIGHT == ControlTypeStr[i]) {
+								if (RIGHT == Controls::ControlTypeStr[i]) {
 									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
 									break;
 								}
@@ -285,7 +285,7 @@ namespace DXLibRef {
 					outputfile << std::string(OptionStr[loop]) + "=" + std::string(DirectXVerStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
 				}
 				else if (loop == static_cast<int>(EnumSaveParam::ControlType)) {
-					outputfile << std::string(OptionStr[loop]) + "=" + std::string(ControlTypeStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
+					outputfile << std::string(OptionStr[loop]) + "=" + std::string(Controls::ControlTypeStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
 				}
 				else if (loop == static_cast<int>(EnumSaveParam::Language)) {
 					outputfile << std::string(OptionStr[loop]) + "=" + std::string(LanguageStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
@@ -321,7 +321,7 @@ namespace DXLibRef {
 		auto* Pad = PadControl::Instance();
 		m_Elements.at(static_cast<size_t>(*select)).GetAnyDoing();
 		if (CanPress) {
-			if (Pad->GetPadsInfo(PADS::MOVE_W).GetKey().trigger()) {
+			if (Pad->GetPadsInfo(Controls::PADS::MOVE_W).GetKey().trigger()) {
 				--(*select);
 				if ((*select) < 0) {
 					(*select) = static_cast<int>(m_Elements.size()) - 1;
@@ -329,7 +329,7 @@ namespace DXLibRef {
 				m_Elements.at(static_cast<size_t>(*select)).selanim = 3.f;
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
-			if (Pad->GetPadsInfo(PADS::MOVE_S).GetKey().trigger()) {
+			if (Pad->GetPadsInfo(Controls::PADS::MOVE_S).GetKey().trigger()) {
 				++(*select);
 				if ((*select) > static_cast<int>(m_Elements.size()) - 1) {
 					(*select) = 0;
@@ -337,13 +337,13 @@ namespace DXLibRef {
 				m_Elements.at(static_cast<size_t>(*select)).selanim = -3.f;
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
-			if (Pad->GetPadsInfo(PADS::MOVE_A).GetKey().repeat()) {
+			if (Pad->GetPadsInfo(Controls::PADS::MOVE_A).GetKey().repeat()) {
 				m_Elements.at(static_cast<size_t>(*select)).GetLeftPush();
 			}
-			if (Pad->GetPadsInfo(PADS::MOVE_D).GetKey().repeat()) {
+			if (Pad->GetPadsInfo(Controls::PADS::MOVE_D).GetKey().repeat()) {
 				m_Elements.at(static_cast<size_t>(*select)).GetRightPush();
 			}
-			if (Pad->GetPadsInfo(PADS::INTERACT).GetKey().trigger() || Pad->GetMouseClick().trigger()) {
+			if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || Pad->GetMouseClick().trigger()) {
 				m_Elements.at(static_cast<size_t>(*select)).GetOKPush();
 			}
 		}
@@ -1055,14 +1055,14 @@ namespace DXLibRef {
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
-				switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
-				case ControlType::PS4:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
+				switch ((Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
+				case Controls::ControlType::PS4:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
 					break;
-				case ControlType::XBox:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
+				case Controls::ControlType::XBox:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
 					break;
-				case ControlType::PC:
+				case Controls::ControlType::PC:
 				default:
 					break;
 				}
@@ -1071,14 +1071,14 @@ namespace DXLibRef {
 			[]() {
 				auto* OptionParts = OPTION::Instance();
 				auto* SE = SoundPool::Instance();
-				switch ((ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
-				case ControlType::PS4:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
+				switch ((Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
+				case Controls::ControlType::PS4:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
 					break;
-				case ControlType::XBox:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
+				case Controls::ControlType::XBox:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
 					break;
-				case ControlType::PC:
+				case Controls::ControlType::PC:
 				default:
 					break;
 				}
@@ -1089,14 +1089,14 @@ namespace DXLibRef {
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OPTION::Instance();
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::PS4)))) {
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::PS4));
+				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(Controls::ControlType::PS4)))) {
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
 				}
 				else {
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(ControlType::XBox));
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
 				}
 				ypos -= LineHeight * 1 / 6;
-				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(ControlType::XBox)) {
+				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(Controls::ControlType::XBox)) {
 					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
 						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
 						White, Black, "XInput");
@@ -1133,7 +1133,7 @@ namespace DXLibRef {
 			}
 		);
 	}
-	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, PADS Sel) noexcept {
+	void OptionWindowClass::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, Controls::PADS Sel) noexcept {
 		auto* Pad = PadControl::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
@@ -1148,7 +1148,7 @@ namespace DXLibRef {
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 			LineHeight, FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::TOP, xpos + 75, ypos, isMine ? White : Gray25, Black, "->");
 		if (Pad->GetPadsInfo(Sel).IsEnableSelectReserve()) {
-			KeyGuideParts->DrawButton(xpos + 100, ypos + LineHeight / 2 - 24 / 2, KeyGuide::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
+			KeyGuideParts->DrawButton(xpos + 100, ypos + LineHeight / 2 - 24 / 2, Controls::GetIDtoOffset(Pad->GetPadsInfo(Sel).GetReserve(), Pad->GetControlType()));
 		}
 		else {
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
@@ -1177,7 +1177,7 @@ namespace DXLibRef {
 					isMine ? White : Gray25, Black, "LMB Click");
 			}
 		);
-		if (Pad->GetPadsInfo(PADS::MOVE_W).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::MOVE_W).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1153), KeyInfo,
 				[]() {},
@@ -1185,15 +1185,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::MOVE_W)) {
+					if (Pad->ChangeConfig(Controls::PADS::MOVE_W)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_W); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::MOVE_W); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::MOVE_S).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::MOVE_S).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1154), KeyInfo,
 				[]() {},
@@ -1201,15 +1201,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::MOVE_S)) {
+					if (Pad->ChangeConfig(Controls::PADS::MOVE_S)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_S); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::MOVE_S); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::MOVE_A).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::MOVE_A).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1155), KeyInfo,
 				[]() {},
@@ -1217,15 +1217,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::MOVE_A)) {
+					if (Pad->ChangeConfig(Controls::PADS::MOVE_A)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_A); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::MOVE_A); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::MOVE_D).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::MOVE_D).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1156), KeyInfo,
 				[]() {},
@@ -1233,16 +1233,16 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::MOVE_D)) {
+					if (Pad->ChangeConfig(Controls::PADS::MOVE_D)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MOVE_D); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::MOVE_D); }
 			);
 		}
 
-		if (Pad->GetPadsInfo(PADS::LEAN_L).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::LEAN_L).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1157), KeyInfo,
 				[]() {},
@@ -1250,15 +1250,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::LEAN_L)) {
+					if (Pad->ChangeConfig(Controls::PADS::LEAN_L)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::LEAN_L); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::LEAN_L); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::LEAN_R).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::LEAN_R).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1158), KeyInfo,
 				[]() {},
@@ -1266,15 +1266,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::LEAN_R)) {
+					if (Pad->ChangeConfig(Controls::PADS::LEAN_R)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::LEAN_R); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::LEAN_R); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::RELOAD).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::RELOAD).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1159), KeyInfo,
 				[]() {},
@@ -1282,15 +1282,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::RELOAD)) {
+					if (Pad->ChangeConfig(Controls::PADS::RELOAD)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::RELOAD); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::RELOAD); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::INTERACT).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::INTERACT).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1160), KeyInfo,
 				[]() {},
@@ -1298,15 +1298,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::INTERACT)) {
+					if (Pad->ChangeConfig(Controls::PADS::INTERACT)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::INTERACT); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::INTERACT); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::THROW).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::THROW).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1161), KeyInfo,
 				[]() {},
@@ -1314,15 +1314,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::THROW)) {
+					if (Pad->ChangeConfig(Controls::PADS::THROW)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::THROW); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::THROW); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::MELEE).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::MELEE).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1162), KeyInfo,
 				[]() {},
@@ -1330,15 +1330,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::MELEE)) {
+					if (Pad->ChangeConfig(Controls::PADS::MELEE)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::MELEE); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::MELEE); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::JUMP).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::JUMP).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1163), KeyInfo,
 				[]() {},
@@ -1346,15 +1346,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::JUMP)) {
+					if (Pad->ChangeConfig(Controls::PADS::JUMP)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::JUMP); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::JUMP); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::RUN).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::RUN).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1164), KeyInfo,
 				[]() {},
@@ -1362,15 +1362,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::RUN)) {
+					if (Pad->ChangeConfig(Controls::PADS::RUN)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::RUN); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::RUN); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::WALK).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::WALK).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1165), KeyInfo,
 				[]() {},
@@ -1378,15 +1378,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::WALK)) {
+					if (Pad->ChangeConfig(Controls::PADS::WALK)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::WALK); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::WALK); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::SHOT).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::SHOT).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1166), KeyInfo,
 				[]() {},
@@ -1394,15 +1394,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::SHOT)) {
+					if (Pad->ChangeConfig(Controls::PADS::SHOT)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::SHOT); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::SHOT); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::AIM).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::AIM).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1167), KeyInfo,
 				[]() {},
@@ -1410,15 +1410,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::AIM)) {
+					if (Pad->ChangeConfig(Controls::PADS::AIM)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::AIM); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::AIM); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::ULT).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::ULT).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1168), KeyInfo,
 				[]() {},
@@ -1426,15 +1426,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::ULT)) {
+					if (Pad->ChangeConfig(Controls::PADS::ULT)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::ULT); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ULT); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::SQUAT).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::SQUAT).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1169), KeyInfo,
 				[]() {},
@@ -1442,15 +1442,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::SQUAT)) {
+					if (Pad->ChangeConfig(Controls::PADS::SQUAT)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::SQUAT); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::SQUAT); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::PRONE).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::PRONE).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1170), KeyInfo,
 				[]() {},
@@ -1458,15 +1458,15 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::PRONE)) {
+					if (Pad->ChangeConfig(Controls::PADS::PRONE)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::PRONE); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::PRONE); }
 			);
 		}
-		if (Pad->GetPadsInfo(PADS::CHECK).IsUse()) {
+		if (Pad->GetPadsInfo(Controls::PADS::CHECK).IsUse()) {
 			this->m_Elements.emplace_back();
 			this->m_Elements.back().Init(LocalizeParts->Get(1171), KeyInfo,
 				[]() {},
@@ -1474,12 +1474,12 @@ namespace DXLibRef {
 				[]() {},
 				[]() {
 					auto* Pad = PadControl::Instance();
-					if (Pad->ChangeConfig(PADS::CHECK)) {
+					if (Pad->ChangeConfig(Controls::PADS::CHECK)) {
 						auto* SE = SoundPool::Instance();
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 				},
-				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, PADS::CHECK); }
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::CHECK); }
 			);
 		}
 
@@ -1533,7 +1533,7 @@ namespace DXLibRef {
 					// ÉKÉCÉh
 					m_Tabs.at(static_cast<size_t>(m_tabsel))->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, m_select);
 					// 
-					if (Pad->GetPadsInfo(PADS::LEAN_L).GetKey().trigger() && (m_tabsel != 3)) {
+					if (Pad->GetPadsInfo(Controls::PADS::LEAN_L).GetKey().trigger() && (m_tabsel != 3)) {
 						--m_tabsel;
 						if (m_tabsel < 0) {
 							m_tabsel = static_cast<int>(m_Tabs.size()) - 1;
@@ -1541,7 +1541,7 @@ namespace DXLibRef {
 						m_select = 0;
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
-					if (Pad->GetPadsInfo(PADS::LEAN_R).GetKey().trigger() && (m_tabsel != 3)) {
+					if (Pad->GetPadsInfo(Controls::PADS::LEAN_R).GetKey().trigger() && (m_tabsel != 3)) {
 						++m_tabsel;
 						if (m_tabsel > static_cast<int>(m_Tabs.size()) - 1) {
 							m_tabsel = 0;
@@ -1565,15 +1565,15 @@ namespace DXLibRef {
 					auto* KeyGuideParts = KeyGuide::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
 
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::INTERACT), LocalizeParts->Get(9992));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::INTERACT), LocalizeParts->Get(9992));
 
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::LEAN_L), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::LEAN_R), LocalizeParts->Get(9994));
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_W), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_A), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_S), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_D), "");
-					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::MOVE_STICK), LocalizeParts->Get(9993));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::LEAN_L), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::LEAN_R), LocalizeParts->Get(9994));
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::MOVE_W), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::MOVE_A), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::MOVE_S), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::MOVE_D), "");
+					KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::MOVE_STICK), LocalizeParts->Get(9993));
 				},
 				true
 			);

@@ -129,7 +129,7 @@ namespace DXLibRef {
 		friend class SingletonBase<DXLib_ref>;
 	private:
 		bool						m_IsFirstBoot{ false };
-		LONGLONG					Update_effect_was = 0;					// エフェクトのアップデートタイミングタイマー
+		LONGLONG					m_Update_effect_was = 0;					// エフェクトのアップデートタイミングタイマー
 
 		float						m_DeltaTime{ 0.f };		//1フレームにかかった時間 マイクロ秒
 		LONGLONG					m_StartTime{ 0 };		// 1フレームが始まってからの経過時間 マイクロ秒

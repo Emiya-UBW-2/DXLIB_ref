@@ -47,19 +47,20 @@ namespace DXLibRef {
 			}
 			auto LEFT = FileStreamDX::getleft(ALL);
 			auto RIGHT = FileStreamDX::getright(ALL);
-			for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
-				if (LEFT == PADSStr[i]) {
-					m_PadsInfo.at(i).SetAssign(GetStrtoID(RIGHT.c_str()));
+			for (size_t i = 0; auto& p : this->m_PadsInfo) {
+				if (LEFT == Controls::PADSStr[i]) {
+					p.SetAssign(Controls::GetStrtoID(RIGHT.c_str(), GetControlType()));
 					break;
 				}
+				++i;
 			}
 		}
 	}
 	void PadControl::Save(void) const noexcept {
 		std::ofstream outputfile(GetSavePath());
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
-			PADS Pads = static_cast<PADS>(i);
-			outputfile << (std::string)PADSStr[i] + "=" + GetIDtoStr(GetPadsInfo(Pads).GetAssign()) + "\n";
+		for (size_t i = 0; auto & p : this->m_PadsInfo) {
+			outputfile << (std::string)Controls::PADSStr[i] + "=" + Controls::GetIDtoStr(p.GetAssign(), GetControlType()) + "\n";
+			++i;
 		}
 		outputfile.close();
 	}
@@ -71,11 +72,11 @@ namespace DXLibRef {
 		// コントロールタイプ決定
 		{
 			//基本はPC
-			ControlType NextControlType = ControlType::PC;
+			Controls::ControlType NextControlType = Controls::ControlType::PC;
 			//ゲームパッドを検知したら
 			if (GetJoypadNum() > 0) {
 				//コントロールタイプに合わせた設定を行う
-				NextControlType = (ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
+				NextControlType = (Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
 			}
 			//以前の設定と異なる場合は
 			if (m_ControlType != NextControlType) {
@@ -86,15 +87,15 @@ namespace DXLibRef {
 			}
 		}
 		//マウス座標を取得しておく
-		int PrevX = MouseX;
-		int PrevY = MouseY;
+		int PrevX = m_MouseX;
+		int PrevY = m_MouseY;
 		//マウス座標を取得しておく
-		GetMousePoint(&MouseX, &MouseY);
-		MouseX = MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
-		MouseY = MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
+		GetMousePoint(&m_MouseX, &m_MouseY);
+		m_MouseX = m_MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
+		m_MouseY = m_MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
 		// タイプに合わせた操作
-		switch (m_ControlType) {
-		case ControlType::XBox:
+		switch (GetControlType()) {
+		case Controls::ControlType::XBox:
 		{
 			SetMouseDispFlag(TRUE);//マウスは必ず表示
 			XINPUT_STATE input;
@@ -103,7 +104,7 @@ namespace DXLibRef {
 			{
 				int LS_X = input.ThumbLX;
 				int LS_Y = -input.ThumbLY;
-				if (GetPadsInfo(PADS::MOVE_STICK).GetAssign() == 0xF002) {
+				if (GetPadsInfo(Controls::PADS::MOVE_STICK).GetAssign() == 0xF002) {
 					LS_X = input.ThumbRX;
 					LS_Y = -input.ThumbRY;
 				}
@@ -125,16 +126,16 @@ namespace DXLibRef {
 					s_key = (130.f <= deg || deg <= -130.f);
 					d_key = (40.f <= deg && deg <= 140.f);
 				}
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_W)).Update(w_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_S)).Update(s_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_A)).Update(a_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_D)).Update(d_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_W)).Update(w_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_S)).Update(s_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_A)).Update(a_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_D)).Update(d_key);
 			}
 			// 右スティック
 			{
 				int RS_X = input.ThumbRX;
 				int RS_Y = -input.ThumbRY;
-				if (GetPadsInfo(PADS::DIR_STICK).GetAssign() == 0xF001) {
+				if (GetPadsInfo(Controls::PADS::DIR_STICK).GetAssign() == 0xF001) {
 					RS_X = input.ThumbLX;
 					RS_Y = -input.ThumbLY;
 				}
@@ -142,17 +143,17 @@ namespace DXLibRef {
 				RS_Y = 1000 * RS_Y / 32768;
 
 				if (!SceneParts->IsPause()) {
-					Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-					Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+					m_Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+					m_Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 				}
 				else {
-					Look_XradAdd = 0.f;
-					Look_YradAdd = 0.f;
+					m_Look_XradAdd = 0.f;
+					m_Look_YradAdd = 0.f;
 				}
 			}
 		}
 		break;
-		case ControlType::PS4:
+		case Controls::ControlType::PS4:
 		{
 			SetMouseDispFlag(TRUE);//マウスは必ず表示
 			DINPUT_JOYSTATE input;
@@ -161,7 +162,7 @@ namespace DXLibRef {
 			{
 				int LS_X = input.X;
 				int LS_Y = input.Y;
-				if (GetPadsInfo(PADS::MOVE_STICK).GetAssign() == 0xF002) {
+				if (GetPadsInfo(Controls::PADS::MOVE_STICK).GetAssign() == 0xF002) {
 					LS_X = input.Z;
 					LS_Y = input.Rz;
 				}
@@ -177,39 +178,39 @@ namespace DXLibRef {
 					s_key = (130.f <= deg || deg <= -130.f);
 					d_key = (40.f <= deg && deg <= 140.f);
 				}
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_W)).Update(w_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_S)).Update(s_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_A)).Update(a_key);
-				m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_D)).Update(d_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_W)).Update(w_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_S)).Update(s_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_A)).Update(a_key);
+				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_D)).Update(d_key);
 			}
 			// 右スティック
 			{
 				int RS_X = input.Z;
 				int RS_Y = input.Rz;
-				if (GetPadsInfo(PADS::DIR_STICK).GetAssign() == 0xF001) {
+				if (GetPadsInfo(Controls::PADS::DIR_STICK).GetAssign() == 0xF001) {
 					RS_X = input.X;
 					RS_Y = input.Y;
 				}
 				if (!SceneParts->IsPause()) {
-					Look_XradAdd = static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					m_Look_XradAdd = static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					m_Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				else {
-					Look_XradAdd = 0.f;
-					Look_YradAdd = 0.f;
+					m_Look_XradAdd = 0.f;
+					m_Look_YradAdd = 0.f;
 				}
 			}
 		}
 		break;
-		case ControlType::PC:
+		case Controls::ControlType::PC:
 		{
 			//マウスによる入力(FPS、TPS)の場合
 			if (m_MouseMoveEnable) {
 				//最前面でポーズ中でない場合
 				if ((GetMainWindowHandle() == GetForegroundWindow()) && !SceneParts->IsPause()) {
 					// 視点移動は前フレームからの移動量
-					Look_XradAdd = static_cast<float>(MouseX - BaseScreenWidth / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					Look_YradAdd = -static_cast<float>(MouseY - BaseScreenHeight / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					m_Look_XradAdd = static_cast<float>(m_MouseX - BaseScreenWidth / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					m_Look_YradAdd = -static_cast<float>(m_MouseY - BaseScreenHeight / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					//移動をリセット
 					SetMousePoint(BaseScreenWidth / 2, BaseScreenHeight / 2);
 					//マウスを表示しない
@@ -219,49 +220,58 @@ namespace DXLibRef {
 					//マウスを表示
 					SetMouseDispFlag(TRUE);
 					// 視点移動はなしとして上書き
-					Look_XradAdd = 0.f;
-					Look_YradAdd = 0.f;
+					m_Look_XradAdd = 0.f;
+					m_Look_YradAdd = 0.f;
 				}
 			}
 			else {
 				// 視点移動は前フレームからの移動量
-				Look_XradAdd = static_cast<float>(MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-				Look_YradAdd = -static_cast<float>(MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+				m_Look_XradAdd = static_cast<float>(m_MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+				m_Look_YradAdd = -static_cast<float>(m_MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				//マウスを表示
 				SetMouseDispFlag(TRUE);
 			}
 			//移動
-			m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_W)).Update(GetButtonPress(GetPadsInfo(PADS::MOVE_W).GetAssign()));
-			m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_A)).Update(GetButtonPress(GetPadsInfo(PADS::MOVE_A).GetAssign()));
-			m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_S)).Update(GetButtonPress(GetPadsInfo(PADS::MOVE_S).GetAssign()));
-			m_PadsInfo.at(static_cast<size_t>(PADS::MOVE_D)).Update(GetButtonPress(GetPadsInfo(PADS::MOVE_D).GetAssign()));
+			for (size_t i = 0; auto & p : this->m_PadsInfo) {
+				Controls::PADS Pads = static_cast<Controls::PADS>(i);
+				++i;
+				if (
+					Pads == Controls::PADS::MOVE_W ||
+					Pads == Controls::PADS::MOVE_A ||
+					Pads == Controls::PADS::MOVE_S ||
+					Pads == Controls::PADS::MOVE_D
+					) {
+					p.Update(Controls::GetButtonPress(GetControlType(), GetPadsInfo(Pads).GetAssign()));
+				}
+			}
 		}
 		break;
 		default:
 			break;
 		}
 		// ボタン
-		for (size_t i = 0; i < static_cast<size_t>(PADS::MAX); ++i) {
-			PADS Pads = static_cast<PADS>(i);
+		for (size_t i = 0; auto& p : this->m_PadsInfo) {
+			Controls::PADS Pads = static_cast<Controls::PADS>(i);
+			++i;
 			if (
-				Pads == PADS::MOVE_W ||
-				Pads == PADS::MOVE_A ||
-				Pads == PADS::MOVE_S ||
-				Pads == PADS::MOVE_D
+				Pads == Controls::PADS::MOVE_W ||
+				Pads == Controls::PADS::MOVE_A ||
+				Pads == Controls::PADS::MOVE_S ||
+				Pads == Controls::PADS::MOVE_D
 				) {
 				continue;
 			}
-			m_PadsInfo.at(i).Update(GetButtonPress(GetPadsInfo(Pads).GetAssign()));
+			p.Update(Controls::GetButtonPress(GetControlType(), GetPadsInfo(Pads).GetAssign()));
 		}
 		// その他特殊入力
 		{
-			MouseClick.Update(GetWindowActiveFlag() ? ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) : false);
+			m_MouseClick.Update(GetWindowActiveFlag() ? ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) : false);
 			if (GetWindowActiveFlag()) {
-				MouseWheelRot = GetMouseWheelRotVol();
+				m_MouseWheelRot = GetMouseWheelRotVol();
 			}
 			else {
 				GetMouseWheelRotVol();//前回との差分が入る仕組みなのでアクティブでない場合も通してはおくように
-				MouseWheelRot = 0;
+				m_MouseWheelRot = 0;
 			}
 		}
 	}

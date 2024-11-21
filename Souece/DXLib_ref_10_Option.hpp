@@ -104,23 +104,23 @@ namespace DXLibRef {
 		Max,
 	};
 
-	struct SaveParams {
+	class SaveParams {
 	private:
-		EnumParamType m_EnumParamType{};
-		int valueint{ 0 };
+		EnumParamType	m_EnumParamType{};
+		int				m_valueint{ 0 };
 	public:
 		void SetEnumParamType(EnumParamType value) noexcept { m_EnumParamType = value; }
 		auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
 
-		void SetBoolean(bool use) noexcept { valueint = use ? 1 : 0; }
-		auto GetBoolean(void) const noexcept { return (valueint != 0); }
+		void SetBoolean(bool use) noexcept { m_valueint = use ? 1 : 0; }
+		auto GetBoolean(void) const noexcept { return (m_valueint != 0); }
 		void ChangeBoolean(void) noexcept { SetBoolean(GetBoolean() ^ 1); }
 
-		void SetInt(int use) noexcept { valueint = use; }
-		auto GetInt(void) const noexcept { return valueint; }
+		void SetInt(int use) noexcept { m_valueint = use; }
+		auto GetInt(void) const noexcept { return m_valueint; }
 
-		void SetFloat(float use) noexcept { valueint = static_cast<int>(use * 1000.f); }
-		auto GetFloat(void) const noexcept { return static_cast<float>(valueint) / 1000.f; }
+		void SetFloat(float use) noexcept { m_valueint = static_cast<int>(use * 1000.f); }
+		auto GetFloat(void) const noexcept { return static_cast<float>(m_valueint) / 1000.f; }
 
 	};
 
@@ -370,7 +370,7 @@ namespace DXLibRef {
 		protected:
 			void Init_Sub(void) noexcept override;
 		private:
-			void KeyDraw(int xpos, int ypos, bool isMine, PADS Sel) noexcept;
+			void KeyDraw(int xpos, int ypos, bool isMine, Controls::PADS Sel) noexcept;
 		};
 		class ElseTabsInfo :public OptionTabsInfo {
 		public:

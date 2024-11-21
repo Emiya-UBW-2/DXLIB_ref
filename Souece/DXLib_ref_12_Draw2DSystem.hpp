@@ -15,15 +15,10 @@ namespace DXLibRef {
 	static constexpr unsigned int Red{ GetColorFix(255, 0, 0) };
 	static constexpr unsigned int Red25{ GetColorFix(192, 0, 0) };
 	static constexpr unsigned int Red50{ GetColorFix(128, 0, 0) };
-
 	static constexpr unsigned int Green{ GetColorFix(0, 255, 0) };// GetColorFix(43, 255, 91)
 	static constexpr unsigned int DarkGreen{ GetColorFix(0, 64, 0) };// GetColorFix(21, 128, 45)
-
 	static constexpr unsigned int Blue{ GetColorFix(0, 0, 255) };
-
 	static constexpr unsigned int Yellow{ GetColorFix(255, 255, 0) };
-
-	static constexpr unsigned int WhiteSel{ GetColorFix(216, 255, 216) };
 
 	static constexpr unsigned int White{ GetColorFix(255, 255, 255) };
 	static constexpr unsigned int Gray05{ GetColorFix(255 * 95 / 100, 255 * 95 / 100, 255 * 95 / 100) };
@@ -368,7 +363,9 @@ namespace DXLibRef {
 				return &this->m_DrawDatas.at(static_cast<int>(Layer)).back();
 			}
 		public:
-			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept;
+			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
+				return HitRectangleToRectangle(0, 0, BaseScreenWidth, BaseScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
+			}
 			// 
 			void	SetAlpha(DrawLayer Layer, int Alpha) noexcept {
 				DrawData* Back = GetBack(Layer);
@@ -869,38 +866,9 @@ namespace DXLibRef {
 		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;				// •ªŠ„Œã‚Ì‰æ‘œ
 		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;								// ƒKƒCƒh
 	public:
-		static const int GetIDtoOffset(int ID, ControlType controlType) noexcept {
-			switch (controlType) {
-			case ControlType::XBox:
-				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
-					if (XBoxID[i] == ID) {
-						return static_cast<int>(i + KeyNum + XBoxNum);
-					}
-				}
-				break;
-			case ControlType::PS4:
-				for (size_t i = 0; i < static_cast<size_t>(DS4Num); ++i) {
-					if (DS4ID[i] == ID) {
-						return static_cast<int>(i + KeyNum);
-					}
-				}
-				break;
-			case ControlType::PC:
-				for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
-					if (KeyID[i] == ID) {
-						return static_cast<int>(i);
-					}
-				}
-				break;
-			default:
-				break;
-			}
-			return InvalidID;
-		}
-
-		static const int GetPADStoOffset(PADS PAD) noexcept {
+		static const int GetPADStoOffset(Controls::PADS PAD) noexcept {
 			auto* Pad = PadControl::Instance();
-			return GetIDtoOffset(Pad->GetPadsInfo(PAD).GetAssign(), Pad->GetControlType());
+			return Controls::GetIDtoOffset(Pad->GetPadsInfo(PAD).GetAssign(), Pad->GetControlType());
 		}
 	public:
 		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }

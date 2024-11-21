@@ -140,9 +140,6 @@ namespace DXLibRef {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
 		}
-		bool DrawControl::IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
-			return HitRectangleToRectangle(0, 0, BaseScreenWidth, BaseScreenHeight, std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2));
-		}
 		void DrawControl::ClearList(void) noexcept {
 			for (size_t index = 0; auto & d : this->m_DrawDatas) {
 				auto& pd = this->m_PrevDrawDatas.at(index);
@@ -263,7 +260,7 @@ namespace DXLibRef {
 			[this]() {
 				auto* KeyGuideParts = KeyGuide::Instance();
 				auto* LocalizeParts = LocalizePool::Instance();
-				KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(PADS::RELOAD), LocalizeParts->Get(9991));
+				KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::RELOAD), LocalizeParts->Get(9991));
 				if (m_GuideDoing) {
 					m_GuideDoing();
 				}
@@ -293,7 +290,7 @@ namespace DXLibRef {
 
 		if (m_Active) {
 			Pad->SetMouseMoveEnable(false);
-			if (Pad->GetPadsInfo(PADS::RELOAD).GetKey().trigger()) {
+			if (Pad->GetPadsInfo(Controls::PADS::RELOAD).GetKey().trigger()) {
 				End();
 			}
 		}
@@ -455,8 +452,8 @@ namespace DXLibRef {
 			// 絶対出すガイド
 			auto* Pad = PadControl::Instance();
 			auto* LocalizeParts = LocalizePool::Instance();
-			AddGuide(GetIDtoOffset(Pad->GetPadsInfo(PADS::Escape).GetAssign(), ControlType::PC), LocalizeParts->Get(9990));
-			AddGuide(GetPADStoOffset(PADS::INVENTORY), LocalizeParts->Get(9995));
+			AddGuide(Controls::GetIDtoOffset(Pad->GetPadsInfo(Controls::PADS::Escape).GetAssign(), Controls::ControlType::PC), LocalizeParts->Get(9990));
+			AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));
 			// 追加のガイド
 			Guide_Pad();
 		}

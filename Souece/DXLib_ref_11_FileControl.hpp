@@ -134,5 +134,4 @@ namespace DXLibRef {
 		delete[] bmpData;
 		return true;
 	}
-
 }
