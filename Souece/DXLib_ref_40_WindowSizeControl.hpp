@@ -17,11 +17,7 @@ namespace DXLibRef {
 
 		int							m_ScreenXSize{ BaseScreenWidth };
 		int							m_ScreenYSize{ BaseScreenHeight };
-
-		Vector3DX					m_LightVec;
-		COLOR_F						m_LightColorF{ GetColorF(0, 0, 0, 0) };
 	public:// ゲッター
-		const auto& GetLightVec(void) const noexcept { return m_LightVec; }
 		// UI以外のスクリーン空間
 		const auto		GetScreenX(int value) const noexcept { return value * this->m_ScreenXSize / BaseScreenWidth; }
 		const auto		GetScreenY(int value) const noexcept { return value * this->m_ScreenYSize / BaseScreenHeight; }
@@ -38,7 +34,6 @@ namespace DXLibRef {
 		const auto& GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
 		const auto& GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
 	public:
-		void			SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept;
 		void			SetWindowOrBorderless(void) noexcept;
 		void			UpdateWindowSize(void) const noexcept {
 			// DPI設定

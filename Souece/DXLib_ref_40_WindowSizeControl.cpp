@@ -42,15 +42,6 @@ namespace DXLibRef {
 		}
 	}
 	// 
-	void			WindowSizeControl::SetAmbientLight(const Vector3DX& AmbientLightVec, const COLOR_F& LightColor) noexcept {
-		m_LightVec = AmbientLightVec;
-		m_LightColorF = LightColor;
-		SetGlobalAmbientLight(LightColor);
-		SetLightDirection(AmbientLightVec.get());
-		auto* PostPassParts = PostPassEffect::Instance();
-		PostPassParts->SetAmbientLight(AmbientLightVec);
-	}
-
 	void			WindowSizeControl::SetupWindowSize(void) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {

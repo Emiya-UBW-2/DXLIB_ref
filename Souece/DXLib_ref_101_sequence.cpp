@@ -172,7 +172,6 @@ namespace DXLibRef {
 	//
 	void SceneControl::Initialize(void) noexcept {
 		auto* OptionParts = OptionManager::Instance();
-		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		auto* CameraParts = Camera3D::Instance();
@@ -186,8 +185,7 @@ namespace DXLibRef {
 		SetUseMaskScreenFlag(FALSE);// ←一部画面でエフェクトが出なくなるため入れる
 		// カメラの初期設定
 		CameraParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
-		// 環境光と影の初期化
-		WindowSizeParts->SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f), GetColorF(1.f, 1.f, 1.f, 0.0f));
+		//
 		this->m_NowScenesPtr->Set();
 		KeyGuideParts->SetGuideFlip();
 		// FPS表示の初期化
@@ -205,24 +203,20 @@ namespace DXLibRef {
 			m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* Pad = PadControl::Instance();
 					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
-					int xp1, yp1;
 					// タイトル
 					{
-						xp1 = xmin + (24);
-						yp1 = ymin + LineHeight;
-
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(101));
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xmin + 24, ymin + LineHeight, White, Black, LocalizeParts->Get(101));
 					}
 					// 
 					{
-						xp1 = (xmax + xmin) / 2 - (54);
-						yp1 = ymax - LineHeight * 3;
+						int xp1 = (xmax + xmin) / 2;
+						int yp1 = ymax - LineHeight * 3;
 
-						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1 - 54, yp1, xp1 + 54, yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
 						if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || ret) {
 							// 終了フラグを立てる
 							SetEndGame();
@@ -238,33 +232,27 @@ namespace DXLibRef {
 			m_IsRestartSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
+					auto* Pad = PadControl::Instance();
 					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
-					int xp1, yp1;
 					// タイトル
 					{
-						xp1 = xmin + (24);
-						yp1 = ymin + LineHeight;
-
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp1, yp1, White, Black, LocalizeParts->Get(2101));
+							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xmin + 24, ymin + LineHeight, White, Black, LocalizeParts->Get(2101));
 					}
 					// 
 					{
-						xp1 = (xmax + xmin) / 2 - (54);
-						yp1 = ymax - LineHeight * 3;
+						int xp1 = (xmax + xmin) / 2;
+						int yp1 = ymax - LineHeight * 3;
 
-						auto* Pad = PadControl::Instance();
-						bool ret = WindowSystem::SetMsgClickBox(xp1, yp1, xp1 + (108), yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
+						bool ret = WindowSystem::SetMsgClickBox(xp1 - 54, yp1, xp1 + 54, yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(2102));
 						if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || ret) {
 							SetEndGame();
 							StartMe();
 						}
 					}
 				},
-				[this]() {
-					m_IsRestartSelect = false;
-				},
+				[this]() { m_IsRestartSelect = false; },
 				[this]() {},
 				true
 			);
@@ -301,15 +289,9 @@ namespace DXLibRef {
 			PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
 			// 影をセット
 			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop()) {
-				PostPassParts->Update_Shadow(
-					[this]() { this->m_NowScenesPtr->ShadowDraw_Far(); },
-					Vector3DX::zero(),
-					this->m_NowScenesPtr->GetShadowScale() * 4.f, true);
+				PostPassParts->Update_Shadow([this]() { this->m_NowScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), true);
 			}
-			PostPassParts->Update_Shadow(
-				[this] { this->m_NowScenesPtr->ShadowDraw(); },
-				CameraParts->GetMainCamera().GetCamPos(),
-				this->m_NowScenesPtr->GetShadowScale(), false);
+			PostPassParts->Update_Shadow([this] { this->m_NowScenesPtr->ShadowDraw(); }, CameraParts->GetMainCamera().GetCamPos(), false);
 		}
 		// 画面に反映
 		if (this->m_NowScenesPtr->Get3DActive()) {

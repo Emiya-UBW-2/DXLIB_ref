@@ -1149,15 +1149,15 @@ namespace DXLibRef {
 		}
 		UpdateActiveCubeMap(false);
 	}
-	void PostPassEffect::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept {
+	void PostPassEffect::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 			// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚Ì€”õ‚ðs‚¤
 			if (!IsFar) {
-				m_ShadowDraw->Update(doing, CenterPos, Scale);
+				m_ShadowDraw->Update(doing, CenterPos, this->GetShadowScale());
 			}
 			else {
-				//m_ShadowDraw->UpdateFar(doing, CenterPos, Scale);
+				//m_ShadowDraw->UpdateFar(doing, CenterPos, this->GetShadowScale() * 4.f);
 			}
 		}
 	}

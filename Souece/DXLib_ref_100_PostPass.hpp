@@ -473,6 +473,7 @@ namespace DXLibRef {
 		bool						m_IsCubeMap{ false };
 		RealTimeCubeMap				m_RealTimeCubeMap;
 		ShaderUseClass				m_PBR_Shader;
+		float			m_ShadowScale{ 1.f };
 	public:
 		auto& GetBufferScreen(void) noexcept { return BufferScreen; }
 	public:
@@ -494,6 +495,7 @@ namespace DXLibRef {
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 		const auto&		GetDistortionPer(void) const noexcept { return m_DistortionPer; }
+		const auto&		GetShadowScale(void) const noexcept { return m_ShadowScale; }
 	public:
 		void			Set_is_lens(bool value) noexcept { m_useScope = value; }
 		void			Set_xp_lens(float value) noexcept { m_ScopeXpos = value; }
@@ -505,6 +507,7 @@ namespace DXLibRef {
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
 		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
+		void			SetShadowScale(float value) noexcept { m_ShadowScale = value; }
 		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
 		void			Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
 			near_DoF = near_d;
@@ -524,6 +527,8 @@ namespace DXLibRef {
 			Set_Per_Blackout(0.f);
 			Set_is_lens(false);
 			Set_zoom_lens(1.f);
+			// 環境光と影の初期化
+			SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f));
 		}
 	private:
 		PostPassEffect(void) noexcept;
@@ -546,7 +551,7 @@ namespace DXLibRef {
 
 		bool			UpdateShadowActive(void) noexcept { return m_ShadowDraw->UpdateActive(); }
 		void			SetAmbientLight(const Vector3DX& AmbientLightVec) noexcept { m_ShadowDraw->SetVec(AmbientLightVec); }
-		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept;
+		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept;
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 
 		void			DrawByPBR(std::function<void()> doing) noexcept;
