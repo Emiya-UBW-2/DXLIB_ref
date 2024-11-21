@@ -761,7 +761,10 @@ namespace DXLibRef {
 			m_rad = rad;
 			m_vel = 0.f;
 		}
-		void Update(void) noexcept;
+		void Update(float deltaTime) noexcept {
+			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * deltaTime;
+			m_rad += this->m_vel * deltaTime;
+		}
 	public:
 		auto GetRad(void) const noexcept { return this->m_rad; }
 		void AddRad(float value) noexcept { this->m_rad += value; }

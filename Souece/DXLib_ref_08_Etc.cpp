@@ -17,12 +17,6 @@ namespace DXLibRef {
 			return 1.f;
 		}
 	}
-	bool IntoMouse(int x1, int y1, int x2, int y2) noexcept {
-		auto* Pad = PadControl::Instance();
-		int mx = Pad->GetMS_X();
-		int my = Pad->GetMS_Y();
-		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
-	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		// ビュー行列と射影行列の取得
@@ -52,12 +46,6 @@ namespace DXLibRef {
 			screenPos.z = -1.f;
 		}
 		return screenPos;
-	}
-	// 
-	void			Pendulum2D::Update(void) noexcept {
-		auto* DXLib_refParts = DXLib_ref::Instance();
-		m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * DXLib_refParts->GetDeltaTime();
-		m_rad += this->m_vel * DXLib_refParts->GetDeltaTime();
 	}
 	// 
 	void CameraShake::Update(void) noexcept {

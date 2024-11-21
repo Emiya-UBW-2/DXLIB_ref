@@ -28,6 +28,13 @@ namespace DXLibRef {
 			m_repeatcount = m_RepeatWaitTime;
 		}
 	}
+	//
+	bool IntoMouse(int x1, int y1, int x2, int y2) noexcept {
+		auto* Pad = PadControl::Instance();
+		int mx = Pad->GetMS_X();
+		int my = Pad->GetMS_Y();
+		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
+	}
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
