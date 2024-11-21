@@ -37,6 +37,7 @@
     <ClInclude Include="Souece\DXLib_ref_10_Option.hpp" />
     <ClInclude Include="Souece\DXLib_ref_11_FileControl.hpp" />
     <ClInclude Include="Souece\DXLib_ref_12_Draw2DSystem.hpp" />
+    <ClInclude Include="Souece\DXLib_ref_13_Localize.hpp" />
     <ClInclude Include="Souece\DXLib_ref_20_Debug.hpp" />
     <ClInclude Include="Souece\DXLib_ref_30_Box2D.hpp" />
     <ClInclude Include="Souece\DXLib_ref_31_VR.hpp" />
@@ -61,6 +62,7 @@
     <ClCompile Include="Souece\DXLib_ref_10_Option.cpp" />
     <ClCompile Include="Souece\DXLib_ref_11_FileControl.cpp" />
     <ClCompile Include="Souece\DXLib_ref_12_Draw2DSystem.cpp" />
+    <ClCompile Include="Souece\DXLib_ref_13_Localize.cpp" />
     <ClCompile Include="Souece\DXLib_ref_20_Debug.cpp" />
     <ClCompile Include="Souece\DXLib_ref_30_Box2D.cpp" />
     <ClCompile Include="Souece\DXLib_ref_31_VR.cpp" />
