@@ -7,7 +7,7 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 	void VRControl::Init(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		// VRが使えるかチェック
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			m_VR_ErrorHandle = vr::VRInitError_None;
@@ -57,7 +57,7 @@ namespace DXLibRef {
 	}
 	void VRControl::SetupBuffer(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// 画面セット
 			m_OutScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());	// 左目
@@ -65,7 +65,7 @@ namespace DXLibRef {
 		}
 	}
 	void VRControl::Execute(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			for (auto& c : m_VR_DeviceInfo) {
 				c.Update(m_VR_SystemPtr);
@@ -124,14 +124,14 @@ namespace DXLibRef {
 		this->Submit(eye_type);
 	}
 	void VRControl::WaitSync(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			vr::TrackedDevicePose_t tmp;
 			vr::VRCompositor()->WaitGetPoses(&tmp, 1, NULL, 1);
 		}
 	}
 	void VRControl::Dispose(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// vr::VR_Shutdown();
 			m_VR_SystemPtr = nullptr;

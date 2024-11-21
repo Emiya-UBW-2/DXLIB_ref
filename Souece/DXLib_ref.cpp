@@ -4,11 +4,11 @@ namespace DXLibRef {
 	const DXLib_ref* SingletonBase<DXLib_ref>::m_Singleton = nullptr;
 
 	DXLib_ref::DXLib_ref(void) noexcept {
-		OPTION::Create();
+		OptionManager::Create();
 		LocalizePool::Create();
 		SaveDataClass::Create();
 		auto* SaveDataParts = SaveDataClass::Instance();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		// ロード
 		m_IsFirstBoot = !SaveDataParts->Load();
 		if (m_IsFirstBoot) {
@@ -65,7 +65,7 @@ namespace DXLibRef {
 		FontSystem::FontPool::Create();
 		KeyGuide::Create();
 		PadControl::Create();							// キー
-		OptionWindowClass::Create();
+		OptionPopup::Create();
 		PopUp::Create();
 
 		auto* SE = SoundPool::Instance();
@@ -83,11 +83,11 @@ namespace DXLibRef {
 		if (m_IsFirstBoot) {
 			SetMainWindowText("FirstBoot Option");						// タイトル
 			auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-			auto* OptionWindowParts = OptionWindowClass::Instance();
+			auto* OptionWindowParts = OptionPopup::Instance();
 			auto* Pad = PadControl::Instance();
 			auto* PopUpParts = PopUp::Instance();
 			auto* LocalizeParts = LocalizePool::Instance();
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 
 			OptionWindowParts->Init();
 
@@ -315,7 +315,7 @@ namespace DXLibRef {
 	}
 	// 
 	void			DXLib_ref::StartLogic(void) noexcept {
-		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* OptionWindowParts = OptionPopup::Instance();
 		OptionWindowParts->Init();
 #if defined(DEBUG)
 		DebugClass::Create();
@@ -402,7 +402,7 @@ namespace DXLibRef {
 	//
 	void			DXLib_ref::SetWaitVSync(void) noexcept {
 		// 垂直同期
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)] == DX_DIRECT3D_11) {
 			SetWaitVSyncFlag(OptionParts->GetParamBoolean(EnumSaveParam::vsync));//DirectX11ではあとからの変更が効く
 		}
@@ -417,7 +417,7 @@ namespace DXLibRef {
 	}
 	// 表画面に反映し、垂直同期または一定のFPSまで待機する
 	bool			DXLib_ref::WaitCount(void) const noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			// 4msだけスリープ
 			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {

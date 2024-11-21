@@ -71,7 +71,7 @@ namespace DXLibRef {
 	}
 
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		if (!m_IsActive) {
 			return;

@@ -11,7 +11,7 @@ namespace DXLibRef {
 	}
 	void LocalizePool::Load(void) noexcept {
 		Dispose();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		std::string Path = "data/Localize/";
 		Path += LanguageStr[OptionParts->GetParamInt(EnumSaveParam::Language)];
 		Path += ".txt";

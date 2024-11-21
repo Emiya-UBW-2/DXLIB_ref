@@ -6,7 +6,7 @@ namespace DXLibRef {
 	// 保持している音声すべての音量を設定
 	void Soundhave::FlipVolume(void) noexcept {
 		//BGMかSEかに合わせて取得するボリュームを変更
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		float Vol = 1.0f;
 		switch (this->m_SoundType) {
 		case SoundType::SE:			Vol = OptionParts->GetParamFloat(EnumSaveParam::SE);			break;

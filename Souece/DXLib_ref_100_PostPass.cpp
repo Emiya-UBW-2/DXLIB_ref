@@ -30,7 +30,7 @@ namespace DXLibRef {
 			m_ShaderBlur.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::SSAO);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
@@ -132,11 +132,11 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0;
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 
@@ -200,7 +200,7 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::DoF);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
@@ -248,7 +248,7 @@ namespace DXLibRef {
 			BufScreen.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::bloom);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -292,7 +292,7 @@ namespace DXLibRef {
 			}
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -398,7 +398,7 @@ namespace DXLibRef {
 			m_BlurScreen.Release();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::MotionBlur);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -457,7 +457,7 @@ namespace DXLibRef {
 			BufScreen.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -513,7 +513,7 @@ namespace DXLibRef {
 			BufScreen.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -692,7 +692,7 @@ namespace DXLibRef {
 			BufScreen.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::ScreenEffect) && OptionParts->GetParamBoolean(EnumProjectSettingParam::Distortion);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
@@ -726,7 +726,7 @@ namespace DXLibRef {
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return OptionParts->GetParamBoolean(EnumSaveParam::AA);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
@@ -776,11 +776,11 @@ namespace DXLibRef {
 		}
 		bool IsActive_Sub(void) noexcept override {
 			auto* PostPassParts = PostPassEffect::Instance();
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::GodRay) && (PostPassParts->GetGodRayPer() > 0.f);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
-			auto* OptionParts = OPTION::Instance();
+			auto* OptionParts = OptionManager::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 			SSRDepthScreen.GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
@@ -944,7 +944,7 @@ namespace DXLibRef {
 		SetRenderTargetToShader(2, InvalidID);
 	}
 	void ShadowDraw::SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		BaseShadowHandle.SetUseTextureToShader(0);				// 影用深度記録画像をテクスチャにセット
 		DepthScreenHandle.SetUseTextureToShader(1);
 		DepthFarScreenHandle.SetUseTextureToShader(2);
@@ -985,7 +985,7 @@ namespace DXLibRef {
 	}
 	void ShadowDraw::SetActive(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		BaseShadowHandle.Make(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND, TRUE);
 		int size = 2 << 10;
@@ -996,7 +996,7 @@ namespace DXLibRef {
 		m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
 	bool ShadowDraw::UpdateActive(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		bool shadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		if (m_PrevShadow != shadow) {
 			m_PrevShadow = shadow;
@@ -1039,7 +1039,7 @@ namespace DXLibRef {
 
 		m_ShadowDraw = std::make_unique<ShadowDraw>();
 		// シェーダー
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 			m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
 			m_PBR_Shader.AddGeometryShader("CommonData/shader/GS_PBR3D.pso");
@@ -1060,13 +1060,13 @@ namespace DXLibRef {
 
 		m_ShadowDraw->Dispose();
 		m_ShadowDraw.reset();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 			m_PBR_Shader.Dispose();
 		}
 	}
 	void PostPassEffect::UpdateActive(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		bool ActiveGBuffer = false;
 		for (auto& P : m_PostPass) {
 			if (P->IsActive()) {
@@ -1117,7 +1117,7 @@ namespace DXLibRef {
 	}
 
 	void PostPassEffect::SetDrawShadow(const Camera3DInfo& camInfo, std::function<void()> setshadowdoing_rigid, std::function<void()> setshadowdoing) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		// 影
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 			// 影画像の用意
@@ -1149,7 +1149,7 @@ namespace DXLibRef {
 		UpdateActiveCubeMap(false);
 	}
 	void PostPassEffect::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, float Scale, bool IsFar) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
 			// 影用の深度記録画像の準備を行う
 			if (!IsFar) {
@@ -1161,13 +1161,13 @@ namespace DXLibRef {
 		}
 	}
 	void PostPassEffect::Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if ((OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap)) {
 			m_RealTimeCubeMap.ReadyDraw(CenterPos, doing);
 		}
 	}
 	void PostPassEffect::DrawByPBR(std::function<void()> doing) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 			MATRIX view, projection;
 			GetTransformToViewMatrix(&view);

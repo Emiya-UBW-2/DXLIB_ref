@@ -2,10 +2,9 @@
 //#include "DXLib_ref.h"
 
 namespace DXLibRef {
-	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
-	const PopUp* SingletonBase<PopUp>::m_Singleton = nullptr;
-	const KeyGuide* SingletonBase<KeyGuide>::m_Singleton = nullptr;
 	const WindowSystem::DrawControl* SingletonBase<WindowSystem::DrawControl>::m_Singleton = nullptr;
+	const SideLog* SingletonBase<SideLog>::m_Singleton = nullptr;
+	const KeyGuide* SingletonBase<KeyGuide>::m_Singleton = nullptr;
 	// 
 	namespace WindowSystem {
 		//
@@ -249,139 +248,6 @@ namespace DXLibRef {
 			}
 		}
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-	}
-	// 
-	void PopUp::PopUpDrawClass::Start(void) noexcept {
-		auto* SE = SoundPool::Instance();
-		auto* KeyGuideParts = KeyGuide::Instance();
-
-		KeyGuideParts->SetGuideFlip();
-		KeyGuideParts->ChangeGuide(
-			[this]() {
-				auto* KeyGuideParts = KeyGuide::Instance();
-				auto* LocalizeParts = LocalizePool::Instance();
-				KeyGuideParts->AddGuide(KeyGuide::GetPADStoOffset(Controls::PADS::RELOAD), LocalizeParts->Get(9991));
-				if (m_GuideDoing) {
-					m_GuideDoing();
-				}
-			}
-		);
-		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_OK))->Play(DX_PLAYTYPE_BACK, TRUE);
-
-		m_Active = true;
-		m_ActiveSwitch = true;
-	}
-	void PopUp::PopUpDrawClass::End(void) noexcept {
-		auto* SE = SoundPool::Instance();
-		auto* KeyGuideParts = KeyGuide::Instance();
-
-		SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_CANCEL))->Play(DX_PLAYTYPE_BACK, TRUE);
-		m_Active = false;
-		m_ActiveSwitch = true;
-		KeyGuideParts->SetGuideFlip();
-		if (m_ExitDoing) {
-			m_ExitDoing();
-		}
-	}
-	void PopUp::PopUpDrawClass::Update(void) noexcept {
-		auto* Pad = PadControl::Instance();
-		m_ActiveSwitch = false;
-		Easing(&m_ActivePer, m_Active ? 1.f : 0.f, m_Active ? 0.7f : 0.3f, EasingType::OutExpo);
-
-		if (m_Active) {
-			Pad->SetMouseMoveEnable(false);
-			if (Pad->GetPadsInfo(Controls::PADS::RELOAD).GetKey().trigger()) {
-				End();
-			}
-		}
-	}
-	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
-		if (m_ActivePer < (1.f / 255.f)) { return; }
-
-		auto* LocalizeParts = LocalizePool::Instance();
-		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-
-		int xm1 = xcenter - (WinSizeX) / 2;
-		int ym1 = ycenter - (WinSizeY) / 2;
-		int xm2 = xcenter + (WinSizeX) / 2;
-		int ym2 = ycenter + (WinSizeY) / 2;
-
-		// ”wŒi
-		auto per = std::clamp(m_ActivePer * 0.5f, 0.f, 1.f);
-		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * per), 0, 255));
-		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xm1, ym1, xm2, ym2, Gray50, true);
-		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-
-		// ƒ^ƒCƒgƒ‹
-		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2,
-			FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xm1 + (32), ym1 + LineHeight / 4, White, Black, m_WindwoName);
-		// 
-		if (m_Active) {
-			int xp1 = xm2 - (140);
-			int yp1 = ym1 + LineHeight / 4 + LineHeight / 2;
-			if (WindowSystem::SetMsgClickBox(xp1, yp1 + (5), xp1 + (108), yp1 + LineHeight * 2 - (5), LineHeight, Red, false, true, LocalizeParts->Get(20))) {
-				End();
-			}
-		}
-		// ”wŒi
-		{
-			int xp1 = xm1 + (24);
-			int yp1 = ym1 + LineHeight * 3;
-			int xp2 = xm2 - (24);
-			int yp2 = ym2 - LineHeight;
-			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, std::clamp(static_cast<int>(255.f * 0.5f), 0, 255));
-			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xp1, yp1, xp2, yp2, Gray50, true);
-			DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-			if (m_Doing) {
-				m_Doing(xp1, yp1, xp2, yp2, m_ActiveSwitch);
-			}
-		}
-	}
-	//
-	void PopUp::Add(const char* WindowName, int sizex, int sizey,
-		std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
-		std::function<void()> ExitDoing,
-		std::function<void()> GuideDoing,
-		bool IsInsert) noexcept {
-		auto& Last = que.at(LastSel);
-		Last.Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
-		if (!IsActivePop()) {
-			Last.Start();
-			auto* SceneParts = SceneControl::Instance();
-			PrevPause = SceneParts->IsPause();
-			SceneParts->ChangePause(true);
-		}
-		else if (IsInsert) {
-			que.at(NowSel).End();
-			NowSel = LastSel;
-			Last.Start();
-		}
-		++LastSel %= que.size();
-	}
-	void PopUp::EndAll(void) noexcept {
-		if (!IsActivePop()) {
-			return;
-		}
-		que.at(NowSel).End();
-		NowSel = LastSel;
-	}
-	void PopUp::Update(void) noexcept {
-		if (!IsActivePop()) {
-			return;
-		}
-		que.at(NowSel).Update();
-		if (que.at(NowSel).IsEnd()) {
-			++NowSel %= que.size();
-			if (IsActivePop()) {
-				que.at(NowSel).Start();
-			}
-			else {
-				if (!PrevPause) {
-					auto* SceneParts = SceneControl::Instance();
-					SceneParts->ChangePause(false);
-				}
-			}
-		}
 	}
 	// --------------------------------------------------------------------------------------------------
 	// 

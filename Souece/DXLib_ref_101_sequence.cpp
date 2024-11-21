@@ -28,7 +28,7 @@ namespace DXLibRef {
 	}
 	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		// FPSの平均値が設定していた上限値に対して高いなら緑、低いなら黄色赤色と変化させる
 		auto color = White;
 		if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
@@ -159,7 +159,7 @@ namespace DXLibRef {
 	}
 	//
 	void SceneControl::Initialize(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
@@ -184,7 +184,7 @@ namespace DXLibRef {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
-		auto* OptionWindowParts = OptionWindowClass::Instance();
+		auto* OptionWindowParts = OptionPopup::Instance();
 		auto* LocalizeParts = LocalizePool::Instance();
 		auto* SideLogParts = SideLog::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
@@ -278,7 +278,7 @@ namespace DXLibRef {
 		m_FPSDrawer.Update();
 	}
 	void SceneControl::DrawMainLoop(void) const noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		auto* PostPassParts = PostPassEffect::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		if (this->m_NowScenesPtr->Get3DActive()) {

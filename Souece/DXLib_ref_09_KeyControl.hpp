@@ -474,7 +474,7 @@ namespace DXLibRef {
 			"R1",
 			"L2",
 			"R2",
-			"OPTION",
+			"OptionManager",
 			"L3",
 			"R3",
 			"LSTICK",
@@ -541,7 +541,7 @@ namespace DXLibRef {
 			"L2",
 			"R2",
 
-			"OPTION",
+			"OptionManager",
 
 			"L3",
 			"R3",

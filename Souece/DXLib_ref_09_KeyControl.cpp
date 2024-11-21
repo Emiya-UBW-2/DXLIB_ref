@@ -67,7 +67,7 @@ namespace DXLibRef {
 	void PadControl::Update(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		// コントロールタイプ決定
 		{

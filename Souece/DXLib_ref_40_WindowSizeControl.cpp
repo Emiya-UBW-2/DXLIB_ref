@@ -6,7 +6,7 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 	void			WindowSizeControl::SetWindowOrBorderless(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			switch (static_cast<WindowType>(OptionParts->GetParamInt(EnumSaveParam::WindowMode))) {
 			case WindowType::Window:
@@ -52,7 +52,7 @@ namespace DXLibRef {
 	}
 
 	void			WindowSizeControl::SetupWindowSize(void) noexcept {
-		auto* OptionParts = OPTION::Instance();
+		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// 解像度指定
 			uint32_t t_x = 1080;

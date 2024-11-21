@@ -124,17 +124,17 @@ namespace DXLibRef {
 
 	};
 
-	class OPTION : public SingletonBase<OPTION> {
+	class OptionManager : public SingletonBase<OptionManager> {
 	private:
-		friend class SingletonBase<OPTION>;
+		friend class SingletonBase<OptionManager>;
 	private:
-		OPTION(void) noexcept {
+		OptionManager(void) noexcept {
 			Load();
 		}
-		OPTION(const OPTION&) = delete;
-		OPTION(OPTION&& o) = delete;
-		OPTION& operator=(const OPTION&) = delete;
-		OPTION& operator=(OPTION&& o) = delete;
+		OptionManager(const OptionManager&) = delete;
+		OptionManager(OptionManager&& o) = delete;
+		OptionManager& operator=(const OptionManager&) = delete;
+		OptionManager& operator=(OptionManager&& o) = delete;
 	private:
 		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
 		std::array<SaveParams, static_cast<int>(EnumProjectSettingParam::Max)> m_ProjectSettingParams;
@@ -256,155 +256,5 @@ namespace DXLibRef {
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) const noexcept;
-	};
-
-	class OptionWindowClass : public SingletonBase<OptionWindowClass> {
-	private:
-		friend class SingletonBase<OptionWindowClass>;
-	private:
-		class OptionElementsInfo {
-		private:
-			std::string m_Name;
-			int m_Info{ 0 };
-			std::function<void()> m_LeftPush;
-			std::function<void()> m_RightPush;
-			std::function<void()> m_OKPush;
-			std::function<void()> m_AnyDoing;
-			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
-		public:
-			float selanim{ 0.f };
-		public:
-			const auto& GetName(void) const noexcept { return m_Name; }
-			const auto& GetInfoTextID(void) const noexcept { return m_Info; }
-
-			void GetLeftPush(void) const noexcept { m_LeftPush(); }
-			void GetRightPush(void) const noexcept { m_RightPush(); }
-			void GetOKPush(void) const noexcept { m_OKPush(); }
-			void GetAnyDoing(void) const noexcept { m_AnyDoing(); }
-		public:
-			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
-				std::function<void()> AnyDoing,
-				std::function<void(int xpos, int ypos, bool isMine)> draw) noexcept {
-				selanim = 0;
-
-				m_Name = name;
-				m_Info = infoTextID;
-				m_LeftPush = LeftPush;
-				m_RightPush = RightPush;
-				m_OKPush = OKPush;
-				m_AnyDoing = AnyDoing;
-				m_Draw = draw;
-			}
-			void Draw(int xpos, int ypos, bool isMine) const noexcept;
-		};
-		class OptionTabsInfo {
-		private:
-		protected:
-			int m_id{ 0 };
-			std::string m_name;
-			std::vector<OptionElementsInfo> m_Elements;
-		protected:
-			virtual void Init_Sub(void) noexcept {}
-		public:
-			const auto& GetID(void) const noexcept { return m_id; }
-		public:
-			OptionTabsInfo(void) noexcept {}
-			virtual ~OptionTabsInfo(void) noexcept {}
-		public:
-			void Init(int ID, const char* name) noexcept {
-				m_id = ID;
-				m_name = name;
-				Init_Sub();
-			}
-			void Execute(int* select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, int xsize, bool isActive, int* TabSel, int* select) noexcept;
-
-			void DrawInfo(int xpos, int ypos, int select) noexcept;
-		protected:
-			void BoolChange(EnumSaveParam SaveParam) noexcept;
-			bool BoolDraw(int xpos, int ypos, EnumSaveParam SaveParam) noexcept;
-			void IntChange(EnumSaveParam SaveParam, int Pow, int Min, int Max) noexcept;
-			bool IntUpDownBoxDraw(int xpos, int ypos, EnumSaveParam SaveParam, int Max) noexcept;
-			void FloatChange(EnumSaveParam SaveParam, float Pow, float Min, float Max) noexcept;
-			bool FloatUpDownBarDraw(int xpos, int ypos, EnumSaveParam SaveParam, float Min, float Max, int Scale) noexcept;
-		};
-
-		class SoundTabsInfo :public OptionTabsInfo {
-		public:
-			SoundTabsInfo(void) noexcept {}
-			virtual ~SoundTabsInfo(void) noexcept {}
-		protected:
-			void Init_Sub(void) noexcept override;
-		};
-		class GraphicTabsInfo :public OptionTabsInfo {
-			static const int	FrameLimitsNum = 10;
-			const int	FrameLimits[FrameLimitsNum] = {
-				30,
-				60,
-				75,
-				90,
-				120,
-				144,
-				240,
-				300,
-				360,
-				1000,
-			};
-		private:
-			int RefreshRate{ FrameLimits[1] };
-		public:
-			GraphicTabsInfo(void) noexcept {}
-			GraphicTabsInfo(const GraphicTabsInfo&) = delete;
-			GraphicTabsInfo(GraphicTabsInfo&& o) = delete;
-			GraphicTabsInfo& operator=(const GraphicTabsInfo&) = delete;
-			GraphicTabsInfo& operator=(GraphicTabsInfo&& o) = delete;
-
-			virtual ~GraphicTabsInfo(void) noexcept {}
-		protected:
-			void Init_Sub(void) noexcept override;
-		};
-		class ControlTabsInfo :public OptionTabsInfo {
-		public:
-			ControlTabsInfo(void) noexcept {}
-			virtual ~ControlTabsInfo(void) noexcept {}
-		protected:
-			void Init_Sub(void) noexcept override;
-		private:
-			void KeyDraw(int xpos, int ypos, bool isMine, Controls::PADS Sel) noexcept;
-		};
-		class ElseTabsInfo :public OptionTabsInfo {
-		public:
-			ElseTabsInfo(void) noexcept {}
-			virtual ~ElseTabsInfo(void) noexcept {}
-		protected:
-			void Init_Sub(void) noexcept override;
-		};
-	private:
-		int m_tabsel{ 0 };
-		int m_select{ 0 };
-		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
-		bool						m_Active{ false };
-		bool						m_ActiveSwitch{ false };
-		bool						m_RestartSwitch{ false };
-	public:
-		void SetRestart(void) noexcept { m_RestartSwitch = true; }
-		void SetActive(void) noexcept { m_ActiveSwitch = true; }
-		auto IsRestartSwitch(void) noexcept {
-			if (!m_Active && m_RestartSwitch) {
-				m_RestartSwitch = false;
-				return true;
-			}
-			return false;
-		}
-		const auto& IsActive(void) const noexcept { return m_Active; }
-	private:
-		OptionWindowClass(void) noexcept {}
-		OptionWindowClass(const OptionWindowClass&) = delete;
-		OptionWindowClass(OptionWindowClass&& o) = delete;
-		OptionWindowClass& operator=(const OptionWindowClass&) = delete;
-		OptionWindowClass& operator=(OptionWindowClass&& o) = delete;
-	public:
-		void Init(void) noexcept;
-		void Update(void)noexcept;
 	};
 }
