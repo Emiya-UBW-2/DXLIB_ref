@@ -1,6 +1,8 @@
 #include "DXLib_ref_100_PostPass.hpp"
 
 namespace DXLibRef {
+	// 
+	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	// --------------------------------------------------------------------------------------------------
 	// ポストプロセスエフェクト
 	// --------------------------------------------------------------------------------------------------
@@ -849,12 +851,12 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			if (!PostPassParts->GetLensParam().use) { return; }
+			if (!PostPassParts->is_lens()) { return; }
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
 				m_Shader.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
-				m_Shader.SetPixelParam(3, PostPassParts->GetLensParam().param.at(0), PostPassParts->GetLensParam().param.at(1), PostPassParts->GetLensParam().param.at(2), PostPassParts->GetLensParam().param.at(3));
+				m_Shader.SetPixelParam(3, PostPassParts->zoom_xpos(), PostPassParts->zoom_ypos(), PostPassParts->zoom_size(), PostPassParts->zoom_lens());
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);
@@ -885,12 +887,12 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle*) noexcept override {
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			if (!PostPassParts->GetBlackoutParam().use) { return; }
+			if (!PostPassParts->is_Blackout()) { return; }
 			// レンズ
 			TargetGraph->SetDraw_Screen(false);
 			{
 				m_Shader.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
-				m_Shader.SetPixelParam(3, PostPassParts->GetBlackoutParam().param.at(0), PostPassParts->GetBlackoutParam().param.at(1), PostPassParts->GetBlackoutParam().param.at(2), PostPassParts->GetBlackoutParam().param.at(3));
+				m_Shader.SetPixelParam(3, PostPassParts->GetBlackoutPer(), 0.f, 0.f, 0.f);
 				ColorGraph->SetUseTextureToShader(0);	// 使用するテクスチャをセット
 				m_Shader.Draw(this->m_ScreenVertex);
 				SetUseTextureToShader(0, InvalidID);
@@ -1013,8 +1015,6 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
-	// 
 	PostPassEffect::PostPassEffect(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
@@ -1048,7 +1048,7 @@ namespace DXLibRef {
 	void PostPassEffect::Init(void) noexcept {
 		UpdateActive();
 		// 影生成
-		m_ShadowDraw->SetActive();
+		m_ShadowDraw->UpdateActive();
 	}
 	void PostPassEffect::Dispose(void) noexcept {
 		ResetAllBuffer();
@@ -1057,8 +1057,6 @@ namespace DXLibRef {
 			P.reset();
 		}
 		m_PostPass.clear();
-
-		m_ShadowDraw->Dispose();
 		m_ShadowDraw.reset();
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {

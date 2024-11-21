@@ -377,4 +377,4 @@ namespace DXLibRef {
 			Initialize();
 		}
 	}
-};
+}

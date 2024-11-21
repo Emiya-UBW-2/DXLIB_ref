@@ -3,14 +3,9 @@
 
 //#define _USE_WAVECALC_
 namespace DXLibRef {
-
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*シェーダー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	struct shaderparam {
-		bool					use{ false };
-		std::array<float, 4>	param{ 0,0,0,0 };
-	};
 	// シェーダーを使用する際の補助クラス
 	class ShaderUseClass {
 	public:
@@ -274,10 +269,6 @@ namespace DXLibRef {
 			UpdateShaderConstantBuffer(BufferHandle);											// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, Slot);					// ピクセルシェーダー用の定数バッファを定数バッファレジスタ3にセット
 		}
-		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
-		void			SetPixelParam(int Slot, const shaderparam& param) noexcept {
-			SetPixelParam(Slot, param.param.at(0), param.param.at(1), param.param.at(2), param.param.at(3));
-		}
 		// 3D空間に適用する場合の関数(引数に3D描画のラムダ式を代入)
 		void			Draw_lamda(std::function<void()> doing) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
@@ -425,7 +416,7 @@ namespace DXLibRef {
 		ShadowDraw(ShadowDraw&& o) = delete;
 		ShadowDraw& operator=(const ShadowDraw&) = delete;
 		ShadowDraw& operator=(ShadowDraw&& o) = delete;
-		~ShadowDraw(void) noexcept {}
+		~ShadowDraw(void) noexcept { Dispose(); }
 	public:
 		const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
 		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
@@ -466,7 +457,15 @@ namespace DXLibRef {
 		Matrix4x4DX					m_CamViewMat{};
 		Matrix4x4DX					m_CamProjectionMat{};
 		Camera3DInfo				m_CamInfo{};
-		std::array<shaderparam, 2>	m_Shader2D;
+
+		bool						m_useScope{ false };
+		float						m_ScopeXpos{ 0.f };
+		float						m_ScopeYpos{ 0.f };
+		float						m_ScopeSize{ 0.f };
+		float						m_ScopeZoom{ 0.f };
+		bool						m_useBlackOut{ false };
+		float						m_BlackOutPer{ 1.f };
+
 		float						m_AberrationPower{ 1.f };
 		float						m_DistortionPer{ 120.f };
 		float						m_GodRayPer{ 0.5f };
@@ -485,21 +484,24 @@ namespace DXLibRef {
 		const auto&		Get_far_DoF(void) const noexcept { return far_DoF; }
 		const auto&		Get_near_DoFMax(void) const noexcept { return near_DoFMax; }
 		const auto&		Get_far_DoFMin(void) const noexcept { return far_DoFMin; }
-		const auto&		is_lens(void) const noexcept { return m_Shader2D.at(0).use; }
-		const auto&		zoom_lens(void) const noexcept { return m_Shader2D.at(0).param.at(3); }
-		const auto&		GetLensParam(void) const noexcept { return m_Shader2D.at(0); }
-		const auto&		GetBlackoutParam(void) const noexcept { return m_Shader2D.at(1); }
+		const auto&		is_lens(void) const noexcept { return m_useScope; }
+		const auto&		zoom_xpos(void) const noexcept { return m_ScopeXpos; }
+		const auto&		zoom_ypos(void) const noexcept { return m_ScopeYpos; }
+		const auto&		zoom_size(void) const noexcept { return m_ScopeSize; }
+		const auto&		zoom_lens(void) const noexcept { return m_ScopeZoom; }
+		const auto&		is_Blackout(void) const noexcept { return m_useBlackOut; }
+		const auto&		GetBlackoutPer(void) const noexcept { return m_BlackOutPer; }
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
 		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 		const auto&		GetDistortionPer(void) const noexcept { return m_DistortionPer; }
 	public:
-		void			Set_is_lens(bool value) noexcept { m_Shader2D.at(0).use = value; }
-		void			Set_xp_lens(float value) noexcept { m_Shader2D.at(0).param.at(0) = value; }
-		void			Set_yp_lens(float value) noexcept { m_Shader2D.at(0).param.at(1) = value; }
-		void			Set_size_lens(float value) noexcept { m_Shader2D.at(0).param.at(2) = value; }
-		void			Set_zoom_lens(float value) noexcept { m_Shader2D.at(0).param.at(3) = value; }
-		void			Set_is_Blackout(bool value) noexcept { m_Shader2D.at(1).use = value; }
-		void			Set_Per_Blackout(float value) noexcept { m_Shader2D.at(1).param.at(0) = value; }
+		void			Set_is_lens(bool value) noexcept { m_useScope = value; }
+		void			Set_xp_lens(float value) noexcept { m_ScopeXpos = value; }
+		void			Set_yp_lens(float value) noexcept { m_ScopeYpos = value; }
+		void			Set_size_lens(float value) noexcept { m_ScopeSize = value; }
+		void			Set_zoom_lens(float value) noexcept { m_ScopeZoom = value; }
+		void			Set_is_Blackout(bool value) noexcept { m_useBlackOut = value; }
+		void			Set_Per_Blackout(float value) noexcept { m_BlackOutPer = value; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
 		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }

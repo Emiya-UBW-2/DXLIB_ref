@@ -148,4 +148,4 @@ namespace DXLibRef {
 		void			DrawMainLoop(void) const noexcept;
 		void			NextMainLoop(void) noexcept;
 	};
-};
+}
