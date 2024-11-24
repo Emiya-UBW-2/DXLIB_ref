@@ -444,7 +444,7 @@ namespace DXLibRef {
 			"MM",
 		};
 
-		static const size_t DS4Num = 12 - 1 + 2 + 4;
+		static const size_t DS4Num = 12 - 1 + 2 + 4 + 1;
 		static const int DS4ID[DS4Num] = {
 			0,
 			1,
@@ -463,6 +463,7 @@ namespace DXLibRef {
 			0xF020,
 			0xF040,
 			0xF080,
+			8,
 		};
 		static const char* DS4Str[DS4Num] = {
 			"SQUARE",
@@ -473,7 +474,7 @@ namespace DXLibRef {
 			"R1",
 			"L2",
 			"R2",
-			"OptionManager",
+			"OPTION",
 			"L3",
 			"R3",
 			"LSTICK",
@@ -482,6 +483,7 @@ namespace DXLibRef {
 			"UP",
 			"RIGHT",
 			"DOWN",
+			"ESCAPE",
 		};
 		static const char* DS4GuidePath[DS4Num] = {
 			"square",
@@ -501,9 +503,11 @@ namespace DXLibRef {
 			"up",
 			"right",
 			"down",
+
+			"share",
 		};
 
-		static const size_t XBoxNum = 12 - 1 + 2 + 4;
+		static const size_t XBoxNum = 12 - 1 + 2 + 4 + 1;
 		static const int XBoxID[XBoxNum] = {
 			14,
 			12,
@@ -527,6 +531,8 @@ namespace DXLibRef {
 			0,
 			3,
 			1,
+
+			5,
 		};
 		static const char* XBoxStr[XBoxNum] = {
 			"SQUARE",
@@ -540,7 +546,7 @@ namespace DXLibRef {
 			"L2",
 			"R2",
 
-			"OptionManager",
+			"OPTION",
 
 			"L3",
 			"R3",
@@ -551,6 +557,8 @@ namespace DXLibRef {
 			"UP",
 			"RIGHT",
 			"DOWN",
+
+			"ESCAPE",
 		};
 		static const char* XBoxGuidePath[XBoxNum] = {
 			"square",
@@ -570,6 +578,8 @@ namespace DXLibRef {
 			"up",
 			"right",
 			"down",
+
+			"share",
 		};
 		//•¶Žš‚©‚çKEY_INPUT_BACK‚È‚Ç‚ÌID‚ðŽæ“¾
 		static const auto GetStrtoID(const char* Str, ControlType controlType) noexcept {

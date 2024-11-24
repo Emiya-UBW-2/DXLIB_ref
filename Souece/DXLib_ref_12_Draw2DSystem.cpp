@@ -318,7 +318,7 @@ namespace DXLibRef {
 			// 絶対出すガイド
 			auto* Pad = PadControl::Instance();
 			auto* LocalizeParts = LocalizePool::Instance();
-			AddGuide(Controls::GetIDtoOffset(Pad->GetPadsInfo(Controls::PADS::Escape).GetAssign(), Controls::ControlType::PC), LocalizeParts->Get(9990));
+			AddGuide(GetPADStoOffset(Controls::PADS::Escape), LocalizeParts->Get(9990));
 			AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));
 			// 追加のガイド
 			Guide_Pad();
