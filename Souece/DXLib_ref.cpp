@@ -93,6 +93,11 @@ namespace DXLibRef {
 			auto* OptionParts = OptionManager::Instance();
 
 			OptionWindowParts->Init();
+			// シェーダー
+			PostPassEffect::Create();
+			auto* PostPassParts = PostPassEffect::Instance();
+			//
+			PostPassParts->Init();
 
 			int xBase = (1366);
 			int yBase = (768);
