@@ -18,8 +18,6 @@ namespace DXLibRef {
 				effsorce.back().load("data/effect/" + p);
 			}
 		}
-		effsorce.emplace_back();
-		effsorce.back().load("data/effect/gndsmk.efk");								// 戦車用エフェクト
 	}
 #endif
 };

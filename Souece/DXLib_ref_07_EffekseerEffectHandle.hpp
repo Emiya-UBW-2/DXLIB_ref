@@ -227,20 +227,24 @@ namespace DXLibRef {
 				this->m_PlayHandle.Dispose();
 			}
 		};
+
+		typedef size_t Effect;
 	private:
 		static const int EffectNum = 16;
-		std::array<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>, static_cast<int>(EffectResource::Effect::effects)> m_effect;// エフェクト
+		std::vector<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>> m_effect;// エフェクト
 	public:
+		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }
+		auto& GetEffect(Effect ID) noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }
 		// 複数エフェクトの再生
-		void		SetOnce_Any(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
-			this->m_effect.at(static_cast<size_t>(ID)).second[static_cast<size_t>(this->m_effect.at(static_cast<size_t>(ID)).first)]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
-			this->m_effect.at(static_cast<size_t>(ID)).second[static_cast<size_t>(this->m_effect.at(static_cast<size_t>(ID)).first)]->SetEffectSpeed(speed);
-			++this->m_effect.at(static_cast<size_t>(ID)).first %= EffectNum;
+		void		SetOnce_Any(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
+			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
+			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetEffectSpeed(speed);
+			++GetEffect(ID).first %= EffectNum;
 		}
 		auto		CheckEffectCount(void) const noexcept {
 			int cnt = 0;
-			for (int i : std::views::iota(0, EffectNum)) {
-				for (auto& t : this->m_effect.at(static_cast<size_t>(i)).second) {
+			for (auto& e : this->m_effect) {
+				for (auto& t : e.second) {
 					if (t->GetIsPlaying()) {
 						++cnt;
 					}
@@ -249,22 +253,22 @@ namespace DXLibRef {
 			return cnt;
 		}
 		// 単体で制御したいエフェクトの制御
-		auto		CheckPlayEffect(EffectResource::Effect ID) const noexcept {
-			return this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->GetIsPlaying();
+		auto		CheckPlayEffect(Effect ID) const noexcept {
+			return GetEffect(ID).second[EffectNum]->GetIsPlaying();
 		}
-		void		SetLoop(EffectResource::Effect ID, const Vector3DX& pos_t) noexcept {
-			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetLoop(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t);
+		void		SetLoop(Effect ID, const Vector3DX& pos_t) noexcept {
+			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t);
 		}
-		void		Update_LoopEffect(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
+		void		Update_LoopEffect(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
+			GetEffect(ID).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
 		}
-		void		SetOnce(EffectResource::Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
+		void		SetOnce(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
+			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->effsorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
 		}
-		void		StopEffect(EffectResource::Effect ID) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->StopEffect(); }
-		void		SetEffectSpeed(EffectResource::Effect ID, float value) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectSpeed(value); }
-		void		SetEffectScale(EffectResource::Effect ID, float value) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectScale(value); }
-		void		SetEffectColor(EffectResource::Effect ID, int r, int g, int b, int a) noexcept { this->m_effect.at(static_cast<size_t>(ID)).second[EffectNum]->SetEffectColor(r, g, b, a); }
+		void		StopEffect(Effect ID) noexcept { GetEffect(ID).second[EffectNum]->StopEffect(); }
+		void		SetEffectSpeed(Effect ID, float value) noexcept { GetEffect(ID).second[EffectNum]->SetEffectSpeed(value); }
+		void		SetEffectScale(Effect ID, float value) noexcept { GetEffect(ID).second[EffectNum]->SetEffectScale(value); }
+		void		SetEffectColor(Effect ID, int r, int g, int b, int a) noexcept { GetEffect(ID).second[EffectNum]->SetEffectColor(r, g, b, a); }
 	public:
 		EffectControl(void) noexcept {}
 		EffectControl(const EffectControl&) = delete;
@@ -276,6 +280,7 @@ namespace DXLibRef {
 	public:
 		// 全体の更新
 		void		Init(void) noexcept {
+			this->m_effect.resize(EffectResource::Instance()->effsorce.size());
 			for (auto& ef : this->m_effect) {
 				ef.first = 0;
 				for (auto& t : ef.second) {
@@ -297,6 +302,7 @@ namespace DXLibRef {
 					t.reset();
 				}
 			}
+			this->m_effect.clear();
 		}
 	};
 #endif
