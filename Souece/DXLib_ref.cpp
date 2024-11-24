@@ -37,6 +37,9 @@ namespace DXLibRef {
 			// DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
+			if (DPI == 0) {
+				DPI = 96;
+			}
 			SetGraphMode(WindowSizeParts->GetSizeXMax() * DPI / 96, WindowSizeParts->GetSizeYMax() * DPI / 96, 32);		// 解像度
 		}
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				// ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする

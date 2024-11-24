@@ -28,6 +28,7 @@ namespace DXLibRef {
 		Language,
 		AA,
 		DrawScale,
+		LoadMovie,
 		Max,
 	};
 	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
@@ -56,6 +57,7 @@ namespace DXLibRef {
 		"Language",
 		"AA",
 		"DrawScale",
+		"LoadMovie",
 	};
 
 	enum class EnumProjectSettingParam {
@@ -192,6 +194,7 @@ namespace DXLibRef {
 			case EnumSaveParam::ControlType:
 			case EnumSaveParam::Language:
 			case EnumSaveParam::DrawScale:
+			case EnumSaveParam::LoadMovie:
 			case EnumSaveParam::Max:
 			default:
 				break;
@@ -238,6 +241,7 @@ namespace DXLibRef {
 			case EnumSaveParam::Language:
 			case EnumSaveParam::AA:
 			case EnumSaveParam::DrawScale:
+			case EnumSaveParam::LoadMovie:
 			case EnumSaveParam::Max:
 			default:
 				break;

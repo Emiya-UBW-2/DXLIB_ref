@@ -87,6 +87,12 @@
     <ClInclude Include="Souece\DXLib_ref_13_Localize.hpp">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Souece\DXLib_ref_14_Popup.hpp">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Souece\DXLib_ref_15_Camera.hpp">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Souece\DXLib_ref.cpp">
@@ -153,6 +159,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Souece\DXLib_ref_13_Localize.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Souece\DXLib_ref_14_Popup.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Souece\DXLib_ref_15_Camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

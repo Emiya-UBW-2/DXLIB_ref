@@ -61,6 +61,9 @@ namespace DXLibRef {
 			// DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
+			if (DPI == 0) {
+				DPI = 96;
+			}
 			// DPIを反映するデスクトップサイズ
 			int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) * 96 / DPI;
 			int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) * 96 / DPI;

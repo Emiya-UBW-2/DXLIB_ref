@@ -39,6 +39,9 @@ namespace DXLibRef {
 			// DPI設定
 			int DPI = 96;
 			GetMonitorDpi(NULL, &DPI);
+			if (DPI == 0) {
+				DPI = 96;
+			}
 			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
 		}
 	private:// コンストラクタ

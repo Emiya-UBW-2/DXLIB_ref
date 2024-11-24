@@ -872,6 +872,14 @@ namespace DXLibRef {
 				}
 			}
 		);
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("LoadMovie", 1139,
+			[this]() { BoolChange(EnumSaveParam::LoadMovie); },
+			[this]() { BoolChange(EnumSaveParam::LoadMovie); },
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::LoadMovie); }
+		);
 	}
 	void OptionPopup::ElseTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.emplace_back();
