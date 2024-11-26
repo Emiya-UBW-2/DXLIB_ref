@@ -316,7 +316,6 @@ namespace DXLibRef {
 			m_IsFlipGuide = false;
 			Dispose();
 			// â‘Îo‚·ƒKƒCƒh
-			auto* Pad = PadControl::Instance();
 			auto* LocalizeParts = LocalizePool::Instance();
 			AddGuide(GetPADStoOffset(Controls::PADS::Escape), LocalizeParts->Get(9990));
 			AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));

@@ -422,6 +422,7 @@ namespace DXLibRef {
 		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
 		const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
 		const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//–¢Žg—p
+		const auto& GetShadowDir(void) const noexcept { return m_ShadowVec; }
 	public:
 		void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
 		void			SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
@@ -480,6 +481,7 @@ namespace DXLibRef {
 		const auto&		GetCamViewMat(void) const noexcept { return m_CamViewMat; }
 		const auto&		GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
 		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
+		const auto&		GetShadowDir(void) const noexcept { return m_ShadowDraw->GetShadowDir(); }
 		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
 		const auto&		Get_near_DoF(void) const noexcept { return near_DoF; }
 		const auto&		Get_far_DoF(void) const noexcept { return far_DoF; }
