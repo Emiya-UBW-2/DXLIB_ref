@@ -230,7 +230,7 @@ namespace DXLibRef {
 
 		typedef size_t Effect;
 	private:
-		static const int EffectNum = 16;
+		static const int EffectNum = 128;
 		std::vector<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>> m_effect;// エフェクト
 	public:
 		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }

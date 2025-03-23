@@ -33,7 +33,7 @@ namespace DXLibRef {
 	public:
 		void			ExecuteObject(void) noexcept;
 		void			LateExecuteObject(void) noexcept;
-		void			Draw(void) noexcept;
+		void			Draw(bool IsCheckDraw = true) noexcept;
 		void			Draw_Shadow(void) noexcept;
 		void			DeleteAll(void) noexcept;
 	};

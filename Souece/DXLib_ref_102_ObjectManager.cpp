@@ -90,9 +90,11 @@ namespace DXLibRef {
 			o->SetScreenPosition(campos, -1.f);
 		}
 	}
-	void			ObjectManager::Draw(void) noexcept {
+	void			ObjectManager::Draw(bool IsCheckDraw) noexcept {
 		for (auto& o : this->m_Object) {
-			o->CheckDraw();
+			if (IsCheckDraw) {
+				o->CheckDraw();
+			}
 			o->Draw(false);
 		}
 		for (auto& o : this->m_Object) {

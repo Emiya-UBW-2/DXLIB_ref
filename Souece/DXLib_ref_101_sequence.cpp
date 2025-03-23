@@ -85,11 +85,17 @@ namespace DXLibRef {
 			PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
 			// 遠距離
 			PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
+#if defined(_USE_EFFEKSEER_)
+				Effekseer_Sync3DSetting();
+#endif
 				auto* PostPassParts = PostPassEffect::Instance();
 				PostPassParts->DrawByPBR([this]() {
 					this->m_NowScenesPtr->CalcOnDraw();
 					this->m_NowScenesPtr->MainDraw();
 					});
+#if defined(_USE_EFFEKSEER_)
+				DrawEffekseer3D();
+#endif
 				this->m_NowScenesPtr->MainDrawFront();
 				});
 			// 中間
@@ -279,7 +285,9 @@ namespace DXLibRef {
 		m_FPSDrawer.Update();
 	}
 	void SceneControl::DrawMainLoop(void) const noexcept {
+#if defined(_USE_OPENVR_)
 		auto* OptionParts = OptionManager::Instance();
+#endif
 		auto* PostPassParts = PostPassEffect::Instance();
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* CameraParts = Camera3D::Instance();
@@ -295,8 +303,8 @@ namespace DXLibRef {
 		}
 		// 画面に反映
 		if (this->m_NowScenesPtr->Get3DActive()) {
-			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 #if defined(_USE_OPENVR_)
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* VRParts = VRControl::Instance();
 				// UIをスクリーンに描画しておく
 				VRParts->SetUpBackUI([this]() { DrawUICommon(); });
@@ -320,16 +328,20 @@ namespace DXLibRef {
 						VRParts->GetOutBuffer()->DrawRotaGraph(WindowSizeParts->GetUIY(BaseScreenWidth) / 2, WindowSizeParts->GetUIY(BaseScreenHeight) / 2, 0.5f, 0, false);
 					}
 				}
-#endif
 			}
-			else {
+			else 
+#endif
+			{
 				DrawMain(CameraParts->GetMainCamera(), true);
 			}
 		}
 		else {
 			DrawMain(CameraParts->GetMainCamera(), false);
 		}
-		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
+#if defined(_USE_OPENVR_)
+		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr))
+#endif
+		{
 			// ディスプレイ描画
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{

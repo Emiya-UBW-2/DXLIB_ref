@@ -421,6 +421,7 @@ namespace DXLibRef {
 	// ループの最初に通す
 	void			DXLib_ref::StartCount(void) noexcept {
 		m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000000.f;
+		m_DeltaTime = std::min(m_DeltaTime, 1.f / 30.f);
 		m_StartTime = GetNowHiPerformanceCount();
 	}
 	// 表画面に反映し、垂直同期または一定のFPSまで待機する

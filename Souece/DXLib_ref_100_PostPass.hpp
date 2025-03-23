@@ -391,7 +391,7 @@ namespace DXLibRef {
 	};
 	//
 	class ShadowDraw {
-		static const int EXTEND = 4;
+		static const int EXTEND = 1;
 	private:
 		GraphHandle			BaseShadowHandle;
 		GraphHandle			DepthBaseScreenHandle;
