@@ -54,20 +54,22 @@ namespace DXLibRef {
 	}
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		// オブジェクトが増えた場合に備えて範囲forは使わない
-		for (int i : std::views::iota(0, static_cast<int>(this->m_Object.size()))) {
-			auto& o = this->m_Object.at(static_cast<size_t>(i));
+		for (auto& o : this->m_Object) {
 			if (!o->GetIsDelete()) {
 				o->FirstExecute();
 			}
 		}
 		// 物理アップデート
-		this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
-		for (int i : std::views::iota(0, static_cast<int>(this->m_Object.size()))) {
-			auto& o = this->m_Object.at(static_cast<size_t>(i));
+		//this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
+		for (auto& o : this->m_Object) {
+			/*
 			if (!o->GetIsDelete()) {
 				if (this->m_ResetP.trigger()) {
 					o->SetResetP(true);
 				}
+			}
+			//*/
+			if (!o->GetIsDelete()) {
 				o->ExecuteCommon();
 			}
 		}
