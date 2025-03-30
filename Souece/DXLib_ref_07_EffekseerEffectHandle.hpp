@@ -91,28 +91,6 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<EffectResource>;
 	public:
-		enum class Effect {
-			ef_fire,			// 発砲炎
-			ef_reco,			// 小口径跳弾
-			ef_smoke,			// 銃の軌跡
-			ef_gndsmoke,		// 地面の軌跡
-			ef_fire2,			// 発砲炎
-			ef_hitblood,		// 血しぶき
-			ef_greexp,			// グレ爆発
-			ef_greexp2,			// グレ爆発2
-			ef_FireBallStart,	// 火はじめ
-			ef_FireBallLoop,	// 火ループ
-			ef_FireBallHit,		// 火ヒット
-
-			ef_ThunderStart,	// 雷はじめ
-			ef_ThunderLoop,		// 雷ループ
-
-			ef_Sonic,			// 衝撃波
-
-			ef_ThunderHit,		// 雷ヒット
-			effects,			// 読み込む総量
-		};
-	public:
 		std::vector<EffekseerEffectResourceHandle> effsorce;	/*エフェクトリソース*/
 	private:
 		EffectResource(void) noexcept;
@@ -230,7 +208,7 @@ namespace DXLibRef {
 
 		typedef size_t Effect;
 	private:
-		static const int EffectNum = 128;
+		static const int EffectNum = 16;
 		std::vector<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>> m_effect;// エフェクト
 	public:
 		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }

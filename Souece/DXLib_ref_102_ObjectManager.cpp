@@ -54,14 +54,16 @@ namespace DXLibRef {
 	}
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		// オブジェクトが増えた場合に備えて範囲forは使わない
-		for (auto& o : this->m_Object) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (!o->GetIsDelete()) {
 				o->FirstExecute();
 			}
 		}
 		// 物理アップデート
 		//this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
-		for (auto& o : this->m_Object) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			/*
 			if (!o->GetIsDelete()) {
 				if (this->m_ResetP.trigger()) {

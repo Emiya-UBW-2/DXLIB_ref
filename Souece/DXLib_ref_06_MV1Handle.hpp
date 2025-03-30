@@ -20,6 +20,8 @@ namespace DXLibRef {
 		public:
 			auto& GetPer(void) noexcept { return this->m_per; }
 			auto& GetTime(void) noexcept { return this->m_time; }
+			const auto& GetPer(void) const noexcept { return this->m_per; }
+			const auto& GetTime(void) const noexcept { return this->m_time; }
 			auto			GetTimePer(void) const noexcept { return (this->m_AllTime > 0) ? this->m_time / this->m_AllTime : 1.f; }
 			auto			TimeStart(void) const noexcept { return m_time <= 0; }
 			auto			TimeEnd(void) const noexcept { return m_time >= m_AllTime; }
