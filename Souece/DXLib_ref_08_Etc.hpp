@@ -64,42 +64,40 @@ namespace DXLibRef {
 		pObj->ResetFrameUserLocalMatrix(Arm);
 		pObj->ResetFrameUserLocalMatrix(Arm2);
 		pObj->ResetFrameUserLocalMatrix(Wrist);
-		auto matBase = pObj->GetParentFrameWorldMatrix(Arm).rotation().inverse();
-
+		auto matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Arm)).inverse();
 		// äÓèÄ
-		auto vec_a1 = Matrix4x4DX::Vtrans((DirPos - pObj->GetFramePosition(Arm)).normalized(), matBase);// äÓèÄ
+		auto vec_a1 = Matrix3x3DX::Vtrans((DirPos - pObj->GetFramePosition(Arm)).normalized(), matBase);// äÓèÄ
 		auto vec_a1L1 = Vector3DX(Vector3DX::vget(XPer, -1.f, vec_a1.y / -abs(vec_a1.z))).normalized();// x=0Ç∆Ç∑ÇÈ
 		float cos_t = GetCosFormula((Vector3DX(pObj->GetFramePosition(Wrist)) - pObj->GetFramePosition(Arm2)).magnitude(), (Vector3DX(pObj->GetFramePosition(Arm2)) - pObj->GetFramePosition(Arm)).magnitude(), (Vector3DX(pObj->GetFramePosition(Arm)) - DirPos).magnitude());
 		auto vec_t = vec_a1 * cos_t + vec_a1L1 * std::sqrtf(1.f - cos_t * cos_t);
 		// è„òr
-		pObj->SetFrameLocalMatrix(Arm, Matrix4x4DX::identity() * FrameBaseLocalMatArm);
-		Matrix4x4DX a1_inv = Matrix4x4DX::RotVec2(Matrix4x4DX::Vtrans(Vector3DX(pObj->GetFramePosition(Arm2)) - pObj->GetFramePosition(Arm), matBase), vec_t);
-		pObj->SetFrameLocalMatrix(Arm, a1_inv * FrameBaseLocalMatArm);
+		pObj->SetFrameLocalMatrix(Arm, Matrix3x3DX::RotVec2(
+			Matrix3x3DX::Vtrans(Vector3DX(pObj->GetFramePosition(Arm2)) - pObj->GetFramePosition(Arm), matBase),
+			vec_t
+		).Get44DX() * FrameBaseLocalMatArm);
 		// â∫òr
-		matBase = pObj->GetParentFrameWorldMatrix(Arm2).rotation().inverse();
-		pObj->SetFrameLocalMatrix(Arm2, Matrix4x4DX::identity() * FrameBaseLocalMatArm2);
-		Matrix4x4DX a2_inv = Matrix4x4DX::RotVec2(
-			Matrix4x4DX::Vtrans(Vector3DX(pObj->GetFramePosition(Wrist)) - pObj->GetFramePosition(Arm2), matBase),
-			Matrix4x4DX::Vtrans(DirPos - pObj->GetFramePosition(Arm2), matBase));
-		pObj->SetFrameLocalMatrix(Arm2, a2_inv * FrameBaseLocalMatArm2);
+		matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Arm2)).inverse();
+		pObj->SetFrameLocalMatrix(Arm2, Matrix3x3DX::RotVec2(
+			Matrix3x3DX::Vtrans(Vector3DX(pObj->GetFramePosition(Wrist)) - pObj->GetFramePosition(Arm2), matBase),
+			Matrix3x3DX::Vtrans(DirPos - pObj->GetFramePosition(Arm2), matBase)
+		).Get44DX() * FrameBaseLocalMatArm2);
 		// éË
-		matBase = pObj->GetParentFrameWorldMatrix(Wrist).rotation().inverse();
-		Matrix4x4DX mat1;
+		matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Wrist)).inverse();
 		{
-			auto zvec = Matrix4x4DX::Vtrans(Localzvec, pObj->GetFrameLocalWorldMatrix(Wrist).rotation());
-			mat1 = Matrix4x4DX::RotVec2(Matrix4x4DX::Vtrans(zvec, matBase), Matrix4x4DX::Vtrans(Dirzvec, matBase)) * mat1;
-			pObj->SetFrameLocalMatrix(Wrist, mat1 * FrameBaseLocalMatWrist);
-			auto xvec = Matrix4x4DX::Vtrans(Localyvec, pObj->GetFrameLocalWorldMatrix(Wrist).rotation());
-			mat1 = Matrix4x4DX::RotAxis(Localzvec, Vector3DX::Angle(xvec, Vector3DX::Cross(Dirzvec, Diryvec) * -1.f) * ((Vector3DX::Dot(Diryvec, xvec) > 0.f) ? -1.f : 1.f)) * mat1;
+			Matrix3x3DX mat1;
+			mat1 = Matrix3x3DX::RotVec2(Matrix3x3DX::Vtrans(Matrix3x3DX::Vtrans(Localzvec, Matrix3x3DX::Get33DX(pObj->GetFrameLocalWorldMatrix(Wrist))), matBase), Matrix3x3DX::Vtrans(Dirzvec, matBase));
+			pObj->SetFrameLocalMatrix(Wrist, mat1.Get44DX() * FrameBaseLocalMatWrist);
+			auto xvec = Matrix3x3DX::Vtrans(Localyvec, Matrix3x3DX::Get33DX(pObj->GetFrameLocalWorldMatrix(Wrist)));
+			mat1 = Matrix3x3DX::RotAxis(Localzvec, Vector3DX::Angle(xvec, Vector3DX::Cross(Diryvec, Dirzvec)) * ((Vector3DX::Dot(Diryvec, xvec) > 0.f) ? -1.f : 1.f)) * mat1;
+			pObj->SetFrameLocalMatrix(Wrist, mat1.Get44DX() * FrameBaseLocalMatWrist);
 		}
-		pObj->SetFrameLocalMatrix(Wrist, mat1 * FrameBaseLocalMatWrist);
 	}
 
 	static void			IK_RightArm(MV1* pObj,
 		int Arm, const Matrix4x4DX& FrameBaseLocalMatArm,
 		int Arm2, const Matrix4x4DX& FrameBaseLocalMatArm2,
 		int Wrist, const Matrix4x4DX& FrameBaseLocalMatWrist,
-		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
+		const Matrix4x4DX& DirMat) noexcept {
 		IK_move_Arm(
 			Vector3DX::vget(0.f, 0.f, -1.f).normalized(),
 			Vector3DX::vget(-1.f, -1.f, 0.f).normalized(),
@@ -110,13 +108,13 @@ namespace DXLibRef {
 			FrameBaseLocalMatArm2,
 			Wrist,
 			FrameBaseLocalMatWrist,
-			DirPos, Diryvec * -1.f, Dirzvec);
+			DirMat.pos(), DirMat.yvec() * -1.f, DirMat.zvec());
 	}
 	static void			IK_LeftArm(MV1* pObj,
 		int Arm, const Matrix4x4DX& FrameBaseLocalMatArm,
 		int Arm2, const Matrix4x4DX& FrameBaseLocalMatArm2,
 		int Wrist, const Matrix4x4DX& FrameBaseLocalMatWrist,
-		const Vector3DX& DirPos, const Vector3DX& Diryvec, const Vector3DX& Dirzvec) noexcept {
+		const Matrix4x4DX& DirMat) noexcept {
 
 		IK_move_Arm(
 			Vector3DX::vget(0.f, 0.f, -1.f).normalized(),
@@ -128,7 +126,7 @@ namespace DXLibRef {
 			FrameBaseLocalMatArm2,
 			Wrist,
 			FrameBaseLocalMatWrist,
-			DirPos, Diryvec, Dirzvec);
+			DirMat.pos(), DirMat.yvec(), DirMat.zvec());
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// ÉJÉÅÉâÇ©ÇÁâÊñ è„ÇÃç¿ïWÇéÊìæ

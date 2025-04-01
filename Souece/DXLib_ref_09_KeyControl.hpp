@@ -988,7 +988,8 @@ namespace DXLibRef {
 		float				m_AddyRad{ 0.f };
 		float				m_xRad{ 0.f };
 		float				m_yRad{ 0.f };
-		unsigned long long	m_Flags{ 0 };
+		unsigned long long	m_Flag{ 0 };
+		unsigned long long	m_Prev{ 0 };
 	public:
 		InputControl(void) noexcept {}
 		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
@@ -998,12 +999,13 @@ namespace DXLibRef {
 		virtual ~InputControl(void) noexcept {}
 	public:
 		void			ResetKeyInput(void) noexcept {
-			this->m_Flags = 0;
+			this->m_Prev = this->m_Flag;
+			this->m_Flag = 0;
 		}
 		void			ResetAllInput(void) noexcept {
 			this->m_AddxRad = 0.f;
 			this->m_AddyRad = 0.f;
-			this->m_Flags = 0;
+			ResetKeyInput();
 		}
 		void			SetAddxRad(float AddxRad) noexcept { this->m_AddxRad = AddxRad; }
 		void			SetAddyRad(float AddyRad) noexcept { this->m_AddyRad = AddyRad; }
@@ -1011,10 +1013,10 @@ namespace DXLibRef {
 		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetInputPADS(Controls::PADS select, bool value) noexcept {
 			if (value) {
-				this->m_Flags |= ((unsigned long long)1 << (0 + static_cast<int>(select)));
+				this->m_Flag |= ((unsigned long long)1 << (0 + static_cast<int>(select)));
 			}
 			else {
-				this->m_Flags &= ~((unsigned long long)1 << (0 + static_cast<int>(select)));
+				this->m_Flag &= ~((unsigned long long)1 << (0 + static_cast<int>(select)));
 			}
 		}
 	public:
@@ -1022,9 +1024,13 @@ namespace DXLibRef {
 		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
 		const auto&		GetxRad(void) const noexcept { return this->m_xRad; }
 		const auto&		GetyRad(void) const noexcept { return this->m_yRad; }
-		auto			GetPADSPress(Controls::PADS select) const noexcept { return (this->m_Flags & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
+		auto			GetPADSPress(Controls::PADS select) const noexcept { return (this->m_Flag & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
+		auto			GetPADSTrigger(Controls::PADS select) const noexcept { return !((this->m_Prev & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0) && GetPADSPress(select); }
 	public:
-		void			SetKeyInputFlags(const InputControl& o) noexcept { this->m_Flags = o.m_Flags; }
+		void			SetKeyInputFlags(const InputControl& o) noexcept {
+			this->m_Prev = this->m_Flag;
+			this->m_Flag = o.m_Flag;
+		}
 	public:
 		auto operator+(const InputControl& o) const noexcept {
 			InputControl tmp;
@@ -1032,7 +1038,8 @@ namespace DXLibRef {
 			tmp.m_AddyRad = this->m_AddyRad + o.m_AddyRad;
 			tmp.m_xRad = this->m_xRad + o.m_xRad;
 			tmp.m_yRad = this->m_yRad + o.m_yRad;
-			tmp.m_Flags = this->m_Flags;
+			tmp.m_Prev = this->m_Flag;
+			tmp.m_Flag = this->m_Flag;
 			return tmp;
 		}
 		auto operator-(const InputControl& o) const noexcept {
@@ -1041,7 +1048,8 @@ namespace DXLibRef {
 			tmp.m_AddyRad = this->m_AddyRad - o.m_AddyRad;
 			tmp.m_xRad = this->m_xRad - o.m_xRad;
 			tmp.m_yRad = this->m_yRad - o.m_yRad;
-			tmp.m_Flags = this->m_Flags;
+			tmp.m_Prev = this->m_Flag;
+			tmp.m_Flag = this->m_Flag;
 			return tmp;
 		}
 		auto operator*(float per) const noexcept {
@@ -1050,7 +1058,8 @@ namespace DXLibRef {
 			tmp.m_AddyRad = this->m_AddyRad * per;
 			tmp.m_xRad = this->m_xRad * per;
 			tmp.m_yRad = this->m_yRad * per;
-			tmp.m_Flags = this->m_Flags;
+			tmp.m_Prev = this->m_Flag;
+			tmp.m_Flag = this->m_Flag;
 			return tmp;
 		}
 		void operator=(const InputControl& o) noexcept {
@@ -1058,7 +1067,8 @@ namespace DXLibRef {
 			this->m_AddyRad = o.m_AddyRad;
 			this->m_xRad = o.m_xRad;
 			this->m_yRad = o.m_yRad;
-			this->m_Flags = o.m_Flags;
+			this->m_Prev = o.m_Prev;
+			this->m_Flag = o.m_Flag;
 		}
 	};
 }
