@@ -954,7 +954,7 @@ namespace DXLibRef {
 		DepthScreenHandle.SetUseTextureToShader(1);
 		DepthFarScreenHandle.SetUseTextureToShader(2);
 		// ‰e‚ÌŒ‹‰Ê‚ğo—Í
-		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f * Scale3DRate, 100.f * Scale3DRate);
+		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f * Scale3DRate, 30.f * Scale3DRate);
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{

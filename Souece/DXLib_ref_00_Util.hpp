@@ -24,6 +24,9 @@ namespace DXLibRef {
 			// if (m_Singleton == nullptr) { m_Singleton = new T(); }
 			return (T*)m_Singleton;
 		}
+		static void Release(void) noexcept {
+			delete m_Singleton;
+		}
 	protected:
 		SingletonBase(void) noexcept {}
 		virtual ~SingletonBase(void) noexcept {}
