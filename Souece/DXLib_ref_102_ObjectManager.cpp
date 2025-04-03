@@ -26,7 +26,7 @@ namespace DXLibRef {
 		pObj->CopyModel(*Ptr);
 		pObj->SetupCol();
 		if (pAnim) {
-			MV1::SetAnime(&pObj->GetObj(), pAnim->GetObj());
+			MV1::SetAnime(&pObj->SetObj(), pAnim->GetObj());
 		}
 	}
 	SharedObj* ObjectManager::GetObj(int ModelType, int num) noexcept {
@@ -90,19 +90,17 @@ namespace DXLibRef {
 	void			ObjectManager::LateExecuteObject(void) noexcept {
 		for (auto& o : this->m_Object) {
 			o->LateExecute();
-			Vector3DX campos; campos.z = (-1.f);
-			o->SetScreenPosition(campos, -1.f);
 		}
 	}
-	void			ObjectManager::Draw(bool IsCheckDraw) noexcept {
+	void			ObjectManager::Draw(bool IsCheckDraw, int Range) noexcept {
 		for (auto& o : this->m_Object) {
 			if (IsCheckDraw) {
-				o->CheckDraw();
+				o->CheckDraw(Range);
 			}
-			o->Draw(false);
+			o->Draw(false, Range);
 		}
 		for (auto& o : this->m_Object) {
-			o->Draw(true);
+			o->Draw(true, Range);
 		}
 	}
 	void			ObjectManager::Draw_Shadow(void) noexcept {

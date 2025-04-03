@@ -194,87 +194,81 @@ namespace DXLibRef {
 	}
 	// 
 	void			ObjectBaseClass::SetAnimOnce(int ID, float speed) noexcept {
-		this->GetObj().SetAnim(ID).Update(false, speed);
+		this->SetObj().SetAnim(ID).Update(false, speed);
 	}
 	void			ObjectBaseClass::SetAnimLoop(int ID, float speed) noexcept {
-		this->GetObj().SetAnim(ID).Update(true, speed);
+		this->SetObj().SetAnim(ID).Update(true, speed);
 	}
 	// 
 	void			ObjectBaseClass::Init(void) noexcept {
-		this->m_IsActive = true;
+		SetActive(true);
 		this->m_IsResetPhysics = true;
 		this->m_IsFirstLoop = true;
-		this->m_IsDraw = false;
 		Init_Sub();
 	}
 	// 
 	void			ObjectBaseClass::ExecuteCommon(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (this->m_IsFirstLoop) {
-			this->m_PrevMat = this->GetObj().GetMatrix();
+			this->m_PrevMat = GetObj().GetMatrix();
 		}
 		// シェイプ更新
-		for (size_t index = 0; auto & f : this->m_Shapes) {
+		for (size_t index = 0; const auto & f : GetShapesList()) {
 			if (index == 0) {
 				continue;
 			}
-			this->GetObj().SetShapeRate(f.first, (1.f - this->m_Shapes.at(0).second) * f.second);
+			GetObj().SetShapeRate(f.first, (1.f - GetShapesList().at(0).second) * f.second);
 			index++;
 		}
 		// 物理更新
-		if (this->m_PHYSICS_SETUP == PHYSICS_SETUP::REALTIME) {
+		if (GetPhysicsSetup() == PHYSICS_SETUP::REALTIME) {
 			if (this->m_IsResetPhysics) {
 				this->m_IsResetPhysics = false;
-				this->GetObj().PhysicsResetState();
+				GetObj().PhysicsResetState();
 			}
 			else {
-				auto NowMat = this->GetObj().GetMatrix();
+				auto NowMat = GetObj().GetMatrix();
 				int Max = 2;
 				if (DXLib_refParts->GetFps() > FrameRate * Max) {
 					Max = 1;
 				}
 				for (int i : std::views::iota(0, Max)) {
-					this->GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
-					this->GetObj().PhysicsCalculation(1000.0f * FrameRate * DXLib_refParts->GetDeltaTime() / static_cast<float>(Max));
+					GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
+					GetObj().PhysicsCalculation(1000.0f * FrameRate * DXLib_refParts->GetDeltaTime() / static_cast<float>(Max));
 				}
 			}
-			this->m_PrevMat = this->GetObj().GetMatrix();
+			this->m_PrevMat = GetObj().GetMatrix();
 		}
 		// 最初のループ終わり
 		this->m_IsFirstLoop = false;
+		for (auto& d : this->m_IsDraw) {
+			d = false;
+		}
 	}
 
 	void			ObjectBaseClass::DrawShadow(void) noexcept {
-		if (this->m_IsActive && this->m_IsDraw) {
-			this->GetObj().DrawModel();
-		}
+		if (!IsActive()) { return; }
+		if (!GetObj().IsActive()) { return; }
+		GetObj().DrawModel();
 	}
-	void			ObjectBaseClass::CheckDraw(void) noexcept {
-		this->m_IsDraw = false;
-		this->m_DistanceToCam = (this->GetObj().GetMatrix().pos() - GetScreenPosition()).magnitude();
+	void			ObjectBaseClass::CheckDraw(int Range) noexcept {
+		if (!IsActive()) { return; }
+		if (Range == -1) { return; }
 		if (CheckCameraViewClip_Box(
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate)).get(),
-			(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale3DRate, 1.f * Scale3DRate, 1.f * Scale3DRate)).get()) == FALSE
+			(GetObj().GetMatrix().pos() + m_MinAABB).get(),
+			(GetObj().GetMatrix().pos() + m_MaxAABB).get()) == FALSE
 			) {
-			this->m_IsDraw |= true;
+			this->m_IsDraw.at(Range) |= true;
 		}
-
-		Vector3DX campos = ConvWorldPosToScreenPos(this->GetMove().GetPos().get());
-		if (0.f < campos.z && campos.z < 1.f) {
-			this->SetScreenPosition(campos, std::max(20.f / ((this->GetMove().GetPos() - GetCameraPosition()).magnitude() / 2.f), 0.2f));
-		}
+		CheckDraw_Sub(Range);
 	}
-	void			ObjectBaseClass::Draw(bool isDrawSemiTrans) noexcept {
-		if (this->m_IsActive && this->m_IsDraw) {
-			if (CheckCameraViewClip_Box(
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate)).get(),
-				(this->GetObj().GetMatrix().pos() + Vector3DX::vget(1.f * Scale3DRate, 1.f * Scale3DRate, 1.f * Scale3DRate)).get()) == FALSE
-				) {
-				for (int i : std::views::iota(0, static_cast<int>(this->GetObj().GetMeshNum()))) {
-					if (this->GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {
-						this->GetObj().DrawMesh(i);
-					}
-				}
+	void			ObjectBaseClass::Draw(bool isDrawSemiTrans, int Range) noexcept {
+		if (!IsActive()) { return; }
+		if (!IsDraw(Range)) { return; }
+		if (!GetObj().IsActive()) { return; }
+		for (int i : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {
+			if (GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {
+				GetObj().DrawMesh(i);
 			}
 		}
 	}

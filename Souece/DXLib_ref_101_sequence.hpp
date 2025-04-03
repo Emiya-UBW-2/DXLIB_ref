@@ -56,9 +56,8 @@ namespace DXLibRef {
 		void BG_Draw(void) noexcept { BG_Draw_Sub(); }
 		void SetShadowDraw_Rigid(void) noexcept { SetShadowDraw_Rigid_Sub(); }
 		void SetShadowDraw(void) noexcept { SetShadowDraw_Sub(); }
-		void CalcOnDraw(void) noexcept { CalcOnDraw_Sub(); }
-		void MainDraw(void) noexcept { MainDraw_Sub(); }
-		void MainDrawFront(void) noexcept { MainDrawFront_Sub(); }
+		void MainDraw(int Range) noexcept { MainDraw_Sub(Range); }
+		void MainDrawFront(int Range) noexcept { MainDrawFront_Sub(Range); }
 		void DrawUI_Base(void) noexcept { DrawUI_Base_Sub(); }
 		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
@@ -72,9 +71,8 @@ namespace DXLibRef {
 		virtual void BG_Draw_Sub(void) const noexcept { FillGraph(GetDrawScreen(), 192, 192, 192); }
 		virtual void SetShadowDraw_Rigid_Sub(void) const noexcept {}
 		virtual void SetShadowDraw_Sub(void) const noexcept {}
-		virtual void CalcOnDraw_Sub(void) noexcept {}
-		virtual void MainDraw_Sub(void) const noexcept {}
-		virtual void MainDrawFront_Sub(void) const noexcept {}
+		virtual void MainDraw_Sub(int) const noexcept {}
+		virtual void MainDrawFront_Sub(int) const noexcept {}
 		virtual void DrawUI_Base_Sub(void) const noexcept {}
 		virtual void DrawUI_In_Sub(void) const noexcept {}
 		virtual void ShadowDraw_Far_Sub(void) const noexcept {}

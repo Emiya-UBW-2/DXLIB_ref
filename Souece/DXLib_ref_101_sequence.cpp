@@ -90,13 +90,12 @@ namespace DXLibRef {
 #endif
 				auto* PostPassParts = PostPassEffect::Instance();
 				PostPassParts->DrawByPBR([this]() {
-					this->m_NowScenesPtr->CalcOnDraw();
-					this->m_NowScenesPtr->MainDraw();
+					this->m_NowScenesPtr->MainDraw(0);
 					});
 #if defined(_USE_EFFEKSEER_)
 				DrawEffekseer3D();
 #endif
-				this->m_NowScenesPtr->MainDrawFront();
+				this->m_NowScenesPtr->MainDrawFront(0);
 				});
 			// ’†ŠÔ
 			PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [this]() {
@@ -105,13 +104,12 @@ namespace DXLibRef {
 #endif
 				auto* PostPassParts = PostPassEffect::Instance();
 				PostPassParts->DrawByPBR([this]() {
-					this->m_NowScenesPtr->CalcOnDraw();
-					this->m_NowScenesPtr->MainDraw();
+					this->m_NowScenesPtr->MainDraw(1);
 					});
 #if defined(_USE_EFFEKSEER_)
 				DrawEffekseer3D();
 #endif
-				this->m_NowScenesPtr->MainDrawFront();
+				this->m_NowScenesPtr->MainDrawFront(1);
 				});
 			// ŽŠ‹ß
 			PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
@@ -120,13 +118,12 @@ namespace DXLibRef {
 #endif
 				auto* PostPassParts = PostPassEffect::Instance();
 				PostPassParts->DrawByPBR([this]() {
-					this->m_NowScenesPtr->CalcOnDraw();
-					this->m_NowScenesPtr->MainDraw();
+					this->m_NowScenesPtr->MainDraw(2);
 					});
 #if defined(_USE_EFFEKSEER_)
 				DrawEffekseer3D();
 #endif
-				this->m_NowScenesPtr->MainDrawFront();
+				this->m_NowScenesPtr->MainDrawFront(2);
 				});
 			// ‰e
 			PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
@@ -135,7 +132,7 @@ namespace DXLibRef {
 			// 2D•`‰æ
 			PostPassParts->GetBufferScreen().SetDraw_Screen();
 			{
-				this->m_NowScenesPtr->MainDraw();
+				this->m_NowScenesPtr->MainDraw(-1);
 			}
 			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);	// Dof‚ð–³Œø‰»
 		}
