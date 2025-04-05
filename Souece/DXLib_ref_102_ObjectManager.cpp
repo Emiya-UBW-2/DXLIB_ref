@@ -109,13 +109,15 @@ namespace DXLibRef {
 		}
 	}
 	void			ObjectManager::DeleteAll(void) noexcept {
-		for (auto& o : this->m_Object) {
+		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (o) {
 				o->Dispose();
 			}
 		}
 		this->m_Object.clear();
-		for (auto& o : this->m_Model) {
+		for (int i = 0; i < static_cast<int>(this->m_Model.size()); i++) {
+			auto& o = this->m_Model.at(static_cast<size_t>(i));
 			if (o) {
 				o->DisposeModel();
 			}
