@@ -35,8 +35,8 @@ namespace DXLibRef {
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
 		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::LoadMovie)).SetEnumParamType(EnumParamType::Boolean);
+		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
 
-		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
 		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::CubeMap)).SetEnumParamType(EnumParamType::Boolean);
@@ -82,6 +82,7 @@ namespace DXLibRef {
 					SetParamBoolean(EnumSaveParam::AA, true);
 					SetParamFloat(EnumSaveParam::DrawScale, 1.f);
 					SetParamBoolean(EnumSaveParam::LoadMovie, true);
+					SetParamBoolean(EnumSaveParam::GodRay, true);
 					return;
 				}
 			}
@@ -150,7 +151,6 @@ namespace DXLibRef {
 		}
 		{
 			if (!IsFileExist("CommonData/ProjectSetting.txt")) {
-				SetParamBoolean(EnumProjectSettingParam::GodRay, true);
 				SetParamBoolean(EnumProjectSettingParam::PBR, true);
 				SetParamBoolean(EnumProjectSettingParam::Distortion, true);
 				SetParamBoolean(EnumProjectSettingParam::CubeMap, true);

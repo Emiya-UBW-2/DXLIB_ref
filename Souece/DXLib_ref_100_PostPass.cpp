@@ -781,7 +781,7 @@ namespace DXLibRef {
 		bool IsActive_Sub(void) noexcept override {
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* OptionParts = OptionManager::Instance();
-			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::GodRay) && (PostPassParts->GetGodRayPer() > 0.f);
+			return (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) && OptionParts->GetParamBoolean(EnumSaveParam::GodRay) && (PostPassParts->GetGodRayPer() > 0.f);
 		}
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* OptionParts = OptionManager::Instance();

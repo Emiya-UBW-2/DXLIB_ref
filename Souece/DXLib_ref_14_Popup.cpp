@@ -412,6 +412,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 0);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -422,6 +423,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -432,6 +434,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -442,6 +445,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -452,6 +456,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -470,6 +475,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 0);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -480,6 +486,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -490,6 +497,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -500,6 +508,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -510,6 +519,7 @@ namespace DXLibRef {
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 					OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -530,6 +540,7 @@ namespace DXLibRef {
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 0);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 0);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, false);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -540,6 +551,7 @@ namespace DXLibRef {
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -550,6 +562,7 @@ namespace DXLibRef {
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -560,6 +573,7 @@ namespace DXLibRef {
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 3);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 3);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -570,6 +584,7 @@ namespace DXLibRef {
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
 						OptionParts->SetParamInt(EnumSaveParam::Reflection, 2);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 4);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 4);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -800,6 +815,16 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) { IntUpDownBoxDraw(xpos, ypos, EnumSaveParam::shadow, 4); }
 		);
+
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("GodRay", 1138,
+			[this]() { BoolChange(EnumSaveParam::GodRay); },
+			[this]() { BoolChange(EnumSaveParam::GodRay); },
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::GodRay); }
+		);
+
 		this->m_Elements.emplace_back();
 		this->m_Elements.back().Init("Object Level", 1130,
 			[this]() { IntChange(EnumSaveParam::ObjLevel, -1, 0, 4); },

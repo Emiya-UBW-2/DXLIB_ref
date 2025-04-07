@@ -29,6 +29,7 @@ namespace DXLibRef {
 		AA,
 		DrawScale,
 		LoadMovie,
+		GodRay,
 		Max,
 	};
 	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
@@ -58,17 +59,16 @@ namespace DXLibRef {
 		"AA",
 		"DrawScale",
 		"LoadMovie",
+		"GodRay",
 	};
 
 	enum class EnumProjectSettingParam {
-		GodRay,
 		Distortion,
 		PBR,
 		CubeMap,
 		Max,
 	};
 	static const char* ProjectSettingStr[static_cast<int>(EnumProjectSettingParam::Max)] = {
-		"GodRay",
 		"Distortion",
 		"PBR",
 		"CubeMap",
