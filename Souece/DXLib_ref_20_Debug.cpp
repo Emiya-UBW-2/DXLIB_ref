@@ -10,6 +10,7 @@ namespace DXLibRef {
 
 	DebugClass::DebugClass(void) noexcept {
 		m_Point.resize(static_cast<size_t>(PointFrame + 1));
+		m_PointP.resize(static_cast<size_t>(PointFrame + 1));
 		m_IsActive = true;
 	}
 
@@ -68,6 +69,17 @@ namespace DXLibRef {
 				m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] = m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] - m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index) - 1];
 			}
 		}
+
+		for (int index : std::views::iota(0, PMax)) {
+			m_PointP[0][index] = 0;
+			for (int loop = 0; loop <= index; ++loop) {
+				m_PointP[0][index] += m_Point[PointFrame][loop];
+			}
+			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {
+				m_PointP[static_cast<std::size_t>(j)][index] = m_PointP[static_cast<std::size_t>(j - 1)][index];
+			}
+
+		}
 	}
 
 	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
@@ -114,8 +126,8 @@ namespace DXLibRef {
 					int xnext = xp + static_cast<int>(static_cast<float>(j + 1) * xs);
 
 					for (size_t index = static_cast<size_t>(PMax - 1); index > 0; --index) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_Point[j][index] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_Point[j + 1][index] * ys));
+						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[j][index] * ys));
+						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[j + 1][index] * ys));
 						DrawCtrls->SetDrawQuadrangle(
 							WindowSystem::DrawLayer::Normal,
 							xnow, ynow, xnext, ynext,
@@ -125,8 +137,8 @@ namespace DXLibRef {
 					}
 					/*
 					for (int index : std::views::iota(0, PMax)) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_Point[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
+						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
+						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
 						DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
 					}
 					//*/
