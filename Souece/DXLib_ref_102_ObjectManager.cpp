@@ -7,6 +7,11 @@ namespace DXLibRef {
 		this->m_Object.emplace_back(NewObj);
 		this->m_Object.back()->SetObjectID(this->m_LastUniqueID);
 		++this->m_LastUniqueID;
+		int Size = this->m_Object.back()->GetobjType();
+		if (Size + 1 > static_cast<int>(this->m_ObjectPtr.size())) {
+			this->m_ObjectPtr.resize(static_cast<size_t>(Size + 1));
+		}
+		this->m_ObjectPtr.at(Size).emplace_back(&this->m_Object.back());
 	}
 	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		const SharedModel* Ptr = nullptr;
@@ -29,28 +34,20 @@ namespace DXLibRef {
 			MV1::SetAnime(&pObj->SetObj(), pAnim->GetObj());
 		}
 	}
-	SharedObj* ObjectManager::GetObj(int ModelType, int num) noexcept {
-		int cnt = 0;
-		for (auto& o : this->m_Object) {
-			if (o->GetobjType() == ModelType) {
-				if (cnt == num) {
-					return &o;
-				}
-				++cnt;
-			}
-		}
-		return nullptr;
-	}
-	void			ObjectManager::DelObj(const SharedObj& ptr) noexcept {
-		for (size_t index = 0; auto & o : this->m_Object) {
-			if (o == ptr) {
-				// 順番の維持のためここはerase
-				o->Dispose();
-				this->m_Object.erase(this->m_Object.begin() + index);
+	SharedObj* ObjectManager::GetObj(int ModelType, int num) noexcept { return this->m_ObjectPtr.at(ModelType).at(num); }
+	void			ObjectManager::DelObj(int index) noexcept {
+		auto& o = this->m_Object.at(index);
+		auto& olist = this->m_ObjectPtr.at(o->GetobjType());
+		for (size_t index2 = 0; auto & op : olist) {
+			if (op == &o) {
+				olist.erase(olist.begin() + index2);
 				break;
 			}
-			index++;
+			index2++;
 		}
+		// 順番の維持のためここはerase
+		o->Dispose();
+		this->m_Object.erase(this->m_Object.begin() + index);
 	}
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		// オブジェクトが増えた場合に備えて範囲forは使わない
@@ -79,9 +76,7 @@ namespace DXLibRef {
 		for (int i = 0, Max = static_cast<int>(this->m_Object.size()); i < Max; i++) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
 			if (o->GetIsDelete()) {
-				// 順番の維持のためここはerase
-				o->Dispose();
-				this->m_Object.erase(this->m_Object.begin() + i);
+				DelObj(i);
 				i--;
 				Max--;
 			}
@@ -116,6 +111,12 @@ namespace DXLibRef {
 			}
 		}
 		this->m_Object.clear();
+
+		for (auto& op : this->m_ObjectPtr) {
+			op.clear();
+		}
+		this->m_ObjectPtr.clear();
+
 		for (int i = 0; i < static_cast<int>(this->m_Model.size()); i++) {
 			auto& o = this->m_Model.at(static_cast<size_t>(i));
 			if (o) {

@@ -14,21 +14,33 @@ namespace DXLibRef {
 	private:
 		std::vector<SharedModel>	m_Model;
 		std::vector<SharedObj>		m_Object;
+		std::vector<std::vector<SharedObj*>>	m_ObjectPtr;
 		int							m_LastUniqueID{ 0 };
 		switchs						m_ResetP;
 	private:
 		ObjectManager(void) noexcept {
 			this->m_Object.reserve(256);
+			this->m_ObjectPtr.reserve(10);
 		}
 		ObjectManager(const ObjectManager&) = delete;
 		ObjectManager(ObjectManager&& o) = delete;
 		ObjectManager& operator=(const ObjectManager&) = delete;
 		ObjectManager& operator=(ObjectManager&& o) = delete;
+	private:
+		void			DelObj(int index) noexcept;
 	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 		SharedObj* GetObj(int ModelType, int num) noexcept;
-		void			DelObj(const SharedObj& ptr) noexcept;
+		void			DelObj(const SharedObj& ptr) noexcept {
+			for (int index = 0; auto & o : this->m_Object) {
+				if (o == ptr) {
+					DelObj(index);
+					break;
+				}
+				index++;
+			}
+		}
 
 	public:
 		void			ExecuteObject(void) noexcept;
