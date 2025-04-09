@@ -41,9 +41,9 @@ namespace DXLibRef {
 		}
 		return nullptr;
 	}
-	void			ObjectManager::DelObj(SharedObj* ptr) noexcept {
+	void			ObjectManager::DelObj(const SharedObj& ptr) noexcept {
 		for (size_t index = 0; auto & o : this->m_Object) {
-			if (o == *ptr) {
+			if (o == ptr) {
 				// ‡”Ô‚ÌˆÛŽ‚Ì‚½‚ß‚±‚±‚Íerase
 				o->Dispose();
 				this->m_Object.erase(this->m_Object.begin() + index);

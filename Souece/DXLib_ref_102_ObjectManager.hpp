@@ -28,7 +28,7 @@ namespace DXLibRef {
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 		SharedObj* GetObj(int ModelType, int num) noexcept;
-		void			DelObj(SharedObj* ptr) noexcept;
+		void			DelObj(const SharedObj& ptr) noexcept;
 
 	public:
 		void			ExecuteObject(void) noexcept;
