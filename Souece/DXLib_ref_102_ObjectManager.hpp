@@ -31,7 +31,7 @@ namespace DXLibRef {
 	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
-		SharedObj* GetObj(int ModelType, int num) noexcept;
+		SharedObj*		GetObj(int ModelType, int num) noexcept { return this->m_ObjectPtr.at(ModelType).at(num); }
 		void			DelObj(const SharedObj& ptr) noexcept {
 			for (int index = 0; auto & o : this->m_Object) {
 				if (o == ptr) {

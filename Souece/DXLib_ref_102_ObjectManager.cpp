@@ -34,7 +34,6 @@ namespace DXLibRef {
 			MV1::SetAnime(&pObj->SetObj(), pAnim->GetObj());
 		}
 	}
-	SharedObj* ObjectManager::GetObj(int ModelType, int num) noexcept { return this->m_ObjectPtr.at(ModelType).at(num); }
 	void			ObjectManager::DelObj(int index) noexcept {
 		auto& o = this->m_Object.at(index);
 		auto& olist = this->m_ObjectPtr.at(o->GetobjType());
