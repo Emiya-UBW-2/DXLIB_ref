@@ -830,6 +830,7 @@ namespace DXLibRef {
 		// 
 		bool													m_MouseMoveEnable{ false };					//FPSなどのマウスを表示しない操作方法を用いるかどうか
 		Controls::ControlType									m_ControlType{ Controls::ControlType::PC };	//現在のコントロールタイプ
+		bool													m_PrevIsActiveLS{ false };
 	private:
 		// コンストラクタ
 		PadControl(void) noexcept { Load(); }

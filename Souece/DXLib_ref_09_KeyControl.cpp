@@ -281,5 +281,10 @@ namespace DXLibRef {
 				m_MouseWheelRot = 0;
 			}
 		}
+		if (m_PrevIsActiveLS != (m_MouseMoveEnable && GetWindowActiveFlag() == TRUE)) {
+			m_Look_XradAdd = 0.f;
+			m_Look_YradAdd = 0.f;
+		}
+		m_PrevIsActiveLS = (m_MouseMoveEnable && GetWindowActiveFlag() == TRUE);
 	}
 };
