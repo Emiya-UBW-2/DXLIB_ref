@@ -159,6 +159,8 @@ namespace DXLibRef {
 		void			SetMaterialAmbColor(int p1, COLOR_F color) const noexcept { MV1SetMaterialAmbColor(DXHandle::get(), p1, color); }
 		void			SetMaterialSpcPower(int p1, float power) const noexcept { MV1SetMaterialSpcPower(DXHandle::get(), p1, power); }
 		void			SetMaterialDrawAddColorAll(int r, int g, int b) const noexcept { MV1SetMaterialDrawAddColorAll(DXHandle::get(), r, g, b); }
+		void			SetMaterialOpacityRate(int p1, float p2) const noexcept { MV1SetMeshOpacityRate(DXHandle::get(), p1, p2); }
+		
 		void			SaveModelToMV1File(std::basic_string_view<TCHAR> FileName, int  SaveType = MV1_SAVETYPE_NORMAL, int AnimMHandle = -1, int AnimNameCheck = TRUE, int Normal8BitFlag = 1, int Position16BitFlag = 1, int Weight8BitFlag = 0, int Anim16BitFlag = 1) const noexcept { MV1SaveModelToMV1FileWithStrLen(DXHandle::get(), FileName.data(), FileName.length(), SaveType, AnimMHandle, AnimNameCheck, Normal8BitFlag, Position16BitFlag, Weight8BitFlag, Anim16BitFlag); }
 		void			SetPrioritizePhysicsOverAnimFlag(bool p1) const noexcept { MV1SetPrioritizePhysicsOverAnimFlag(DXHandle::get(), p1 ? TRUE : FALSE); }
 
