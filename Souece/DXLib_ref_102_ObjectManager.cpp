@@ -34,51 +34,69 @@ namespace DXLibRef {
 			MV1::SetAnime(&pObj->SetObj(), pAnim->GetObj());
 		}
 	}
-	void			ObjectManager::DelObj(int index) noexcept {
-		auto& o = this->m_Object.at(index);
-		auto& olist = this->m_ObjectPtr.at(o->GetobjType());
-		for (size_t index2 = 0; auto & op : olist) {
-			if (op == &o) {
+	//
+	void			ObjectManager::InitObject(const SharedObj& pObj) noexcept {
+		AddObject(pObj);
+		pObj->Init();
+	}
+	void			ObjectManager::InitObject(const SharedObj& pObj, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+		AddObject(pObj);
+		LoadModel(pObj, pObj, filepath, objfilename, colfilename);
+		pObj->Init();
+	}
+	void			ObjectManager::InitObject(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+		AddObject(pObj);
+		LoadModel(pObj, pAnim, filepath, objfilename, colfilename);
+		pObj->Init();
+	}
+	void ObjectManager::DelObj(const SharedObj& ptr) noexcept {
+		//ポインター解除
+		auto& olist = this->m_ObjectPtr.at(ptr->GetobjType());
+		for (auto& op : olist) {
+			int index2 = static_cast<int>(&op - &olist.front());
+			if (op == &ptr) {
 				olist.erase(olist.begin() + index2);
 				break;
 			}
-			index2++;
 		}
-		// 順番の維持のためここはerase
-		o->Dispose();
-		this->m_Object.erase(this->m_Object.begin() + index);
+		//実体削除
+		for (auto& o : this->m_Object) {
+			int index = static_cast<int>(&o - &this->m_Object.front());
+			if (o == ptr) {
+				// 順番の維持のためここはerase
+				ptr->Dispose();
+				this->m_Object.erase(this->m_Object.begin() + index);
+				break;
+			}
+		}
 	}
+	//
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		// オブジェクトが増えた場合に備えて範囲forは使わない
 		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
-			if (!o->GetIsDelete()) {
-				o->FirstExecute();
-			}
+			if (o->GetIsDelete()) { continue; }
+			o->FirstExecute();
 		}
 		// 物理アップデート
 		//this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
 		for (int i = 0; i < static_cast<int>(this->m_Object.size()); i++) {
 			auto& o = this->m_Object.at(static_cast<size_t>(i));
+			if (o->GetIsDelete()) { continue; }
 			/*
-			if (!o->GetIsDelete()) {
-				if (this->m_ResetP.trigger()) {
-					o->SetResetP(true);
-				}
+			if (this->m_ResetP.trigger()) {
+				o->SetResetP(true);
 			}
 			//*/
-			if (!o->GetIsDelete()) {
-				o->ExecuteCommon();
-			}
+			o->ExecuteCommon();
 		}
 		// オブジェクトの排除チェック
-		for (int i = 0, Max = static_cast<int>(this->m_Object.size()); i < Max; i++) {
-			auto& o = this->m_Object.at(static_cast<size_t>(i));
-			if (o->GetIsDelete()) {
-				DelObj(i);
-				i--;
-				Max--;
-			}
+		for (int loop = 0, Max = static_cast<int>(this->m_Object.size()); loop < Max; loop++) {
+			auto& o = this->m_Object.at(static_cast<size_t>(loop));
+			if (!o->GetIsDelete()) { continue; }
+			DelObj(o);
+			loop--;
+			Max--;
 		}
 	}
 	void			ObjectManager::LateExecuteObject(void) noexcept {

@@ -27,21 +27,19 @@ namespace DXLibRef {
 		ObjectManager& operator=(const ObjectManager&) = delete;
 		ObjectManager& operator=(ObjectManager&& o) = delete;
 	private:
-		void			DelObj(int index) noexcept;
-	public:
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+	public:
+		//モデル未使用バージョン
+		void			InitObject(const SharedObj& pObj) noexcept;
+		//モデル使用バージョン
+		void			InitObject(const SharedObj& pObj, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+		//アニメーション兼務モデルバージョン
+		void			InitObject(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+	public:
 		SharedObj*		GetObj(int ModelType, int num) noexcept { return this->m_ObjectPtr.at(ModelType).at(num); }
-		void			DelObj(const SharedObj& ptr) noexcept {
-			for (int index = 0; auto & o : this->m_Object) {
-				if (o == ptr) {
-					DelObj(index);
-					break;
-				}
-				index++;
-			}
-		}
-
+	public:
+		void			DelObj(const SharedObj& ptr) noexcept;
 	public:
 		void			ExecuteObject(void) noexcept;
 		void			LateExecuteObject(void) noexcept;
