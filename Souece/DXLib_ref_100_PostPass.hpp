@@ -440,7 +440,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<PostPassEffect>;
 	private:
-		std::vector<std::unique_ptr<PostPassBase>> m_PostPass;
+		std::array<std::unique_ptr<PostPassBase>, 16>	m_PostPass;
 		//
 		bool						m_IsActiveGBuffer{ false };
 		GraphHandle					BufferScreen;	// •`‰æƒXƒNƒŠ[ƒ“

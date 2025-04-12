@@ -9,8 +9,6 @@ namespace DXLibRef {
 
 
 	DebugClass::DebugClass(void) noexcept {
-		m_Point.resize(static_cast<size_t>(PointFrame + 1));
-		m_PointP.resize(static_cast<size_t>(PointFrame + 1));
 		m_IsActive = true;
 	}
 

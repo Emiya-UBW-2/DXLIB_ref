@@ -242,10 +242,9 @@ namespace DXLibRef {
 			FontPool& operator=(FontPool&& o) = delete;
 		public:
 			std::unique_ptr<Fonthave>& Get(FontType type, int fontSize, int edgeSize) noexcept {
-				for (auto& h : this->m_Pools) {
-					if (h->Equal(type, fontSize, edgeSize)) {
-						return h;
-					}
+				auto Find = std::find_if(this->m_Pools.begin(), this->m_Pools.end(), [&](const std::unique_ptr<Fonthave>& tgt) {return tgt->Equal(type, fontSize, edgeSize); });
+				if (Find != this->m_Pools.end()) {
+					return *Find;
 				}
 				this->m_Pools.emplace_back(std::make_unique<Fonthave>(type, fontSize, edgeSize));
 				return this->m_Pools.back();

@@ -1026,19 +1026,20 @@ namespace DXLibRef {
 		ColorScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), false);
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		// ポストエフェクト
-		m_PostPass.emplace_back(std::make_unique<PostPassBloom>());
-		m_PostPass.emplace_back(std::make_unique<PostPassDoF>());
-		m_PostPass.emplace_back(std::make_unique<PostPassSSR>());
-		m_PostPass.emplace_back(std::make_unique<PostPassSSAO>());
-		m_PostPass.emplace_back(std::make_unique<PostPassGodRay>());
-		m_PostPass.emplace_back(std::make_unique<PostPassDistortion>());
-		m_PostPass.emplace_back(std::make_unique<PostPassAberration>());
-		m_PostPass.emplace_back(std::make_unique<PostPassMotionBlur>());
-		m_PostPass.emplace_back(std::make_unique<PostPassVignette>());
-		m_PostPass.emplace_back(std::make_unique<PostPassCornerBlur>());
-		m_PostPass.emplace_back(std::make_unique<PostPassFXAA>());
-		m_PostPass.emplace_back(std::make_unique<PostPassScope>());
-		m_PostPass.emplace_back(std::make_unique<PostPassBlackout>());
+		int now = 0;
+		m_PostPass.at(now) = std::make_unique<PostPassBloom>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassDoF>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassSSR>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassSSAO>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassGodRay>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassDistortion>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassAberration>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassMotionBlur>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassVignette>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassCornerBlur>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassFXAA>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassScope>(); ++now;
+		m_PostPass.at(now) = std::make_unique<PostPassBlackout>(); ++now;
 
 		m_ShadowDraw = std::make_unique<ShadowDraw>();
 		// シェーダー
@@ -1057,9 +1058,9 @@ namespace DXLibRef {
 		ResetAllBuffer();
 		// ポストエフェクト
 		for (auto& P : m_PostPass) {
+			if (!P) { continue; }
 			P.reset();
 		}
-		m_PostPass.clear();
 		m_ShadowDraw.reset();
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
@@ -1070,6 +1071,7 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		bool ActiveGBuffer = false;
 		for (auto& P : m_PostPass) {
+			if (!P) { continue; }
 			if (P->IsActive()) {
 				ActiveGBuffer = true;
 				break;
@@ -1077,6 +1079,7 @@ namespace DXLibRef {
 		}
 		UpdateActiveGBuffer(ActiveGBuffer);
 		for (auto& P : m_PostPass) {
+			if (!P) { continue; }
 			P->UpdateActive(P->IsActive());
 		}
 		UpdateActiveCubeMap((OptionParts->GetParamInt(EnumSaveParam::Reflection) > 0) && OptionParts->GetParamBoolean(EnumProjectSettingParam::CubeMap));
@@ -1137,6 +1140,7 @@ namespace DXLibRef {
 		// ポストパスエフェクトのbufに描画
 		if (m_IsActiveGBuffer) {
 			for (auto& P : m_PostPass) {
+				if (!P) { continue; }
 				ColorScreen.GraphFilterBlt(BufferScreen, DX_GRAPH_FILTER_DOWN_SCALE, 1);
 				P->SetEffect(&BufferScreen, &ColorScreen, &NormalScreen, &DepthScreen);
 			}
@@ -1145,6 +1149,7 @@ namespace DXLibRef {
 	void PostPassEffect::ResetAllBuffer(void) noexcept {
 		UpdateActiveGBuffer(false);
 		for (auto& P : m_PostPass) {
+			if (!P) { continue; }
 			P->UpdateActive(false);
 		}
 		UpdateActiveCubeMap(false);

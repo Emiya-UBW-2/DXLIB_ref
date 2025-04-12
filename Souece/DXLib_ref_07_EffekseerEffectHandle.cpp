@@ -14,8 +14,8 @@ namespace DXLibRef {
 		for (const auto& d : data_t) {
 			std::string p = d.cFileName;
 			if (p.find(".efk") != std::string::npos && p.find(".efkproj") == std::string::npos) {
-				effsorce.emplace_back();
-				effsorce.back().load("data/effect/" + p);
+				m_Sorce.emplace_back();
+				m_Sorce.back().load("data/effect/" + p);
 			}
 		}
 	}

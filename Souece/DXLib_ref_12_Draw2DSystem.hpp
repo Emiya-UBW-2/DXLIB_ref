@@ -558,9 +558,21 @@ namespace DXLibRef {
 			}
 			// 
 		public:
-			void	ClearList(void) noexcept;
+			void	ClearList(void) noexcept {
+				for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
+					d.second = 0;
+				}
+				this->m_DrawNow = 1 - this->m_DrawNow;
+			}
 			void	Draw(void) noexcept;
-			void	Dispose(void) noexcept;
+			void	Dispose(void) noexcept {
+				this->m_DrawNow = 0;
+				for (auto& ds : this->m_DrawDatas) {
+					for (auto& d : ds) {
+						d.second = 0;
+					}
+				}
+			}
 		};
 		// クリックできる文字付のボックス
 		template <typename... Args>

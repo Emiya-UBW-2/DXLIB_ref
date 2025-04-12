@@ -137,12 +137,6 @@ namespace DXLibRef {
 			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
 			Dispose();
 		}
-		void DrawControl::ClearList(void) noexcept {
-			for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
-				d.second = 0;
-			}
-			this->m_DrawNow = 1 - this->m_DrawNow;
-		}
 		void DrawControl::Draw(void) noexcept {
 			bool IsHit = false;
 			// 同じかどうかチェック
@@ -181,14 +175,6 @@ namespace DXLibRef {
 			}
 			// バッファーを出力
 			m_BufferScreen.DrawGraph(0, 0, true);
-		}
-		void DrawControl::Dispose(void) noexcept {
-			this->m_DrawNow = 0;
-			for (auto& ds : this->m_DrawDatas) {
-				for (auto& d : ds) {
-					d.second = 0;
-				}
-			}
 		}
 	};
 	// 
@@ -280,15 +266,18 @@ namespace DXLibRef {
 				if (ALL == "") { continue; }
 				//=の右側の文字をカンマ区切りとして識別する
 				auto RIGHT = FileStreamDX::getright(ALL);
-				std::vector<int> Args;
+				std::array<int, 4> Args;
+				int now = 0;
 				while (true) {
 					auto div = RIGHT.find(",");
 					if (div != std::string::npos) {
-						Args.emplace_back(std::stoi(RIGHT.substr(0, div)));
+						Args.at(now) = std::stoi(RIGHT.substr(0, div));
+						++now;
 						RIGHT = RIGHT.substr(div + 1);
 					}
 					else {
-						Args.emplace_back(std::stoi(RIGHT));
+						Args.at(now) = std::stoi(RIGHT);
+						++now;
 						break;
 					}
 				}
