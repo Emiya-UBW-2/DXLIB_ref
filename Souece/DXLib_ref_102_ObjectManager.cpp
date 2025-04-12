@@ -14,7 +14,14 @@ namespace DXLibRef {
 		this->m_Object.back()->SetObjectID(this->m_LastUniqueID);
 		++this->m_LastUniqueID;
 	}
-	void			ObjectManager::LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+	void			ObjectManager::LoadModelBefore(const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+		auto Find = std::find_if(this->m_Model.begin(), this->m_Model.end(), [&](const SharedModel& tgt) {return tgt && tgt->GetPathCompare(filepath, objfilename, colfilename); });
+		if (Find == this->m_Model.end()) {
+			this->m_Model.emplace_back(std::make_shared<ModelBaseClass>());
+			this->m_Model.back()->LoadModel(PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
+		}
+	}
+	void			ObjectManager::LoadModelAfter(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		const SharedModel* Ptr = nullptr;
 		auto Find = std::find_if(this->m_Model.begin(), this->m_Model.end(), [&](const SharedModel& tgt) {return tgt && tgt->GetPathCompare(filepath, objfilename, colfilename); });
 		if (Find != this->m_Model.end()) {
@@ -22,9 +29,12 @@ namespace DXLibRef {
 		}
 		else {
 			this->m_Model.emplace_back(std::make_shared<ModelBaseClass>());
-			this->m_Model.back()->LoadModel(pObj, PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
-			this->m_Model.back()->SaveModel(false);
+			this->m_Model.back()->LoadModel(PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
 			Ptr = &this->m_Model.back();
+		}
+		if (!(*Ptr)->m_IsEndLoadData) {
+			(*Ptr)->LoadModelData(pObj);
+			(*Ptr)->SaveModel(false);
 		}
 		pObj->CopyModel(*Ptr);
 		pObj->SetupCol();
@@ -39,12 +49,12 @@ namespace DXLibRef {
 	}
 	void			ObjectManager::InitObject(const SharedObj& pObj, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		AddObject(pObj);
-		LoadModel(pObj, pObj, filepath, objfilename, colfilename);
+		LoadModelAfter(pObj, pObj, filepath, objfilename, colfilename);
 		pObj->Init();
 	}
 	void			ObjectManager::InitObject(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		AddObject(pObj);
-		LoadModel(pObj, pAnim, filepath, objfilename, colfilename);
+		LoadModelAfter(pObj, pAnim, filepath, objfilename, colfilename);
 		pObj->Init();
 	}
 	SharedObj*		ObjectManager::GetObj(int ModelType, int num) noexcept {

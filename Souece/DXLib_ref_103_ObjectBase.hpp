@@ -21,7 +21,9 @@ namespace DXLibRef {
 		std::string									m_ObjFileName;
 		std::string									m_ColFileName;
 	public:
-		ModelBaseClass(void) noexcept {}
+		bool										m_IsEndLoadData{};
+	public:
+		ModelBaseClass(void) noexcept { m_IsEndLoadData = false; }
 		ModelBaseClass(const ModelBaseClass&) = delete;
 		ModelBaseClass(ModelBaseClass&& o) = delete;
 		ModelBaseClass& operator=(const ModelBaseClass&) = delete;
@@ -49,9 +51,8 @@ namespace DXLibRef {
 	public:
 		void			SetShapePer(int pShape, float Per) noexcept { this->m_Shapes[static_cast<size_t>(pShape)].second = Per; }
 	public:
-		void			LoadModel(
-			const std::shared_ptr<ObjectBaseClass>& pBase,
-			PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+		void			LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+		void			LoadModelData(const std::shared_ptr<ObjectBaseClass>& pBase) noexcept;
 		void			SaveModel(bool UseToonWhenCreateFile) noexcept;
 		void			CopyModel(const std::shared_ptr<ModelBaseClass>& pBase) noexcept;
 	public:

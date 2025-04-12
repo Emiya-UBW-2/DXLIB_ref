@@ -26,8 +26,10 @@ namespace DXLibRef {
 		ObjectManager& operator=(ObjectManager&& o) = delete;
 	private:
 		void			AddObject(const SharedObj& NewObj) noexcept;
-		void			LoadModel(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+		void			LoadModelAfter(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 	public:
+		//あらかじめモデルを読み込んでおく
+		void			LoadModelBefore(const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 		//モデル未使用バージョン
 		void			InitObject(const SharedObj& pObj) noexcept;
 		//モデル使用バージョン

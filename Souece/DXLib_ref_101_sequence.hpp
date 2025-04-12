@@ -9,6 +9,7 @@ namespace DXLibRef {
 	private:
 		bool			m_IsFirstLoop{ true };			// 初回チェック
 		bool			m_IsLoading{ false };
+		bool			m_IsLoadingEnd{ false };
 		std::array<std::shared_ptr<TEMPSCENE>, 10> m_pNextSceneList{ nullptr };
 		size_t			m_Next_Select{ 0 };
 		bool			m_Is3DActive{ true };
@@ -34,6 +35,12 @@ namespace DXLibRef {
 				Load_Sub();
 			}
 		}
+		void LoadEnd(void) noexcept {
+			if (!m_IsLoadingEnd) {
+				m_IsLoadingEnd = true;
+				LoadEnd_Sub();
+			}
+		}
 		void Set(void) noexcept {
 			this->m_Next_Select = 0;
 			Set_Sub();
@@ -48,6 +55,7 @@ namespace DXLibRef {
 		void Dispose_Load(void) noexcept {
 			if (m_IsLoading) {
 				m_IsLoading = false;
+				m_IsLoadingEnd = false;
 				Dispose_Load_Sub();
 			}
 		}
@@ -64,6 +72,7 @@ namespace DXLibRef {
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
 	protected:// 継承物
 		virtual void Load_Sub(void) noexcept {}
+		virtual void LoadEnd_Sub(void) noexcept {}
 		virtual void Set_Sub(void) noexcept {}
 		virtual bool Update_Sub(void) noexcept { return true; }
 

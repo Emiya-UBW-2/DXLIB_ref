@@ -1,9 +1,7 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
-	void			ModelBaseClass::LoadModel(
-		const std::shared_ptr<ObjectBaseClass>& pBase,
-		PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+	void			ModelBaseClass::LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		this->m_PHYSICS_SETUP = TYPE;
 		this->m_FilePath = filepath;
 		this->m_ObjFileName = objfilename;
@@ -33,6 +31,9 @@ namespace DXLibRef {
 		}
 		// col
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
+	}
+	void			ModelBaseClass::LoadModelData(const std::shared_ptr<ObjectBaseClass>& pBase) noexcept {
+		if (m_IsEndLoadData) { return; }
 		// ƒtƒŒ[ƒ€
 		{
 			this->m_Frames.clear();
@@ -106,7 +107,9 @@ namespace DXLibRef {
 				}
 			}
 		}
+		m_IsEndLoadData = true;
 	}
+
 	void			ModelBaseClass::SaveModel(bool UseToonWhenCreateFile) noexcept {
 		auto Save = [&](MV1* obj, std::string NameAdd, int PHYSICS_TYPE) {
 			if (!IsFileExist((this->m_FilePath + this->m_ObjFileName + NameAdd + ".mv1").c_str()) && IsFileExist((this->m_FilePath + this->m_ObjFileName + ".pmx").c_str())) {
