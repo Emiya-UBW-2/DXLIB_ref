@@ -14,13 +14,11 @@ namespace DXLibRef {
 	private:
 		std::vector<SharedModel>	m_Model;
 		std::vector<SharedObj>		m_Object;
-		std::vector<std::vector<SharedObj*>>	m_ObjectPtr;
 		int							m_LastUniqueID{ 0 };
 		switchs						m_ResetP;
 	private:
 		ObjectManager(void) noexcept {
 			this->m_Object.reserve(256);
-			this->m_ObjectPtr.reserve(10);
 		}
 		ObjectManager(const ObjectManager&) = delete;
 		ObjectManager(ObjectManager&& o) = delete;
@@ -37,7 +35,7 @@ namespace DXLibRef {
 		//アニメーション兼務モデルバージョン
 		void			InitObject(const SharedObj& pObj, const SharedObj& pAnim, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
 	public:
-		SharedObj*		GetObj(int ModelType, int num) noexcept { return this->m_ObjectPtr.at(ModelType).at(num); }
+		SharedObj*		GetObj(int ModelType, int num) noexcept;
 	public:
 		void			DelObj(const SharedObj& ptr) noexcept;
 	public:

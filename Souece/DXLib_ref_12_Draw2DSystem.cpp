@@ -266,7 +266,7 @@ namespace DXLibRef {
 				if (ALL == "") { continue; }
 				//=‚Ì‰E‘¤‚Ì•¶š‚ğƒJƒ“ƒ}‹æØ‚è‚Æ‚µ‚Ä¯•Ê‚·‚é
 				auto RIGHT = FileStreamDX::getright(ALL);
-				std::array<int, 4> Args;
+				std::array<int, 4> Args{};
 				int now = 0;
 				while (true) {
 					auto div = RIGHT.find(",");
