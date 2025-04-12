@@ -336,6 +336,9 @@ namespace DXLibRef {
 					this->m_string == tgt.m_string
 					);
 			}
+			bool		operator!=(const DrawData& tgt) const noexcept {
+				return !(*this == tgt);
+			}
 		};
 		// 
 		enum class DrawLayer : int {
@@ -351,16 +354,18 @@ namespace DXLibRef {
 		private:
 			friend class SingletonBase<DrawControl>;
 		private:
-			std::vector<std::vector<DrawData>>	m_DrawDatas;
-			std::vector<std::vector<DrawData>>	m_PrevDrawDatas;
-
-			GraphHandle				m_BufferScreen;
+			static const int DrawMax = 2048;
+			std::array<std::array<std::pair<std::array<DrawData, DrawMax>, int>, static_cast<size_t>(DrawLayer::Max)>, 2>	m_DrawDatas{};
+			int																												m_DrawNow{ 0 };
+			GraphHandle																										m_BufferScreen{};
 		private:
 			DrawControl(void) noexcept;
 		private:
 			DrawData* GetBack(DrawLayer Layer) noexcept {
-				this->m_DrawDatas.at(static_cast<int>(Layer)).emplace_back();
-				return &this->m_DrawDatas.at(static_cast<int>(Layer)).back();
+				auto& LayerData = this->m_DrawDatas.at(this->m_DrawNow).at(static_cast<int>(Layer));
+				++LayerData.second;
+				//LayerData.second %= DrawMax;
+				return &LayerData.first.at(static_cast<size_t>(LayerData.second - 1));
 			}
 		public:
 			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {

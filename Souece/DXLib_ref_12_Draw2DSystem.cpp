@@ -133,53 +133,44 @@ namespace DXLibRef {
 		}
 		//
 		DrawControl::DrawControl(void) noexcept {
-			this->m_DrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
-			this->m_PrevDrawDatas.resize(static_cast<size_t>(DrawLayer::Max));
-
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
+			Dispose();
 		}
 		void DrawControl::ClearList(void) noexcept {
-			for (size_t index = 0; auto & d : this->m_DrawDatas) {
-				auto& pd = this->m_PrevDrawDatas.at(index);
-				pd.clear();
-				for (auto& d2 : d) {
-					pd.emplace_back(d2);
-				}
-				index++;
+			for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
+				d.second = 0;
 			}
-			for (auto& d : this->m_DrawDatas) {
-				d.clear();
-			}
+			this->m_DrawNow = 1 - this->m_DrawNow;
 		}
 		void DrawControl::Draw(void) noexcept {
 			bool IsHit = false;
 			// 同じかどうかチェック
-			for (size_t index = 0; auto & d : this->m_DrawDatas) {
-				auto& pd = this->m_PrevDrawDatas.at(index);
-				if (pd.size() == d.size()) {
-					for (size_t index2 = 0; auto & d2 : d) {
-						auto& pd2 = pd.at(index2);
-						if (!(pd2 == d2)) {
-							IsHit = true;
-							break;
-						}
-						index2++;
-					}
-				}
-				else {
+			for (auto & d : this->m_DrawDatas.at(this->m_DrawNow)) {
+				int index = static_cast<int>(&d - &this->m_DrawDatas.at(this->m_DrawNow).front());
+				auto& pd = this->m_DrawDatas.at(static_cast<size_t>(1 - this->m_DrawNow)).at(index);
+				if (pd.second != d.second) {
 					IsHit = true;
 					break;
 				}
-				index++;
+				for (int loop = 0; loop < d.second; ++loop) {
+					if (pd.first.at(loop) != pd.first.at(loop)) {
+						IsHit = true;
+						break;
+					}
+				}
+				if (IsHit) {
+					break;
+				}
 			}
-			// 
+			// 内容が同じならスルー ちがうならバッファーを更新
 			if (IsHit) {
 				auto NowScreen = GetDrawScreen();
 				m_BufferScreen.SetDraw_Screen(true);
 				{
-					for (auto& d : this->m_DrawDatas) {
-						for (auto& d2 : d) {
+					for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
+						for (int loop = 0; loop < d.second; ++loop) {
+							auto& d2 = d.first.at(loop);
 							d2.Output();
 						}
 						DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -188,19 +179,16 @@ namespace DXLibRef {
 				}
 				GraphHandle::SetDraw_Screen(NowScreen, false);
 			}
-			// 前に描画したものをそのまま出す
+			// バッファーを出力
 			m_BufferScreen.DrawGraph(0, 0, true);
 		}
 		void DrawControl::Dispose(void) noexcept {
-			for (auto& d : this->m_DrawDatas) {
-				d.clear();
+			this->m_DrawNow = 0;
+			for (auto& ds : this->m_DrawDatas) {
+				for (auto& d : ds) {
+					d.second = 0;
+				}
 			}
-			this->m_DrawDatas.clear();
-
-			for (auto& d : this->m_PrevDrawDatas) {
-				d.clear();
-			}
-			this->m_PrevDrawDatas.clear();
 		}
 	};
 	// 
