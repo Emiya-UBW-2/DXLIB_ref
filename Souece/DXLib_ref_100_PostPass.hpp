@@ -7,7 +7,7 @@ namespace DXLibRef {
 	/*シェーダー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// シェーダーを使用する際の補助クラス
-	class ShaderUseClass {
+	class ShaderController {
 	public:
 		// 2Dにシェーダーを適用する際に使用する画面サイズの頂点情報
 		class ScreenVertex {
@@ -77,7 +77,7 @@ namespace DXLibRef {
 #endif
 		ScreenVertex	m_ScreenVertex;					// 頂点データ
 	public:
-		ShaderUseClass(void) noexcept {
+		ShaderController(void) noexcept {
 			// シェーダーハンドル
 			m_VertexShaderhandle = InvalidID;
 			m_GeometryShaderhandle = InvalidID;
@@ -92,7 +92,7 @@ namespace DXLibRef {
 				h = InvalidID;
 			}
 		}
-		~ShaderUseClass(void) noexcept {
+		~ShaderController(void) noexcept {
 			Dispose();
 		}
 	public:
@@ -398,8 +398,8 @@ namespace DXLibRef {
 		GraphHandle			DepthScreenHandle;
 		GraphHandle			DepthFarScreenHandle;
 
-		ShaderUseClass		m_Shader;
-		ShaderUseClass		m_ShaderRigid;
+		ShaderController		m_Shader;
+		ShaderController		m_ShaderRigid;
 		Vector3DX			m_ShadowVec{ Vector3DX::up() };
 		float				m_Scale{ 1.f };
 		float				m_ScaleFar{ 1.f };
@@ -473,7 +473,7 @@ namespace DXLibRef {
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
 		bool						m_IsCubeMap{ false };
 		RealTimeCubeMap				m_RealTimeCubeMap;
-		ShaderUseClass				m_PBR_Shader;
+		ShaderController				m_PBR_Shader;
 		float			m_ShadowScale{ 1.f };
 	public:
 		auto& GetBufferScreen(void) noexcept { return BufferScreen; }

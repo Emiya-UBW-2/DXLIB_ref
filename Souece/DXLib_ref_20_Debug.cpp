@@ -5,14 +5,14 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// ƒVƒ“ƒOƒ‹ƒgƒ“
 	// --------------------------------------------------------------------------------------------------
-	const DebugClass* SingletonBase<DebugClass>::m_Singleton = nullptr;
+	const DebugDraw* SingletonBase<DebugDraw>::m_Singleton = nullptr;
 
 
-	DebugClass::DebugClass(void) noexcept {
+	DebugDraw::DebugDraw(void) noexcept {
 		m_IsActive = true;
 	}
 
-	void DebugClass::SetStartPoint(void) noexcept {
+	void DebugDraw::SetStartPoint(void) noexcept {
 		if (!m_IsActive) {
 			return;
 		}
@@ -20,7 +20,7 @@ namespace DXLibRef {
 		m_PointSel = 0;
 		SetPoint("-----Start-----");
 	}
-	void DebugClass::SetPoint(const char* DebugMes) noexcept {
+	void DebugDraw::SetPoint(const char* DebugMes) noexcept {
 		if (!m_IsActive) {
 			return;
 		}
@@ -31,7 +31,7 @@ namespace DXLibRef {
 			return;
 		}
 	}
-	void DebugClass::SetEndPoint(void) noexcept {
+	void DebugDraw::SetEndPoint(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		m_Switch.Update(CheckHitKey(KEY_INPUT_F1) != 0);
 		if (m_Switch.trigger()) {
@@ -80,7 +80,7 @@ namespace DXLibRef {
 		}
 	}
 
-	void DebugClass::DebugWindow(int xpos, int ypos) noexcept {
+	void DebugDraw::DebugWindow(int xpos, int ypos) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		if (!m_IsActive) {

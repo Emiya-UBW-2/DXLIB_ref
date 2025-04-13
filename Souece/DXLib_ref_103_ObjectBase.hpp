@@ -7,9 +7,9 @@ namespace DXLibRef {
 		LOADCALC,
 		REALTIME,
 	};
-	class ObjectBaseClass;
+	class BaseObject;
 
-	class ModelBaseClass {
+	class ResourceModel {
 	private:
 		PHYSICS_SETUP								m_PHYSICS_SETUP{ PHYSICS_SETUP::DISABLE };
 		MV1											m_obj;
@@ -23,13 +23,13 @@ namespace DXLibRef {
 	public:
 		bool										m_IsEndLoadData{};
 	public:
-		ModelBaseClass(void) noexcept { m_IsEndLoadData = false; }
-		ModelBaseClass(const ModelBaseClass&) = delete;
-		ModelBaseClass(ModelBaseClass&& o) = delete;
-		ModelBaseClass& operator=(const ModelBaseClass&) = delete;
-		ModelBaseClass& operator=(ModelBaseClass&& o) = delete;
+		ResourceModel(void) noexcept { m_IsEndLoadData = false; }
+		ResourceModel(const ResourceModel&) = delete;
+		ResourceModel(ResourceModel&& o) = delete;
+		ResourceModel& operator=(const ResourceModel&) = delete;
+		ResourceModel& operator=(ResourceModel&& o) = delete;
 
-		virtual ~ModelBaseClass(void) noexcept {}
+		virtual ~ResourceModel(void) noexcept {}
 	public:
 		const auto&		GetPhysicsSetup(void) const noexcept { return this->m_PHYSICS_SETUP; }
 		const auto&		GetShapesList(void) const noexcept { return this->m_Shapes; }
@@ -52,14 +52,14 @@ namespace DXLibRef {
 		void			SetShapePer(int pShape, float Per) noexcept { this->m_Shapes[static_cast<size_t>(pShape)].second = Per; }
 	public:
 		void			LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
-		void			LoadModelData(const std::shared_ptr<ObjectBaseClass>& pBase) noexcept;
+		void			LoadModelData(const std::shared_ptr<BaseObject>& pBase) noexcept;
 		void			SaveModel(bool UseToonWhenCreateFile) noexcept;
-		void			CopyModel(const std::shared_ptr<ModelBaseClass>& pBase) noexcept;
+		void			CopyModel(const std::shared_ptr<ResourceModel>& pBase) noexcept;
 	public:
 		void			DisposeModel(void) noexcept;
 	};
 
-	class ObjectBaseClass : public ModelBaseClass {
+	class BaseObject : public ResourceModel {
 	private:
 		bool										m_IsActive{ true };
 		std::array<bool, 3>							m_IsDraw{ true };
@@ -154,13 +154,13 @@ namespace DXLibRef {
 		virtual int	GetShapeNum(void) noexcept { return 0; }
 		virtual const char* GetShapeStr(int) noexcept { return nullptr; }
 	public:
-		ObjectBaseClass(void) noexcept {}
-		ObjectBaseClass(const ObjectBaseClass&) = delete;
-		ObjectBaseClass(ObjectBaseClass&& o) = delete;
-		ObjectBaseClass& operator=(const ObjectBaseClass&) = delete;
-		ObjectBaseClass& operator=(ObjectBaseClass&& o) = delete;
+		BaseObject(void) noexcept {}
+		BaseObject(const BaseObject&) = delete;
+		BaseObject(BaseObject&& o) = delete;
+		BaseObject& operator=(const BaseObject&) = delete;
+		BaseObject& operator=(BaseObject&& o) = delete;
 
-		virtual ~ObjectBaseClass(void) noexcept {}
+		virtual ~BaseObject(void) noexcept {}
 	public:
 		void			Init(void) noexcept;
 		virtual void	FirstExecute(void) noexcept {}

@@ -235,19 +235,19 @@ namespace DXLibRef {
 	// 汎用セーブデータ
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	typedef std::pair<std::string, int64_t> SaveParam;
-	class SaveDataClass : public SingletonBase<SaveDataClass> {
+	class SaveData : public SingletonBase<SaveData> {
 	private:
-		friend class SingletonBase<SaveDataClass>;
+		friend class SingletonBase<SaveData>;
 	private:
 		std::vector<SaveParam> m_data;
 	private:
-		SaveDataClass(void) noexcept {
+		SaveData(void) noexcept {
 			Load();
 		}
-		SaveDataClass(const SaveDataClass&) = delete;
-		SaveDataClass(SaveDataClass&& o) = delete;
-		SaveDataClass& operator=(const SaveDataClass&) = delete;
-		SaveDataClass& operator=(SaveDataClass&& o) = delete;
+		SaveData(const SaveData&) = delete;
+		SaveData(SaveData&& o) = delete;
+		SaveData& operator=(const SaveData&) = delete;
+		SaveData& operator=(SaveData&& o) = delete;
 	public:
 		SaveParam* GetData(std::string_view Name) noexcept {
 			for (auto& d : m_data) {

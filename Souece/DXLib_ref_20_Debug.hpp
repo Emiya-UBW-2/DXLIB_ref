@@ -3,9 +3,9 @@
 
 namespace DXLibRef {
 #if defined(DEBUG)
-	class DebugClass : public SingletonBase<DebugClass> {
+	class DebugDraw : public SingletonBase<DebugDraw> {
 	private:
-		friend class SingletonBase<DebugClass>;
+		friend class SingletonBase<DebugDraw>;
 	private:
 		static const int	PointMax{ 12 };
 		static const size_t	PointFrame{ 120 };
@@ -18,11 +18,11 @@ namespace DXLibRef {
 		switchs														m_Switch{};
 		bool														m_IsActive{ true };
 	private:
-		DebugClass(void) noexcept;
-		DebugClass(const DebugClass&) = delete;
-		DebugClass(DebugClass&& o) = delete;
-		DebugClass& operator=(const DebugClass&) = delete;
-		DebugClass& operator=(DebugClass&& o) = delete;
+		DebugDraw(void) noexcept;
+		DebugDraw(const DebugDraw&) = delete;
+		DebugDraw(DebugDraw&& o) = delete;
+		DebugDraw& operator=(const DebugDraw&) = delete;
+		DebugDraw& operator=(DebugDraw&& o) = delete;
 	public:
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;

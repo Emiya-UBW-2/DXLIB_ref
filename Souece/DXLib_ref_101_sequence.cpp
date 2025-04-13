@@ -154,7 +154,7 @@ namespace DXLibRef {
 		SideLogParts->Draw();
 		PopUp::Instance()->Draw(BaseScreenWidth / 2, BaseScreenHeight / 2);
 #if defined(DEBUG)
-		DebugClass::Instance()->DebugWindow(BaseScreenWidth - (350), (150));
+		DebugDraw::Instance()->DebugWindow(BaseScreenWidth - (350), (150));
 #endif // DEBUG
 	}
 	void SceneControl::DrawUIFront(void) const noexcept {

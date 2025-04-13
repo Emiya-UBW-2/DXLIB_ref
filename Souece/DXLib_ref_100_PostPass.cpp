@@ -8,9 +8,9 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 継承クラス
 	class PostPassSSAO : public PostPassBase {
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;	// 頂点データ
-		ShaderUseClass					m_ShaderSSAO;	// シェーダー
-		ShaderUseClass					m_ShaderBlur;	// シェーダー
+		ShaderController::ScreenVertex	m_ScreenVertex;	// 頂点データ
+		ShaderController					m_ShaderSSAO;	// シェーダー
+		ShaderController					m_ShaderBlur;	// シェーダー
 		GraphHandle						SSRScreen;		// 描画スクリーン
 		GraphHandle						SSRScreen2;		// 描画スクリーン
 	protected:
@@ -81,8 +81,8 @@ namespace DXLibRef {
 		GraphHandle	SSRDepthScreen;	// 深度のGバッファ
 		GraphHandle SSRScreen;		// 描画スクリーン
 		GraphHandle bkScreen2;		// ブレンド
-		ShaderUseClass::ScreenVertex	m_SSRScreenVertex;				// 頂点データ
-		ShaderUseClass		m_Shader;										// シェーダー
+		ShaderController::ScreenVertex	m_SSRScreenVertex;				// 頂点データ
+		ShaderController		m_Shader;										// シェーダー
 
 		int RayInterval = 200;// レイの分割間隔
 		float DepthThreshold = 17.f;
@@ -182,8 +182,8 @@ namespace DXLibRef {
 	class PostPassDoF : public PostPassBase {
 	private:
 		GraphHandle			DoFScreen;		// 描画スクリーン
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
-		ShaderUseClass		m_Shader;			// シェーダー
+		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderController		m_Shader;			// シェーダー
 	public:
 		PostPassDoF(void) noexcept {}
 		PostPassDoF(const PostPassDoF&) = delete;
@@ -717,8 +717,8 @@ namespace DXLibRef {
 	};
 	class PostPassFXAA : public PostPassBase {
 	private:
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;
-		ShaderUseClass		m_Shader;
+		ShaderController::ScreenVertex	m_ScreenVertex;
+		ShaderController		m_Shader;
 	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
@@ -751,8 +751,8 @@ namespace DXLibRef {
 		GraphHandle	SSRDepthScreen;	// 深度のGバッファ
 		GraphHandle SSRScreen;		// 描画スクリーン
 
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
-		ShaderUseClass		m_Shader;			// シェーダー
+		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderController		m_Shader;			// シェーダー
 		float range = 1.f;
 
 		static const int EXTEND = 8;
@@ -831,8 +831,8 @@ namespace DXLibRef {
 	};
 	class PostPassScope : public PostPassBase {
 	private:
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
-		ShaderUseClass		m_Shader;			// シェーダー
+		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderController		m_Shader;			// シェーダー
 	public:
 		PostPassScope(void) noexcept {}
 		PostPassScope(const PostPassScope&) = delete;
@@ -867,8 +867,8 @@ namespace DXLibRef {
 	};
 	class PostPassBlackout : public PostPassBase {
 	private:
-		ShaderUseClass::ScreenVertex	m_ScreenVertex;					// 頂点データ
-		ShaderUseClass		m_Shader;			// シェーダー
+		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
+		ShaderController		m_Shader;			// シェーダー
 	public:
 		PostPassBlackout(void) noexcept {}
 		PostPassBlackout(const PostPassBlackout&) = delete;

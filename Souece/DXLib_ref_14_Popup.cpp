@@ -9,7 +9,7 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	void PopUp::PopUpDrawClass::Start(void) noexcept {
+	void PopUp::PopUpDraw::Start(void) noexcept {
 		auto* SE = SoundPool::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 
@@ -29,7 +29,7 @@ namespace DXLibRef {
 		m_Active = true;
 		m_ActiveSwitch = true;
 	}
-	void PopUp::PopUpDrawClass::End(void) noexcept {
+	void PopUp::PopUpDraw::End(void) noexcept {
 		auto* SE = SoundPool::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 
@@ -41,7 +41,7 @@ namespace DXLibRef {
 			m_ExitDoing();
 		}
 	}
-	void PopUp::PopUpDrawClass::Update(void) noexcept {
+	void PopUp::PopUpDraw::Update(void) noexcept {
 		auto* Pad = PadControl::Instance();
 		m_ActiveSwitch = false;
 		Easing(&m_ActivePer, m_Active ? 1.f : 0.f, m_Active ? 0.7f : 0.3f, EasingType::OutExpo);
@@ -53,7 +53,7 @@ namespace DXLibRef {
 			}
 		}
 	}
-	void PopUp::PopUpDrawClass::Draw(int xcenter, int ycenter) noexcept {
+	void PopUp::PopUpDraw::Draw(int xcenter, int ycenter) noexcept {
 		if (m_ActivePer < (1.f / 255.f)) { return; }
 
 		auto* LocalizeParts = LocalizePool::Instance();

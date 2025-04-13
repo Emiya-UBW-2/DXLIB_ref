@@ -2,11 +2,11 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
-	class ModelBaseClass;
-	class ObjectBaseClass;
+	class ResourceModel;
+	class BaseObject;
 
-	using SharedModel = std::shared_ptr<ModelBaseClass>;
-	using SharedObj = std::shared_ptr<ObjectBaseClass>;
+	using SharedModel = std::shared_ptr<ResourceModel>;
+	using SharedObj = std::shared_ptr<BaseObject>;
 
 	class ObjectManager : public SingletonBase<ObjectManager> {
 	private:

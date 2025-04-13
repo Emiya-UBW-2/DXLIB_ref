@@ -588,7 +588,7 @@ namespace DXLibRef {
 		}
 		// 
 		/*
-		class ScrollBoxClass {
+		class ScrollBox {
 			bool		m_IsChangeScrollY{ false }
 			int			m_BaseScrollY{ 0 }
 			float		m_NowScrollYPer{ 0.f }

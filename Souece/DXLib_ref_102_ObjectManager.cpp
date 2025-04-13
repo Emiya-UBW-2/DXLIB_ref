@@ -17,7 +17,7 @@ namespace DXLibRef {
 	void			ObjectManager::LoadModelBefore(const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		auto Find = std::find_if(this->m_Model.begin(), this->m_Model.end(), [&](const SharedModel& tgt) {return tgt && tgt->GetPathCompare(filepath, objfilename, colfilename); });
 		if (Find == this->m_Model.end()) {
-			this->m_Model.emplace_back(std::make_shared<ModelBaseClass>());
+			this->m_Model.emplace_back(std::make_shared<ResourceModel>());
 			this->m_Model.back()->LoadModel(PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
 		}
 	}
@@ -28,7 +28,7 @@ namespace DXLibRef {
 			Ptr = &*Find;
 		}
 		else {
-			this->m_Model.emplace_back(std::make_shared<ModelBaseClass>());
+			this->m_Model.emplace_back(std::make_shared<ResourceModel>());
 			this->m_Model.back()->LoadModel(PHYSICS_SETUP::DISABLE, filepath, objfilename, colfilename);
 			Ptr = &this->m_Model.back();
 		}

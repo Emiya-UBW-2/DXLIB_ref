@@ -14,7 +14,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<VRControl>;
 	private:
-		class VRDeviceClass {
+		class VRDevice {
 		private:
 			int							m_ID{ 0 };
 			char						m_DeviceNumber{ 0 };
@@ -123,7 +123,7 @@ namespace DXLibRef {
 	private:
 		vr::IVRSystem* m_VR_SystemPtr{ nullptr };
 		vr::EVRInitError			m_VR_ErrorHandle{ vr::VRInitError_None };
-		std::vector<VRDeviceClass>	m_VR_DeviceInfo;
+		std::vector<VRDevice>	m_VR_DeviceInfo;
 		char						m_VR_HMDID{ InvalidID };
 		char						m_VR_Hand1ID{ InvalidID };
 		char						m_VR_Hand2ID{ InvalidID };
@@ -141,9 +141,9 @@ namespace DXLibRef {
 		VRControl& operator=(const VRControl&) = delete;
 		VRControl& operator=(VRControl&& o) = delete;
 	public:
-		const VRDeviceClass* Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
-		const VRDeviceClass* Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
-		const VRDeviceClass* GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
+		const VRDevice* Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
+		const VRDevice* Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
+		const VRDevice* GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
 		void			ResetHMD(void) noexcept {
 			m_VR_PrevHMDIsActive = false;
 			m_VR_HMD_StartFlag = true;

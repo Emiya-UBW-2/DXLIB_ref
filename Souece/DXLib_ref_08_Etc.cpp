@@ -2,7 +2,7 @@
 // #include "DXLib_ref_08_Etc.hpp"
 
 namespace DXLibRef {
-	const SaveDataClass* SingletonBase<SaveDataClass>::m_Singleton = nullptr;
+	const SaveData* SingletonBase<SaveData>::m_Singleton = nullptr;
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ namespace DXLibRef {
 		}
 		IsEnd = true;
 	}
-	bool SaveDataClass::Load(void) noexcept {
+	bool SaveData::Load(void) noexcept {
 		m_data.clear();
 		if (!IsFileExist("Save/new.svf")) {
 			return false;

@@ -9,7 +9,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<PopUp>;
 	private:
-		class PopUpDrawClass {
+		class PopUpDraw {
 		private:
 			bool m_Active{ false };
 			bool m_ActiveSwitch{ false };
@@ -23,13 +23,13 @@ namespace DXLibRef {
 			std::function<void()> m_ExitDoing{ nullptr };
 			std::function<void()> m_GuideDoing{ nullptr };
 		public:
-			PopUpDrawClass(void) noexcept {}
-			PopUpDrawClass(const PopUpDrawClass&) = delete;
-			PopUpDrawClass(PopUpDrawClass&& o) = delete;
-			PopUpDrawClass& operator=(const PopUpDrawClass&) = delete;
-			PopUpDrawClass& operator=(PopUpDrawClass&& o) = delete;
+			PopUpDraw(void) noexcept {}
+			PopUpDraw(const PopUpDraw&) = delete;
+			PopUpDraw(PopUpDraw&& o) = delete;
+			PopUpDraw& operator=(const PopUpDraw&) = delete;
+			PopUpDraw& operator=(PopUpDraw&& o) = delete;
 
-			~PopUpDrawClass(void) noexcept {}
+			~PopUpDraw(void) noexcept {}
 		public:
 			void			Set(const char* WindowName, int sizex, int sizey,
 				std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
@@ -51,7 +51,7 @@ namespace DXLibRef {
 			auto IsEnd(void) const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
 		};
 	private:
-		std::array<PopUpDrawClass, 24> que;
+		std::array<PopUpDraw, 24> que;
 		size_t NowSel{ 0 };
 		size_t LastSel{ 0 };
 		bool PrevPause{ false };

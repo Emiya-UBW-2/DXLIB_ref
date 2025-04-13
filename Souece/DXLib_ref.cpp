@@ -6,8 +6,8 @@ namespace DXLibRef {
 	DXLib_ref::DXLib_ref(void) noexcept {
 		OptionManager::Create();
 		LocalizePool::Create();
-		SaveDataClass::Create();
-		auto* SaveDataParts = SaveDataClass::Instance();
+		SaveData::Create();
+		auto* SaveDataParts = SaveData::Instance();
 		auto* OptionParts = OptionManager::Instance();
 		// ロード
 		m_IsFirstBoot = !SaveDataParts->Load();
@@ -326,7 +326,7 @@ namespace DXLibRef {
 		auto* OptionWindowParts = OptionPopup::Instance();
 		OptionWindowParts->Init();
 #if defined(DEBUG)
-		DebugClass::Create();
+		DebugDraw::Create();
 #endif // DEBUG
 #if defined(_USE_EFFEKSEER_)
 		EffectResource::Create();						// エフェクト
@@ -351,7 +351,7 @@ namespace DXLibRef {
 	void			DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
 #if defined(DEBUG)
-		auto* DebugParts = DebugClass::Instance();		// デバッグ
+		auto* DebugParts = DebugDraw::Instance();		// デバッグ
 #endif // DEBUG
 		//最初のシーンの初期化
 		SceneParts->Initialize();

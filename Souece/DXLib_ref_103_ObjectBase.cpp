@@ -1,7 +1,7 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
-	void			ModelBaseClass::LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+	void			ResourceModel::LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
 		this->m_PHYSICS_SETUP = TYPE;
 		this->m_FilePath = filepath;
 		this->m_ObjFileName = objfilename;
@@ -32,7 +32,7 @@ namespace DXLibRef {
 		// col
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
 	}
-	void			ModelBaseClass::LoadModelData(const std::shared_ptr<ObjectBaseClass>& pBase) noexcept {
+	void			ResourceModel::LoadModelData(const std::shared_ptr<BaseObject>& pBase) noexcept {
 		if (m_IsEndLoadData) { return; }
 		// ƒtƒŒ[ƒ€
 		{
@@ -110,7 +110,7 @@ namespace DXLibRef {
 		m_IsEndLoadData = true;
 	}
 
-	void			ModelBaseClass::SaveModel(bool UseToonWhenCreateFile) noexcept {
+	void			ResourceModel::SaveModel(bool UseToonWhenCreateFile) noexcept {
 		auto Save = [&](MV1* obj, std::string NameAdd, int PHYSICS_TYPE) {
 			if (!IsFileExist((this->m_FilePath + this->m_ObjFileName + NameAdd + ".mv1").c_str()) && IsFileExist((this->m_FilePath + this->m_ObjFileName + ".pmx").c_str())) {
 				MV1SetLoadModelUsePhysicsMode(PHYSICS_TYPE);
@@ -155,11 +155,11 @@ namespace DXLibRef {
 		// col
 		Save(&this->m_col, "", DX_LOADMODEL_PHYSICS_DISABLE);
 	}
-	void			ModelBaseClass::DisposeModel(void) noexcept {
+	void			ResourceModel::DisposeModel(void) noexcept {
 		this->m_obj.Dispose();
 		this->m_col.Dispose();
 	}
-	void			ModelBaseClass::CopyModel(const std::shared_ptr<ModelBaseClass>& pBase) noexcept {
+	void			ResourceModel::CopyModel(const std::shared_ptr<ResourceModel>& pBase) noexcept {
 		this->m_PHYSICS_SETUP = pBase->m_PHYSICS_SETUP;
 		this->m_FilePath = pBase->m_FilePath;
 		this->m_ObjFileName = pBase->m_ObjFileName;
@@ -196,21 +196,21 @@ namespace DXLibRef {
 		}
 	}
 	// 
-	void			ObjectBaseClass::SetAnimOnce(int ID, float speed) noexcept {
+	void			BaseObject::SetAnimOnce(int ID, float speed) noexcept {
 		this->SetObj().SetAnim(ID).Update(false, speed);
 	}
-	void			ObjectBaseClass::SetAnimLoop(int ID, float speed) noexcept {
+	void			BaseObject::SetAnimLoop(int ID, float speed) noexcept {
 		this->SetObj().SetAnim(ID).Update(true, speed);
 	}
 	// 
-	void			ObjectBaseClass::Init(void) noexcept {
+	void			BaseObject::Init(void) noexcept {
 		SetActive(true);
 		this->m_IsResetPhysics = true;
 		this->m_IsFirstLoop = true;
 		Init_Sub();
 	}
 	// 
-	void			ObjectBaseClass::ExecuteCommon(void) noexcept {
+	void			BaseObject::ExecuteCommon(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = GetObj().GetMatrix();
@@ -249,12 +249,12 @@ namespace DXLibRef {
 		}
 	}
 
-	void			ObjectBaseClass::DrawShadow(void) noexcept {
+	void			BaseObject::DrawShadow(void) noexcept {
 		if (!IsActive()) { return; }
 		if (!GetObj().IsActive()) { return; }
 		GetObj().DrawModel();
 	}
-	void			ObjectBaseClass::CheckDraw(int Range) noexcept {
+	void			BaseObject::CheckDraw(int Range) noexcept {
 		if (!IsActive()) { return; }
 		if (Range == -1) { return; }
 		if (CheckCameraViewClip_Box(
@@ -265,7 +265,7 @@ namespace DXLibRef {
 		}
 		CheckDraw_Sub(Range);
 	}
-	void			ObjectBaseClass::Draw(bool isDrawSemiTrans, int Range) noexcept {
+	void			BaseObject::Draw(bool isDrawSemiTrans, int Range) noexcept {
 		if (!IsActive()) { return; }
 		if (!IsDraw(Range)) { return; }
 		if (!GetObj().IsActive()) { return; }
@@ -276,7 +276,7 @@ namespace DXLibRef {
 		}
 	}
 	// 
-	void			ObjectBaseClass::Dispose(void) noexcept {
+	void			BaseObject::Dispose(void) noexcept {
 		DisposeModel();
 		Dispose_Sub();
 	}
