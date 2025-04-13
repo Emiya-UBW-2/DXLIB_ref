@@ -334,12 +334,12 @@ namespace DXLibRef {
 		// 内容
 		if (isActive) {
 			int yp1 = ypos + LineHeight * 2;
-			for (int i : std::views::iota(0, static_cast<int>(m_Elements.size()))) {
+			for (int loop : std::views::iota(0, static_cast<int>(m_Elements.size()))) {
 				yp1 += (LineHeight + (6));
 				if (IntoMouse(xpos, yp1, xpos + xsize, yp1 + (LineHeight + (6)))) {
-					*select = i;
+					*select = loop;
 				}
-				m_Elements.at(static_cast<size_t>(i)).Draw(xpos, yp1, (*select == i));
+				m_Elements.at(static_cast<size_t>(loop)).Draw(xpos, yp1, (*select == loop));
 			}
 		}
 	}
@@ -679,13 +679,15 @@ namespace DXLibRef {
 
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 				bool isHit = false;
-				for (int i = 0; i < FrameLimitsNum; ++i) {
-					if (FrameLimits[static_cast<size_t>(i)] == value) {
-						i--;
-						if (i < 0) {
-							i = FrameLimitsNum - 1;
+				for (size_t loop = 0; loop < FrameLimitsNum; ++loop) {
+					if (FrameLimits[loop] == value) {
+						if (loop <= 0) {
+							loop = FrameLimitsNum - 1;
 						}
-						value = FrameLimits[static_cast<size_t>(i)];
+						else {
+							loop--;
+						}
+						value = FrameLimits[loop];
 						isHit = true;
 						break;
 					}
@@ -702,13 +704,13 @@ namespace DXLibRef {
 				auto* SE = SoundPool::Instance();
 				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
 				bool isHit = false;
-				for (int i = 0; i < FrameLimitsNum; ++i) {
-					if (FrameLimits[static_cast<size_t>(i)] == value) {
-						++i;
-						if (i > FrameLimitsNum - 1) {
-							i = 0;
+				for (size_t loop = 0; loop < FrameLimitsNum; ++loop) {
+					if (FrameLimits[loop] == value) {
+						++loop;
+						if (loop > FrameLimitsNum - 1) {
+							loop = 0;
 						}
-						value = FrameLimits[static_cast<size_t>(i)];
+						value = FrameLimits[loop];
 						isHit = true;
 						break;
 					}
@@ -723,17 +725,17 @@ namespace DXLibRef {
 			[]() {},
 			[this](int xpos, int ypos, bool) {
 				auto* OptionParts = OptionManager::Instance();
-				int ret = 0;
+				size_t ret = 0;
 				// 結果から一番近いやつに指定
 				int diff = 10000;
-				for (int i : std::views::iota(0, FrameLimitsNum)) {
-					int tmp = std::abs(FrameLimits[static_cast<size_t>(i)] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
+				for (size_t loop : std::views::iota(static_cast<size_t>(0), FrameLimitsNum)) {
+					int tmp = std::abs(FrameLimits[loop] - OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 					if (diff > tmp) {
 						diff = tmp;
-						ret = i;
+						ret = loop;
 					}
 				}
-				int value = UpDownBox(xpos, xpos + (200), ypos, ret, FrameLimitsNum);
+				int value = UpDownBox(xpos, xpos + (200), ypos, static_cast<int>(ret), static_cast<int>(FrameLimitsNum));
 				OptionParts->SetParamInt(EnumSaveParam::FpsLimit, FrameLimits[value]);
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,

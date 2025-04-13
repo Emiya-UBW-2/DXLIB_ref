@@ -175,8 +175,8 @@ namespace DXLibRef {
 		// 
 #if defined(_USE_WAVECALC_)
 		void CalcGWave() {
-			for (int i : std::views::iota(0, 20)) {
-				Wave& w = WaveData.waves[i];
+			for (int loop : std::views::iota(0, 20)) {
+				Wave& w = WaveData.waves[loop];
 				float randomRad = static_cast<float>(GetRand(30) * DX_PI_F * 2 * 0.3f);
 				w.dir[0] = sinf(randomRad);
 				w.dir[1] = cosf(randomRad);
@@ -335,14 +335,14 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) noexcept {
-			for (int i : std::views::iota(0, 6)) {		// 映りこむ環境を描画する面の数だけ繰り返し
-				for (int j : std::views::iota(0, MIPLEVEL)) {			// ミップマップの数だけ繰り返し
-					dynamicCubeTex.SetRenderTargetToShader(0, i, j);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのi番目の面に設定
+			for (size_t loop : std::views::iota(0, 6)) {		// 映りこむ環境を描画する面の数だけ繰り返し
+				for (int loop2 : std::views::iota(0, MIPLEVEL)) {			// ミップマップの数だけ繰り返し
+					dynamicCubeTex.SetRenderTargetToShader(0, static_cast<int>(loop), loop2);		// 描画先番号０番の描画対象を描画対象にできるキューブマップのloop番目の面に設定
 					ClearDrawScreen();										// クリア
 					{
 						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// カメラの画角は90度に設定
 						SetCameraNearFar(0.5f * Scale3DRate, 1000.0f * Scale3DRate);									// Nearクリップ面とFarクリップ面の距離を設定
-						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[static_cast<size_t>(i)]).get(), up[static_cast<size_t>(i)].get());	// カメラの位置と注視点、カメラの上方向を設定
+						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[loop]).get(), up[loop].get());	// カメラの位置と注視点、カメラの上方向を設定
 						Doing();
 					}
 				}
@@ -418,8 +418,8 @@ namespace DXLibRef {
 		ShadowDraw& operator=(ShadowDraw&& o) = delete;
 		~ShadowDraw(void) noexcept { Dispose(); }
 	public:
-		const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
-		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<std::size_t>(isFar ? 1 : 0)]; }
+		const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
+		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
 		const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
 		const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//未使用
 		const auto& GetShadowDir(void) const noexcept { return m_ShadowVec; }

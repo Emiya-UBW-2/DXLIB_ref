@@ -585,23 +585,23 @@ namespace DXLibRef {
 		static const auto GetStrtoID(const char* Str, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
-					if (strcmpDx(XBoxStr[i], Str) == 0) {
-						return XBoxID[i];
+				for (size_t loop = 0; loop < XBoxNum; ++loop) {
+					if (strcmpDx(XBoxStr[loop], Str) == 0) {
+						return XBoxID[loop];
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < static_cast<size_t>(DS4Num); ++i) {
-					if (strcmpDx(DS4Str[i], Str) == 0) {
-						return DS4ID[i];
+				for (size_t loop = 0; loop < DS4Num; ++loop) {
+					if (strcmpDx(DS4Str[loop], Str) == 0) {
+						return DS4ID[loop];
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
-					if (strcmpDx(KeyStr[i], Str) == 0) {
-						return KeyID[i];
+				for (size_t loop = 0; loop < KeyNum; ++loop) {
+					if (strcmpDx(KeyStr[loop], Str) == 0) {
+						return KeyID[loop];
 					}
 				}
 				break;
@@ -614,23 +614,23 @@ namespace DXLibRef {
 		static const std::string	GetIDtoStr(int ID, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
-					if (XBoxID[i] == ID) {
-						return XBoxStr[i];
+				for (size_t loop = 0; loop < XBoxNum; ++loop) {
+					if (XBoxID[loop] == ID) {
+						return XBoxStr[loop];
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < static_cast<size_t>(DS4Num); ++i) {
-					if (DS4ID[i] == ID) {
-						return DS4Str[i];
+				for (size_t loop = 0; loop < DS4Num; ++loop) {
+					if (DS4ID[loop] == ID) {
+						return DS4Str[loop];
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
-					if (KeyID[i] == ID) {
-						return KeyStr[i];
+				for (size_t loop = 0; loop < KeyNum; ++loop) {
+					if (KeyID[loop] == ID) {
+						return KeyStr[loop];
 					}
 				}
 				break;
@@ -643,23 +643,23 @@ namespace DXLibRef {
 		static const int GetIDtoOffset(int ID, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
-				for (size_t i = 0; i < static_cast<size_t>(XBoxNum); ++i) {
-					if (XBoxID[i] == ID) {
-						return static_cast<int>(i + KeyNum + XBoxNum);
+				for (size_t loop = 0; loop < XBoxNum; ++loop) {
+					if (XBoxID[loop] == ID) {
+						return static_cast<int>(loop + KeyNum + XBoxNum);
 					}
 				}
 				break;
 			case ControlType::PS4:
-				for (size_t i = 0; i < static_cast<size_t>(DS4Num); ++i) {
-					if (DS4ID[i] == ID) {
-						return static_cast<int>(i + KeyNum);
+				for (size_t loop = 0; loop < DS4Num; ++loop) {
+					if (DS4ID[loop] == ID) {
+						return static_cast<int>(loop + KeyNum);
 					}
 				}
 				break;
 			case ControlType::PC:
-				for (size_t i = 0; i < static_cast<size_t>(KeyNum); ++i) {
-					if (KeyID[i] == ID) {
-						return static_cast<int>(i);
+				for (size_t loop = 0; loop < KeyNum; ++loop) {
+					if (KeyID[loop] == ID) {
+						return static_cast<int>(loop);
 					}
 				}
 				break;
@@ -932,25 +932,25 @@ namespace DXLibRef {
 			//âüÇ≥ÇÍÇƒÇ¢ÇΩÇÁÇªÇÃÉLÅ[Ç…ê›íËÇ∑ÇÈ
 			switch (GetControlType()) {
 			case Controls::ControlType::XBox:
-				for (size_t i = 0; i < static_cast<size_t>(Controls::XBoxNum); ++i) {
-					if (Controls::GetButtonPress(GetControlType(), Controls::XBoxID[i])) {
-						ChangeConfigOnce(select, Controls::XBoxID[i]);
+				for (size_t loop = 0; loop < Controls::XBoxNum; ++loop) {
+					if (Controls::GetButtonPress(GetControlType(), Controls::XBoxID[loop])) {
+						ChangeConfigOnce(select, Controls::XBoxID[loop]);
 						break;
 					}
 				}
 				break;
 			case Controls::ControlType::PS4:
-				for (size_t i = 0; i < static_cast<size_t>(Controls::DS4Num); ++i) {
-					if (Controls::GetButtonPress(GetControlType(), Controls::DS4ID[i])) {
-						ChangeConfigOnce(select, Controls::DS4ID[i]);
+				for (size_t loop = 0; loop < Controls::DS4Num; ++loop) {
+					if (Controls::GetButtonPress(GetControlType(), Controls::DS4ID[loop])) {
+						ChangeConfigOnce(select, Controls::DS4ID[loop]);
 						break;
 					}
 				}
 				break;
 			case Controls::ControlType::PC:
-				for (size_t i = 0; i < static_cast<size_t>(Controls::KeyNum); ++i) {
-					if (Controls::GetButtonPress(GetControlType(), Controls::KeyID[i])) {
-						ChangeConfigOnce(select, Controls::KeyID[i]);
+				for (size_t loop = 0; loop < Controls::KeyNum; ++loop) {
+					if (Controls::GetButtonPress(GetControlType(), Controls::KeyID[loop])) {
+						ChangeConfigOnce(select, Controls::KeyID[loop]);
 						break;
 					}
 				}

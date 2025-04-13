@@ -123,8 +123,8 @@ namespace DXLibRef {
 				const float area_height = draw_area_y_bottom - draw_area_y_top;
 
 				// 描画開始
-				std::size_t current_string_byte_pos = 0;
-				std::size_t line_front_string_byte_pos = 0;
+				size_t current_string_byte_pos = 0;
+				size_t line_front_string_byte_pos = 0;
 				float current_y_relative = 0.0f;
 				auto line_front_it = info.begin();
 				for (auto it = info.begin(); it < info.end(); current_string_byte_pos += it->Bytes, ++it) {
@@ -132,7 +132,7 @@ namespace DXLibRef {
 					if (area_width < line_width_contain_current_it_point_char) {
 						using namespace std::string_literals;
 						// 次の行に行く前に描画、itが指す文字は含まない
-						const std::size_t str_len_byte = current_string_byte_pos - line_front_string_byte_pos;
+						const size_t str_len_byte = current_string_byte_pos - line_front_string_byte_pos;
 						// it->DrawXは前の文字の右端に等しい
 						// const float line_width = it->DrawX - line_front_it->DrawX;
 						const float padding = 0.f;// (area_width - line_width) / 2.0f;
@@ -163,13 +163,13 @@ namespace DXLibRef {
 				info.resize(string.size());
 				auto char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), static_cast<int>(string.length() * sizeof(TCHAR)), font_handle, false);
 				if (char_info_num < 0) throw std::runtime_error("fail in function DxLib::GetDrawStringCharInfoToHandle");
-				if (info.size() < static_cast<std::size_t>(char_info_num)) {
-					info.resize(static_cast<std::size_t>(char_info_num) + 1);
+				if (info.size() < static_cast<size_t>(char_info_num)) {
+					info.resize(static_cast<size_t>(char_info_num) + 1);
 					// 再取得
 					char_info_num = GetDrawStringCharInfoToHandle(info.data(), info.size(), string.c_str(), static_cast<int>(string.length() * sizeof(TCHAR)), font_handle, false);
 					if (char_info_num < 0 || static_cast<int>(info.size()) < char_info_num) throw std::runtime_error("fail to detect draw info.");
 				}
-				info.resize(static_cast<std::size_t>(char_info_num));
+				info.resize(static_cast<size_t>(char_info_num));
 				return info;
 			}
 		};

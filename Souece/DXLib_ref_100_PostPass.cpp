@@ -328,13 +328,13 @@ namespace DXLibRef {
 	class PostPassMotionBlur : public PostPassBase {
 	private:
 		class BlurScreen {
-			static const int MAX = 3;
+			static const size_t MAX = 3;
 			std::array<GraphHandle, MAX> m_screen;
-			int m_current{ 0 };
+			size_t m_current{ 0 };
 			int m_alpha{ 0 };
 			int m_screenWidth{ 0 }, m_screenHeight{ 0 };
 			int m_offsetX1{ 0 }, m_offsetX2{ 0 }, m_offsetY1{ 0 }, offsetY2{ 0 };
-			int m_notBlendDraw{ 0 };
+			size_t m_notBlendDraw{ 0 };
 		public:
 			BlurScreen(void) noexcept {}
 			BlurScreen(const BlurScreen&) = delete;
@@ -346,8 +346,8 @@ namespace DXLibRef {
 		public:
 			void Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
 				auto* WindowSizeParts = WindowSizeControl::Instance();
-				for (int i : std::views::iota(0, MAX)) {
-					m_screen.at(static_cast<size_t>(i)).Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+				for (size_t loop : std::views::iota(static_cast<size_t>(0), MAX)) {
+					m_screen.at(loop).Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 				}
 				m_current = 0;
 				m_alpha = t_alpha;
@@ -359,29 +359,29 @@ namespace DXLibRef {
 				m_notBlendDraw = 0;
 			}
 			void Release(void) noexcept {
-				for (int i : std::views::iota(0, MAX)) {
-					m_screen.at(static_cast<size_t>(i)).Dispose();
+				for (size_t loop : std::views::iota(static_cast<size_t>(0), MAX)) {
+					m_screen.at(loop).Dispose();
 				}
 			}
 		public:
 			auto* PostRenderBlurScreen(std::function<void()> doing) noexcept {
 				auto* WindowSizeParts = WindowSizeControl::Instance();
-				auto next = (m_current != 0) ? (m_current - 1) : MAX - 1;
-				m_screen[static_cast<size_t>(m_current)].SetDraw_Screen();
+				size_t next = ((m_current != 0) ? m_current : MAX) - 1;
+				m_screen[m_current].SetDraw_Screen();
 				{
 					doing();
 					if (++m_notBlendDraw > MAX) {
 						int drawMode = GetDrawMode();
 						SetDrawMode(DX_DRAWMODE_BILINEAR);
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alpha);
-						m_screen[static_cast<size_t>(next)].DrawExtendGraph(m_offsetX1, m_offsetY1, WindowSizeParts->GetScreenXMax() + m_offsetX2, WindowSizeParts->GetScreenYMax() + offsetY2, false);
+						m_screen[next].DrawExtendGraph(m_offsetX1, m_offsetY1, WindowSizeParts->GetScreenXMax() + m_offsetX2, WindowSizeParts->GetScreenYMax() + offsetY2, false);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 						SetDrawMode(drawMode);
 					}
 				}
 				auto Cur = m_current;
 				m_current = next;
-				return &m_screen[static_cast<size_t>(Cur)];
+				return &m_screen[Cur];
 			}
 		};
 	private:
@@ -561,7 +561,6 @@ namespace DXLibRef {
 			float Angle;
 			float Sin, Cos;
 			COLOR_U8 DiffuseColor;
-			int i;
 			VERTEX2D* Vert;
 			WORD* Ind;
 			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleCosTable{};
@@ -580,26 +579,26 @@ namespace DXLibRef {
 
 			// 外周部分用の Sin, Cos テーブルを作成する
 			Angle = 0.0f;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
-				AngleSinTable.at(static_cast<size_t>(i)) = std::sin(Angle);
-				AngleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
+			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
+				AngleSinTable.at(loop) = std::sin(Angle);
+				AngleCosTable.at(loop) = std::cos(Angle);
 			}
 
 			// 内側の盛り上がっているように見せる箇所で使用する Cos テーブルを作成する
 			Angle = 0.0f;
-			for (i = 0; i < CIRCLE_RADIUS_VERTEX_NUM; ++i, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
-				InCircleCosTable.at(static_cast<size_t>(i)) = std::cos(Angle);
+			for (size_t loop = 0; loop < CIRCLE_RADIUS_VERTEX_NUM; ++loop, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
+				InCircleCosTable.at(loop) = std::cos(Angle);
 			}
 
 			// ポリゴン頂点インデックスの準備
 			Ind = Index;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
-				for (WORD j = 0; j < CIRCLE_RADIUS_VERTEX_NUM - 1; ++j, Ind += 6) {
-					Ind[0] = static_cast<WORD>(i * CIRCLE_RADIUS_VERTEX_NUM + j);
+			for (int loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
+				for (WORD loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM - 1; ++loop2, Ind += 6) {
+					Ind[0] = static_cast<WORD>(loop * CIRCLE_RADIUS_VERTEX_NUM + loop2);
 					Ind[1] = static_cast<WORD>(Ind[0] + 1);
-					if (i == CIRCLE_ANGLE_VERTEX_NUM - 1) {
-						Ind[2] = j;
-						Ind[3] = static_cast<WORD>(j + 1);
+					if (loop == CIRCLE_ANGLE_VERTEX_NUM - 1) {
+						Ind[2] = loop2;
+						Ind[3] = static_cast<WORD>(loop2 + 1);
 					}
 					else {
 						Ind[2] = static_cast<WORD>(Ind[0] + CIRCLE_RADIUS_VERTEX_NUM);
@@ -618,17 +617,17 @@ namespace DXLibRef {
 
 			// 中心に向かうにしたがって中心方向にテクスチャ座標をずらす
 			Vert = Vertex;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
+			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
 				// 使用する Sin, Cos の値をセット
-				Sin = AngleSinTable.at(static_cast<size_t>(i));
-				Cos = AngleCosTable.at(static_cast<size_t>(i));
+				Sin = AngleSinTable.at(loop);
+				Cos = AngleCosTable.at(loop);
 
-				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; ++j, ++Vert) {
+				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
 					// 円の中心までの距離を算出
 					CenterDistance = Radius;
 
 					// 中心に引き込まれる距離を算出
-					AbsorptionDistance = Absorption * static_cast<float>(j) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
+					AbsorptionDistance = Absorption * static_cast<float>(loop2) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
 					// 中心に向かって移動する距離を算出
 					AbsorptionMoveX = Cos * AbsorptionDistance;
@@ -657,17 +656,17 @@ namespace DXLibRef {
 
 			// Cosテーブルにしたがってテクスチャ座標をずらす
 			Vert = Vertex;
-			for (i = 0; i < CIRCLE_ANGLE_VERTEX_NUM; ++i) {
+			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
 				// 使用する Sin, Cos の値をセット
-				Sin = AngleSinTable.at(static_cast<size_t>(i));
-				Cos = AngleCosTable.at(static_cast<size_t>(i));
+				Sin = AngleSinTable.at(loop);
+				Cos = AngleCosTable.at(loop);
 
-				for (int j = 0; j < CIRCLE_RADIUS_VERTEX_NUM; ++j, ++Vert) {
+				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
 					// 円の中心までの距離を算出
-					CenterDistance = InCircleCosTable[static_cast<size_t>(j)] * Radius;
+					CenterDistance = InCircleCosTable[static_cast<size_t>(loop2)] * Radius;
 
 					// 画像座標視点での円の中心までの距離を算出
-					GraphCenterDistance = static_cast<float>((CIRCLE_RADIUS_VERTEX_NUM - 1) - j) * (Absorption + Radius) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
+					GraphCenterDistance = static_cast<float>((CIRCLE_RADIUS_VERTEX_NUM - 1) - loop2) * (Absorption + Radius) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
 					// スクリーン座標の決定
 					Vert->pos.x = Cos * CenterDistance + static_cast<float>(CenterX);

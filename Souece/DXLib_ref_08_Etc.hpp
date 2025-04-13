@@ -146,14 +146,14 @@ namespace DXLibRef {
 			this->m_WorldPos = tgt.m_WorldPos;
 			this->m_LocalPos = tgt.m_LocalPos;
 		}
-		void			Set(int i, const MV1& obj) noexcept {
-			m_FrameID = i;
-			m_WorldPos = obj.GetFrameLocalWorldMatrix(i);
-			if (obj.GetFrameParent(i) >= 0) {
-				m_LocalPos = obj.GetFrameLocalMatrix(i);
+		void			Set(int frameID, const MV1& obj) noexcept {
+			m_FrameID = frameID;
+			m_WorldPos = obj.GetFrameLocalWorldMatrix(frameID);
+			if (obj.GetFrameParent(frameID) >= 0) {
+				m_LocalPos = obj.GetFrameLocalMatrix(frameID);
 			}
 			else {
-				m_LocalPos = obj.GetFrameLocalWorldMatrix(i);// 
+				m_LocalPos = obj.GetFrameLocalWorldMatrix(frameID);// 
 			}
 		}
 		const auto& GetFrameID(void) const noexcept { return m_FrameID; }
@@ -383,23 +383,23 @@ namespace DXLibRef {
 		}
 	public:
 		static void GetOnlyNumber(const char* Target, std::array<std::string, 12>* String) noexcept {
-			int NumCount = 0;
+			size_t NumCount = 0;
 			for (auto& s : *String) {
 				s = "";
 			}
-			for (int i : std::views::iota(0, static_cast<int>(strlenDx(Target)))) {
+			for (size_t loop : std::views::iota(static_cast<size_t>(0), strlenDx(Target))) {
 				if (!
 					(
-						Target[static_cast<size_t>(i)] == ' ' ||
-						Target[static_cast<size_t>(i)] == '-'
+						Target[loop] == ' ' ||
+						Target[loop] == '-'
 						)
 					) {
-					String->at(static_cast<size_t>(NumCount)) += Target[static_cast<size_t>(i)];
+					String->at(NumCount) += Target[loop];
 				}
 				else {
-					if (String->at(static_cast<size_t>(NumCount)) != "") {
+					if (String->at(NumCount) != "") {
 						++NumCount;
-						String->at(static_cast<size_t>(NumCount)) = "";
+						String->at(NumCount) = "";
 					}
 				}
 			}

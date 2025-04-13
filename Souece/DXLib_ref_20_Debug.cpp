@@ -27,7 +27,7 @@ namespace DXLibRef {
 		if (m_PointSel < PointMax) {
 			m_Point.at(0)[m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
 			m_Str[m_PointSel] = DebugMes;
-			m_PointSel++;
+			++m_PointSel;
 			return;
 		}
 	}
@@ -43,38 +43,38 @@ namespace DXLibRef {
 		auto PMax = PointMax + 1;
 		// ç≈å„ÇÃââéZ
 		SetPoint("-----End-----");
-		for (int index : std::views::iota(0, PMax)) {
-			if (!(static_cast<int>(m_PointSel) > index)) {
-				m_Point.at(0)[static_cast<std::size_t>(index)] = m_Point.at(0)[m_PointSel - 1];
+		for (size_t loop : std::views::iota(0, PMax)) {
+			if (m_PointSel <= loop) {
+				m_Point[0][loop] = m_Point[0][m_PointSel - 1];
 			}
-			if (index == PointMax) {
-				m_Point.at(0)[static_cast<std::size_t>(index)] = 1000.0f * DXLib_refParts->GetDeltaTime();
+			if (loop == PointMax) {
+				m_Point[0][loop] = 1000.0f * DXLib_refParts->GetDeltaTime();
 			}
 
-			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {
-				m_Point[static_cast<std::size_t>(j)][static_cast<std::size_t>(index)] = m_Point[static_cast<std::size_t>(j - 1)][static_cast<std::size_t>(index)];
+			for (int loop2 = static_cast<int>(PointFrame - 1); loop2 >= 1; --loop2) {
+				m_Point[static_cast<size_t>(loop2)][loop] = m_Point[static_cast<size_t>(loop2 - 1)][loop];
 			}
 
 			// ïΩãœ
-			m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] = 0.f;
-			for (int j : std::views::iota(0, PointFrame)) {
-				m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] += m_Point[static_cast<std::size_t>(j)][static_cast<std::size_t>(index)];
+			m_Point[PointFrame][loop] = 0.f;
+			for (size_t loop2 : std::views::iota(static_cast<size_t>(0), PointFrame)) {
+				m_Point[PointFrame][loop] += m_Point[loop2][loop];
 			}
-			m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] /= PointFrame;
+			m_Point[PointFrame][loop] /= PointFrame;
 		}
-		for (int index = PMax - 1; index >= 1; --index) {
-			if (index > 0) {
-				m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] = m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index)] - m_Point[static_cast<std::size_t>(PointFrame)][static_cast<std::size_t>(index) - 1];
+		for (int loop = PMax - 1; loop >= 1; --loop) {
+			if (loop > 0) {
+				m_Point[PointFrame][static_cast<size_t>(loop)] = m_Point[PointFrame][static_cast<size_t>(loop)] - m_Point[PointFrame][static_cast<size_t>(loop - 1)];
 			}
 		}
 
-		for (int index : std::views::iota(0, PMax)) {
-			m_PointP[0][index] = 0;
-			for (int loop = 0; loop <= index; ++loop) {
-				m_PointP[0][index] += m_Point[PointFrame][loop];
+		for (size_t loop2 : std::views::iota(0, PMax)) {
+			m_PointP[0][loop2] = 0;
+			for (size_t loop = 0; loop <= loop2; ++loop) {
+				m_PointP[0][loop2] += m_Point[PointFrame][loop];
 			}
-			for (int j = static_cast<int>(PointFrame - 1); j >= 1; --j) {
-				m_PointP[static_cast<std::size_t>(j)][index] = m_PointP[static_cast<std::size_t>(j - 1)][index];
+			for (int loop3 = static_cast<int>(PointFrame - 1); loop3 >= 1; --loop3) {
+				m_PointP[static_cast<size_t>(loop3)][loop2] = m_PointP[static_cast<size_t>(loop3 - 1)][loop2];
 			}
 
 		}
@@ -119,24 +119,24 @@ namespace DXLibRef {
 				const float ys = static_cast<float>(border) / (1000.0f / static_cast<float>(value));
 
 				const int ye = yp + height;
-				for (size_t j = static_cast<size_t>(PointFrame - 1 - 1); j > 0; --j) {
-					int xnow = xp + static_cast<int>(static_cast<float>(j) * xs);
-					int xnext = xp + static_cast<int>(static_cast<float>(j + 1) * xs);
+				for (size_t loop2 = PointFrame - 1 - 1; loop2 > 0; --loop2) {
+					int xnow = xp + static_cast<int>(static_cast<float>(loop2) * xs);
+					int xnext = xp + static_cast<int>(static_cast<float>(loop2 + 1) * xs);
 
-					for (size_t index = static_cast<size_t>(PMax - 1); index > 0; --index) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[j][index] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[j + 1][index] * ys));
+					for (size_t loop = static_cast<size_t>(PMax - 1); loop > 0; --loop) {
+						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[loop2][loop] * ys));
+						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[loop2 + 1][loop] * ys));
 						DrawCtrls->SetDrawQuadrangle(
 							WindowSystem::DrawLayer::Normal,
 							xnow, ynow, xnext, ynext,
 							xnext, ye, xnow, ye,
-							Colors[index],
+							Colors[loop],
 							TRUE);
 					}
 					/*
-					for (int index : std::views::iota(0, PMax)) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(j)][static_cast<size_t>(index)] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(j + 1)][static_cast<size_t>(index)] * ys));
+					for (int loop : std::views::iota(0, PMax)) {
+						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(loop2)][static_cast<size_t>(loop)] * ys));
+						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(loop2 + 1)][static_cast<size_t>(loop)] * ys));
 						DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
 					}
 					//*/
@@ -154,32 +154,32 @@ namespace DXLibRef {
 
 			xpos += (2);
 			ypos += (2);
-			int i = 0;
+			int num = 0;
 			// ì‡óe
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
 				White, Black, "AsyncCount :%d", GetASyncLoadNum());
-			++i;
+			++num;
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
 				White, Black, "Drawcall  :%d", GetDrawCallCount());
-			++i;
+			++num;
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
+				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
 				White, Black, "FPS    :%5.2f fps", GetFPS());
-			++i;
-			for (size_t index : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
+			++num;
+			for (size_t loop : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
-					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
-				++i;
+					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
+					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, m_Point[PointFrame][loop], m_Str[loop - 1].c_str());
+				++num;
 			}
 			{
-				size_t index = static_cast<size_t>(PointMax);
+				size_t loop = static_cast<size_t>(PointMax);
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (i * LineHeight),
-					Colors[index], DarkGreen, "%02d(%5.2fms)[%s]", index, m_Point[static_cast<size_t>(PointFrame)][index], m_Str[index - 1].c_str());
-				++i;
+					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
+					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, m_Point[PointFrame][loop], m_Str[loop - 1].c_str());
+				++num;
 			}
 		}
 	}

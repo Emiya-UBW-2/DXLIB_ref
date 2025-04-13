@@ -84,16 +84,16 @@ namespace DXLibRef {
 	//
 	void			ObjectManager::ExecuteObject(void) noexcept {
 		// オブジェクトが増えた場合に備えて範囲forは使わない
-		for (int loop = 0; loop < static_cast<int>(this->m_Object.size()); loop++) {
-			auto& o = this->m_Object.at(static_cast<size_t>(loop));
+		for (size_t loop = 0; loop < this->m_Object.size(); ++loop) {
+			auto& o = this->m_Object.at(loop);
 			if (!o) { continue; }
 			if (o->GetIsDelete()) { continue; }
 			o->FirstExecute();
 		}
 		// 物理アップデート
 		//this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
-		for (int loop = 0; loop < static_cast<int>(this->m_Object.size()); loop++) {
-			auto& o = this->m_Object.at(static_cast<size_t>(loop));
+		for (size_t loop = 0; loop < this->m_Object.size(); ++loop) {
+			auto& o = this->m_Object.at(loop);
 			if (!o) { continue; }
 			if (o->GetIsDelete()) { continue; }
 			/*
@@ -104,8 +104,8 @@ namespace DXLibRef {
 			o->ExecuteCommon();
 		}
 		// オブジェクトの排除チェック
-		for (int loop = 0; loop < static_cast<int>(this->m_Object.size()); loop++) {
-			auto& o = this->m_Object.at(static_cast<size_t>(loop));
+		for (size_t loop = 0; loop < this->m_Object.size(); ++loop) {
+			auto& o = this->m_Object.at(loop);
 			if (!o) { continue; }
 			if (!o->GetIsDelete()) { continue; }
 			o->Dispose();
@@ -138,8 +138,8 @@ namespace DXLibRef {
 		}
 	}
 	void			ObjectManager::DeleteAll(void) noexcept {
-		for (int loop = 0; loop < static_cast<int>(this->m_Object.size()); loop++) {
-			auto& o = this->m_Object.at(static_cast<size_t>(loop));
+		for (size_t loop = 0; loop < this->m_Object.size(); ++loop) {
+			auto& o = this->m_Object.at(loop);
 			if (!o) { continue; }
 			o->Dispose();
 			o.reset();

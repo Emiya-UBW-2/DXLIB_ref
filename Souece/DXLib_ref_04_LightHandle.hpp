@@ -34,8 +34,8 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<LightPool>;
 	private:
-		std::array<LightHandle, 5> handles;
-		int now = 0;
+		std::array<LightHandle, 5>	handles;
+		size_t						m_now = 0;
 	private:
 		LightPool(void) noexcept {}
 		LightPool(const LightPool&) = delete;
@@ -44,24 +44,24 @@ namespace DXLibRef {
 		LightPool& operator=(LightPool&& o) = delete;
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
-			int prev = now;
-			handles[static_cast<size_t>(now)].Dispose();
-			// handles[static_cast<size_t>(now)].time = GetNowHiPerformanceCount();
+			size_t prev = m_now;
+			handles[m_now].Dispose();
+			// handles[m_now].time = GetNowHiPerformanceCount();
 			switch (Lighttype) {
 			case LightType::POINT:
-				handles[static_cast<size_t>(now)].CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
+				handles[m_now].CreatePoint(pos, 2.5f, 0.5f, 1.5f, 0.5f);
 				break;
 			case LightType::SPOT:
-				handles[static_cast<size_t>(now)].CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
+				handles[m_now].CreateSpot(pos, Vector3DX::down(), DX_PI_F / 2, DX_PI_F / 4, 2.5f, 0.5f, 1.5f, 0.5f);
 				break;
 			case LightType::DIRECTIONAL:
-				handles[static_cast<size_t>(now)].CreateDir(pos);
+				handles[m_now].CreateDir(pos);
 				break;
 			default:
 				break;
 			}
-			++now %= handles.size();
-			return handles[static_cast<size_t>(prev)];
+			++m_now %= handles.size();
+			return handles[prev];
 		}
 		void			Update(void) noexcept {
 			/*

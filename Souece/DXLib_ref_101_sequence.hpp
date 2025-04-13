@@ -14,7 +14,7 @@ namespace DXLibRef {
 		size_t			m_Next_Select{ 0 };
 		bool			m_Is3DActive{ true };
 	public:
-		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { m_pNextSceneList.at(static_cast<std::size_t>(index)) = Next_scenes_ptr_t; }
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { m_pNextSceneList.at(static_cast<size_t>(index)) = Next_scenes_ptr_t; }
 		auto&		Get_Next(void) noexcept { return m_pNextSceneList.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }

@@ -100,8 +100,8 @@ namespace DXLibRef {
 			}
 			targetMV1->m_AnimControler.resize(static_cast<size_t>(MV1GetAnimNum(animPaletteMV1.get())));
 			if (targetMV1->GetAnimNum() > 0) {
-				for (int i : std::views::iota(0, static_cast<int>(targetMV1->GetAnimNum()))) {
-					targetMV1->SetAnim(i).Set(targetMV1, i, &animPaletteMV1);
+				for (int loop : std::views::iota(0, static_cast<int>(targetMV1->GetAnimNum()))) {
+					targetMV1->SetAnim(loop).Set(targetMV1, loop, &animPaletteMV1);
 				}
 			}
 			return;

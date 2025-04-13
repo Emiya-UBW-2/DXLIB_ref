@@ -118,25 +118,25 @@ namespace DXLibRef {
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
-							for (size_t i : std::views::iota(0, 2)) {
-								if (RIGHT == DirectXVerStr[i]) {
-									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+							for (size_t loop2 : std::views::iota(0, 2)) {
+								if (RIGHT == DirectXVerStr[loop2]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(loop2));
 									break;
 								}
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
-							for (size_t i : std::views::iota(1, 3)) {
-								if (RIGHT == Controls::ControlTypeStr[i]) {
-									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+							for (size_t loop2 : std::views::iota(1, 3)) {
+								if (RIGHT == Controls::ControlTypeStr[loop2]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(loop2));
 									break;
 								}
 							}
 						}
 						else if (loop == static_cast<size_t>(EnumSaveParam::Language) && !NewData) {
-							for (size_t i : std::views::iota(0, 2)) {
-								if (RIGHT == LanguageStr[i]) {
-									SetParamInt((EnumSaveParam)loop, static_cast<int>(i));
+							for (size_t loop2 : std::views::iota(0, 2)) {
+								if (RIGHT == LanguageStr[loop2]) {
+									SetParamInt((EnumSaveParam)loop, static_cast<int>(loop2));
 									break;
 								}
 							}
@@ -197,26 +197,26 @@ namespace DXLibRef {
 	void			OptionManager::Save(void) const noexcept {
 		std::ofstream outputfile("Save/Setting.txt");
 
-		for (int loop : std::views::iota(0, static_cast<int>(EnumSaveParam::Max))) {
-			switch (m_SaveParams.at(static_cast<size_t>(loop)).GetEnumParamType()) {
+		for (size_t loop : std::views::iota(static_cast<size_t>(0), static_cast<size_t>(EnumSaveParam::Max))) {
+			switch (m_SaveParams.at(loop).GetEnumParamType()) {
 			case EnumParamType::Boolean:
-				outputfile << std::string(OptionStr[loop]) + "=" + std::string(GetParamBoolean((EnumSaveParam)loop) ? "true" : "false") + "\n";
+				outputfile << std::string(OptionStr[loop]) + "=" + std::string(GetParamBoolean(static_cast<EnumSaveParam>(loop)) ? "true" : "false") + "\n";
 				break;
 			case EnumParamType::Int:
-				outputfile << std::string(OptionStr[loop]) + "=" + std::to_string(GetParamInt((EnumSaveParam)loop)) + "\n";
+				outputfile << std::string(OptionStr[loop]) + "=" + std::to_string(GetParamInt(static_cast<EnumSaveParam>(loop))) + "\n";
 				break;
 			case EnumParamType::Float:
-				outputfile << std::string(OptionStr[loop]) + "=" + std::to_string(GetParamFloat((EnumSaveParam)loop)) + "\n";
+				outputfile << std::string(OptionStr[loop]) + "=" + std::to_string(GetParamFloat(static_cast<EnumSaveParam>(loop))) + "\n";
 				break;
 			case EnumParamType::Else:
-				if (loop == static_cast<int>(EnumSaveParam::DirectXVer)) {
-					outputfile << std::string(OptionStr[loop]) + "=" + std::string(DirectXVerStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
+				if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
+					outputfile << std::string(OptionStr[loop]) + "=" + std::string(DirectXVerStr[GetParamInt(static_cast<EnumSaveParam>(loop))]) + "\n";
 				}
-				else if (loop == static_cast<int>(EnumSaveParam::ControlType)) {
-					outputfile << std::string(OptionStr[loop]) + "=" + std::string(Controls::ControlTypeStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
+				else if (loop == static_cast<size_t>(EnumSaveParam::ControlType)) {
+					outputfile << std::string(OptionStr[loop]) + "=" + std::string(Controls::ControlTypeStr[GetParamInt(static_cast<EnumSaveParam>(loop))]) + "\n";
 				}
-				else if (loop == static_cast<int>(EnumSaveParam::Language)) {
-					outputfile << std::string(OptionStr[loop]) + "=" + std::string(LanguageStr[GetParamInt((EnumSaveParam)loop)]) + "\n";
+				else if (loop == static_cast<size_t>(EnumSaveParam::Language)) {
+					outputfile << std::string(OptionStr[loop]) + "=" + std::string(LanguageStr[GetParamInt(static_cast<EnumSaveParam>(loop))]) + "\n";
 				}
 				break;
 			default:

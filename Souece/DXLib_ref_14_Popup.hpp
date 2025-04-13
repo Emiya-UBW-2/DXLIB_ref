@@ -153,7 +153,7 @@ namespace DXLibRef {
 			void Init_Sub(void) noexcept override;
 		};
 		class GraphicTabsInfo :public OptionTabsInfo {
-			static const int	FrameLimitsNum = 10;
+			static const size_t	FrameLimitsNum = 10;
 			const int	FrameLimits[FrameLimitsNum] = {
 				30,
 				60,

@@ -54,20 +54,20 @@ namespace DXLibRef {
 			}
 			auto LEFT = FileStreamDX::getleft(ALL);
 			auto RIGHT = FileStreamDX::getright(ALL);
-			for (size_t i = 0; auto& p : this->m_PadsInfo) {
-				if (LEFT == Controls::PADSStr[i]) {
+			for (size_t index = 0; auto& p : this->m_PadsInfo) {
+				if (LEFT == Controls::PADSStr[index]) {
 					p.SetAssign(Controls::GetStrtoID(RIGHT.c_str(), GetControlType()));
 					break;
 				}
-				++i;
+				++index;
 			}
 		}
 	}
 	void PadControl::Save(void) const noexcept {
 		std::ofstream outputfile(GetSavePath());
-		for (size_t i = 0; auto & p : this->m_PadsInfo) {
-			outputfile << (std::string)Controls::PADSStr[i] + "=" + Controls::GetIDtoStr(p.GetAssign(), GetControlType()) + "\n";
-			++i;
+		for (size_t index = 0; auto & p : this->m_PadsInfo) {
+			outputfile << (std::string)Controls::PADSStr[index] + "=" + Controls::GetIDtoStr(p.GetAssign(), GetControlType()) + "\n";
+			++index;
 		}
 		outputfile.close();
 	}
@@ -239,9 +239,9 @@ namespace DXLibRef {
 				SetMouseDispFlag(TRUE);
 			}
 			//ˆÚ“®
-			for (size_t i = 0; auto & p : this->m_PadsInfo) {
-				Controls::PADS Pads = static_cast<Controls::PADS>(i);
-				++i;
+			for (size_t index = 0; auto & p : this->m_PadsInfo) {
+				Controls::PADS Pads = static_cast<Controls::PADS>(index);
+				++index;
 				if (
 					Pads == Controls::PADS::MOVE_W ||
 					Pads == Controls::PADS::MOVE_A ||
@@ -257,9 +257,9 @@ namespace DXLibRef {
 			break;
 		}
 		// ƒ{ƒ^ƒ“
-		for (size_t i = 0; auto& p : this->m_PadsInfo) {
-			Controls::PADS Pads = static_cast<Controls::PADS>(i);
-			++i;
+		for (size_t index = 0; auto& p : this->m_PadsInfo) {
+			Controls::PADS Pads = static_cast<Controls::PADS>(index);
+			++index;
 			if (
 				Pads == Controls::PADS::MOVE_W ||
 				Pads == Controls::PADS::MOVE_A ||

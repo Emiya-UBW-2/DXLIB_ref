@@ -22,13 +22,13 @@ namespace DXLibRef {
 			m_VR_TrackerID.clear();
 			char DeviceCount = 0;
 			bool IsFirstHand = true;
-			for (char i = 0; i < 8; ++i) {
+			for (char loop = 0; loop < 8; ++loop) {
 				auto DeviceID = DeviceCount;
-				auto DeviceType = m_VR_SystemPtr->GetTrackedDeviceClass(i);
+				auto DeviceType = m_VR_SystemPtr->GetTrackedDeviceClass(loop);
 				switch (DeviceType) {
 				case vr::TrackedDeviceClass_HMD:
 					m_VR_HMDID = DeviceID;
-					DeviceCount++;
+					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_Controller:
 					if (IsFirstHand) {
@@ -38,20 +38,20 @@ namespace DXLibRef {
 					else {
 						m_VR_Hand2ID = DeviceID;
 					}
-					DeviceCount++;
+					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_GenericTracker:
 					m_VR_TrackerID.emplace_back(DeviceID);
-					DeviceCount++;
+					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_TrackingReference:
-					DeviceCount++;
+					++DeviceCount;
 					break;
 				default:
 					continue;
 				}
 				m_VR_DeviceInfo.resize(DeviceCount);
-				m_VR_DeviceInfo.back().Init(DeviceID, i, DeviceType);
+				m_VR_DeviceInfo.back().Init(DeviceID, loop, DeviceType);
 			}
 		}
 	}

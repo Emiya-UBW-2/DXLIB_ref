@@ -38,25 +38,25 @@ namespace DXLibRef {
 		{
 			this->m_Frames.clear();
 			if (pBase->GetFrameNum() > 0) {
-				this->m_Frames.resize(static_cast<std::size_t>(pBase->GetFrameNum()));
+				this->m_Frames.resize(static_cast<size_t>(pBase->GetFrameNum()));
 			}
 			for (auto& f : this->m_Frames) {
 				f.first = InvalidID;
 			}
 			if (this->m_Frames.size() > 0) {
-				int count = 0;
+				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetFrameNum(); frameNum < Max; ++frameNum) {
-					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(count)) {
+					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(static_cast<int>(count))) {
 						// そのフレームを登録
-						this->m_Frames[static_cast<size_t>(count)].first = frameNum;
-						this->m_Frames[static_cast<size_t>(count)].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[static_cast<size_t>(count)].first).pos());
+						this->m_Frames[count].first = frameNum;
+						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[count].first).pos());
 					}
 					else if (frameNum < Max - 1) {
 						continue;// 飛ばす
 					}
-					count++;
+					++count;
 					frameNum = 0;
-					if (count >= static_cast<int>(this->m_Frames.size())) {
+					if (count >= this->m_Frames.size()) {
 						break;
 					}
 				}
@@ -66,24 +66,24 @@ namespace DXLibRef {
 		{
 			this->m_Materials.clear();
 			if (pBase->GetMaterialNum() > 0) {
-				this->m_Materials.resize(static_cast<std::size_t>(pBase->GetMaterialNum()));
+				this->m_Materials.resize(static_cast<size_t>(pBase->GetMaterialNum()));
 			}
 			for (auto& f : this->m_Materials) {
 				f = InvalidID;
 			}
 			if (this->m_Materials.size() > 0) {
-				int count = 0;
+				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetMaterialNum(); frameNum < Max; ++frameNum) {
-					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(count)) {
+					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(static_cast<int>(count))) {
 						// そのフレームを登録
-						this->m_Materials[static_cast<size_t>(count)] = frameNum;
+						this->m_Materials[count] = frameNum;
 					}
 					else if (frameNum < Max - 1) {
 						continue;// 飛ばす
 					}
-					count++;
+					++count;
 					frameNum = 0;
-					if (count >= static_cast<int>(this->m_Materials.size())) {
+					if (count >= this->m_Materials.size()) {
 						break;
 					}
 				}
@@ -95,15 +95,15 @@ namespace DXLibRef {
 			if (pBase->GetShapeNum() > 0) {
 				this->m_Shapes.resize(static_cast<size_t>(pBase->GetShapeNum()));
 			}
-			for (int j : std::views::iota(0, static_cast<int>(this->m_Shapes.size()))) {
-				auto s = this->m_obj.SearchShape(pBase->GetShapeStr(j));
+			for (size_t loop : std::views::iota(static_cast<size_t>(0), this->m_Shapes.size())) {
+				auto s = this->m_obj.SearchShape(pBase->GetShapeStr(static_cast<int>(loop)));
 				if (s >= 0) {
-					this->m_Shapes[static_cast<size_t>(j)].first = s;
-					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
+					this->m_Shapes[loop].first = s;
+					this->m_Shapes[loop].second = 0.f;
 				}
 				else {
-					this->m_Shapes[static_cast<size_t>(j)].first = InvalidID;
-					this->m_Shapes[static_cast<size_t>(j)].second = 0.f;
+					this->m_Shapes[loop].first = InvalidID;
+					this->m_Shapes[loop].second = 0.f;
 				}
 			}
 		}
@@ -117,20 +117,20 @@ namespace DXLibRef {
 				if (!UseToonWhenCreateFile) {
 					obj->SetMaterialTypeAll(DX_MATERIAL_TYPE_NORMAL);
 					if (obj->GetMaterialNum() > 0) {
-						for (int i : std::views::iota(0, obj->GetMaterialNum())) {
+						for (int loop : std::views::iota(0, obj->GetMaterialNum())) {
 							/*
 							// テクスチャ追加前のテクスチャ数を取得しておく
 							int TexIndex = MV1GetTextureNum(obj->get()());
 							// モデルで使用するテクスチャを追加する
 							MV1AddTexture(obj->get()(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
 							// 指定のマテリアル( ここでは例として3番のマテリアル )で使用する法線マップを設定する
-							MV1SetMaterialNormalMapTexture(obj->get()(), i, TexIndex);
+							MV1SetMaterialNormalMapTexture(obj->get()(), loop, TexIndex);
 							//*/
 
-							obj->SetMaterialDifColor(i, GetColorF(1.f, 1.f, 1.f, 1.f));
-							obj->SetMaterialSpcColor(i, GetColorF(0.f, 0.f, 0.f, 0.f));
-							obj->SetMaterialAmbColor(i, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
-							obj->SetMaterialSpcPower(i, 0.1f);
+							obj->SetMaterialDifColor(loop, GetColorF(1.f, 1.f, 1.f, 1.f));
+							obj->SetMaterialSpcColor(loop, GetColorF(0.f, 0.f, 0.f, 0.f));
+							obj->SetMaterialAmbColor(loop, GetColorF(0.25f, 0.25f, 0.25f, 1.f));
+							obj->SetMaterialSpcPower(loop, 0.1f);
 						}
 					}
 				}
@@ -177,13 +177,13 @@ namespace DXLibRef {
 			if (f.first != InvalidID) {
 				f.second = pBase->m_Frames.at(index).second;
 			}
-			index++;
+			++index;
 		}
 		// フレーム
 		this->m_Materials.resize(pBase->m_Materials.size());
 		for (size_t index = 0; auto & f : this->m_Materials) {
 			f = pBase->m_Materials.at(index);
-			index++;
+			++index;
 		}
 		// シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());
@@ -192,7 +192,7 @@ namespace DXLibRef {
 			if (f.first != InvalidID) {
 				f.second = pBase->m_Shapes.at(index).second;
 			}
-			index++;
+			++index;
 		}
 	}
 	// 
@@ -221,7 +221,7 @@ namespace DXLibRef {
 				continue;
 			}
 			GetObj().SetShapeRate(f.first, (1.f - GetShapesList().at(0).second) * f.second);
-			index++;
+			++index;
 		}
 		// 物理更新
 		if (GetPhysicsSetup() == PHYSICS_SETUP::REALTIME) {
@@ -235,8 +235,8 @@ namespace DXLibRef {
 				if (DXLib_refParts->GetFps() > FrameRate * Max) {
 					Max = 1;
 				}
-				for (int i : std::views::iota(0, Max)) {
-					GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(i + 1) / static_cast<float>(Max)));
+				for (int loop : std::views::iota(0, Max)) {
+					GetObj().SetMatrix(Lerp(this->m_PrevMat, NowMat, static_cast<float>(loop + 1) / static_cast<float>(Max)));
 					GetObj().PhysicsCalculation(1000.0f * FrameRate * DXLib_refParts->GetDeltaTime() / static_cast<float>(Max));
 				}
 			}
@@ -269,9 +269,9 @@ namespace DXLibRef {
 		if (!IsActive()) { return; }
 		if (!IsDraw(Range)) { return; }
 		if (!GetObj().IsActive()) { return; }
-		for (int i : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {
-			if (GetObj().GetMeshSemiTransState(i) == isDrawSemiTrans) {
-				GetObj().DrawMesh(i);
+		for (int loop : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {
+			if (GetObj().GetMeshSemiTransState(loop) == isDrawSemiTrans) {
+				GetObj().DrawMesh(loop);
 			}
 		}
 	}

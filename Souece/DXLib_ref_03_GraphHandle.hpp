@@ -195,9 +195,9 @@ namespace DXLibRef {
 			DxLib::LoadDivGraphWithStrLen(FileName.data(), FileName.length(), AllNum, XNum, YNum, XSize, YSize, HandleArray, NotUse3DFlag);
 
 			Handles->clear();
-			for (int i : std::views::iota(0, AllNum)) {
+			for (size_t loop : std::views::iota(0, AllNum)) {
 				Handles->emplace_back();
-				Handles->back().SetHandleDirect(HandleArray[static_cast<size_t>(i)]);
+				Handles->back().SetHandleDirect(HandleArray[loop]);
 			}
 			delete[] HandleArray;
 

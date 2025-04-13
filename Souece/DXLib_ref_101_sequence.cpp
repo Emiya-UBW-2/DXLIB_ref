@@ -306,16 +306,16 @@ namespace DXLibRef {
 				// UIをスクリーンに描画しておく
 				VRParts->SetUpBackUI([this]() { DrawUICommon(); });
 				// VRに移す
-				for (char i = 0; i < 2; ++i) {
+				for (char loop = 0; loop < 2; ++loop) {
 					Camera3DInfo tmp_cam = CameraParts->GetMainCamera();
 					tmp_cam.SetCamPos(
-						tmp_cam.GetCamPos() + VRParts->GetEyePosition(i),
-						tmp_cam.GetCamVec() + VRParts->GetEyePosition(i),
+						tmp_cam.GetCamPos() + VRParts->GetEyePosition(loop),
+						tmp_cam.GetCamVec() + VRParts->GetEyePosition(loop),
 						tmp_cam.GetCamUp()
 					);
 					DrawMain(tmp_cam, true);
 					// それぞれの目に内容を送信
-					VRParts->SubmitDraw(i, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
+					VRParts->SubmitDraw(loop, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
 				}
 				// ディスプレイ描画
 				GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);

@@ -70,8 +70,8 @@ namespace DXLibRef {
 			}
 			this->handle.resize(buffersize);
 			this->handle[0].Load(path_t);
-			for (size_t i = 1; i < buffersize; ++i) {
-				this->handle.at(static_cast<size_t>(i)).Duplicate(this->handle[0]);
+			for (size_t loop = 1; loop < buffersize; ++loop) {
+				this->handle.at(loop).Duplicate(this->handle[0]);
 			}
 			SetCreate3DSoundFlag(FALSE);
 		}

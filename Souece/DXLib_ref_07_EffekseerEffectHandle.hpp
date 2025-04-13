@@ -211,11 +211,11 @@ namespace DXLibRef {
 		static const int EffectNum = 16;
 		std::vector<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>> m_effect;// エフェクト
 	public:
-		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }
-		auto& GetEffect(Effect ID) noexcept { return this->m_effect.at(static_cast<size_t>(ID)); }
+		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(ID); }
+		auto& GetEffect(Effect ID) noexcept { return this->m_effect.at(ID); }
 		// 複数エフェクトの再生
 		void		SetOnce_Any(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
-			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetOnce(EffectResource::Instance()->m_Sorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
+			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
 			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetEffectSpeed(speed);
 			++GetEffect(ID).first %= EffectNum;
 		}
@@ -235,13 +235,13 @@ namespace DXLibRef {
 			return GetEffect(ID).second[EffectNum]->GetIsPlaying();
 		}
 		void		SetLoop(Effect ID, const Vector3DX& pos_t) noexcept {
-			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->m_Sorce.at(static_cast<size_t>(ID)), pos_t);
+			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->m_Sorce.at(ID), pos_t);
 		}
 		void		Update_LoopEffect(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			GetEffect(ID).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
 		}
 		void		SetOnce(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->m_Sorce.at(static_cast<size_t>(ID)), pos_t, nomal_t, scale);
+			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
 		}
 		void		StopEffect(Effect ID) noexcept { GetEffect(ID).second[EffectNum]->StopEffect(); }
 		void		SetEffectSpeed(Effect ID, float value) noexcept { GetEffect(ID).second[EffectNum]->SetEffectSpeed(value); }
