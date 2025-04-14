@@ -181,7 +181,8 @@ namespace DXLibRef {
 	};
 	class PostPassDoF : public PostPassBase {
 	private:
-		GraphHandle			DoFScreen;		// 描画スクリーン
+		GraphHandle			DoFNearScreen;		// 描画スクリーン
+		GraphHandle			DoFFarScreen;		// 描画スクリーン
 		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderController		m_Shader;			// シェーダー
 	public:
@@ -195,12 +196,14 @@ namespace DXLibRef {
 	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			DoFScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			DoFNearScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			DoFFarScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 			m_Shader.Init("CommonData/shader/VS_DoF.vso", "CommonData/shader/PS_DoF.pso");
 		}
 		void Dispose_Sub(void) noexcept override {
-			DoFScreen.Dispose();
+			DoFNearScreen.Dispose();
+			DoFFarScreen.Dispose();
 			m_Shader.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
@@ -210,12 +213,14 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
-			DoFScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 2000);
+			DoFNearScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 2000);
+			DoFFarScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 20);
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->SetUseTextureToShader(0);
-				DoFScreen.SetUseTextureToShader(1);
-				DepthPtr->SetUseTextureToShader(2);
+				DoFNearScreen.SetUseTextureToShader(1);
+				DoFFarScreen.SetUseTextureToShader(2);
+				DepthPtr->SetUseTextureToShader(3);
 				m_Shader.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 				m_Shader.SetPixelParam(3, PostPassParts->Get_near_DoF(), PostPassParts->Get_far_DoF(), PostPassParts->Get_near_DoFMax(), PostPassParts->Get_far_DoFMin());
 				{
@@ -224,6 +229,7 @@ namespace DXLibRef {
 				SetUseTextureToShader(0, InvalidID);
 				SetUseTextureToShader(1, InvalidID);
 				SetUseTextureToShader(2, InvalidID);
+				SetUseTextureToShader(3, InvalidID);
 			}
 		}
 	};
