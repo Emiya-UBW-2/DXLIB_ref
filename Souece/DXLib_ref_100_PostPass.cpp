@@ -828,14 +828,14 @@ namespace DXLibRef {
 				// SetUseTextureToShader(2, InvalidID);
 			}
 			GodRayTime += DXLib_refParts->GetDeltaTime();
-			if (GodRayTime>1.f) {
+			if (GodRayTime > 1.f) {
 				GodRayTime -= 1.f;
 				SSRMin.SetDraw_Screen();
 				auto Prev = GetDrawMode();
 				SetDrawMode(DX_DRAWMODE_BILINEAR);
 				SSRScreen.DrawExtendGraph(0, 0, 1, 1, true);
-				GetDrawScreenSoftImage(0, 0, 1, 1, GodRaySoftImage);
 				SetDrawMode(Prev);
+				GetDrawScreenSoftImage(0, 0, 1, 1, GodRaySoftImage);
 				GetPixelSoftImage(GodRaySoftImage, 0, 0, &GodRayRed, nullptr, nullptr, nullptr);
 			}
 			PostPassParts->SetGodRayPerByPostPass(1.f - std::clamp(GodRayRed / 128.f, 0.f, 1.f));
