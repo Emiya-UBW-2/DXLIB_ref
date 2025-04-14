@@ -750,7 +750,10 @@ namespace DXLibRef {
 		GraphHandle SSRColorScreen;	// そのままのGバッファ
 		GraphHandle	SSRDepthScreen;	// 深度のGバッファ
 		GraphHandle SSRScreen;		// 描画スクリーン
-
+		GraphHandle SSRMin;			// 描画スクリーン
+		int GodRaySoftImage = -1;
+		int GodRayRed = -1;
+		float GodRayTime = 0.f;
 		ShaderController::ScreenVertex	m_ScreenVertex;					// 頂点データ
 		ShaderController		m_Shader;			// シェーダー
 		float range = 1.f;
@@ -771,8 +774,12 @@ namespace DXLibRef {
 			m_Shader.Init("CommonData/shader/VS_GodRay.vso", "CommonData/shader/PS_GodRay.pso");
 			SSRScreen.Make(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND, true);
 			SSRDepthScreen.MakeDepth(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND);
+
+			SSRMin.Make(1, 1, true);
+			GodRaySoftImage = MakeRGB8ColorSoftImage(1,1);
 		}
 		void Dispose_Sub(void) noexcept override {
+			SSRMin.Dispose();
 			SSRScreen.Dispose();
 			SSRDepthScreen.Dispose();
 			m_Shader.Dispose();
@@ -787,6 +794,7 @@ namespace DXLibRef {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* CameraParts = Camera3D::Instance();
+			auto* DXLib_refParts = DXLib_ref::Instance();
 			SSRDepthScreen.GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 
 			m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat().inverse(), PostPassParts->GetCamProjectionMat().inverse());
@@ -819,11 +827,24 @@ namespace DXLibRef {
 				SetUseTextureToShader(1, InvalidID);
 				// SetUseTextureToShader(2, InvalidID);
 			}
+			GodRayTime += DXLib_refParts->GetDeltaTime();
+			if (GodRayTime>1.f) {
+				GodRayTime -= 1.f;
+				SSRMin.SetDraw_Screen();
+				auto Prev = GetDrawMode();
+				SetDrawMode(DX_DRAWMODE_BILINEAR);
+				SSRScreen.DrawExtendGraph(0, 0, 1, 1, true);
+				GetDrawScreenSoftImage(0, 0, 1, 1, GodRaySoftImage);
+				SetDrawMode(Prev);
+				GetPixelSoftImage(GodRaySoftImage, 0, 0, &GodRayRed, nullptr, nullptr, nullptr);
+			}
+			PostPassParts->SetGodRayPerByPostPass(1.f - std::clamp(GodRayRed / 128.f, 0.f, 1.f));
+
 			SSRScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 300);
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->DrawGraph(0, 0, true);
-				SetDrawBlendMode(DX_BLENDMODE_ADD, (int)(255.f * PostPassParts->GetGodRayPer()));
+				SetDrawBlendMode(DX_BLENDMODE_ADD, (int)(255.f * PostPassParts->GetGodRayPerRet()));
 				SSRScreen.DrawExtendGraph(0, 0, WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 			}

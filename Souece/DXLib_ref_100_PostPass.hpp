@@ -470,6 +470,7 @@ namespace DXLibRef {
 		float						m_AberrationPower{ 1.f };
 		float						m_DistortionPer{ 120.f };
 		float						m_GodRayPer{ 0.5f };
+		float						m_GodRayPerByPostPass{ 1.f };
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
 		bool						m_IsCubeMap{ false };
 		RealTimeCubeMap				m_RealTimeCubeMap;
@@ -495,9 +496,10 @@ namespace DXLibRef {
 		const auto&		is_Blackout(void) const noexcept { return m_useBlackOut; }
 		const auto&		GetBlackoutPer(void) const noexcept { return m_BlackOutPer; }
 		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
-		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
+		const auto		GetGodRayPerRet(void) const noexcept { return m_GodRayPer * m_GodRayPerByPostPass; }
 		const auto&		GetDistortionPer(void) const noexcept { return m_DistortionPer; }
 		const auto&		GetShadowScale(void) const noexcept { return m_ShadowScale; }
+		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
 	public:
 		void			Set_is_lens(bool value) noexcept { m_useScope = value; }
 		void			Set_xp_lens(float value) noexcept { m_ScopeXpos = value; }
@@ -508,6 +510,7 @@ namespace DXLibRef {
 		void			Set_Per_Blackout(float value) noexcept { m_BlackOutPer = value; }
 		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
 		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
+		void			SetGodRayPerByPostPass(float value) noexcept { Easing(&m_GodRayPerByPostPass, value, 0.975f, EasingType::OutExpo); }
 		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
 		void			SetShadowScale(float value) noexcept { m_ShadowScale = value; }
 		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
