@@ -1029,7 +1029,7 @@ namespace DXLibRef {
 		auto			GetPADSTrigger(Controls::PADS select) const noexcept { return !((this->m_Prev & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0) && GetPADSPress(select); }
 	public:
 		void			SetKeyInputFlags(const InputControl& o) noexcept {
-			this->m_Prev = this->m_Flag;
+			this->m_Prev = o.m_Prev;
 			this->m_Flag = o.m_Flag;
 		}
 	public:

@@ -216,10 +216,10 @@ namespace DXLibRef {
 				//最前面でポーズ中でない場合
 				if ((GetMainWindowHandle() == GetForegroundWindow()) && !SceneParts->IsPause()) {
 					// 視点移動は前フレームからの移動量
-					m_Look_XradAdd = static_cast<float>(m_MouseX - BaseScreenWidth / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					m_Look_YradAdd = -static_cast<float>(m_MouseY - BaseScreenHeight / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					m_Look_XradAdd = static_cast<float>(m_MouseX - WindowSizeParts->GetUIXMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					m_Look_YradAdd = -static_cast<float>(m_MouseY - WindowSizeParts->GetUIYMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					//移動をリセット
-					SetMousePoint(BaseScreenWidth / 2, BaseScreenHeight / 2);
+					SetMousePoint(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
 					//マウスを表示しない
 					SetMouseDispFlag(FALSE);
 				}
