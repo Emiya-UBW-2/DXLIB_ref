@@ -7,6 +7,7 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	class TEMPSCENE {
 	private:
+		bool			m_IsUpdateFarShadow{ true };			// 初回チェック
 		bool			m_IsFirstLoop{ true };			// 初回チェック
 		bool			m_IsLoading{ false };
 		bool			m_IsLoadingEnd{ false };
@@ -18,6 +19,12 @@ namespace DXLibRef {
 		auto&		Get_Next(void) noexcept { return m_pNextSceneList.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
+		const auto	PopIsUpdateFarShadow(void) noexcept {
+			auto Ret = m_IsUpdateFarShadow;
+			m_IsUpdateFarShadow = false;
+			return Ret;
+		}
+		void		SetIsUpdateFarShadowActive() noexcept { m_IsUpdateFarShadow = true; }
 	public:// ゲッター
 		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
 		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
@@ -132,6 +139,7 @@ namespace DXLibRef {
 		SceneControl& operator=(SceneControl&& o) = delete;
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
+		void		SetIsUpdateFarShadowActive() noexcept { m_NowScenesPtr->SetIsUpdateFarShadowActive(); }
 	private:
 		void	DrawMain(const Camera3DInfo& camInfo, bool Is3D) const noexcept;
 		void	DrawUICommon(void) const noexcept;

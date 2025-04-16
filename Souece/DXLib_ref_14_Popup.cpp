@@ -421,9 +421,9 @@ namespace DXLibRef {
 				case 1:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
-					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
-					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -432,9 +432,9 @@ namespace DXLibRef {
 				case 2:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
-					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
-					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -484,9 +484,9 @@ namespace DXLibRef {
 				case 1:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
-					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
-					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -495,9 +495,9 @@ namespace DXLibRef {
 				case 2:
 					OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
-					OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+					OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 					OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
-					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+					OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 					OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 					OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 					OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -549,9 +549,9 @@ namespace DXLibRef {
 					case 1:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, false);
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, false);
-						OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+						OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 1);
-						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 1);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);
@@ -560,9 +560,9 @@ namespace DXLibRef {
 					case 2:
 						OptionParts->SetParamBoolean(EnumSaveParam::AA, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::SSAO, true);
-						OptionParts->SetParamInt(EnumSaveParam::Reflection, 1);
+						OptionParts->SetParamInt(EnumSaveParam::Reflection, 0);
 						OptionParts->SetParamInt(EnumSaveParam::shadow, 2);
-						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, false);
+						OptionParts->SetParamBoolean(EnumSaveParam::GodRay, true);
 						OptionParts->SetParamInt(EnumSaveParam::ObjLevel, 2);
 						OptionParts->SetParamBoolean(EnumSaveParam::bloom, true);
 						OptionParts->SetParamBoolean(EnumSaveParam::ScreenEffect, true);

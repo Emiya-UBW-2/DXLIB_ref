@@ -986,11 +986,11 @@ namespace DXLibRef {
 		{
 			m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), m_Scale * 180.f, 0.f, 0.f);
 			m_Shader.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
-			//m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
+			m_Shader.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_Shader.Draw_lamda(doing);
 			m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), m_Scale * 180.f, 0.f, 0.f);
 			m_ShaderRigid.SetVertexCameraMatrix(4, m_CamViewMatrix.at(0), m_CamProjectionMatrix.at(0));
-			//m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
+			m_ShaderRigid.SetVertexCameraMatrix(5, m_CamViewMatrix.at(1), m_CamProjectionMatrix.at(1));
 			m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
 		SetUseTextureToShader(1, InvalidID);				// 使用テクスチャの設定を解除
@@ -1188,7 +1188,7 @@ namespace DXLibRef {
 				m_ShadowDraw->Update(doing, CenterPos, this->GetShadowScale());
 			}
 			else {
-				//m_ShadowDraw->UpdateFar(doing, CenterPos, this->GetShadowScale() * 4.f);
+				m_ShadowDraw->UpdateFar(doing, CenterPos, this->GetShadowScale() * 4.f);
 			}
 		}
 	}

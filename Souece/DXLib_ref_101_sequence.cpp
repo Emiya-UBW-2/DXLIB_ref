@@ -290,11 +290,16 @@ namespace DXLibRef {
 		auto* CameraParts = Camera3D::Instance();
 		if (this->m_NowScenesPtr->Get3DActive()) {
 			// キューブマップをセット
-			Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos(); Pos.y *= -1.f;
-			PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
+			{
+				Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos(); Pos.y *= -1.f;
+				PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
+			}
 			// 影をセット
-			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop()) {
-				PostPassParts->Update_Shadow([this]() { this->m_NowScenesPtr->ShadowDraw_Far(); }, Vector3DX::zero(), true);
+			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop() || this->m_NowScenesPtr->PopIsUpdateFarShadow()) {
+				Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos();
+				Pos.x = 0.f;
+				Pos.z = 0.f;
+				PostPassParts->Update_Shadow([this]() { this->m_NowScenesPtr->ShadowDraw_Far(); }, Pos, true);
 			}
 			PostPassParts->Update_Shadow([this] { this->m_NowScenesPtr->ShadowDraw(); }, CameraParts->GetMainCamera().GetCamPos(), false);
 		}
