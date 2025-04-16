@@ -13,23 +13,37 @@ namespace DXLibRef {
 		ShaderController					m_ShaderBlur;	// シェーダー
 		GraphHandle						SSRScreen;		// 描画スクリーン
 		GraphHandle						SSRScreen2;		// 描画スクリーン
+
+		GraphHandle SSRColorScreen;	// そのままのGバッファ
+		GraphHandle SSRNormalScreen;	// 法線のGバッファ
+		GraphHandle	SSRDepthScreen;	// 深度のGバッファ
+
+		static const int EXTEND = 4;
 	protected:
 		void Load_Sub(void) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			m_ScreenVertex.SetScreenVertex(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+			int xsize = WindowSizeParts->GetScreenXMax() / EXTEND;
+			int ysize = WindowSizeParts->GetScreenYMax() / EXTEND;
+			m_ScreenVertex.SetScreenVertex(xsize, ysize);
 			m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
 			m_ShaderBlur.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_BilateralBlur.pso");
 			auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
 			SetCreateDrawValidGraphZBufferBitDepth(24);
-			SSRScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
-			SSRScreen2.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			SSRScreen.Make(xsize, ysize, true);
+			SSRScreen2.Make(xsize, ysize, true);
 			SetCreateDrawValidGraphZBufferBitDepth(Prev);
+			SSRColorScreen.Make(xsize, ysize, false);
+			SSRNormalScreen.Make(xsize, ysize, false);
+			SSRDepthScreen.MakeDepth(xsize, ysize);
 		}
 		void Dispose_Sub(void) noexcept override {
 			SSRScreen.Dispose();
 			SSRScreen2.Dispose();
 			m_ShaderSSAO.Dispose();
 			m_ShaderBlur.Dispose();
+			SSRColorScreen.Dispose();
+			SSRNormalScreen.Dispose();
+			SSRDepthScreen.Dispose();
 		}
 		bool IsActive_Sub(void) noexcept override {
 			auto* OptionParts = OptionManager::Instance();
@@ -38,13 +52,21 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle* NormalPtr, GraphHandle* DepthPtr) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* CameraParts = Camera3D::Instance();
+			int xsize = WindowSizeParts->GetScreenXMax() / EXTEND;
+			int ysize = WindowSizeParts->GetScreenYMax() / EXTEND;
+
+			SSRColorScreen.GraphFilterBlt(*ColorGraph, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+			SSRNormalScreen.GraphFilterBlt(*NormalPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+			SSRDepthScreen.GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
+			SSRScreen.SetDraw_Screen();
+
 			// SSRシェーダーを適用
 			SSRScreen2.SetDraw_Screen(false);
 			{
-				ColorGraph->SetUseTextureToShader(0);
-				NormalPtr->SetUseTextureToShader(1);
-				DepthPtr->SetUseTextureToShader(2);
-				m_ShaderSSAO.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+				SSRColorScreen.SetUseTextureToShader(0);
+				SSRNormalScreen.SetUseTextureToShader(1);
+				SSRDepthScreen.SetUseTextureToShader(2);
+				m_ShaderSSAO.SetPixelDispSize(xsize, ysize);
 				m_ShaderSSAO.SetPixelParam(3, 0.0f, Scale3DRate, std::tan(CameraParts->GetMainCamera().GetCamFov() / 2.f), 0.f);
 
 				m_ShaderSSAO.Draw(m_ScreenVertex);
@@ -58,7 +80,7 @@ namespace DXLibRef {
 			{
 				SSRScreen2.SetUseTextureToShader(0);	// 使用するテクスチャをセット
 
-				m_ShaderBlur.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+				m_ShaderBlur.SetPixelDispSize(xsize, ysize);
 				m_ShaderBlur.Draw(m_ScreenVertex);
 
 				SetUseTextureToShader(0, InvalidID);
