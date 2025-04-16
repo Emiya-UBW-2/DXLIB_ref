@@ -213,8 +213,8 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle* ColorGraph, GraphHandle*, GraphHandle* DepthPtr) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			auto* PostPassParts = PostPassEffect::Instance();
-			DoFNearScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 2000);
-			DoFFarScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 16, 20);
+			DoFNearScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 8, 2000);
+			DoFFarScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_GAUSS, 8, 20);
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->SetUseTextureToShader(0);
@@ -265,7 +265,7 @@ namespace DXLibRef {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			BufScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_TWO_COLOR, 250, Black, 255, Gray50, 255);
 			GaussScreen_.GraphFilterBlt(BufScreen, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-			GaussScreen_.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 1000);
+			GaussScreen_.GraphFilter(DX_GRAPH_FILTER_GAUSS, 8, 1000);
 			TargetGraph->SetDraw_Screen(false);
 			{
 				auto Prev = GetDrawMode();
@@ -473,7 +473,7 @@ namespace DXLibRef {
 		void SetEffect_Sub(GraphHandle* TargetGraph, GraphHandle*, GraphHandle*, GraphHandle*) noexcept override {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			AberrationScreen.GraphFilterBlt(*TargetGraph, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-			AberrationScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 1000);
+			AberrationScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 8, 1000);
 			BufScreen.GraphBlendBlt(*TargetGraph, bkScreen2, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 				DX_RGBA_SELECT_SRC_R, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_B, DX_RGBA_SELECT_BLEND_R);
 			TargetGraph->SetDraw_Screen(false);
@@ -846,7 +846,7 @@ namespace DXLibRef {
 			}
 			PostPassParts->SetGodRayPerByPostPass(1.f - std::clamp(GodRayRed / 128.f, 0.f, 1.f));
 
-			SSRScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 16, 300);
+			SSRScreen.GraphFilter(DX_GRAPH_FILTER_GAUSS, 8, 300);
 			TargetGraph->SetDraw_Screen();
 			{
 				ColorGraph->DrawGraph(0, 0, true);
