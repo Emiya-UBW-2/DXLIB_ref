@@ -89,16 +89,16 @@ namespace DXLibRef {
 		// サウンドが再生中かどうかを取得
 		bool	CheckPlay(void) const noexcept { return handle[nowSelect].CheckPlay(); }
 		// サウンドを一つ再生
-		int				Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int panpal = -256) noexcept {
-			int Answer = static_cast<int>(nowSelect);
+		const auto		Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int panpal = -256) noexcept {
+			auto Answer = nowSelect;
 			auto& NowHandle = handle[nowSelect];
 			NowHandle.Play(type_t, Flag_t);
 			if (panpal != -256) { NowHandle.Pan(panpal); }
 			++nowSelect %= handle.size();
 			return Answer;
 		}
-		int 			Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
-			int Answer = static_cast<int>(nowSelect);
+		const auto		Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
+			auto Answer = nowSelect;
 			auto& NowHandle = handle[nowSelect];
 			NowHandle.Play3D(pos_t, radius, type_t);
 			++nowSelect %= handle.size();
@@ -134,7 +134,7 @@ namespace DXLibRef {
 			if (path_t == "") { return; }
 			this->m_SoundID = SoundIDSelect;
 			this->m_Handles = std::make_unique<SoundHandles>(buffersize, path_t, is3Dsound);
-			m_SoundType = soundType;
+			this->m_SoundType = soundType;
 			FlipVolume();
 		}
 		// デストラクタ
@@ -143,15 +143,15 @@ namespace DXLibRef {
 		}
 	public:
 		//サウンドの識別用ID
-		const auto& GetSoundID(void)const noexcept { return m_SoundID; }
+		const auto& GetSoundID(void)const noexcept { return this->m_SoundID; }
 	public:
 		// サウンドが再生中かどうかを取得
 		bool			CheckPlay(void) const noexcept { return this->m_Handles->CheckPlay(); }
 		//再生中の音声をすべて停止
 		void			StopAll(void) noexcept { this->m_Handles->StopAll(); }
 		//再生
-		int				Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = TRUE, int panpal = -256) noexcept { return this->m_Handles->Play(type_t, Flag_t, panpal); }
-		int 			Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept { return this->m_Handles->Play3D(pos_t, radius, type_t); }
+		const auto		Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = TRUE, int panpal = -256) noexcept { return this->m_Handles->Play(type_t, Flag_t, panpal); }
+		const auto		Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept { return this->m_Handles->Play3D(pos_t, radius, type_t); }
 		// 音声の総裁性時間をミリ秒で取得
 		LONGLONG		GetTotalTIme(void) noexcept { return this->m_Handles->GetTotalTIme(); }
 		// その音量でのみの音量設定
@@ -168,7 +168,7 @@ namespace DXLibRef {
 		friend class SingletonBase<SoundPool>;
 	private:
 		//各種サウンドを保持しておくリスト
-		std::array<std::vector<std::unique_ptr<Soundhave>>, 2> m_SoundHas;
+		std::array<std::vector<std::unique_ptr<Soundhave>>, 2>	m_SoundHas;
 	private:
 		// コンストラクタ
 		SoundPool(void) noexcept {}// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete

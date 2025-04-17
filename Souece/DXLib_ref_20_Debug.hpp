@@ -7,7 +7,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<DebugDraw>;
 	private:
-		static const int	PointMax{ 12 };
+		static const size_t	PointMax{ 12 };
 		static const size_t	PointFrame{ 120 };
 	private:
 		LONGLONG													m_StartTime{ 0 };

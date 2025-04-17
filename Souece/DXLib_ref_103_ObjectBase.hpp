@@ -23,7 +23,7 @@ namespace DXLibRef {
 	public:
 		bool										m_IsEndLoadData{};
 	public:
-		ResourceModel(void) noexcept { m_IsEndLoadData = false; }
+		ResourceModel(void) noexcept { this->m_IsEndLoadData = false; }
 		ResourceModel(const ResourceModel&) = delete;
 		ResourceModel(ResourceModel&& o) = delete;
 		ResourceModel& operator=(const ResourceModel&) = delete;
@@ -88,7 +88,7 @@ namespace DXLibRef {
 		const auto&			GetMove(void) const noexcept { return this->m_move; }
 		const auto&			IsActive(void) const noexcept { return this->m_IsActive; }
 		const auto&			GetIsDelete(void) const noexcept { return this->m_IsDelete; }
-		const auto			IsDraw(int Range) const noexcept { return (Range == -1) ? true : this->m_IsDraw.at(Range); }
+		const auto			IsDraw(int Range) const noexcept { return (Range == InvalidID) ? true : this->m_IsDraw.at(Range); }
 	public:
 		void				SetMinAABB(const Vector3DX& value) noexcept { this->m_MinAABB = value; }
 		void				SetMaxAABB(const Vector3DX& value) noexcept { this->m_MaxAABB = value; }
@@ -122,7 +122,7 @@ namespace DXLibRef {
 			if (this->m_ColActive) {
 				return true;
 			}				// ‚·‚Å‚É‹N“®‚µ‚Ä‚¢‚é‚È‚ç–³Ž‹
-			if (GetMinLenSegmentToPoint(StartPos, EndPos, m_move.GetPos()) <= pRange) {
+			if (GetMinLenSegmentToPoint(StartPos, EndPos, this->m_move.GetPos()) <= pRange) {
 				// ”»’è‹N“®
 				this->m_ColActive = true;
 				for (int loop : std::views::iota(0, static_cast<int>(GetCol().GetMeshNum()))) {

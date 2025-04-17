@@ -10,38 +10,38 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		// VRが使えるかチェック
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			m_VR_ErrorHandle = vr::VRInitError_None;
-			m_VR_SystemPtr = vr::VR_Init(&m_VR_ErrorHandle, vr::VRApplication_Scene);
-			if (m_VR_ErrorHandle != vr::VRInitError_None) {
-				m_VR_SystemPtr = nullptr;
+			this->m_VR_ErrorHandle = vr::VRInitError_None;
+			this->m_VR_SystemPtr = vr::VR_Init(&this->m_VR_ErrorHandle, vr::VRApplication_Scene);
+			if (this->m_VR_ErrorHandle != vr::VRInitError_None) {
+				this->m_VR_SystemPtr = nullptr;
 				OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
 			}
 		}
 		// デバイスセット
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			m_VR_TrackerID.clear();
+			this->m_VR_TrackerID.clear();
 			char DeviceCount = 0;
 			bool IsFirstHand = true;
 			for (char loop = 0; loop < 8; ++loop) {
 				auto DeviceID = DeviceCount;
-				auto DeviceType = m_VR_SystemPtr->GetTrackedDeviceClass(loop);
+				auto DeviceType = this->m_VR_SystemPtr->GetTrackedDeviceClass(loop);
 				switch (DeviceType) {
 				case vr::TrackedDeviceClass_HMD:
-					m_VR_HMDID = DeviceID;
+					this->m_VR_HMDID = DeviceID;
 					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_Controller:
 					if (IsFirstHand) {
 						IsFirstHand = false;
-						m_VR_Hand1ID = DeviceID;
+						this->m_VR_Hand1ID = DeviceID;
 					}
 					else {
-						m_VR_Hand2ID = DeviceID;
+						this->m_VR_Hand2ID = DeviceID;
 					}
 					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_GenericTracker:
-					m_VR_TrackerID.emplace_back(DeviceID);
+					this->m_VR_TrackerID.emplace_back(DeviceID);
 					++DeviceCount;
 					break;
 				case vr::TrackedDeviceClass_TrackingReference:
@@ -50,8 +50,8 @@ namespace DXLibRef {
 				default:
 					continue;
 				}
-				m_VR_DeviceInfo.resize(DeviceCount);
-				m_VR_DeviceInfo.back().Init(DeviceID, loop, DeviceType);
+				this->m_VR_DeviceInfo.resize(DeviceCount);
+				this->m_VR_DeviceInfo.back().Init(DeviceID, loop, DeviceType);
 			}
 		}
 	}
@@ -60,19 +60,19 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// 画面セット
-			m_OutScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());	// 左目
+			this->m_OutScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());	// 左目
 			UI_Screen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);	// UI
 		}
 	}
 	void VRControl::Execute(void) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-			for (auto& c : m_VR_DeviceInfo) {
-				c.Update(m_VR_SystemPtr);
+			for (auto& c : this->m_VR_DeviceInfo) {
+				c.Update(this->m_VR_SystemPtr);
 			}
 		}
 		else {
-			for (auto& c : m_VR_DeviceInfo) {
+			for (auto& c : this->m_VR_DeviceInfo) {
 				c.Reset();
 			}
 		}
@@ -97,7 +97,7 @@ namespace DXLibRef {
 			tmp_cam.GetCamUp()
 		);
 		// 目線用に合成
-		m_OutScreen.SetDraw_Screen();
+		this->m_OutScreen.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
 		{
 			MainDrawScreen.DrawGraph(0, 0, true);
@@ -117,7 +117,7 @@ namespace DXLibRef {
 		// 合成したものをBACKに持ってきて
 		GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK));
 		{
-			m_OutScreen.DrawGraph(0, 0, false);
+			this->m_OutScreen.DrawGraph(0, 0, false);
 			doingUI2();
 		}
 		// それぞれの目にDX_SCREEN_BACKの内容を送信
@@ -134,7 +134,7 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			// vr::VR_Shutdown();
-			m_VR_SystemPtr = nullptr;
+			this->m_VR_SystemPtr = nullptr;
 		}
 	}
 #endif

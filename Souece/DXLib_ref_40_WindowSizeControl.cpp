@@ -48,7 +48,7 @@ namespace DXLibRef {
 			// 解像度指定
 			uint32_t t_x = 1080;
 			uint32_t t_y = 1200;
-			// m_VR_SystemPtr->GetRecommendedRenderTargetSize(&t_x,&t_y);
+			// this->m_VR_SystemPtr->GetRecommendedRenderTargetSize(&t_x,&t_y);
 			int DispXSize = static_cast<int>(t_x) * 2;
 			int DispYSize = static_cast<int>(t_y) * 2;
 
@@ -58,15 +58,9 @@ namespace DXLibRef {
 			this->m_DispYSize_Border = DispYSize;
 		}
 		else {
-			// DPI設定
-			int DPI = 96;
-			GetMonitorDpi(NULL, &DPI);
-			if (DPI == 0) {
-				DPI = 96;
-			}
 			// DPIを反映するデスクトップサイズ
-			int DispXSize = static_cast<int>(GetSystemMetrics(SM_CXSCREEN)) * 96 / DPI;
-			int DispYSize = static_cast<int>(GetSystemMetrics(SM_CYSCREEN)) * 96 / DPI;
+			int DispXSize = GetSystemMetrics(SM_CXSCREEN) * BaseDPI / GetDPI();
+			int DispYSize = GetSystemMetrics(SM_CYSCREEN) * BaseDPI / GetDPI();
 			// 解像度指定
 			if (DispYSize >= (DispXSize * BaseScreenHeight / BaseScreenWidth)) {// 4:3
 				DispYSize = (DispXSize * BaseScreenHeight / BaseScreenWidth);

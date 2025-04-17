@@ -18,10 +18,10 @@ namespace DXLibRef {
 
 		Camera3DInfo				m_MainCamera;				// カメラ
 	public:
-		const auto& GetMainCamera(void) const noexcept { return m_MainCamera; }
-		auto& SetMainCamera(void) noexcept { return m_MainCamera; }
+		const auto& GetMainCamera(void) const noexcept { return this->m_MainCamera; }
+		auto& SetMainCamera(void) noexcept { return this->m_MainCamera; }
 	public:
-		const auto& GetCamShake(void) const noexcept { return m_CamShake2; }
+		const auto& GetCamShake(void) const noexcept { return this->m_CamShake2; }
 	public:
 		void			SetCamShake(float time, float power) noexcept {
 			this->m_SendCamShake = true;
@@ -34,6 +34,8 @@ namespace DXLibRef {
 		Camera3D(Camera3D&& o) = delete;
 		Camera3D& operator=(const Camera3D&) = delete;
 		Camera3D& operator=(Camera3D&& o) = delete;
+
+		virtual ~Camera3D(void) noexcept {}
 	public:
 		void Update(void) noexcept;
 	};

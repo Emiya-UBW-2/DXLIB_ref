@@ -2,6 +2,8 @@
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
+	constexpr int BaseDPI = 96;
+
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// 補完
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -47,7 +49,7 @@ namespace DXLibRef {
 	/*DXLIBラッパー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// ランダム
-	static float GetRandf(float m_arg) noexcept { return -m_arg + static_cast<float>(GetRand(static_cast<int>(m_arg * 2.f * 10000.f))) / 10000.f; }
+	static float GetRandf(float arg) noexcept { return -arg + static_cast<float>(GetRand(static_cast<int>(arg * 2.f * 10000.f))) / 10000.f; }
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// IK
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -147,18 +149,18 @@ namespace DXLibRef {
 			this->m_LocalPos = tgt.m_LocalPos;
 		}
 		void			Set(int frameID, const MV1& obj) noexcept {
-			m_FrameID = frameID;
-			m_WorldPos = obj.GetFrameLocalWorldMatrix(frameID);
+			this->m_FrameID = frameID;
+			this->m_WorldPos = obj.GetFrameLocalWorldMatrix(frameID);
 			if (obj.GetFrameParent(frameID) >= 0) {
-				m_LocalPos = obj.GetFrameLocalMatrix(frameID);
+				this->m_LocalPos = obj.GetFrameLocalMatrix(frameID);
 			}
 			else {
-				m_LocalPos = obj.GetFrameLocalWorldMatrix(frameID);// 
+				this->m_LocalPos = obj.GetFrameLocalWorldMatrix(frameID);// 
 			}
 		}
-		const auto& GetFrameID(void) const noexcept { return m_FrameID; }
-		const auto& GetFrameWorldPosition(void) const noexcept { return m_WorldPos; }
-		const auto& GetFrameLocalPosition(void) const noexcept { return m_LocalPos; }
+		const auto&		GetFrameID(void) const noexcept { return this->m_FrameID; }
+		const auto&		GetFrameWorldPosition(void) const noexcept { return this->m_WorldPos; }
+		const auto&		GetFrameLocalPosition(void) const noexcept { return this->m_LocalPos; }
 	};
 
 	// 位置情報
@@ -170,13 +172,13 @@ namespace DXLibRef {
 		Matrix3x3DX mat;	// 回転
 		Matrix3x3DX matbuf;	// 回転
 	public:
-		const auto& GetPos(void) const noexcept { return pos; }
-		const auto& GetRePos(void) const noexcept { return repos; }
-		const auto& GetVec(void) const noexcept { return vec; }
-		const auto& GetMat(void) const noexcept { return mat; }
+		const auto&		GetPos(void) const noexcept { return pos; }
+		const auto&		GetRePos(void) const noexcept { return repos; }
+		const auto&		GetVec(void) const noexcept { return vec; }
+		const auto&		GetMat(void) const noexcept { return mat; }
 
-		const auto& GetPosBuf(void) const noexcept { return posbuf; }// 演算以外では使うな
-		const auto& GetMatBuf(void) const noexcept { return matbuf; }// 演算以外では使うな
+		const auto&		GetPosBuf(void) const noexcept { return posbuf; }// 演算以外では使うな
+		const auto&		GetMatBuf(void) const noexcept { return matbuf; }// 演算以外では使うな
 	public:
 		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
 		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
@@ -239,7 +241,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<SaveData>;
 	private:
-		std::vector<SaveParam> m_data;
+		std::vector<SaveParam>	m_data;
 	private:
 		SaveData(void) noexcept {
 			Load();
@@ -250,7 +252,7 @@ namespace DXLibRef {
 		SaveData& operator=(SaveData&& o) = delete;
 	public:
 		SaveParam* GetData(std::string_view Name) noexcept {
-			for (auto& d : m_data) {
+			for (auto& d : this->m_data) {
 				if (d.first == Name) {
 					return &d;
 				}
@@ -264,7 +266,7 @@ namespace DXLibRef {
 				Data->second = value;
 			}
 			else {
-				m_data.emplace_back(std::make_pair((std::string)Name, value));
+				this->m_data.emplace_back(std::make_pair((std::string)Name, value));
 			}
 		}
 		auto GetParam(std::string_view Name) noexcept {
@@ -277,14 +279,14 @@ namespace DXLibRef {
 	public:
 		void Save(void) noexcept {
 			std::ofstream outputfile("Save/new.svf");
-			for (auto& d : m_data) {
+			for (auto& d : this->m_data) {
 				outputfile << d.first + "=" + std::to_string(d.second) + "\n";
 			}
 			outputfile.close();
 		}
 		bool Load(void) noexcept;
 		void Reset(void) noexcept {
-			m_data.clear();
+			this->m_data.clear();
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -297,43 +299,43 @@ namespace DXLibRef {
 		IPDATA		m_RecvIp{ 127,0,0,1 };			// 受信用ＩＰアドレスデータ
 		int			m_RecvPort{ 0 };				// 受信用ポート
 	public:
-		auto			IsActive(void) const noexcept { return (m_Handle != InvalidID); }
+		auto			IsActive(void) const noexcept { return (this->m_Handle != InvalidID); }
 	public:
-		void			SetServerIP(const IPDATA& pIP) noexcept { m_SendIP = pIP; }// クライアントは必ず行う
+		void			SetServerIP(const IPDATA& pIP) noexcept { this->m_SendIP = pIP; }// クライアントは必ず行う
 		bool			Init(bool IsServer, int PORT = InvalidID) noexcept {
 			if (!IsActive()) {
-				m_SendPort = PORT;
-				m_Handle = MakeUDPSocket(IsServer ? m_SendPort : InvalidID);
+				this->m_SendPort = PORT;
+				this->m_Handle = MakeUDPSocket(IsServer ? this->m_SendPort : InvalidID);
 			}
-			return m_Handle != InvalidID;
+			return this->m_Handle != InvalidID;
 		}
 		void			Dispose(void) noexcept {
 			if (IsActive()) {
-				DeleteUDPSocket(m_Handle);	// ＵＤＰソケットハンドルの削除
-				m_Handle = InvalidID;
-				m_SendPort = InvalidID;
+				DeleteUDPSocket(this->m_Handle);	// ＵＤＰソケットハンドルの削除
+				this->m_Handle = InvalidID;
+				this->m_SendPort = InvalidID;
 			}
 		}
 	private:
 		template<class T>
 		int				SendData(IPDATA& Ip, int SendPort, const T& Data) noexcept {
 			if (IsActive()) {
-				return NetWorkSendUDP(m_Handle, Ip, SendPort, &Data, sizeof(T));
+				return NetWorkSendUDP(this->m_Handle, Ip, SendPort, &Data, sizeof(T));
 			}
 			return InvalidID;
 		}
 	public:
 		// 送信
 		template<class T>
-		int				SendData(const T& Data) noexcept { return SendData(m_SendIP, m_SendPort, Data); }
+		int				SendData(const T& Data) noexcept { return SendData(this->m_SendIP, this->m_SendPort, Data); }
 		// 受信
 		template<class T>
 		bool			RecvData(T* Data, int* RecvReturn, bool IsPeek) noexcept {
 			*RecvReturn = InvalidID;
 			if (IsActive()) {
-				switch (CheckNetWorkRecvUDP(m_Handle)) {
+				switch (CheckNetWorkRecvUDP(this->m_Handle)) {
 				case TRUE:
-					*RecvReturn = NetWorkRecvUDP(m_Handle, &m_RecvIp, &m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// 受信
+					*RecvReturn = NetWorkRecvUDP(this->m_Handle, &this->m_RecvIp, &this->m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// 受信
 					return true;
 				case FALSE:// 待機
 					break;
@@ -345,7 +347,7 @@ namespace DXLibRef {
 		}
 		// 返送
 		template<class T>
-		int				ReturnData(const T& Data) noexcept { return SendData(m_RecvIp, m_RecvPort, Data); }
+		int				ReturnData(const T& Data) noexcept { return SendData(this->m_RecvIp, this->m_RecvPort, Data); }
 	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -369,7 +371,7 @@ namespace DXLibRef {
 
 		std::array<std::string, 12> CPUStr;
 		std::array<std::string, 12> GPUStr;
-		std::thread m_thread;
+		std::thread					m_thread;
 	public:
 		CheckPCSpec(void) noexcept {}
 		CheckPCSpec(const CheckPCSpec&) = delete;
@@ -377,8 +379,8 @@ namespace DXLibRef {
 		CheckPCSpec& operator=(const CheckPCSpec&) = delete;
 		CheckPCSpec& operator=(CheckPCSpec&& o) = delete;
 		~CheckPCSpec(void) noexcept {
-			if (m_thread.joinable()) {
-				m_thread.detach();
+			if (this->m_thread.joinable()) {
+				this->m_thread.detach();
 			}
 		}
 	public:
@@ -407,20 +409,29 @@ namespace DXLibRef {
 	public:
 		void FindCPU(void) noexcept;
 	public:
-		const auto* GetCPUDatas(void) const noexcept { return IsEnd ? &CPUResult : nullptr; }
-		const auto* GetGPUDatas(void) const noexcept { return IsEnd ? &GPUResult : nullptr; }
-		const auto& GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
-		const auto& GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
+		const auto*		GetCPUDatas(void) const noexcept { return IsEnd ? &CPUResult : nullptr; }
+		const auto*		GetGPUDatas(void) const noexcept { return IsEnd ? &GPUResult : nullptr; }
+		const auto&		GetFreeMemorySize(void) const noexcept { return FreeMemorySize; }
+		const auto&		GetTotalMemorySize(void) const noexcept { return TotalMemorySize; }
 	public:
 		void StartSearch(void) noexcept {
 			GetPcInfo(NULL, NULL, CPUString, NULL, &FreeMemorySize, &TotalMemorySize, NULL, GPUString, NULL, NULL);
 			GetOnlyNumber(CPUString, &CPUStr);
 			GetOnlyNumber(GPUString, &GPUStr);
-			if (m_thread.joinable()) {
-				m_thread.detach();
+			if (this->m_thread.joinable()) {
+				this->m_thread.detach();
 			}
 			std::thread newThead(&CheckPCSpec::FindCPU, this);
-			m_thread.swap(newThead);
+			this->m_thread.swap(newThead);
 		}
 	};
+
+	static int GetDPI() noexcept {
+		int DPI = BaseDPI;
+		GetMonitorDpi(NULL, &DPI);
+		if (DPI == 0) {
+			DPI = BaseDPI;
+		}
+		return DPI;
+	}
 }

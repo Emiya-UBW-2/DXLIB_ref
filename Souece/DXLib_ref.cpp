@@ -10,8 +10,8 @@ namespace DXLibRef {
 		auto* SaveDataParts = SaveData::Instance();
 		auto* OptionParts = OptionManager::Instance();
 		// ロード
-		m_IsFirstBoot = !SaveDataParts->Load();
-		if (m_IsFirstBoot) {
+		this->m_IsFirstBoot = !SaveDataParts->Load();
+		if (this->m_IsFirstBoot) {
 			// 初回データ作成
 			SaveDataParts->Save();
 			OptionParts->SetParamBoolean(EnumSaveParam::usevr, false);
@@ -33,15 +33,7 @@ namespace DXLibRef {
 		SetUseDirect3DVersion(DirectXVerID[OptionParts->GetParamInt(EnumSaveParam::DirectXVer)]);								// directX ver
 		SetUseDirectInputFlag(TRUE);								// 
 		SetDirectInputMouseMode(TRUE);								// 
-		{
-			// DPI設定
-			int DPI = 96;
-			GetMonitorDpi(NULL, &DPI);
-			if (DPI == 0) {
-				DPI = 96;
-			}
-			SetGraphMode(WindowSizeParts->GetSizeXMax() * DPI / 96, WindowSizeParts->GetSizeYMax() * DPI / 96, 32);		// 解像度
-		}
+		SetGraphMode(WindowSizeParts->GetSizeXMax() * GetDPI() / BaseDPI, WindowSizeParts->GetSizeYMax() * GetDPI() / BaseDPI, 32);		// 解像度
 		SetWindowSizeChangeEnableFlag(FALSE, FALSE);				// ウインドウサイズを手動不可、ウインドウサイズに合わせて拡大もしないようにする
 		Set3DSoundOneMetre(1.0f);									// 
 		SetZBufferBitDepth(32);										// デフォのZバッファ精度を32bitに
@@ -83,7 +75,7 @@ namespace DXLibRef {
 	}
 	bool			DXLib_ref::FirstBootSetting(void) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		if (m_IsFirstBoot) {
+		if (this->m_IsFirstBoot) {
 			SetMainWindowText("FirstBoot Option");						// タイトル
 			auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 			auto* OptionWindowParts = OptionPopup::Instance();
@@ -133,10 +125,10 @@ namespace DXLibRef {
 					int xp = Width + Edge + Edge;
 					int yp = Edge;
 					if (WindowSystem::SetMsgClickBox(xp, yp, xp + (400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
-						m_CheckPCSpec.StartSearch();
+						this->m_CheckPCSpec.StartSearch();
 					}
 					yp += (24);
-					if (m_CheckPCSpec.GetCPUDatas()) {
+					if (this->m_CheckPCSpec.GetCPUDatas()) {
 						int MouseOverID = InvalidID;
 						// CPU
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
@@ -183,7 +175,7 @@ namespace DXLibRef {
 								White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 							yp += LineHeight;
 						}
-						if (m_CheckPCSpec.GetCPUDatas()->size() == 0) {
+						if (this->m_CheckPCSpec.GetCPUDatas()->size() == 0) {
 							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 								Red, DarkGreen, LocalizeParts->Get(2005)); yp += LineHeight;
@@ -196,10 +188,10 @@ namespace DXLibRef {
 
 							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
-								White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", m_CheckPCSpec.GetFreeMemorySize(), m_CheckPCSpec.GetTotalMemorySize());
+								White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", this->m_CheckPCSpec.GetFreeMemorySize(), this->m_CheckPCSpec.GetTotalMemorySize());
 							int TextID = 0;
 							unsigned int Color = White;
-							if ((m_CheckPCSpec.GetTotalMemorySize() - m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {// 
+							if ((this->m_CheckPCSpec.GetTotalMemorySize() - this->m_CheckPCSpec.GetFreeMemorySize()) >= 2000) {// 
 								Color = Green;
 								TextID = 2012;
 							}
@@ -269,7 +261,7 @@ namespace DXLibRef {
 								White, DarkGreen, "PassMark Score:%d", c.m_Score); yp += LineHeight;
 							yp += LineHeight;
 						}
-						if (m_CheckPCSpec.GetGPUDatas()->size() == 0) {
+						if (this->m_CheckPCSpec.GetGPUDatas()->size() == 0) {
 							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xp, yp,
 								Red, DarkGreen, LocalizeParts->Get(2025)); yp += LineHeight;
@@ -346,7 +338,7 @@ namespace DXLibRef {
 		VRParts->SetupBuffer();
 #endif
 		//
-		m_Update_effect_was = GetNowHiPerformanceCount();
+		this->m_Update_effect_was = GetNowHiPerformanceCount();
 	}
 	void			DXLib_ref::MainLogic(void) noexcept {
 		auto* SceneParts = SceneControl::Instance();
@@ -368,8 +360,8 @@ namespace DXLibRef {
 			SceneParts->Update();
 			// 
 #if defined(_USE_EFFEKSEER_)
-			if (!SceneParts->IsPause() && ((m_StartTime - m_Update_effect_was) >= 1000000 / 60)) {
-				m_Update_effect_was = m_StartTime;
+			if (!SceneParts->IsPause() && ((this->m_StartTime - this->m_Update_effect_was) >= 1000000 / 60)) {
+				this->m_Update_effect_was = this->m_StartTime;
 				UpdateEffekseer3D();
 			}
 #endif
@@ -420,22 +412,22 @@ namespace DXLibRef {
 	}
 	// ループの最初に通す
 	void			DXLib_ref::StartCount(void) noexcept {
-		m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000000.f;
-		m_DeltaTime = std::min(m_DeltaTime, 1.f / 30.f);
-		m_StartTime = GetNowHiPerformanceCount();
+		this->m_DeltaTime = static_cast<float>(GetNowHiPerformanceCount() - this->m_StartTime) / 1000000.f;
+		this->m_DeltaTime = std::min(this->m_DeltaTime, 1.f / 30.f);
+		this->m_StartTime = GetNowHiPerformanceCount();
 	}
 	// 表画面に反映し、垂直同期または一定のFPSまで待機する
 	bool			DXLib_ref::WaitCount(void) const noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::vsync)) {
 			// 4msだけスリープ
-			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
+			while ((GetNowHiPerformanceCount() - this->m_StartTime) < static_cast<LONGLONG>(1000 * (1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 4))) {
 				if (ProcessMessage() != 0) {
 					return false;
 				}
 				SleepThread(1);	// 1msecスリープする
 			}
-			while ((GetNowHiPerformanceCount() - m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {
+			while ((GetNowHiPerformanceCount() - this->m_StartTime) < static_cast<LONGLONG>(1000 * 1000 / OptionParts->GetParamInt(EnumSaveParam::FpsLimit))) {
 			}
 		}
 		else {

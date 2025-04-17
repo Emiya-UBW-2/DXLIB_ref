@@ -10,30 +10,27 @@ namespace DXLibRef {
 	void			switchs::Update(bool key) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		//押したと記録
-		m_press = key;
-		//押したらカウントアップ、離したらカウントダウン
-		m_presscount = static_cast<int8_t>(std::clamp(static_cast<int>(m_presscount) + (m_press ? 1 : -1), 0, 2));
+		this->m_prevpress = this->m_press;
+		this->m_press = key;
 		//リピート処理
-		m_repeat = trigger();//押した瞬間か、もしくは...
+		this->m_repeat = trigger();//押した瞬間か、もしくは...
 		//押してから一定時間後、一定間隔でtrueに
-		if (m_press) {
-			m_repeatcount -= DXLib_refParts->GetDeltaTime();
-			if (m_repeatcount <= 0.f) {
-				m_repeatcount += m_RepeatTime;
-				m_repeat = true;
+		if (this->m_press) {
+			this->m_repeatcount += DXLib_refParts->GetDeltaTime();
+			if (this->m_repeatcount >= this->m_RepeatTime) {
+				this->m_repeatcount -= this->m_RepeatTime;
+				this->m_repeat = true;
 			}
 		}
 		else {
 			//離したら押してからのカウントをリセット
-			m_repeatcount = m_RepeatWaitTime;
+			this->m_repeatcount = 0;
 		}
 	}
 	//
 	bool IntoMouse(int x1, int y1, int x2, int y2) noexcept {
 		auto* Pad = PadControl::Instance();
-		int mx = Pad->GetMS_X();
-		int my = Pad->GetMS_Y();
-		return HitPointToRectangle(mx, my, x1, y1, x2, y2);
+		return HitPointToRectangle(Pad->GetMS_X(), Pad->GetMS_Y(), x1, y1, x2, y2);
 	}
 	// --------------------------------------------------------------------------------------------------
 	// 
@@ -86,20 +83,20 @@ namespace DXLibRef {
 				NextControlType = (Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
 			}
 			//以前の設定と異なる場合は
-			if (m_ControlType != NextControlType) {
+			if (this->m_ControlType != NextControlType) {
 				Save();									//元のコントロールパッドの設定を保存
-				m_ControlType = NextControlType;		//変更
+				this->m_ControlType = NextControlType;		//変更
 				Load();									//次のコントロールパッドの情報をロード
 				KeyGuideParts->SetGuideFlip();			//ガイド表示をアップデート
 			}
 		}
 		//マウス座標を取得しておく
-		int PrevX = m_MouseX;
-		int PrevY = m_MouseY;
+		int PrevX = this->m_MouseX;
+		int PrevY = this->m_MouseY;
 		//マウス座標を取得しておく
-		GetMousePoint(&m_MouseX, &m_MouseY);
-		m_MouseX = m_MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
-		m_MouseY = m_MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
+		GetMousePoint(&this->m_MouseX, &this->m_MouseY);
+		this->m_MouseX = this->m_MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
+		this->m_MouseY = this->m_MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UI座標系に合わせて変換
 		// タイプに合わせた操作
 		switch (GetControlType()) {
 		case Controls::ControlType::XBox:
@@ -150,12 +147,12 @@ namespace DXLibRef {
 				RS_Y = 1000 * RS_Y / 32768;
 
 				if (!SceneParts->IsPause()) {
-					m_Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-					m_Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+					this->m_Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+					this->m_Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 				}
 				else {
-					m_Look_XradAdd = 0.f;
-					m_Look_YradAdd = 0.f;
+					this->m_Look_XradAdd = 0.f;
+					this->m_Look_YradAdd = 0.f;
 				}
 			}
 		}
@@ -199,12 +196,12 @@ namespace DXLibRef {
 					RS_Y = input.Y;
 				}
 				if (!SceneParts->IsPause()) {
-					m_Look_XradAdd = static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					m_Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					this->m_Look_XradAdd = static_cast<float>(RS_X) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					this->m_Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 4.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				else {
-					m_Look_XradAdd = 0.f;
-					m_Look_YradAdd = 0.f;
+					this->m_Look_XradAdd = 0.f;
+					this->m_Look_YradAdd = 0.f;
 				}
 			}
 		}
@@ -212,12 +209,12 @@ namespace DXLibRef {
 		case Controls::ControlType::PC:
 		{
 			//マウスによる入力(FPS、TPS)の場合
-			if (m_MouseMoveEnable) {
+			if (this->m_MouseMoveEnable) {
 				//最前面でポーズ中でない場合
 				if ((GetMainWindowHandle() == GetForegroundWindow()) && !SceneParts->IsPause()) {
 					// 視点移動は前フレームからの移動量
-					m_Look_XradAdd = static_cast<float>(m_MouseX - WindowSizeParts->GetUIXMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					m_Look_YradAdd = -static_cast<float>(m_MouseY - WindowSizeParts->GetUIYMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					this->m_Look_XradAdd = static_cast<float>(this->m_MouseX - WindowSizeParts->GetUIXMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					this->m_Look_YradAdd = -static_cast<float>(this->m_MouseY - WindowSizeParts->GetUIYMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 					//移動をリセット
 					SetMousePoint(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
 					//マウスを表示しない
@@ -227,14 +224,14 @@ namespace DXLibRef {
 					//マウスを表示
 					SetMouseDispFlag(TRUE);
 					// 視点移動はなしとして上書き
-					m_Look_XradAdd = 0.f;
-					m_Look_YradAdd = 0.f;
+					this->m_Look_XradAdd = 0.f;
+					this->m_Look_YradAdd = 0.f;
 				}
 			}
 			else {
 				// 視点移動は前フレームからの移動量
-				m_Look_XradAdd = static_cast<float>(m_MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-				m_Look_YradAdd = -static_cast<float>(m_MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+				this->m_Look_XradAdd = static_cast<float>(this->m_MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+				this->m_Look_YradAdd = -static_cast<float>(this->m_MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				//マウスを表示
 				SetMouseDispFlag(TRUE);
 			}
@@ -272,19 +269,19 @@ namespace DXLibRef {
 		}
 		// その他特殊入力
 		{
-			m_MouseClick.Update(GetWindowActiveFlag() ? ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) : false);
+			this->m_MouseClick.Update(GetWindowActiveFlag() ? ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) : false);
 			if (GetWindowActiveFlag()) {
-				m_MouseWheelRot = GetMouseWheelRotVol();
+				this->m_MouseWheelRot = GetMouseWheelRotVol();
 			}
 			else {
 				GetMouseWheelRotVol();//前回との差分が入る仕組みなのでアクティブでない場合も通してはおくように
-				m_MouseWheelRot = 0;
+				this->m_MouseWheelRot = 0;
 			}
 		}
-		if (m_PrevIsActiveLS != (m_MouseMoveEnable && GetWindowActiveFlag() == TRUE)) {
-			m_Look_XradAdd = 0.f;
-			m_Look_YradAdd = 0.f;
+		if (this->m_PrevIsActiveLS != (this->m_MouseMoveEnable && GetWindowActiveFlag() == TRUE)) {
+			this->m_Look_XradAdd = 0.f;
+			this->m_Look_YradAdd = 0.f;
 		}
-		m_PrevIsActiveLS = (m_MouseMoveEnable && GetWindowActiveFlag() == TRUE);
+		this->m_PrevIsActiveLS = (this->m_MouseMoveEnable && GetWindowActiveFlag() == TRUE);
 	}
 };

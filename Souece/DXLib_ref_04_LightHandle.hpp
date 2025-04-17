@@ -44,7 +44,7 @@ namespace DXLibRef {
 		LightPool& operator=(LightPool&& o) = delete;
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
-			size_t prev = m_now;
+			size_t prev = this->m_now;
 			handles[m_now].Dispose();
 			// handles[m_now].time = GetNowHiPerformanceCount();
 			switch (Lighttype) {

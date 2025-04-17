@@ -22,27 +22,21 @@ namespace DXLibRef {
 		const auto		GetScreenX(int value) const noexcept { return value * this->m_ScreenXSize / BaseScreenWidth; }
 		const auto		GetScreenY(int value) const noexcept { return value * this->m_ScreenYSize / BaseScreenHeight; }
 		// UI以外のスクリーン空間(1920,1080の場合)
-		const auto& GetScreenXMax(void) const noexcept { return this->m_ScreenXSize; }
-		const auto& GetScreenYMax(void) const noexcept { return this->m_ScreenYSize; }
+		const auto&		GetScreenXMax(void) const noexcept { return this->m_ScreenXSize; }
+		const auto&		GetScreenYMax(void) const noexcept { return this->m_ScreenYSize; }
 		// UI用
 		const auto		GetUIX(int value) const noexcept { return value * this->m_DispXSize / BaseScreenWidth; }
 		const auto		GetUIY(int value) const noexcept { return value * this->m_DispYSize / BaseScreenHeight; }
 		// UI用(1920,1080の場合)
-		const auto& GetUIXMax(void) const noexcept { return this->m_DispXSize; }
-		const auto& GetUIYMax(void) const noexcept { return this->m_DispYSize; }
+		const auto&		GetUIXMax(void) const noexcept { return this->m_DispXSize; }
+		const auto&		GetUIYMax(void) const noexcept { return this->m_DispYSize; }
 		// UI用(1920,1080の場合)
-		const auto& GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
-		const auto& GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
+		const auto&		GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
+		const auto&		GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
 	public:
 		void			SetWindowOrBorderless(void) noexcept;
 		void			UpdateWindowSize(void) const noexcept {
-			// DPI設定
-			int DPI = 96;
-			GetMonitorDpi(NULL, &DPI);
-			if (DPI == 0) {
-				DPI = 96;
-			}
-			SetWindowSize(this->m_DispXSize * DPI / 96, this->m_DispYSize * DPI / 96);
+			SetWindowSize(this->m_DispXSize * GetDPI() / BaseDPI, this->m_DispYSize * GetDPI() / BaseDPI);
 		}
 	private:// コンストラクタ
 		WindowSizeControl(void) noexcept{}

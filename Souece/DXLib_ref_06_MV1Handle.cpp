@@ -5,7 +5,7 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	void MV1::AnimControler::Update(const bool& loop, float speed) noexcept {
+	void MV1::AnimControler::Update(bool loop, float speed) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		this->m_time += 30.f * DXLib_refParts->GetDeltaTime() * speed;
 		if (loop) {

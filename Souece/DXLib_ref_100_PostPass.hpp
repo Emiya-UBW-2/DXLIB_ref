@@ -3,6 +3,7 @@
 
 //#define _USE_WAVECALC_
 namespace DXLibRef {
+
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*シェーダー																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -62,33 +63,33 @@ namespace DXLibRef {
 #endif
 	private:
 		// シェーダーハンドル
-		int m_VertexShaderhandle{ InvalidID };
-		int m_GeometryShaderhandle{ InvalidID };
-		int m_PixelShaderhandle{ InvalidID };
+		int					m_VertexShaderhandle{ InvalidID };
+		int					m_GeometryShaderhandle{ InvalidID };
+		int					m_PixelShaderhandle{ InvalidID };
 		// シェーダーに渡す追加パラメーターを配するハンドル
-		std::array<int, 2> LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
-		std::array<int, 4> m_VertexShadercbhandle{};
-		int m_GeometryShaderMatcbhandle{ InvalidID };
-		int m_PixelShaderSendDispSizeHandle{ InvalidID };
-		std::array<int, 3> m_PixelShadercbhandle{};
+		std::array<int, 2>	LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
+		std::array<int, 4>	m_VertexShadercbhandle{};
+		int					m_GeometryShaderMatcbhandle{ InvalidID };
+		int					m_PixelShaderSendDispSizeHandle{ InvalidID };
+		std::array<int, 3>	m_PixelShadercbhandle{};
 #if defined(_USE_WAVECALC_)
 		ImmutableCB WaveData{};
-		int m_VertexShadercbWaveDataHandle{ InvalidID };
+		int	m_VertexShadercbWaveDataHandle{ InvalidID };
 #endif
 		ScreenVertex	m_ScreenVertex;					// 頂点データ
 	public:
 		ShaderController(void) noexcept {
 			// シェーダーハンドル
-			m_VertexShaderhandle = InvalidID;
-			m_GeometryShaderhandle = InvalidID;
-			m_PixelShaderhandle = InvalidID;
+			this->m_VertexShaderhandle = InvalidID;
+			this->m_GeometryShaderhandle = InvalidID;
+			this->m_PixelShaderhandle = InvalidID;
 			// シェーダーに渡す追加パラメーターを配するハンドル
-			for (auto& h : m_VertexShadercbhandle) {
+			for (auto& h : this->m_VertexShadercbhandle) {
 				h = InvalidID;
 			}
-			m_GeometryShaderMatcbhandle = InvalidID;
-			m_PixelShaderSendDispSizeHandle = InvalidID;
-			for (auto& h : m_PixelShadercbhandle) {
+			this->m_GeometryShaderMatcbhandle = InvalidID;
+			this->m_PixelShaderSendDispSizeHandle = InvalidID;
+			for (auto& h : this->m_PixelShadercbhandle) {
 				h = InvalidID;
 			}
 		}
@@ -101,15 +102,15 @@ namespace DXLibRef {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			// 頂点シェーダー周り
 #if defined(_USE_WAVECALC_)
-			m_VertexShadercbWaveDataHandle = CreateShaderConstantBuffer(sizeof(ImmutableCB));
+			this->m_VertexShadercbWaveDataHandle = CreateShaderConstantBuffer(sizeof(ImmutableCB));
 #endif
-			for (auto& h : m_VertexShadercbhandle) {
+			for (auto& h : this->m_VertexShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
 			this->m_VertexShaderhandle = LoadVertexShader(VertexShader);
 			// ピクセルシェーダ―周り
 			this->m_PixelShaderSendDispSizeHandle = CreateShaderConstantBuffer(sizeof(float) * 4);
-			for (auto& h : m_PixelShadercbhandle) {
+			for (auto& h : this->m_PixelShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
 			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);
@@ -130,11 +131,11 @@ namespace DXLibRef {
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				DeleteShaderConstantBuffer(h);
 			}
-			for (auto& h : m_VertexShadercbhandle) {
+			for (auto& h : this->m_VertexShadercbhandle) {
 				DeleteShaderConstantBuffer(h);
 			}
 #if defined(_USE_WAVECALC_)
-			DeleteShaderConstantBuffer(m_VertexShadercbWaveDataHandle);
+			DeleteShaderConstantBuffer(this->m_VertexShadercbWaveDataHandle);
 #endif
 			DeleteShader(this->m_VertexShaderhandle);
 			// 
@@ -142,7 +143,7 @@ namespace DXLibRef {
 			DeleteShader(this->m_GeometryShaderhandle);
 			// ピクセルシェーダ―周り
 			DeleteShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);
-			for (auto& h : m_PixelShadercbhandle) {
+			for (auto& h : this->m_PixelShadercbhandle) {
 				DeleteShaderConstantBuffer(h);
 			}
 			DeleteShader(this->m_PixelShaderhandle);
@@ -255,7 +256,7 @@ namespace DXLibRef {
 			dispsize->v = static_cast<float>(dispy);
 			UpdateShaderConstantBuffer(BufferHandle);									// ピクセルシェーダー用の定数バッファを更新して書き込んだ内容を反映する
 			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, 2);				// ピクセルシェーダー用の定数バッファを定数バッファレジスタ2にセット
-			m_ScreenVertex.SetScreenVertex(dispx, dispy);
+			this->m_ScreenVertex.SetScreenVertex(dispx, dispy);
 		}
 		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
@@ -288,10 +289,10 @@ namespace DXLibRef {
 		// 2D画像に適用する場合の関数
 		void			Draw(void) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			Draw_lamda([this] {DrawPolygon3DToShader(m_ScreenVertex.GetScreenVertex(), 2); });
+			Draw_lamda([this] {DrawPolygon3DToShader(this->m_ScreenVertex.GetScreenVertex(), 2); });
 		}
 		// 2D画像に適用する場合の関数
-		void			Draw(ScreenVertex& Screenvertex) const noexcept {
+		void			Draw(const ScreenVertex& Screenvertex) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
@@ -353,7 +354,119 @@ namespace DXLibRef {
 			dynamicCubeTex.Dispose();
 		}
 
-		const auto& GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
+		const auto&		GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
+	};
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	/*スクリーンバッファのつかいまわし																											*/
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+	struct PostPassScreenBuffer {
+		int xSize{};
+		int ySize{};
+		bool isTrans{};
+		bool m_isDepth{};
+		int m_ZBufferBitDepth{};
+		std::array<GraphHandle, 3>	m_Screen{};
+		int m_UsedLocal = 0;
+		int m_Used = 0;
+		int m_UnUse = 0;
+	public:
+		PostPassScreenBuffer(int xsize, int ysize, bool trans, bool isDepth = false, int ZBufferBitDepth = InvalidID) noexcept {
+			this->xSize = xsize;
+			this->ySize = ysize;
+			this->isTrans = trans;
+			this->m_isDepth = isDepth;
+			this->m_ZBufferBitDepth = ZBufferBitDepth;
+			int PrevZBufferBitDepth{};
+			if (this->m_ZBufferBitDepth != InvalidID) {
+				PrevZBufferBitDepth = GetCreateDrawValidGraphZBufferBitDepth();
+				SetCreateDrawValidGraphZBufferBitDepth(this->m_ZBufferBitDepth);
+			}
+			for (auto& s : this->m_Screen) {
+				if (this->m_isDepth) {
+					s.MakeDepth(this->xSize, this->ySize);
+				}
+				else {
+					s.Make(this->xSize, this->ySize, this->isTrans);
+				}
+			}
+			if (this->m_ZBufferBitDepth != InvalidID) {
+				SetCreateDrawValidGraphZBufferBitDepth(PrevZBufferBitDepth);
+			}
+			this->m_Used = 0;
+			this->m_UsedLocal = 0;
+			this->m_UnUse = 0;
+		}
+		~PostPassScreenBuffer(void) noexcept {
+			for (auto& s : this->m_Screen) {
+				s.Dispose();
+			}
+		}
+	public:
+		const GraphHandle* PopBlankScreen(void) noexcept {
+			if (this->m_UsedLocal >= m_Screen.size()) {
+				MessageBox(NULL, "None Blank PostPassScreenBuffer", "", MB_OK);
+				exit(InvalidID);
+			}
+			auto* Ret = &this->m_Screen.at(this->m_UsedLocal);
+			++this->m_Used;
+			++this->m_UsedLocal;
+			return Ret;
+		}
+	};
+	class PostPassScreenBufferPool : public SingletonBase<PostPassScreenBufferPool> {
+	private:
+		friend class SingletonBase<PostPassScreenBufferPool>;
+	private:
+		std::vector<std::unique_ptr<PostPassScreenBuffer>>	m_ScreenBuffer;		// 描画スクリーン
+	private:
+		PostPassScreenBufferPool(void) noexcept {}
+		PostPassScreenBufferPool(const PostPassScreenBufferPool&) = delete;
+		PostPassScreenBufferPool(PostPassScreenBufferPool&& o) = delete;
+		PostPassScreenBufferPool& operator=(const PostPassScreenBufferPool&) = delete;
+		PostPassScreenBufferPool& operator=(PostPassScreenBufferPool&& o) = delete;
+		virtual ~PostPassScreenBufferPool(void) noexcept {}
+	public:
+		const GraphHandle* PopBlankScreen(int xsize, int ysize, bool trans, bool isDepth = false, int ZBufferBitDepth = InvalidID) noexcept {
+			auto Find = std::find_if(this->m_ScreenBuffer.begin(), this->m_ScreenBuffer.end(), [&](const std::unique_ptr<PostPassScreenBuffer>& tgt) {
+				return  ((tgt->xSize == xsize) && (tgt->ySize == ysize) && (tgt->isTrans == trans) && (tgt->m_isDepth == isDepth) && tgt->m_ZBufferBitDepth == ZBufferBitDepth);
+				});
+			if (Find != this->m_ScreenBuffer.end()) {
+				return (*Find)->PopBlankScreen();
+			}
+			this->m_ScreenBuffer.emplace_back(std::make_unique<PostPassScreenBuffer>(xsize, ysize, trans, isDepth, ZBufferBitDepth));
+			return this->m_ScreenBuffer.back()->PopBlankScreen();
+		}
+		void ResetUseCount(int xsize, int ysize, bool trans, bool isDepth = false, int ZBufferBitDepth = InvalidID) noexcept {
+			for (auto& s : this->m_ScreenBuffer) {
+				if ((s->xSize == xsize) && (s->ySize == ysize) && (s->isTrans == trans) && (s->m_isDepth == isDepth) && s->m_ZBufferBitDepth == ZBufferBitDepth) {
+					s->m_UsedLocal = 0;
+				}
+			}
+		}
+	public:
+		void FirstUpdate(void) noexcept {
+			for (auto& s : this->m_ScreenBuffer) {
+				if (s->m_Used != 0) {
+					s->m_UnUse = 0;
+				}
+				else {
+					++s->m_UnUse;
+				}
+				s->m_UsedLocal = 0;
+				s->m_Used = 0;
+			}
+			//5フレーム間使われていないスクリーンバッファは消す
+			for (size_t loop = 0, max = this->m_ScreenBuffer.size(); loop < max; ++loop) {
+				auto& s = this->m_ScreenBuffer.at(loop);
+				if (s->m_UnUse > 5) {
+					s.reset();
+					std::swap(s, this->m_ScreenBuffer.back());
+					this->m_ScreenBuffer.pop_back();
+					--loop;
+					--max;
+				}
+			}
+		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*ポストプロセス																															*/
@@ -361,7 +474,7 @@ namespace DXLibRef {
 	// ベース
 	class PostPassBase {
 	protected:
-		bool m_PrevActive{ false };
+		bool	m_PrevActive{ false };
 	public:
 		PostPassBase(void) noexcept {}
 		virtual ~PostPassBase(void) noexcept {}
@@ -373,8 +486,8 @@ namespace DXLibRef {
 	public:
 		bool IsActive(void) noexcept { return IsActive_Sub(); }
 		void UpdateActive(bool active) noexcept {
-			if (m_PrevActive != active) {
-				m_PrevActive = active;
+			if (this->m_PrevActive != active) {
+				this->m_PrevActive = active;
 				if (active) {
 					Load_Sub();
 				}
@@ -397,17 +510,17 @@ namespace DXLibRef {
 		GraphHandle			DepthBaseScreenHandle;
 		GraphHandle			DepthScreenHandle;
 		GraphHandle			DepthFarScreenHandle;
-
-		ShaderController		m_Shader;
-		ShaderController		m_ShaderRigid;
-		Vector3DX			m_ShadowVec{ Vector3DX::up() };
-		float				m_Scale{ 1.f };
-		float				m_ScaleFar{ 1.f };
+		
+		ShaderController			m_Shader;
+		ShaderController			m_ShaderRigid;
+		Vector3DX					m_ShadowVec{ Vector3DX::up() };
+		float						m_Scale{ 1.f };
+		float						m_ScaleFar{ 1.f };
 
 		bool						m_PrevShadow{ false };
 
-		std::array<Matrix4x4DX, 2> m_CamViewMatrix{};
-		std::array<Matrix4x4DX, 2> m_CamProjectionMatrix{};
+		std::array<Matrix4x4DX, 2>	m_CamViewMatrix{};
+		std::array<Matrix4x4DX, 2>	m_CamProjectionMatrix{};
 	private:
 		void SetupCam(Vector3DX Center, float scale) const noexcept;
 	public:
@@ -418,13 +531,13 @@ namespace DXLibRef {
 		ShadowDraw& operator=(ShadowDraw&& o) = delete;
 		~ShadowDraw(void) noexcept { Dispose(); }
 	public:
-		const auto& GetCamViewMatrix(bool isFar) const noexcept { return m_CamViewMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
-		const auto& GetCamProjectionMatrix(bool isFar) const noexcept { return m_CamProjectionMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
-		const auto& GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
-		const auto& GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//未使用
-		const auto& GetShadowDir(void) const noexcept { return m_ShadowVec; }
+		const auto&		GetCamViewMatrix(bool isFar) const noexcept { return this->m_CamViewMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
+		const auto&		GetCamProjectionMatrix(bool isFar) const noexcept { return this->m_CamProjectionMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
+		const auto&		GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
+		const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//未使用
+		const auto&		GetShadowDir(void) const noexcept { return this->m_ShadowVec; }
 	public:
-		void			SetVec(const Vector3DX& Vec) noexcept { m_ShadowVec = Vec; }
+		void			SetVec(const Vector3DX& Vec) noexcept { this->m_ShadowVec = Vec; }
 		void			SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept;
 
 		void			Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept;
@@ -443,18 +556,18 @@ namespace DXLibRef {
 		std::array<std::unique_ptr<PostPassBase>, 16>	m_PostPass;
 		//
 		bool						m_IsActiveGBuffer{ false };
-		GraphHandle					BufferScreen;	// 描画スクリーン
-		GraphHandle					ColorScreen;	// そのまま透過なしにしたスクリーン
-		GraphHandle					NormalScreen;	// 法線のGバッファ
-		GraphHandle					DepthScreen;	// 深度のGバッファ
+		GraphHandle					m_BufferScreen;	// 描画スクリーン
+		GraphHandle					m_ColorScreen;	// そのまま透過なしにしたスクリーン
+		GraphHandle					m_NormalScreen;	// 法線のGバッファ
+		GraphHandle					m_DepthScreen;	// 深度のGバッファ
 		// 
-		float						near_DoF = 0.f;
-		float						far_DoF = 0.f;
-		float						near_DoFMax = 0.f;
-		float						far_DoFMin = 0.f;
-		int							InColorPerMin = 20;
-		int							InColorPerMax = 255;
-		float						InColorGamma = 1.1f;
+		float						m_near_DoF = 0.f;
+		float						m_far_DoF = 0.f;
+		float						m_near_DoFMax = 0.f;
+		float						m_far_DoFMin = 0.f;
+		int							m_InColorPerMin = 20;
+		int							m_InColorPerMax = 255;
+		float						m_InColorGamma = 1.1f;
 		Matrix4x4DX					m_CamViewMat{};
 		Matrix4x4DX					m_CamProjectionMat{};
 		Camera3DInfo				m_CamInfo{};
@@ -474,56 +587,56 @@ namespace DXLibRef {
 		std::unique_ptr<ShadowDraw>	m_ShadowDraw;
 		bool						m_IsCubeMap{ false };
 		RealTimeCubeMap				m_RealTimeCubeMap;
-		ShaderController				m_PBR_Shader;
-		float			m_ShadowScale{ 1.f };
+		ShaderController			m_PBR_Shader;
+		float						m_ShadowScale{ 1.f };
 	public:
-		auto& GetBufferScreen(void) noexcept { return BufferScreen; }
+		auto& GetBufferScreen(void) noexcept { return this->m_BufferScreen; }
 	public:
-		const auto&		GetCamViewMat(void) const noexcept { return m_CamViewMat; }
-		const auto&		GetCamProjectionMat(void) const noexcept { return m_CamProjectionMat; }
-		const auto&		GetShadowDraw(void) const noexcept { return m_ShadowDraw; }
-		const auto&		GetShadowDir(void) const noexcept { return m_ShadowDraw->GetShadowDir(); }
-		const auto&		GetCubeMapTex(void) const noexcept { return m_RealTimeCubeMap.GetCubeMapTex(); }
-		const auto&		Get_near_DoF(void) const noexcept { return near_DoF; }
-		const auto&		Get_far_DoF(void) const noexcept { return far_DoF; }
-		const auto&		Get_near_DoFMax(void) const noexcept { return near_DoFMax; }
-		const auto&		Get_far_DoFMin(void) const noexcept { return far_DoFMin; }
-		const auto&		is_lens(void) const noexcept { return m_useScope; }
-		const auto&		zoom_xpos(void) const noexcept { return m_ScopeXpos; }
-		const auto&		zoom_ypos(void) const noexcept { return m_ScopeYpos; }
-		const auto&		zoom_size(void) const noexcept { return m_ScopeSize; }
-		const auto&		zoom_lens(void) const noexcept { return m_ScopeZoom; }
-		const auto&		is_Blackout(void) const noexcept { return m_useBlackOut; }
-		const auto&		GetBlackoutPer(void) const noexcept { return m_BlackOutPer; }
-		const auto&		GetAberrationPower(void) const noexcept { return m_AberrationPower; }
-		const auto		GetGodRayPerRet(void) const noexcept { return m_GodRayPer * m_GodRayPerByPostPass; }
-		const auto&		GetDistortionPer(void) const noexcept { return m_DistortionPer; }
-		const auto&		GetShadowScale(void) const noexcept { return m_ShadowScale; }
-		const auto&		GetGodRayPer(void) const noexcept { return m_GodRayPer; }
+		const auto&		GetCamViewMat(void) const noexcept { return this->m_CamViewMat; }
+		const auto&		GetCamProjectionMat(void) const noexcept { return this->m_CamProjectionMat; }
+		const auto&		GetShadowDraw(void) const noexcept { return this->m_ShadowDraw; }
+		const auto&		GetShadowDir(void) const noexcept { return this->m_ShadowDraw->GetShadowDir(); }
+		const auto&		GetCubeMapTex(void) const noexcept { return this->m_RealTimeCubeMap.GetCubeMapTex(); }
+		const auto&		Get_near_DoF(void) const noexcept { return this->m_near_DoF; }
+		const auto&		Get_far_DoF(void) const noexcept { return this->m_far_DoF; }
+		const auto&		Get_near_DoFMax(void) const noexcept { return this->m_near_DoFMax; }
+		const auto&		Get_far_DoFMin(void) const noexcept { return this->m_far_DoFMin; }
+		const auto&		is_lens(void) const noexcept { return this->m_useScope; }
+		const auto&		zoom_xpos(void) const noexcept { return this->m_ScopeXpos; }
+		const auto&		zoom_ypos(void) const noexcept { return this->m_ScopeYpos; }
+		const auto&		zoom_size(void) const noexcept { return this->m_ScopeSize; }
+		const auto&		zoom_lens(void) const noexcept { return this->m_ScopeZoom; }
+		const auto&		is_Blackout(void) const noexcept { return this->m_useBlackOut; }
+		const auto&		GetBlackoutPer(void) const noexcept { return this->m_BlackOutPer; }
+		const auto&		GetAberrationPower(void) const noexcept { return this->m_AberrationPower; }
+		const auto		GetGodRayPerRet(void) const noexcept { return this->m_GodRayPer * this->m_GodRayPerByPostPass; }
+		const auto&		GetDistortionPer(void) const noexcept { return this->m_DistortionPer; }
+		const auto&		GetShadowScale(void) const noexcept { return this->m_ShadowScale; }
+		const auto&		GetGodRayPer(void) const noexcept { return this->m_GodRayPer; }
 	public:
-		void			Set_is_lens(bool value) noexcept { m_useScope = value; }
-		void			Set_xp_lens(float value) noexcept { m_ScopeXpos = value; }
-		void			Set_yp_lens(float value) noexcept { m_ScopeYpos = value; }
-		void			Set_size_lens(float value) noexcept { m_ScopeSize = value; }
-		void			Set_zoom_lens(float value) noexcept { m_ScopeZoom = value; }
-		void			Set_is_Blackout(bool value) noexcept { m_useBlackOut = value; }
-		void			Set_Per_Blackout(float value) noexcept { m_BlackOutPer = value; }
-		void			SetAberrationPower(float value) noexcept { m_AberrationPower = value; }
-		void			SetGodRayPer(float value) noexcept { m_GodRayPer = value; }
-		void			SetGodRayPerByPostPass(float value) noexcept { Easing(&m_GodRayPerByPostPass, value, 0.975f, EasingType::OutExpo); }
-		void			SetDistortionPer(float value) noexcept { m_DistortionPer = value; }
-		void			SetShadowScale(float value) noexcept { m_ShadowScale = value; }
+		void			Set_is_lens(bool value) noexcept { this->m_useScope = value; }
+		void			Set_xp_lens(float value) noexcept { this->m_ScopeXpos = value; }
+		void			Set_yp_lens(float value) noexcept { this->m_ScopeYpos = value; }
+		void			Set_size_lens(float value) noexcept { this->m_ScopeSize = value; }
+		void			Set_zoom_lens(float value) noexcept { this->m_ScopeZoom = value; }
+		void			Set_is_Blackout(bool value) noexcept { this->m_useBlackOut = value; }
+		void			Set_Per_Blackout(float value) noexcept { this->m_BlackOutPer = value; }
+		void			SetAberrationPower(float value) noexcept { this->m_AberrationPower = value; }
+		void			SetGodRayPer(float value) noexcept { this->m_GodRayPer = value; }
+		void			SetGodRayPerByPostPass(float value) noexcept { Easing(&this->m_GodRayPerByPostPass, value, 0.975f, EasingType::OutExpo); }
+		void			SetDistortionPer(float value) noexcept { this->m_DistortionPer = value; }
+		void			SetShadowScale(float value) noexcept { this->m_ShadowScale = value; }
 		// ボケ始める場所を指定(完全にボケるのはニアファーの限度)
 		void			Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
-			near_DoF = near_d;
-			far_DoF = far_d;
-			near_DoFMax = near_m;
-			far_DoFMin = far_m;
+			this->m_near_DoF = near_d;
+			this->m_far_DoF = far_d;
+			this->m_near_DoFMax = near_m;
+			this->m_far_DoFMin = far_m;
 		}
 		void			SetLevelFilter(int inMin, int inMax, float gamma) noexcept {
-			InColorPerMin = std::clamp(inMin, 0, 255);
-			InColorPerMax = std::clamp(inMax, 0, 255);
-			InColorGamma = std::max(1.f, gamma);
+			this->m_InColorPerMin = std::clamp(inMin, 0, 255);
+			this->m_InColorPerMax = std::clamp(inMax, 0, 255);
+			this->m_InColorGamma = std::max(1.f, gamma);
 		}
 		void			ResetAllParams(void) noexcept {
 			SetLevelFilter(0, 255, 1.f);
@@ -541,9 +654,15 @@ namespace DXLibRef {
 		PostPassEffect(PostPassEffect&& o) = delete;
 		PostPassEffect& operator=(const PostPassEffect&) = delete;
 		PostPassEffect& operator=(PostPassEffect&& o) = delete;
+		virtual ~PostPassEffect(void) noexcept {
+			PostPassScreenBufferPool::Release();
+			Dispose();
+
+		}
+	private:
+		void			Dispose(void) noexcept;
 	public:
 		void			Init(void) noexcept;
-		void			Dispose(void) noexcept;
 		void			UpdateActive(void) noexcept;
 		void			SetCamMat(const Camera3DInfo& camInfo) noexcept;
 		void			ResetBuffer(void) noexcept;
@@ -554,8 +673,8 @@ namespace DXLibRef {
 		void			DrawPostProcess(void) noexcept;
 		void			ResetAllBuffer(void) noexcept;
 
-		bool			UpdateShadowActive(void) noexcept { return m_ShadowDraw->UpdateActive(); }
-		void			SetAmbientLight(const Vector3DX& AmbientLightVec) noexcept { m_ShadowDraw->SetVec(AmbientLightVec); }
+		bool			UpdateShadowActive(void) noexcept { return this->m_ShadowDraw->UpdateActive(); }
+		void			SetAmbientLight(const Vector3DX& AmbientLightVec) noexcept { this->m_ShadowDraw->SetVec(AmbientLightVec); }
 		void			Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept;
 		void			Update_CubeMap(std::function<void()> doing, const Vector3DX& CenterPos) noexcept;
 
@@ -565,9 +684,9 @@ namespace DXLibRef {
 		void DisposeGBuffer(void) noexcept;
 
 		void UpdateActiveGBuffer(bool ActiveGBuffer) noexcept {
-			if (m_IsActiveGBuffer != ActiveGBuffer) {
-				m_IsActiveGBuffer = ActiveGBuffer;
-				if (m_IsActiveGBuffer) {
+			if (this->m_IsActiveGBuffer != ActiveGBuffer) {
+				this->m_IsActiveGBuffer = ActiveGBuffer;
+				if (this->m_IsActiveGBuffer) {
 					LoadGBuffer();
 				}
 				else {
@@ -577,13 +696,13 @@ namespace DXLibRef {
 		}
 
 		void UpdateActiveCubeMap(bool ActiveCubeMap) noexcept {
-			if (ActiveCubeMap != m_IsCubeMap) {
-				m_IsCubeMap = ActiveCubeMap;
-				if (m_IsCubeMap) {
-					m_RealTimeCubeMap.Init();
+			if (ActiveCubeMap != this->m_IsCubeMap) {
+				this->m_IsCubeMap = ActiveCubeMap;
+				if (this->m_IsCubeMap) {
+					this->m_RealTimeCubeMap.Init();
 				}
 				else {
-					m_RealTimeCubeMap.Dispose();
+					this->m_RealTimeCubeMap.Dispose();
 				}
 			}
 		}

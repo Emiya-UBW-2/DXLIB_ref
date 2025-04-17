@@ -30,20 +30,20 @@ namespace DXLibRef {
 			Matrix3x3DX					m_Mat;
 			moves						m_move;
 		public:
-			const auto& GetID(void) const noexcept { return m_ID; }
-			auto			IsActive(void) const noexcept { return m_isInitialized && m_isActive; }
+			const auto& GetID(void) const noexcept { return this->m_ID; }
+			auto			IsActive(void) const noexcept { return this->m_isInitialized && this->m_isActive; }
 			bool			PadPress(VR_PAD ID) const noexcept {
 				switch (ID) {
 				case VR_PAD::TRIGGER:
-					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
+					return(this->m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
 				case VR_PAD::SIDEBUTTON:
-					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
+					return(this->m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
 				case VR_PAD::TOUCHPAD:
-					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
+					return(this->m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
 				case VR_PAD::TOPBUTTON1:
-					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
+					return(this->m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
 				case VR_PAD::TOPBUTTON2:
-					return(m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
+					return(this->m_ButtonPressFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
 				default:
 					return false;
 				}
@@ -51,22 +51,22 @@ namespace DXLibRef {
 			bool			PadTouch(VR_PAD ID) const noexcept {
 				switch (ID) {
 				case VR_PAD::TRIGGER:
-					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
+					return(this->m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Trigger));
 				case VR_PAD::SIDEBUTTON:
-					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
+					return(this->m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_Grip));
 				case VR_PAD::TOUCHPAD:
-					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
+					return(this->m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_SteamVR_Touchpad));
 				case VR_PAD::TOPBUTTON1:
-					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
+					return(this->m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_ApplicationMenu));
 				case VR_PAD::TOPBUTTON2:
-					return(m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
+					return(this->m_ButtonTouchFlag & vr::ButtonMaskFromId(vr::EVRButtonId::k_EButton_IndexController_B));
 				default:
 					return false;
 				}
 			}
-			const auto& GetTouchPadPoint(void) const noexcept { return m_TouchPadPoint; }
-			const auto& GetPos(void) const noexcept { return m_Pos; }
-			const auto& GetMat(void) const noexcept { return m_Mat; }
+			const auto& GetTouchPadPoint(void) const noexcept { return this->m_TouchPadPoint; }
+			const auto& GetPos(void) const noexcept { return this->m_Pos; }
+			const auto& GetMat(void) const noexcept { return this->m_Mat; }
 		public:
 			void Init(int ID, char Num, vr::ETrackedDeviceClass Type) noexcept {
 				this->m_ID = ID;
@@ -121,7 +121,7 @@ namespace DXLibRef {
 			}
 		};
 	private:
-		vr::IVRSystem* m_VR_SystemPtr{ nullptr };
+		vr::IVRSystem*				m_VR_SystemPtr{ nullptr };
 		vr::EVRInitError			m_VR_ErrorHandle{ vr::VRInitError_None };
 		std::vector<VRDevice>	m_VR_DeviceInfo;
 		char						m_VR_HMDID{ InvalidID };
@@ -141,31 +141,31 @@ namespace DXLibRef {
 		VRControl& operator=(const VRControl&) = delete;
 		VRControl& operator=(VRControl&& o) = delete;
 	public:
-		const VRDevice* Get_VR_Hand1Device(void) const noexcept { return (m_VR_Hand1ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand1ID) : nullptr; }
-		const VRDevice* Get_VR_Hand2Device(void) const noexcept { return (m_VR_Hand2ID >= 0) ? &m_VR_DeviceInfo.at(m_VR_Hand2ID) : nullptr; }
-		const VRDevice* GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < m_VR_TrackerID.size()) ? &m_VR_DeviceInfo.at(m_VR_TrackerID.at(sel)) : nullptr; }
+		const VRDevice* Get_VR_Hand1Device(void) const noexcept { return (this->m_VR_Hand1ID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_Hand1ID) : nullptr; }
+		const VRDevice* Get_VR_Hand2Device(void) const noexcept { return (this->m_VR_Hand2ID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_Hand2ID) : nullptr; }
+		const VRDevice* GetTrackerDevice(int sel) const noexcept { return (0 <= sel && sel < this->m_VR_TrackerID.size()) ? &this->m_VR_DeviceInfo.at(this->m_VR_TrackerID.at(sel)) : nullptr; }
 		void			ResetHMD(void) noexcept {
-			m_VR_PrevHMDIsActive = false;
-			m_VR_HMD_StartFlag = true;
+			this->m_VR_PrevHMDIsActive = false;
+			this->m_VR_HMD_StartFlag = true;
 		}
 		void			GetHMDPosition(Vector3DX* pos_, Matrix4x4DX* mat) noexcept {
-			auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
+			auto* HMDPtr = (this->m_VR_HMDID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_HMDID) : nullptr;
 			if (HMDPtr) {
 				*mat = Matrix4x4DX::Axis1(HMDPtr->GetMat().yvec(), HMDPtr->GetMat().zvec() * -1.f);
 				if (!HMDPtr->IsActive()) {
-					m_VR_HMD_StartFlag = true;
+					this->m_VR_HMD_StartFlag = true;
 				}
-				if (m_VR_HMD_StartFlag && HMDPtr->IsActive() != m_VR_PrevHMDIsActive) {
-					m_VR_HMD_StartFlag = false;
+				if (this->m_VR_HMD_StartFlag && HMDPtr->IsActive() != this->m_VR_PrevHMDIsActive) {
+					this->m_VR_HMD_StartFlag = false;
 					// 
 					Vector3DX pos = HMDPtr->GetPos(); pos.y = 0.f;
 					Vector3DX tmp = mat->zvec(); tmp.y = 0.f; tmp = tmp.normalized();
 					float rad = DX_PI_F + std::atan2f(tmp.x, -tmp.z);
-					m_VR_HMD_StartPoint = Matrix4x4DX::RotAxis(Vector3DX::up(), rad) * Matrix4x4DX::Mtrans(pos);
+					this->m_VR_HMD_StartPoint = Matrix4x4DX::RotAxis(Vector3DX::up(), rad) * Matrix4x4DX::Mtrans(pos);
 				}
-				m_VR_PrevHMDIsActive = HMDPtr->IsActive();
-				*pos_ = HMDPtr->GetPos() - m_VR_HMD_StartPoint.pos();
-				*mat = *mat * m_VR_HMD_StartPoint.rotation();
+				this->m_VR_PrevHMDIsActive = HMDPtr->IsActive();
+				*pos_ = HMDPtr->GetPos() - this->m_VR_HMD_StartPoint.pos();
+				*mat = *mat * this->m_VR_HMD_StartPoint.rotation();
 			}
 			else {
 				*pos_ = Vector3DX::zero();
@@ -175,14 +175,14 @@ namespace DXLibRef {
 		}
 		void			Haptic(char id_, unsigned short times) noexcept {
 			auto* OptionParts = OptionManager::Instance();
-			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && (id_ != InvalidID) && m_VR_SystemPtr) {
-				m_VR_SystemPtr->TriggerHapticPulse(m_VR_DeviceInfo[id_].GetID(), 2, times);
+			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr) && (id_ != InvalidID) && this->m_VR_SystemPtr) {
+				this->m_VR_SystemPtr->TriggerHapticPulse(this->m_VR_DeviceInfo[id_].GetID(), 2, times);
 			}
 		}
 		auto			GetEyePosition(char eye_type) noexcept {
 			auto* OptionParts = OptionManager::Instance();
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
-				auto* HMDPtr = (m_VR_HMDID >= 0) ? &m_VR_DeviceInfo.at(m_VR_HMDID) : nullptr;
+				auto* HMDPtr = (this->m_VR_HMDID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_HMDID) : nullptr;
 				if (HMDPtr) {
 					const vr::HmdMatrix34_t tmpmat = vr::VRSystem()->GetEyeToHeadTransform((vr::EVREye)eye_type);
 					return Matrix3x3DX::Vtrans(Vector3DX::vget(tmpmat.m[0][3], tmpmat.m[1][3], tmpmat.m[2][3]), HMDPtr->GetMat());
@@ -190,7 +190,7 @@ namespace DXLibRef {
 			}
 			return Vector3DX::zero();
 		}
-		const GraphHandle* GetOutBuffer(void) const noexcept { return &m_OutScreen; }
+		const GraphHandle* GetOutBuffer(void) const noexcept { return &this->m_OutScreen; }
 	public:
 		void Init(void) noexcept;
 		void SetupBuffer(void) noexcept;

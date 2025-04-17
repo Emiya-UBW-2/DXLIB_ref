@@ -15,27 +15,27 @@ namespace DXLibRef {
 		float		m_near{ 0.1f };
 		float		m_far{ 10.f };	// ニアファー
 	public:
-		const auto& GetCamPos(void)const noexcept { return m_pos; }
-		const auto& GetCamVec(void)const noexcept { return m_vec; }
-		const auto& GetCamUp(void)const noexcept { return m_up; }
-		const auto& GetCamFov(void)const noexcept { return m_fov; }
-		const auto& GetCamNear(void)const noexcept { return m_near; }
-		const auto& GetCamFar(void)const noexcept { return m_far; }
+		const auto&		GetCamPos(void)const noexcept { return this->m_pos; }
+		const auto&		GetCamVec(void)const noexcept { return this->m_vec; }
+		const auto&		GetCamUp(void)const noexcept { return this->m_up; }
+		const auto&		GetCamFov(void)const noexcept { return this->m_fov; }
+		const auto&		GetCamNear(void)const noexcept { return this->m_near; }
+		const auto&		GetCamFar(void)const noexcept { return this->m_far; }
 	public:
 		void			SetCamPos(const Vector3DX& cam_pos, const Vector3DX& cam_vec, const Vector3DX& cam_up) noexcept {
-			m_pos = cam_pos;
-			m_vec = cam_vec;
-			m_up = cam_up;
+			this->m_pos = cam_pos;
+			this->m_vec = cam_vec;
+			this->m_up = cam_up;
 		}
 		void			SetNowCamPos(void) noexcept {
-			m_pos = DxLib::GetCameraPosition();
-			m_vec = DxLib::GetCameraTarget();
-			m_up = DxLib::GetCameraUpVector();
+			this->m_pos = DxLib::GetCameraPosition();
+			this->m_vec = DxLib::GetCameraTarget();
+			this->m_up = DxLib::GetCameraUpVector();
 		}
 		void			SetCamInfo(float cam_fov_, float cam_near_, float cam_far_) noexcept {
-			m_fov = cam_fov_;
-			m_near = cam_near_;
-			m_far = cam_far_;
+			this->m_fov = cam_fov_;
+			this->m_near = cam_near_;
+			this->m_far = cam_far_;
 		}
 		void FlipCamInfo(void) const noexcept {
 			SetUpCamInfo(this->m_pos, this->m_vec, this->m_up, this->m_fov, this->m_near, this->m_far);
@@ -43,16 +43,16 @@ namespace DXLibRef {
 
 		const Matrix4x4DX GetViewMatrix(void) const noexcept {
 			MATRIX mat_view;					// ビュー行列
-			VECTOR vec_from = m_pos.get();		// カメラの位置
-			VECTOR vec_lookat = m_vec.get();  // カメラの注視点
-			VECTOR vec_up = m_up.get();    // カメラの上方向
+			VECTOR vec_from = this->m_pos.get();		// カメラの位置
+			VECTOR vec_lookat = this->m_vec.get();  // カメラの注視点
+			VECTOR vec_up = this->m_up.get();    // カメラの上方向
 			CreateLookAtMatrix(&mat_view, &vec_from, &vec_lookat, &vec_up);
 			return mat_view;
 		}
 
 		const Matrix4x4DX GetProjectionMatrix(void) const noexcept {
 			MATRIX mat_view;					// プロジェクション行列
-			CreatePerspectiveFovMatrix(&mat_view, m_fov, m_near, m_far);
+			CreatePerspectiveFovMatrix(&mat_view, this->m_fov, this->m_near, this->m_far);
 			return mat_view;
 		}
 
@@ -132,22 +132,22 @@ namespace DXLibRef {
 		}
 
 		template <typename... Args>
-		void GraphFilter(int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) noexcept {
+		void GraphFilter(int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) const noexcept {
 			DxLib::GraphFilter(DXHandle::get(), FilterType, args...);
 		}
 
 		template <typename... Args>
-		void GraphFilterBlt(const GraphHandle& targetImage, int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) noexcept {
+		void GraphFilterBlt(const GraphHandle& targetImage, int FilterType /* DX_GRAPH_FILTER_GAUSS 等 */, Args&&... args) const noexcept {
 			DxLib::GraphFilterBlt(targetImage.get(), DXHandle::get(), FilterType, args...);
 		}
 
 		template <typename... Args>
-		void GraphBlend(const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) noexcept {
+		void GraphBlend(const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) const noexcept {
 			DxLib::GraphBlend(DXHandle::get(), BlendImage.get(), BlendRatio, BlendType, args...);
 		}
 
 		template <typename... Args>
-		void GraphBlendBlt(const GraphHandle& BaseImage, const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) noexcept {
+		void GraphBlendBlt(const GraphHandle& BaseImage, const GraphHandle& BlendImage, int BlendRatio /* ブレンド効果の影響度( 0:０％  255:１００％ ) */, int BlendType /* DX_GRAPH_BLEND_ADD 等 */, Args&&... args) const noexcept {
 			DxLib::GraphBlendBlt(BaseImage.get(), BlendImage.get(), DXHandle::get(), BlendRatio, BlendType, args...);
 		}
 
@@ -158,7 +158,7 @@ namespace DXLibRef {
 			GetGraphSize(DXHandle::get(), xsize, ysize);
 		}
 		// 
-		void SetDraw_Screen(const bool& Clear = true) const noexcept {
+		void SetDraw_Screen(bool Clear = true) const noexcept {
 			SetDrawScreen(DXHandle::get());
 			if (Clear) {
 				ClearDrawScreen();
@@ -173,7 +173,7 @@ namespace DXLibRef {
 		}
 	public:
 		// 
-		static void SetDraw_Screen(int handle, const bool& Clear = true) noexcept {
+		static void SetDraw_Screen(int handle, bool Clear = true) noexcept {
 			SetDrawScreen(handle);
 			if (Clear) {
 				ClearDrawScreen();
@@ -204,4 +204,22 @@ namespace DXLibRef {
 			return;
 		}
 	};
+	class SoftImageHandle : public DXHandle {
+	protected:
+		void	Dispose_Sub(void) noexcept override {
+			DeleteSoftImage(DXHandle::get());
+		}
+	public:
+		void	Make(int xsize, int ysize) noexcept {
+			DXHandle::SetHandleDirect(MakeRGB8ColorSoftImage(xsize, ysize));
+		}
+		void	GetDrawScreen(int x1, int y1, int x2, int y2) noexcept {
+			GetDrawScreenSoftImage(x1, y1, x2, y2, DXHandle::get());
+		}
+		void	GetPixel(int x, int y, int* r, int* g, int* b, int* a) noexcept {
+			GetPixelSoftImage(DXHandle::get(), x, y, r, g, b, a);
+		}
+
+	};
 };
+	

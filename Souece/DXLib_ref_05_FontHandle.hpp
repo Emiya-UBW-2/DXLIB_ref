@@ -191,7 +191,7 @@ namespace DXLibRef {
 			Fonthave& operator=(Fonthave&& o) = delete;
 
 			~Fonthave(void) noexcept {
-				m_Handle.Dispose();
+				this->m_Handle.Dispose();
 			}
 		public:
 			bool			Equal(FontType type, int fontSize, int edgeSize) const noexcept {
@@ -233,7 +233,7 @@ namespace DXLibRef {
 			friend class SingletonBase<FontPool>;
 		public:
 		private:
-			std::vector<std::unique_ptr<Fonthave>> m_Pools;
+			std::vector<std::unique_ptr<Fonthave>>	m_Pools;
 		private:
 			FontPool(void) noexcept {}
 			FontPool(const FontPool&) = delete;

@@ -11,17 +11,17 @@ namespace DXLibRef {
 	private:
 		class PopUpDraw {
 		private:
-			bool m_Active{ false };
-			bool m_ActiveSwitch{ false };
-			float m_ActivePer{ 0.f };
-			char m_WindwoName[64]{};
+			bool																		m_Active{ false };
+			bool																		m_ActiveSwitch{ false };
+			float																		m_ActivePer{ 0.f };
+			char																		m_WindwoName[64]{};
 
 			int WinSizeX{ 720 };
 			int WinSizeY{ 720 };
 
-			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> m_Doing{ nullptr };
-			std::function<void()> m_ExitDoing{ nullptr };
-			std::function<void()> m_GuideDoing{ nullptr };
+			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)>	m_Doing{ nullptr };
+			std::function<void()>														m_ExitDoing{ nullptr };
+			std::function<void()>														m_GuideDoing{ nullptr };
 		public:
 			PopUpDraw(void) noexcept {}
 			PopUpDraw(const PopUpDraw&) = delete;
@@ -36,25 +36,25 @@ namespace DXLibRef {
 				std::function<void()> ExitDoing,
 				std::function<void()> GuideDoing
 			) noexcept {
-				strcpy_sDx(m_WindwoName, 64, WindowName);
+				strcpy_sDx(this->m_WindwoName, 64, WindowName);
 				WinSizeX = sizex;
 				WinSizeY = sizey;
-				m_Doing = doing;
-				m_ExitDoing = ExitDoing;
-				m_GuideDoing = GuideDoing;
+				this->m_Doing = doing;
+				this->m_ExitDoing = ExitDoing;
+				this->m_GuideDoing = GuideDoing;
 			}
 			void			Start(void) noexcept;
 			void			End(void) noexcept;
 			void			Update(void) noexcept;
 			void			Draw(int xcenter, int ycenter) noexcept;
 		public:
-			auto IsEnd(void) const noexcept { return !m_Active && !(m_ActivePer > 1.f / 255.f); }
+			auto IsEnd(void) const noexcept { return !this->m_Active && !(this->m_ActivePer > 1.f / 255.f); }
 		};
 	private:
-		std::array<PopUpDraw, 24> que;
-		size_t NowSel{ 0 };
-		size_t LastSel{ 0 };
-		bool PrevPause{ false };
+		std::array<PopUpDraw, 24>	m_que;
+		size_t						m_NowSel{ 0 };
+		size_t						m_LastSel{ 0 };
+		bool						m_PrevPause{ false };
 	private:
 		PopUp(void) noexcept {}
 		PopUp(const PopUp&) = delete;
@@ -62,7 +62,7 @@ namespace DXLibRef {
 		PopUp& operator=(const PopUp&) = delete;
 		PopUp& operator=(PopUp&& o) = delete;
 	public:
-		auto IsActivePop(void) const noexcept { return (NowSel != LastSel); }
+		auto IsActivePop(void) const noexcept { return (this->m_NowSel != this->m_LastSel); }
 	public:
 		void Add(const char* WindowName, int sizex, int sizey,
 			std::function<void(int xmin, int ymin, int xmax, int ymax, bool EndSwitch)> doing,
@@ -75,7 +75,7 @@ namespace DXLibRef {
 			if (!IsActivePop()) {
 				return;
 			}
-			que.at(static_cast<size_t>(NowSel)).Draw(xcenter, ycenter);
+			this->m_que.at(this->m_NowSel).Draw(xcenter, ycenter);
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -87,62 +87,62 @@ namespace DXLibRef {
 	private:
 		class OptionElementsInfo {
 		private:
-			std::string m_Name;
-			int m_Info{ 0 };
-			std::function<void()> m_LeftPush;
-			std::function<void()> m_RightPush;
-			std::function<void()> m_OKPush;
-			std::function<void()> m_AnyDoing;
-			std::function<void(int xpos, int ypos, bool isMine)> m_Draw;
+			std::string												m_Name;
+			int														m_Info{ 0 };
+			std::function<void()>									m_LeftPush;
+			std::function<void()>									m_RightPush;
+			std::function<void()>									m_OKPush;
+			std::function<void()>									m_AnyDoing;
+			std::function<void(int xpos, int ypos, bool isMine)>	m_Draw;
 		public:
-			float selanim{ 0.f };
+			float													m_selanim{ 0.f };
 		public:
-			const auto& GetName(void) const noexcept { return m_Name; }
-			const auto& GetInfoTextID(void) const noexcept { return m_Info; }
+			const auto& GetName(void) const noexcept { return this->m_Name; }
+			const auto& GetInfoTextID(void) const noexcept { return this->m_Info; }
 
-			void GetLeftPush(void) const noexcept { m_LeftPush(); }
-			void GetRightPush(void) const noexcept { m_RightPush(); }
-			void GetOKPush(void) const noexcept { m_OKPush(); }
-			void GetAnyDoing(void) const noexcept { m_AnyDoing(); }
+			void GetLeftPush(void) const noexcept { this->m_LeftPush(); }
+			void GetRightPush(void) const noexcept { this->m_RightPush(); }
+			void GetOKPush(void) const noexcept { this->m_OKPush(); }
+			void GetAnyDoing(void) const noexcept { this->m_AnyDoing(); }
 		public:
 			void Init(const char* name, int infoTextID, std::function<void()> LeftPush, std::function<void()> RightPush, std::function<void()> OKPush,
 				std::function<void()> AnyDoing,
 				std::function<void(int xpos, int ypos, bool isMine)> draw) noexcept {
-				selanim = 0;
+				this->m_selanim = 0;
 
-				m_Name = name;
-				m_Info = infoTextID;
-				m_LeftPush = LeftPush;
-				m_RightPush = RightPush;
-				m_OKPush = OKPush;
-				m_AnyDoing = AnyDoing;
-				m_Draw = draw;
+				this->m_Name = name;
+				this->m_Info = infoTextID;
+				this->m_LeftPush = LeftPush;
+				this->m_RightPush = RightPush;
+				this->m_OKPush = OKPush;
+				this->m_AnyDoing = AnyDoing;
+				this->m_Draw = draw;
 			}
 			void Draw(int xpos, int ypos, bool isMine) const noexcept;
 		};
 		class OptionTabsInfo {
 		private:
 		protected:
-			int m_id{ 0 };
-			std::string m_name;
-			std::vector<OptionElementsInfo> m_Elements;
+			size_t							m_id{ 0 };
+			std::string						m_name;
+			std::vector<OptionElementsInfo>	m_Elements;
 		protected:
 			virtual void Init_Sub(void) noexcept {}
 		public:
-			const auto& GetID(void) const noexcept { return m_id; }
+			const auto& GetID(void) const noexcept { return this->m_id; }
 		public:
 			OptionTabsInfo(void) noexcept {}
 			virtual ~OptionTabsInfo(void) noexcept {}
 		public:
-			void Init(int ID, const char* name) noexcept {
-				m_id = ID;
-				m_name = name;
+			void Init(size_t ID, const char* name) noexcept {
+				this->m_id = ID;
+				this->m_name = name;
 				Init_Sub();
 			}
-			void Execute(int* select, bool CanPress) noexcept;
-			void Draw(int xpos, int ypos, int xsize, bool isActive, int* TabSel, int* select) noexcept;
+			void Execute(size_t* select, bool CanPress) noexcept;
+			void Draw(int xpos, int ypos, int xsize, bool isActive, size_t* TabSel, size_t* select) noexcept;
 
-			void DrawInfo(int xpos, int ypos, int select) noexcept;
+			void DrawInfo(int xpos, int ypos, size_t select) noexcept;
 		};
 
 		class SoundTabsInfo :public OptionTabsInfo {
@@ -196,23 +196,23 @@ namespace DXLibRef {
 			void Init_Sub(void) noexcept override;
 		};
 	private:
-		int m_tabsel{ 0 };
-		int m_select{ 0 };
-		std::array<std::unique_ptr<OptionTabsInfo>, 4> m_Tabs;
-		bool						m_Active{ false };
-		bool						m_ActiveSwitch{ false };
-		bool						m_RestartSwitch{ false };
+		size_t											m_tabsel{ 0 };
+		size_t											m_select{ 0 };
+		std::array<std::unique_ptr<OptionTabsInfo>, 4>	m_Tabs;
+		bool											m_Active{ false };
+		bool											m_ActiveSwitch{ false };
+		bool											m_RestartSwitch{ false };
 	public:
-		void SetRestart(void) noexcept { m_RestartSwitch = true; }
-		void SetActive(void) noexcept { m_ActiveSwitch = true; }
+		void SetRestart(void) noexcept { this->m_RestartSwitch = true; }
+		void SetActive(void) noexcept { this->m_ActiveSwitch = true; }
 		auto IsRestartSwitch(void) noexcept {
-			if (!m_Active && m_RestartSwitch) {
-				m_RestartSwitch = false;
+			if (!this->m_Active && this->m_RestartSwitch) {
+				this->m_RestartSwitch = false;
 				return true;
 			}
 			return false;
 		}
-		const auto& IsActive(void) const noexcept { return m_Active; }
+		const auto& IsActive(void) const noexcept { return this->m_Active; }
 	private:
 		OptionPopup(void) noexcept {}
 		OptionPopup(const OptionPopup&) = delete;

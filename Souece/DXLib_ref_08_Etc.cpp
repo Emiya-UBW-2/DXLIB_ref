@@ -144,7 +144,7 @@ namespace DXLibRef {
 		IsEnd = true;
 	}
 	bool SaveData::Load(void) noexcept {
-		m_data.clear();
+		this->m_data.clear();
 		if (!IsFileExist("Save/new.svf")) {
 			return false;
 		}
@@ -157,7 +157,7 @@ namespace DXLibRef {
 			}
 			auto LEFT = FileStreamDX::getleft(ALL);
 			auto RIGHT = FileStreamDX::getright(ALL);
-			m_data.emplace_back(std::make_pair(LEFT, std::stoi(RIGHT)));
+			this->m_data.emplace_back(std::make_pair(LEFT, std::stoi(RIGHT)));
 		}
 		return true;
 	}

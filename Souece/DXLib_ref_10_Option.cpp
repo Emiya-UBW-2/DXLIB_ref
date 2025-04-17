@@ -9,37 +9,37 @@ namespace DXLibRef {
 	// 
 	// --------------------------------------------------------------------------------------------------
 	void			OptionManager::Load(void) noexcept {
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GraphicsPreset)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);// DirectXVer
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::usevr)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ObjLevel)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DoF)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::bloom)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::shadow)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SSAO)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::fov)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::vsync)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::FpsLimit)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SE)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::VOICE)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::BGM)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::WindowMode)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ScreenEffect)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Reflection)).SetEnumParamType(EnumParamType::Int);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::MotionBlur)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Xsensing)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Ysensing)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::HeadBobbing)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ControlType)).SetEnumParamType(EnumParamType::Else);// ControlType
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);// Language
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::LoadMovie)).SetEnumParamType(EnumParamType::Boolean);
-		m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GraphicsPreset)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DirectXVer)).SetEnumParamType(EnumParamType::Else);// DirectXVer
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::usevr)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ObjLevel)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DoF)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::bloom)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::shadow)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SSAO)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::fov)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::vsync)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::FpsLimit)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::SE)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::VOICE)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::BGM)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::WindowMode)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ScreenEffect)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Reflection)).SetEnumParamType(EnumParamType::Int);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::MotionBlur)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Xsensing)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Ysensing)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::HeadBobbing)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::ControlType)).SetEnumParamType(EnumParamType::Else);// ControlType
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::Language)).SetEnumParamType(EnumParamType::Else);// Language
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::AA)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::DrawScale)).SetEnumParamType(EnumParamType::Float);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::LoadMovie)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams.at(static_cast<size_t>(EnumSaveParam::GodRay)).SetEnumParamType(EnumParamType::Boolean);
 
-		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
-		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
-		m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::CubeMap)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::PBR)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::Distortion)).SetEnumParamType(EnumParamType::Boolean);
+		this->m_ProjectSettingParams.at(static_cast<size_t>(EnumProjectSettingParam::CubeMap)).SetEnumParamType(EnumParamType::Boolean);
 
 		// SetOutApplicationLogValidFlag(FALSE);
 		{
@@ -101,7 +101,7 @@ namespace DXLibRef {
 					if (LEFT != OptionStr[loop]) {
 						continue;
 					}
-					switch (m_SaveParams.at(loop).GetEnumParamType()) {
+					switch (this->m_SaveParams.at(loop).GetEnumParamType()) {
 					case EnumParamType::Boolean:
 						SetParamBoolean((EnumSaveParam)loop, (RIGHT.find("true") != std::string::npos));
 						break;
@@ -168,7 +168,7 @@ namespace DXLibRef {
 					if (LEFT != ProjectSettingStr[loop]) {
 						continue;
 					}
-					switch (m_ProjectSettingParams.at(loop).GetEnumParamType()) {
+					switch (this->m_ProjectSettingParams.at(loop).GetEnumParamType()) {
 					case EnumParamType::Boolean:
 						SetParamBoolean((EnumProjectSettingParam)loop, (RIGHT.find("true") != std::string::npos));
 						break;
@@ -198,7 +198,7 @@ namespace DXLibRef {
 		std::ofstream outputfile("Save/Setting.txt");
 
 		for (size_t loop : std::views::iota(static_cast<size_t>(0), static_cast<size_t>(EnumSaveParam::Max))) {
-			switch (m_SaveParams.at(loop).GetEnumParamType()) {
+			switch (this->m_SaveParams.at(loop).GetEnumParamType()) {
 			case EnumParamType::Boolean:
 				outputfile << std::string(OptionStr[loop]) + "=" + std::string(GetParamBoolean(static_cast<EnumSaveParam>(loop)) ? "true" : "false") + "\n";
 				break;

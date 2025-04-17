@@ -10,7 +10,7 @@ namespace DXLibRef {
 		//
 		void DrawData::Output(void) const noexcept {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			switch (m_type) {
+			switch (this->m_type) {
 			case DrawType::Alpha:
 				if (this->m_intParam.at(0) < 255) {
 					DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, this->m_intParam.at(0));
@@ -26,11 +26,11 @@ namespace DXLibRef {
 				DxLib::SetDrawBright(this->m_intParam.at(0), this->m_intParam.at(1), this->m_intParam.at(2));
 				break;
 			case DrawType::Box:
-				if (this->m_intParam.at(4) == 1 || (m_boolParam.at(0))) {
+				if (this->m_intParam.at(4) == 1 || (this->m_boolParam.at(0))) {
 					DxLib::DrawBox(
 						WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 						WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
-						this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
+						this->m_UintParam.at(0), (this->m_boolParam.at(0)) ? TRUE : FALSE);
 				}
 				else {
 					int p1x = WindowSizeParts->GetUIY(this->m_intParam.at(0));
@@ -49,81 +49,81 @@ namespace DXLibRef {
 					WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
 					WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
 					WindowSizeParts->GetUIY(this->m_intParam.at(6)), WindowSizeParts->GetUIY(this->m_intParam.at(7)),
-					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE);
+					this->m_UintParam.at(0), (this->m_boolParam.at(0)) ? TRUE : FALSE);
 				break;
 			case DrawType::Circle:
 				DxLib::DrawCircle(
-					WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)),
-					this->m_UintParam.at(0), (m_boolParam.at(0)) ? TRUE : FALSE,
+					WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)),
+					this->m_UintParam.at(0), (this->m_boolParam.at(0)) ? TRUE : FALSE,
 					(this->m_intParam.at(3) >= 2) ? WindowSizeParts->GetUIY(this->m_intParam.at(3)) : this->m_intParam.at(3));
 				break;
 			case DrawType::Line:
-				DxLib::DrawLine(WindowSizeParts->GetUIY(m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_UintParam.at(0),
+				DxLib::DrawLine(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_UintParam.at(0),
 					(this->m_intParam.at(4) >= 2) ? WindowSizeParts->GetUIY(this->m_intParam.at(4)) : this->m_intParam.at(4));
 				break;
 			case DrawType::String:
 				FontSystem::FontPool::Instance()->Get((FontSystem::FontType)m_intParam.at(0), WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawString(
 						(FontSystem::FontXCenter)m_intParam.at(2), (FontSystem::FontYCenter)m_intParam.at(3),
-						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
-						m_UintParam.at(0),
-						m_UintParam.at(1),
-						m_string.c_str()
+						WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+						this->m_UintParam.at(0),
+						this->m_UintParam.at(1),
+						this->m_string.c_str()
 					);
 				break;
 			case DrawType::StringAutoFit:
 				FontSystem::FontPool::Instance()->Get((FontSystem::FontType)m_intParam.at(0), WindowSizeParts->GetUIY(this->m_intParam.at(1)), 3)->DrawStringAutoFit(
-					WindowSizeParts->GetUIY(m_intParam.at(2)), WindowSizeParts->GetUIY(m_intParam.at(3)),
-						WindowSizeParts->GetUIY(m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
-						m_UintParam.at(0),
-						m_UintParam.at(1),
-						m_string.c_str()
+					WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
+						WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
+						this->m_UintParam.at(0),
+						this->m_UintParam.at(1),
+						this->m_string.c_str()
 					);
 				break;
 			case DrawType::RotaGraph:
-				if (m_GraphHandleParam.at(0)) {
+				if (this->m_GraphHandleParam.at(0)) {
 					float Scale = (float)(WindowSizeParts->GetUIY((int)(this->m_floatParam.at(0) * 10000))) / 10000.f;
 
 					if (Scale < 0.95f && 1.05f < Scale) {
 						auto prev = GetDrawMode();
 						DxLib::SetDrawMode(DX_DRAWMODE_BILINEAR);
-						m_GraphHandleParam.at(0)->DrawRotaGraph(
+						this->m_GraphHandleParam.at(0)->DrawRotaGraph(
 							WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 							Scale, this->m_floatParam.at(1), this->m_boolParam.at(0));
 						DxLib::SetDrawMode(prev);
 					}
 					else {
-						m_GraphHandleParam.at(0)->DrawRotaGraph(
+						this->m_GraphHandleParam.at(0)->DrawRotaGraph(
 							WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 							Scale, this->m_floatParam.at(1), this->m_boolParam.at(0));
 					}
 				}
 				break;
 			case DrawType::ExtendGraph:
-				if (m_GraphHandleParam.at(0)) {
+				if (this->m_GraphHandleParam.at(0)) {
 					auto prev = GetDrawMode();
 					DxLib::SetDrawMode(DX_DRAWMODE_BILINEAR);
-					m_GraphHandleParam.at(0)->DrawExtendGraph(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_boolParam.at(0));
+					this->m_GraphHandleParam.at(0)->DrawExtendGraph(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)), WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)), this->m_boolParam.at(0));
 					DxLib::SetDrawMode(prev);
 				}
 				break;
 			case DrawType::CircleGauge:
-				if (m_GraphHandleParam.at(0)) {
+				if (this->m_GraphHandleParam.at(0)) {
 					DxLib::DrawCircleGauge(WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 						(double)this->m_floatParam.at(0),
-						m_GraphHandleParam.at(0)->get(),
+						this->m_GraphHandleParam.at(0)->get(),
 						(double)this->m_floatParam.at(1),
 						(double)(this->m_floatParam.at(2) * (float)(WindowSizeParts->GetUIY(100)) / 100.f));
 				}
 				break;
 			case DrawType::NineSliceGraph:
-				if (m_GraphHandleParam.at(0)) {
+				if (this->m_GraphHandleParam.at(0)) {
 					Draw9SliceGraph(
 						WindowSizeParts->GetUIY(this->m_intParam.at(0)), WindowSizeParts->GetUIY(this->m_intParam.at(1)),
 						WindowSizeParts->GetUIY(this->m_intParam.at(2)), WindowSizeParts->GetUIY(this->m_intParam.at(3)),
 						WindowSizeParts->GetUIY(this->m_intParam.at(4)), WindowSizeParts->GetUIY(this->m_intParam.at(5)),
 						WindowSizeParts->GetUIY(this->m_intParam.at(6)), WindowSizeParts->GetUIY(this->m_intParam.at(7)),
 						this->m_floatParam.at(0), this->m_floatParam.at(1), this->m_floatParam.at(2),
-						m_GraphHandleParam.at(0)->get(),this->m_boolParam.at(0), this->m_boolParam.at(1)
+						this->m_GraphHandleParam.at(0)->get(),this->m_boolParam.at(0), this->m_boolParam.at(1)
 					);
 				}
 				break;
@@ -134,7 +134,7 @@ namespace DXLibRef {
 		//
 		DrawControl::DrawControl(void) noexcept {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
+			this->m_BufferScreen.Make(WindowSizeParts->GetSizeXMax(), WindowSizeParts->GetSizeYMax(), true);
 			Dispose();
 		}
 		void DrawControl::Draw(void) noexcept {
@@ -160,7 +160,7 @@ namespace DXLibRef {
 			// 内容が同じならスルー ちがうならバッファーを更新
 			if (IsHit) {
 				auto NowScreen = GetDrawScreen();
-				m_BufferScreen.SetDraw_Screen(true);
+				this->m_BufferScreen.SetDraw_Screen(true);
 				{
 					for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
 						for (int loop = 0; loop < d.second; ++loop) {
@@ -174,19 +174,19 @@ namespace DXLibRef {
 				GraphHandle::SetDraw_Screen(NowScreen, false);
 			}
 			// バッファーを出力
-			m_BufferScreen.DrawGraph(0, 0, true);
+			this->m_BufferScreen.DrawGraph(0, 0, true);
 		}
 	};
 	// 
 	void SideLog::SideLogData::UpdateActive(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		if (m_Time > 0.f) {
-			m_Time -= DXLib_refParts->GetDeltaTime();
+		if (this->m_Time > 0.f) {
+			this->m_Time -= DXLib_refParts->GetDeltaTime();
 		}
 		else {
-			m_Time = -1.f;
+			this->m_Time = -1.f;
 		}
-		Easing(&m_Flip_Y, m_Flip, 0.9f, EasingType::OutExpo);
+		Easing(&this->m_Flip_Y, this->m_Flip, 0.9f, EasingType::OutExpo);
 	}
 	void SideLog::Draw(void) noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
@@ -233,7 +233,7 @@ namespace DXLibRef {
 	}
 	// 
 	int KeyGuide::KeyGuideOnce::GetDrawSize(void) const noexcept {
-		int ofs = (m_GuideGraph) ? m_GuideGraph->GetDrawSize() : 0;
+		int ofs = (this->m_GuideGraph) ? this->m_GuideGraph->GetDrawSize() : 0;
 		if (GuideString != "") {
 			ofs += FontSystem::FontPool::Instance()->Get(FontSystem::FontType::MS_Gothic, LineHeight, 3)->GetStringWidth(GuideString) + 12;
 		}
@@ -242,9 +242,9 @@ namespace DXLibRef {
 	void KeyGuide::KeyGuideOnce::Draw(int x, int y) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		int ofs = 0;
-		if (m_GuideGraph) {
-			m_GuideGraph->Draw(x, y);
-			ofs = m_GuideGraph->GetDrawSize();
+		if (this->m_GuideGraph) {
+			this->m_GuideGraph->Draw(x, y);
+			ofs = this->m_GuideGraph->GetDrawSize();
 		}
 		if (GuideString != "") {
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
@@ -256,7 +256,7 @@ namespace DXLibRef {
 	// 
 	KeyGuide::KeyGuide(void) noexcept {
 		SetGuideFlip();
-		m_GuideBaseImage.Load("CommonData/key/OutputFont.png");
+		this->m_GuideBaseImage.Load("CommonData/key/OutputFont.png");
 		{
 			int count = 0;
 			FileStreamDX FileStream("CommonData/key/OutputFont.psf");
@@ -282,15 +282,15 @@ namespace DXLibRef {
 					}
 				}
 				//得た情報をもとに分割した画像を得る
-				m_DerivationGuideImage.emplace_back(std::make_shared<KeyGuideGraph>());
-				m_DerivationGuideImage.back()->AddGuide(Args.at(0), Args.at(1), Args.at(2), Args.at(3), m_GuideBaseImage);
+				this->m_DerivationGuideImage.emplace_back(std::make_shared<KeyGuideGraph>());
+				this->m_DerivationGuideImage.back()->AddGuide(Args.at(0), Args.at(1), Args.at(2), Args.at(3), this->m_GuideBaseImage);
 				++count;
 			}
 		}
 	}
 	void KeyGuide::ChangeGuide(std::function<void()>Guide_Pad) noexcept {
-		if (m_IsFlipGuide) {
-			m_IsFlipGuide = false;
+		if (this->m_IsFlipGuide) {
+			this->m_IsFlipGuide = false;
 			Dispose();
 			// 絶対出すガイド
 			auto* LocalizeParts = LocalizePool::Instance();
@@ -303,7 +303,7 @@ namespace DXLibRef {
 	void KeyGuide::Draw(void) const noexcept {
 		int x = 32;
 		int y = BaseScreenHeight - (21 + 16);
-		for (const auto& k : m_Key) {
+		for (const auto& k : this->m_Key) {
 			k->Draw(x, y);
 			x += k->GetDrawSize();
 			//次の行へ移行

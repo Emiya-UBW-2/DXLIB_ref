@@ -564,7 +564,7 @@ namespace DXLibRef {
 	}
 
 	class Matrix3x3DX {
-		MATRIX33 m_value;
+		MATRIX33	m_value;
 	public:
 		Matrix3x3DX(void) noexcept : m_value(M33GetIdent()) {}
 		Matrix3x3DX(MATRIX33 value) noexcept { this->m_value = value; }
@@ -604,7 +604,7 @@ namespace DXLibRef {
 		// 
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
-			if (std::abs(m_value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1‚ÌŽž
+			if (std::abs(this->m_value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1‚ÌŽž
 				if (angle_x) {
 					*angle_x = DX_PI_F / 2.f;
 				}
@@ -612,10 +612,10 @@ namespace DXLibRef {
 					*angle_y = 0.f;
 				}
 				if (angle_z) {
-					*angle_z = std::atan2f(m_value.m[0][1], m_value.m[0][0]);
+					*angle_z = std::atan2f(this->m_value.m[0][1], this->m_value.m[0][0]);
 				}
 			}
-			else if (std::abs(m_value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1‚ÌŽž
+			else if (std::abs(this->m_value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1‚ÌŽž
 				if (angle_x) {
 					*angle_x = -DX_PI_F / 2.f;
 				}
@@ -623,31 +623,31 @@ namespace DXLibRef {
 					*angle_y = 0.f;
 				}
 				if (angle_z) {
-					*angle_z = std::atan2f(m_value.m[0][1], m_value.m[0][0]);
+					*angle_z = std::atan2f(this->m_value.m[0][1], this->m_value.m[0][0]);
 				}
 			}
 			else {
 				if (angle_x) {
-					*angle_x = std::asinf(m_value.m[1][2]);
+					*angle_x = std::asinf(this->m_value.m[1][2]);
 				}
 				if (angle_y) {
-					*angle_y = std::atan2f(-m_value.m[0][2], m_value.m[2][2]);
+					*angle_y = std::atan2f(-m_value.m[0][2], this->m_value.m[2][2]);
 				}
 				if (angle_z) {
-					*angle_z = std::atan2f(-m_value.m[1][0], m_value.m[1][1]);
+					*angle_z = std::atan2f(-m_value.m[1][0], this->m_value.m[1][1]);
 				}
 			}
 		}
 		void SetRadian(float x, float y, float z) noexcept {
-			m_value.m[0][0] = std::cos(y) * std::cos(z) - std::sin(x) * std::sin(y) * std::sin(z);
-			m_value.m[1][0] = -std::cos(x) * std::sin(z);
-			m_value.m[2][0] = std::sin(y) * std::cos(z) + std::sin(x) * std::cos(y) * std::sin(z);
-			m_value.m[0][1] = std::cos(y) * std::sin(z) + std::sin(x) * std::sin(y) * std::cos(z);
-			m_value.m[1][1] = std::cos(x) * std::cos(z);
-			m_value.m[2][1] = std::sin(y) * std::sin(z) - std::sin(x) * std::cos(y) * std::cos(z);
-			m_value.m[0][2] = -std::cos(x) * std::sin(y);
-			m_value.m[1][2] = std::sin(x);
-			m_value.m[2][2] = std::cos(x) * std::cos(y);
+			this->m_value.m[0][0] = std::cos(y) * std::cos(z) - std::sin(x) * std::sin(y) * std::sin(z);
+			this->m_value.m[1][0] = -std::cos(x) * std::sin(z);
+			this->m_value.m[2][0] = std::sin(y) * std::cos(z) + std::sin(x) * std::cos(y) * std::sin(z);
+			this->m_value.m[0][1] = std::cos(y) * std::sin(z) + std::sin(x) * std::sin(y) * std::cos(z);
+			this->m_value.m[1][1] = std::cos(x) * std::cos(z);
+			this->m_value.m[2][1] = std::sin(y) * std::sin(z) - std::sin(x) * std::cos(y) * std::cos(z);
+			this->m_value.m[0][2] = -std::cos(x) * std::sin(y);
+			this->m_value.m[1][2] = std::sin(x);
+			this->m_value.m[2][2] = std::cos(x) * std::cos(y);
 		}
 		// ”äŠr
 		bool operator==(const Matrix3x3DX& obj) const noexcept {
@@ -756,14 +756,14 @@ namespace DXLibRef {
 		float	m_vel = 0.f;
 	public:
 		void Init(float Length, float N, float rad) noexcept {
-			m_PendulumLength = Length;
-			m_PendulumMass = N;
-			m_rad = rad;
-			m_vel = 0.f;
+			this->m_PendulumLength = Length;
+			this->m_PendulumMass = N;
+			this->m_rad = rad;
+			this->m_vel = 0.f;
 		}
 		void Update(float deltaTime) noexcept {
-			m_vel += (-9.8f / this->m_PendulumLength * std::sin(m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * deltaTime;
-			m_rad += this->m_vel * deltaTime;
+			this->m_vel += (-9.8f / this->m_PendulumLength * std::sin(this->m_rad) - this->m_drag_coeff / this->m_PendulumMass * this->m_vel) * deltaTime;
+			this->m_rad += this->m_vel * deltaTime;
 		}
 	public:
 		auto GetRad(void) const noexcept { return this->m_rad; }

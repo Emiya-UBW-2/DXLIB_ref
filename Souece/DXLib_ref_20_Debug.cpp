@@ -9,72 +9,70 @@ namespace DXLibRef {
 
 
 	DebugDraw::DebugDraw(void) noexcept {
-		m_IsActive = true;
+		this->m_IsActive = true;
 	}
 
 	void DebugDraw::SetStartPoint(void) noexcept {
-		if (!m_IsActive) {
+		if (!this->m_IsActive) {
 			return;
 		}
-		m_StartTime = GetNowHiPerformanceCount();
-		m_PointSel = 0;
+		this->m_StartTime = GetNowHiPerformanceCount();
+		this->m_PointSel = 0;
 		SetPoint("-----Start-----");
 	}
 	void DebugDraw::SetPoint(const char* DebugMes) noexcept {
-		if (!m_IsActive) {
+		if (!this->m_IsActive) {
 			return;
 		}
-		if (m_PointSel < PointMax) {
-			m_Point.at(0)[m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - m_StartTime) / 1000.0f;
-			m_Str[m_PointSel] = DebugMes;
+		if (this->m_PointSel < PointMax) {
+			this->m_Point.at(0)[m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - this->m_StartTime) / 1000.0f;
+			this->m_Str[m_PointSel] = DebugMes;
 			++m_PointSel;
 			return;
 		}
 	}
 	void DebugDraw::SetEndPoint(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		m_Switch.Update(CheckHitKey(KEY_INPUT_F1) != 0);
-		if (m_Switch.trigger()) {
-			m_IsActive ^= 1;
+		this->m_Switch.Update(CheckHitKey(KEY_INPUT_F1) != 0);
+		if (this->m_Switch.trigger()) {
+			this->m_IsActive ^= 1;
 		}
-		if (!m_IsActive) {
+		if (!this->m_IsActive) {
 			return;
 		}
 		auto PMax = PointMax + 1;
 		// ç≈å„ÇÃââéZ
 		SetPoint("-----End-----");
-		for (size_t loop : std::views::iota(0, PMax)) {
-			if (m_PointSel <= loop) {
-				m_Point[0][loop] = m_Point[0][m_PointSel - 1];
+		for (size_t loop : std::views::iota(static_cast<size_t>(0), PMax)) {
+			if (this->m_PointSel <= loop) {
+				this->m_Point[0][loop] = this->m_Point[0][m_PointSel - 1];
 			}
 			if (loop == PointMax) {
-				m_Point[0][loop] = 1000.0f * DXLib_refParts->GetDeltaTime();
+				this->m_Point[0][loop] = 1000.0f * DXLib_refParts->GetDeltaTime();
 			}
 
-			for (int loop2 = static_cast<int>(PointFrame - 1); loop2 >= 1; --loop2) {
-				m_Point[static_cast<size_t>(loop2)][loop] = m_Point[static_cast<size_t>(loop2 - 1)][loop];
+			for (size_t loop2 = PointFrame - 1; loop2 >= 1; --loop2) {
+				this->m_Point[loop2][loop] = this->m_Point[loop2 - 1][loop];
 			}
 
 			// ïΩãœ
-			m_Point[PointFrame][loop] = 0.f;
+			this->m_Point[PointFrame][loop] = 0.f;
 			for (size_t loop2 : std::views::iota(static_cast<size_t>(0), PointFrame)) {
-				m_Point[PointFrame][loop] += m_Point[loop2][loop];
+				this->m_Point[PointFrame][loop] += this->m_Point[loop2][loop];
 			}
-			m_Point[PointFrame][loop] /= PointFrame;
+			this->m_Point[PointFrame][loop] /= PointFrame;
 		}
-		for (int loop = PMax - 1; loop >= 1; --loop) {
-			if (loop > 0) {
-				m_Point[PointFrame][static_cast<size_t>(loop)] = m_Point[PointFrame][static_cast<size_t>(loop)] - m_Point[PointFrame][static_cast<size_t>(loop - 1)];
-			}
+		for (size_t loop = PMax - 1; loop >= 1; --loop) {
+			this->m_Point[PointFrame][loop] = this->m_Point[PointFrame][loop] - this->m_Point[PointFrame][loop - 1];
 		}
 
-		for (size_t loop2 : std::views::iota(0, PMax)) {
-			m_PointP[0][loop2] = 0;
+		for (size_t loop2 : std::views::iota(static_cast<size_t>(0), PMax)) {
+			this->m_PointP[0][loop2] = 0;
 			for (size_t loop = 0; loop <= loop2; ++loop) {
-				m_PointP[0][loop2] += m_Point[PointFrame][loop];
+				this->m_PointP[0][loop2] += this->m_Point[PointFrame][loop];
 			}
-			for (int loop3 = static_cast<int>(PointFrame - 1); loop3 >= 1; --loop3) {
-				m_PointP[static_cast<size_t>(loop3)][loop2] = m_PointP[static_cast<size_t>(loop3 - 1)][loop2];
+			for (size_t loop3 = PointFrame - 1; loop3 >= 1; --loop3) {
+				this->m_PointP[loop3][loop2] = this->m_PointP[loop3 - 1][loop2];
 			}
 
 		}
@@ -83,7 +81,7 @@ namespace DXLibRef {
 	void DebugDraw::DebugWindow(int xpos, int ypos) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		if (!m_IsActive) {
+		if (!this->m_IsActive) {
 			return;
 		}
 		const unsigned int Colors[PointMax + 1] = {
@@ -111,43 +109,41 @@ namespace DXLibRef {
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
 
 			{
-				const int xp = xpos;
-				const int yp = ypos;
 				// ì‡óe
-				int value = OptionParts->GetParamInt(EnumSaveParam::FpsLimit);
-				const float xs = static_cast<float>(wide) / PointFrame;
-				const float ys = static_cast<float>(border) / (1000.0f / static_cast<float>(value));
+				float FPSLimit = static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
+				const float xsize = static_cast<float>(wide) / PointFrame;
+				const float ysize = static_cast<float>(border) / (1000.0f / FPSLimit);
 
-				const int ye = yp + height;
+				const int yend = ypos + height;
 				for (size_t loop2 = PointFrame - 1 - 1; loop2 > 0; --loop2) {
-					int xnow = xp + static_cast<int>(static_cast<float>(loop2) * xs);
-					int xnext = xp + static_cast<int>(static_cast<float>(loop2 + 1) * xs);
+					int xnow = xpos + static_cast<int>(static_cast<float>(loop2) * xsize);
+					int xnext = xpos + static_cast<int>(static_cast<float>(loop2 + 1) * xsize);
 
 					for (size_t loop = static_cast<size_t>(PMax - 1); loop > 0; --loop) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[loop2][loop] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[loop2 + 1][loop] * ys));
+						int ynow = std::max(ypos, yend - static_cast<int>(this->m_PointP[loop2][loop] * ysize));
+						int ynext = std::max(ypos, yend - static_cast<int>(this->m_PointP[loop2 + 1][loop] * ysize));
 						DrawCtrls->SetDrawQuadrangle(
 							WindowSystem::DrawLayer::Normal,
 							xnow, ynow, xnext, ynext,
-							xnext, ye, xnow, ye,
+							xnext, yend, xnow, yend,
 							Colors[loop],
 							TRUE);
 					}
 					/*
 					for (int loop : std::views::iota(0, PMax)) {
-						int ynow = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(loop2)][static_cast<size_t>(loop)] * ys));
-						int ynext = std::max(yp, ye - static_cast<int>(m_PointP[static_cast<size_t>(loop2 + 1)][static_cast<size_t>(loop)] * ys));
+						int ynow = std::max(ypos, yend - static_cast<int>(this->m_PointP[static_cast<size_t>(loop2)][static_cast<size_t>(loop)] * ysize));
+						int ynext = std::max(ypos, yend - static_cast<int>(this->m_PointP[static_cast<size_t>(loop2 + 1)][static_cast<size_t>(loop)] * ysize));
 						DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xnow, ynow, xnext, ynext, Gray75);
 					}
 					//*/
 				}
-				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xp, ye - border, xp + wide, ye - border, White);// äÓèÄê¸
+				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xpos, yend - border, xpos + wide, yend - border, White);// äÓèÄê¸
 			}
 			ypos += height;
 		}
 		{
 			const int wide = (350);
-			const int height = static_cast<int>(m_PointSel + 3 + 1) * LineHeight + (10);
+			const int height = static_cast<int>(this->m_PointSel + 3 + 1) * LineHeight + (10);
 			// îwåi
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos, ypos, xpos + wide, ypos + height, White, true);
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
@@ -168,17 +164,17 @@ namespace DXLibRef {
 				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
 				White, Black, "FPS    :%5.2f fps", GetFPS());
 			++num;
-			for (size_t loop : std::views::iota(1, static_cast<int>(m_PointSel + 1))) {
+			for (size_t loop : std::views::iota(1, static_cast<int>(this->m_PointSel + 1))) {
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
-					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, m_Point[PointFrame][loop], m_Str[loop - 1].c_str());
+					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, this->m_Point[PointFrame][loop], this->m_Str[loop - 1].c_str());
 				++num;
 			}
 			{
-				size_t loop = static_cast<size_t>(PointMax);
+				size_t loop = PointMax;
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
-					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, m_Point[PointFrame][loop], m_Str[loop - 1].c_str());
+					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, this->m_Point[PointFrame][loop], this->m_Str[loop - 1].c_str());
 				++num;
 			}
 		}

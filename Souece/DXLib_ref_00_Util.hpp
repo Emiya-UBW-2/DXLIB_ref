@@ -11,7 +11,7 @@ namespace DXLibRef {
 	template <class T>
 	class SingletonBase {
 	private:
-		static const T* m_Singleton;
+		static const T*	m_Singleton;
 	public:
 		static void Create(void) noexcept {
 			m_Singleton = new T();
@@ -49,7 +49,7 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	class DXHandle {
 	private:
-		int m_handle{ InvalidID };
+		int		m_handle{ InvalidID };
 	protected:
 		constexpr DXHandle(int h) noexcept : m_handle(h) {}
 	public:

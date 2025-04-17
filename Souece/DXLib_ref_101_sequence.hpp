@@ -11,23 +11,23 @@ namespace DXLibRef {
 		bool			m_IsFirstLoop{ true };			// 初回チェック
 		bool			m_IsLoading{ false };
 		bool			m_IsLoadingEnd{ false };
-		std::array<std::shared_ptr<TEMPSCENE>, 10> m_pNextSceneList{ nullptr };
+		std::array<std::shared_ptr<TEMPSCENE>, 10>	m_pNextSceneList{ nullptr };
 		size_t			m_Next_Select{ 0 };
 		bool			m_Is3DActive{ true };
 	public:
-		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { m_pNextSceneList.at(static_cast<size_t>(index)) = Next_scenes_ptr_t; }
-		auto&		Get_Next(void) noexcept { return m_pNextSceneList.at(this->m_Next_Select); }
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { this->m_pNextSceneList.at(static_cast<size_t>(index)) = Next_scenes_ptr_t; }
+		auto&		Get_Next(void) noexcept { return this->m_pNextSceneList.at(this->m_Next_Select); }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
-		void		Set3DActive(bool value) noexcept { m_Is3DActive = value; }
+		void		Set3DActive(bool value) noexcept { this->m_Is3DActive = value; }
 		const auto	PopIsUpdateFarShadow(void) noexcept {
-			auto Ret = m_IsUpdateFarShadow;
-			m_IsUpdateFarShadow = false;
+			auto Ret = this->m_IsUpdateFarShadow;
+			this->m_IsUpdateFarShadow = false;
 			return Ret;
 		}
-		void		SetIsUpdateFarShadowActive() noexcept { m_IsUpdateFarShadow = true; }
+		void		SetIsUpdateFarShadowActive() noexcept { this->m_IsUpdateFarShadow = true; }
 	public:// ゲッター
-		const auto& GetIsFirstLoop(void) const noexcept { return m_IsFirstLoop; }
-		const auto& Get3DActive(void) const noexcept { return m_Is3DActive; }
+		const auto& GetIsFirstLoop(void) const noexcept { return this->m_IsFirstLoop; }
+		const auto& Get3DActive(void) const noexcept { return this->m_Is3DActive; }
 	public:// コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;
@@ -37,32 +37,32 @@ namespace DXLibRef {
 		virtual ~TEMPSCENE(void) noexcept {}
 	public:// メイン更新
 		void Load(void) noexcept {
-			if (!m_IsLoading) {
-				m_IsLoading = true;
+			if (!this->m_IsLoading) {
+				this->m_IsLoading = true;
 				Load_Sub();
 			}
 		}
 		void LoadEnd(void) noexcept {
-			if (!m_IsLoadingEnd) {
-				m_IsLoadingEnd = true;
+			if (!this->m_IsLoadingEnd) {
+				this->m_IsLoadingEnd = true;
 				LoadEnd_Sub();
 			}
 		}
 		void Set(void) noexcept {
 			this->m_Next_Select = 0;
 			Set_Sub();
-			m_IsFirstLoop = true;
+			this->m_IsFirstLoop = true;
 		}
 		bool Update(void) noexcept {
 			auto ans = Update_Sub();
-			m_IsFirstLoop = false;
+			this->m_IsFirstLoop = false;
 			return ans;
 		}
 		void Dispose(void) noexcept { Dispose_Sub(); }
 		void Dispose_Load(void) noexcept {
-			if (m_IsLoading) {
-				m_IsLoading = false;
-				m_IsLoadingEnd = false;
+			if (this->m_IsLoading) {
+				this->m_IsLoading = false;
+				this->m_IsLoadingEnd = false;
 				Dispose_Load_Sub();
 			}
 		}
@@ -139,21 +139,21 @@ namespace DXLibRef {
 		SceneControl& operator=(SceneControl&& o) = delete;
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
-		void		SetIsUpdateFarShadowActive() noexcept { m_NowScenesPtr->SetIsUpdateFarShadowActive(); }
+		void		SetIsUpdateFarShadowActive() noexcept { this->m_NowScenesPtr->SetIsUpdateFarShadowActive(); }
 	private:
 		void	DrawMain(const Camera3DInfo& camInfo, bool Is3D) const noexcept;
 		void	DrawUICommon(void) const noexcept;
 		void	DrawUIFront(void) const noexcept;
 	public:
-		const auto&		IsEndGame(void) const noexcept { return m_IsEndGame; }
-		const auto&		IsPause(void) const noexcept { return m_IsPauseActive; }
-		const auto&		IsExit(void) const noexcept { return m_IsExitSelect; }
-		const auto&		IsRestart(void) const noexcept { return m_IsRestartSelect; }
-		const auto		IsEndScene(void) const noexcept { return m_IsEndScene || m_IsEndGame; }
+		const auto&		IsEndGame(void) const noexcept { return this->m_IsEndGame; }
+		const auto&		IsPause(void) const noexcept { return this->m_IsPauseActive; }
+		const auto&		IsExit(void) const noexcept { return this->m_IsExitSelect; }
+		const auto&		IsRestart(void) const noexcept { return this->m_IsRestartSelect; }
+		const auto		IsEndScene(void) const noexcept { return this->m_IsEndScene || this->m_IsEndGame; }
 
-		void			SetEndGame(void) noexcept { m_IsEndGame = true; }
+		void			SetEndGame(void) noexcept { this->m_IsEndGame = true; }
 		void			ChangePause(bool value) noexcept;
-		void			SetFirstScene(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { m_NowScenesPtr = ptr; }
+		void			SetFirstScene(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { this->m_NowScenesPtr = ptr; }
 	public:
 		void			Initialize(void) noexcept;
 		void			Update(void) noexcept;

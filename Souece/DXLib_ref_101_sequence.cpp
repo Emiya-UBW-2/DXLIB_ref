@@ -8,33 +8,33 @@ namespace DXLibRef {
 	// FPS表示
 	void SceneControl::FPSDrawer::Initialize(void) noexcept {
 		// 各々の数値を初期化
-		for (auto& f : m_FPSAvgs) {
+		for (auto& f : this->m_FPSAvgs) {
 			f = FrameRate;
 		}
-		m_FPSAvgCount = 0;
+		this->m_FPSAvgCount = 0;
 	}
 	void SceneControl::FPSDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		// m_FPSAvgCountの番号に対して今のフレームレートを保存
-		m_FPSAvgs.at(m_FPSAvgCount) = DXLib_refParts->GetFps();
+		this->m_FPSAvgs.at(this->m_FPSAvgCount) = DXLib_refParts->GetFps();
 		// 保存する場所をずらす
-		++m_FPSAvgCount %= m_FPSAvgs.size();
+		++m_FPSAvgCount %= this->m_FPSAvgs.size();
 		// 保存している過去のFPS値の平均をとる
-		m_FPSAvg = 0.f;
-		for (auto& f : m_FPSAvgs) {
-			m_FPSAvg += f;
+		this->m_FPSAvg = 0.f;
+		for (auto& f : this->m_FPSAvgs) {
+			this->m_FPSAvg += f;
 		}
-		m_FPSAvg = m_FPSAvg / static_cast<float>(m_FPSAvgs.size());
+		this->m_FPSAvg = this->m_FPSAvg / static_cast<float>(this->m_FPSAvgs.size());
 	}
 	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		auto* OptionParts = OptionManager::Instance();
 		// FPSの平均値が設定していた上限値に対して高いなら緑、低いなら黄色赤色と変化させる
 		auto color = White;
-		if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
+		if (this->m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
 			color = Green;// 十分にFPSが出ている
 		}
-		else if (m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 10)) {
+		else if (this->m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 10)) {
 			color = Yellow;// 十分にFPSが出ていない
 		}
 		else {
@@ -43,7 +43,7 @@ namespace DXLibRef {
 		// FPS値の表示
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
-			BaseScreenWidth - 8, 8, color, Black, "%5.2f FPS", m_FPSAvg);
+			BaseScreenWidth - 8, 8, color, Black, "%5.2f FPS", this->m_FPSAvg);
 		// ドローコール(DirectXに何回描画指示を送ったか)の表示
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
@@ -53,10 +53,10 @@ namespace DXLibRef {
 	void SceneControl::PauseDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		// ポーズ画面では点滅の演算を行う
-		m_PauseFlashCount += DXLib_refParts->GetDeltaTime();
+		this->m_PauseFlashCount += DXLib_refParts->GetDeltaTime();
 		// 1秒経ったら0秒にリセットする
-		if (m_PauseFlashCount > 1.f) {
-			m_PauseFlashCount -= 1.f;
+		if (this->m_PauseFlashCount > 1.f) {
+			this->m_PauseFlashCount -= 1.f;
 		}
 	}
 	void SceneControl::PauseDrawer::DrawPause(void) const noexcept {
@@ -67,7 +67,7 @@ namespace DXLibRef {
 		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, BaseScreenWidth, BaseScreenHeight, Black, TRUE);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
 		// カウントが0.5秒以上であれば Pause の文字を表示
-		if (m_PauseFlashCount > 0.5f) {
+		if (this->m_PauseFlashCount > 0.5f) {
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 				36, FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP,
 				16, 16, Green, Black, "Pause");
@@ -132,7 +132,7 @@ namespace DXLibRef {
 			// 2D描画
 			PostPassParts->GetBufferScreen().SetDraw_Screen();
 			{
-				this->m_NowScenesPtr->MainDraw(-1);
+				this->m_NowScenesPtr->MainDraw(InvalidID);
 			}
 			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);	// Dofを無効化
 		}
@@ -146,10 +146,10 @@ namespace DXLibRef {
 		this->m_NowScenesPtr->DrawUI_Base();
 		// ポーズ描画を設定
 		if (IsPause()) {
-			m_PauseDrawer.DrawPause();
+			this->m_PauseDrawer.DrawPause();
 		}
 		// FPS表示描画を設定
-		m_FPSDrawer.DrawFPSCounter();
+		this->m_FPSDrawer.DrawFPSCounter();
 		KeyGuideParts->Draw();
 		SideLogParts->Draw();
 		PopUp::Instance()->Draw(BaseScreenWidth / 2, BaseScreenHeight / 2);
@@ -164,8 +164,8 @@ namespace DXLibRef {
 	//
 	void SceneControl::ChangePause(bool value) noexcept {
 		auto* PopUpParts = PopUp::Instance();
-		if (m_IsPauseActive != value) {
-			m_IsPauseActive = value;
+		if (this->m_IsPauseActive != value) {
+			this->m_IsPauseActive = value;
 			auto* KeyGuideParts = KeyGuide::Instance();
 			KeyGuideParts->SetGuideFlip();
 		}
@@ -192,7 +192,7 @@ namespace DXLibRef {
 		this->m_NowScenesPtr->Set();
 		KeyGuideParts->SetGuideFlip();
 		// FPS表示の初期化
-		m_FPSDrawer.Initialize();
+		this->m_FPSDrawer.Initialize();
 	}
 	void SceneControl::Update(void) noexcept {
 		auto* Pad = PadControl::Instance();
@@ -202,8 +202,8 @@ namespace DXLibRef {
 		auto* SideLogParts = SideLog::Instance();
 		auto* CameraParts = Camera3D::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
-		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !m_IsExitSelect) {
-			m_IsExitSelect = true;
+		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !this->m_IsExitSelect) {
+			this->m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
 					auto* Pad = PadControl::Instance();
@@ -226,13 +226,13 @@ namespace DXLibRef {
 						}
 					}
 				},
-				[this]() { m_IsExitSelect = false; },
+				[this]() { this->m_IsExitSelect = false; },
 				[]() {},
 				true
 			);
 		}
-		if (OptionWindowParts->IsRestartSwitch() && !m_IsRestartSelect) {
-			m_IsRestartSelect = true;
+		if (OptionWindowParts->IsRestartSwitch() && !this->m_IsRestartSelect) {
+			this->m_IsRestartSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
 					auto* Pad = PadControl::Instance();
@@ -255,13 +255,13 @@ namespace DXLibRef {
 						}
 					}
 				},
-				[this]() { m_IsRestartSelect = false; },
+				[this]() { this->m_IsRestartSelect = false; },
 				[this]() {},
 				true
 			);
 		}
 		Pad->Update();
-		m_IsEndScene = !this->m_NowScenesPtr->Update();		// 更新
+		this->m_IsEndScene = !this->m_NowScenesPtr->Update();		// 更新
 		OptionWindowParts->Update();
 		Set3DSoundListenerPosAndFrontPosAndUpVec(CameraParts->SetMainCamera().GetCamPos().get(), CameraParts->SetMainCamera().GetCamVec().get(), CameraParts->SetMainCamera().GetCamUp().get());		// 音位置指定
 #if defined(_USE_OPENVR_)
@@ -272,14 +272,14 @@ namespace DXLibRef {
 		PopUpParts->Update();
 		// ポーズ画面の更新
 		if (IsPause()) {
-			m_PauseDrawer.Update();
+			this->m_PauseDrawer.Update();
 		}
 		// ポーズ入力によるオンオフ
 		if (Pad->GetPadsInfo(Controls::PADS::INVENTORY).GetKey().trigger()) {
 			ChangePause(!IsPause());
 		}
 		// FPS表示機能の更新
-		m_FPSDrawer.Update();
+		this->m_FPSDrawer.Update();
 	}
 	void SceneControl::DrawMainLoop(void) const noexcept {
 #if defined(_USE_OPENVR_)

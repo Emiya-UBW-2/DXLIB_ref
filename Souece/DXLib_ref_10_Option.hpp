@@ -111,18 +111,18 @@ namespace DXLibRef {
 		EnumParamType	m_EnumParamType{};
 		int				m_valueint{ 0 };
 	public:
-		void SetEnumParamType(EnumParamType value) noexcept { m_EnumParamType = value; }
-		auto GetEnumParamType(void) const noexcept { return m_EnumParamType; }
+		void SetEnumParamType(EnumParamType value) noexcept { this->m_EnumParamType = value; }
+		auto GetEnumParamType(void) const noexcept { return this->m_EnumParamType; }
 
-		void SetBoolean(bool use) noexcept { m_valueint = use ? 1 : 0; }
-		auto GetBoolean(void) const noexcept { return (m_valueint != 0); }
+		void SetBoolean(bool use) noexcept { this->m_valueint = use ? 1 : 0; }
+		auto GetBoolean(void) const noexcept { return (this->m_valueint != 0); }
 		void ChangeBoolean(void) noexcept { SetBoolean(GetBoolean() ^ 1); }
 
-		void SetInt(int use) noexcept { m_valueint = use; }
-		auto GetInt(void) const noexcept { return m_valueint; }
+		void SetInt(int use) noexcept { this->m_valueint = use; }
+		auto GetInt(void) const noexcept { return this->m_valueint; }
 
-		void SetFloat(float use) noexcept { m_valueint = static_cast<int>(use * 1000.f); }
-		auto GetFloat(void) const noexcept { return static_cast<float>(m_valueint) / 1000.f; }
+		void SetFloat(float use) noexcept { this->m_valueint = static_cast<int>(use * 1000.f); }
+		auto GetFloat(void) const noexcept { return static_cast<float>(this->m_valueint) / 1000.f; }
 
 	};
 
@@ -137,13 +137,15 @@ namespace DXLibRef {
 		OptionManager(OptionManager&& o) = delete;
 		OptionManager& operator=(const OptionManager&) = delete;
 		OptionManager& operator=(OptionManager&& o) = delete;
+
+		virtual ~OptionManager(void) noexcept {}
 	private:
-		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)> m_SaveParams;
-		std::array<SaveParams, static_cast<int>(EnumProjectSettingParam::Max)> m_ProjectSettingParams;
+		std::array<SaveParams, static_cast<int>(EnumSaveParam::Max)>	m_SaveParams;
+		std::array<SaveParams, static_cast<int>(EnumProjectSettingParam::Max)>	m_ProjectSettingParams;
 	public:
-		auto		GetParamBoolean(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
-		auto		GetParamInt(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
-		auto		GetParamFloat(EnumSaveParam id)const noexcept { return m_SaveParams.at(static_cast<size_t>(id)).GetFloat(); }
+		auto		GetParamBoolean(EnumSaveParam id)const noexcept { return this->m_SaveParams.at(static_cast<size_t>(id)).GetBoolean(); }
+		auto		GetParamInt(EnumSaveParam id)const noexcept { return this->m_SaveParams.at(static_cast<size_t>(id)).GetInt(); }
+		auto		GetParamFloat(EnumSaveParam id)const noexcept { return this->m_SaveParams.at(static_cast<size_t>(id)).GetFloat(); }
 	public:
 		void			SetParamBoolean(EnumSaveParam id, bool use) noexcept {
 			switch (id) {
@@ -199,9 +201,9 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			m_SaveParams.at(static_cast<size_t>(id)).SetBoolean(use);
+			this->m_SaveParams.at(static_cast<size_t>(id)).SetBoolean(use);
 		}
-		void			ChangeParamBoolean(EnumSaveParam id) noexcept { m_SaveParams.at(static_cast<size_t>(id)).ChangeBoolean(); }
+		void			ChangeParamBoolean(EnumSaveParam id) noexcept { this->m_SaveParams.at(static_cast<size_t>(id)).ChangeBoolean(); }
 
 		void			SetParamInt(EnumSaveParam id, int use) noexcept {
 			switch (id) {
@@ -246,17 +248,17 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			m_SaveParams.at(static_cast<size_t>(id)).SetInt(use);
+			this->m_SaveParams.at(static_cast<size_t>(id)).SetInt(use);
 		}
-		void			SetParamFloat(EnumSaveParam id, float use) noexcept { m_SaveParams.at(static_cast<size_t>(id)).SetFloat(use); }
+		void			SetParamFloat(EnumSaveParam id, float use) noexcept { this->m_SaveParams.at(static_cast<size_t>(id)).SetFloat(use); }
 	public:
-		auto		GetParamBoolean(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetBoolean(); }
-		auto		GetParamInt(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetInt(); }
-		auto		GetParamFloat(EnumProjectSettingParam id)const noexcept { return m_ProjectSettingParams.at(static_cast<size_t>(id)).GetFloat(); }
+		auto		GetParamBoolean(EnumProjectSettingParam id)const noexcept { return this->m_ProjectSettingParams.at(static_cast<size_t>(id)).GetBoolean(); }
+		auto		GetParamInt(EnumProjectSettingParam id)const noexcept { return this->m_ProjectSettingParams.at(static_cast<size_t>(id)).GetInt(); }
+		auto		GetParamFloat(EnumProjectSettingParam id)const noexcept { return this->m_ProjectSettingParams.at(static_cast<size_t>(id)).GetFloat(); }
 	public:
-		void			SetParamBoolean(EnumProjectSettingParam id, bool use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetBoolean(use); }
-		void			SetParamInt(EnumProjectSettingParam id, int use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetInt(use); }
-		void			SetParamFloat(EnumProjectSettingParam id, float use) noexcept { m_ProjectSettingParams.at(static_cast<size_t>(id)).SetFloat(use); }
+		void			SetParamBoolean(EnumProjectSettingParam id, bool use) noexcept { this->m_ProjectSettingParams.at(static_cast<size_t>(id)).SetBoolean(use); }
+		void			SetParamInt(EnumProjectSettingParam id, int use) noexcept { this->m_ProjectSettingParams.at(static_cast<size_t>(id)).SetInt(use); }
+		void			SetParamFloat(EnumProjectSettingParam id, float use) noexcept { this->m_ProjectSettingParams.at(static_cast<size_t>(id)).SetFloat(use); }
 	public:
 		void			Load(void) noexcept;
 		void			Save(void) const noexcept;

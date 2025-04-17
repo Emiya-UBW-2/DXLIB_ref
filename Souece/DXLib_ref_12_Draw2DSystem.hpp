@@ -612,46 +612,46 @@ namespace DXLibRef {
 		{
 						if (Pad->GetWheelAdd() != 0.f)
 		{
-							m_NowScrollYPer = std::clamp(m_NowScrollYPer + static_cast<float>(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
+							this->m_NowScrollYPer = std::clamp(this->m_NowScrollYPer + static_cast<float>(-Pad->GetWheelAdd() * 3) / Total, 0.f, 1.f);
 						}
 					}
 					if (IntoMouse(xp2 - (24), yp1, xp2, yp2))
 		{
 						if (Pad->GetINTERACTKey().trigger())
 		{
-							m_IsChangeScrollY = true;
+							this->m_IsChangeScrollY = true;
 						}
 
-						if (!m_IsChangeScrollY)
+						if (!this->m_IsChangeScrollY)
 		{
 							HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
 							SetCursor(hCursor);
 						}
 					}
-					if (m_IsChangeScrollY)
+					if (this->m_IsChangeScrollY)
 		{
 						if (Pad->GetINTERACTKey().press())
 		{
 							color = White;
-							m_NowScrollYPer = std::clamp(static_cast<float>(Pad->GetMouseY() - this->m_BaseScrollY) / Total, 0.f, 1.f);
+							this->m_NowScrollYPer = std::clamp(static_cast<float>(Pad->GetMouseY() - this->m_BaseScrollY) / Total, 0.f, 1.f);
 
 							HCURSOR hCursor = LoadCursor(NULL, IDC_SIZENS);
 							SetCursor(hCursor);
 						}
 						else {
-							m_IsChangeScrollY = false;
+							this->m_IsChangeScrollY = false;
 						}
 					}
 					else {
-						m_BaseScrollY = Pad->GetMouseY() - Yp_t;
+						this->m_BaseScrollY = Pad->GetMouseY() - Yp_t;
 						if (Pad->GetMouseY() < Yp_s)
 		{
-							m_BaseScrollY += Yp_s - Pad->GetMouseY();
+							this->m_BaseScrollY += Yp_s - Pad->GetMouseY();
 						}
 
 						if (Pad->GetMouseY() > Yp_e)
 		{
-							m_BaseScrollY += Yp_e - Pad->GetMouseY();
+							this->m_BaseScrollY += Yp_e - Pad->GetMouseY();
 						}
 					}
 				}
@@ -669,41 +669,41 @@ namespace DXLibRef {
 		friend class SingletonBase<SideLog>;
 	private:
 		class SideLogData {
-			unsigned int m_Color{ 0 };
-			char m_Message[64]{};
-			float m_TimeStart{ -1.f };
-			float m_TimeMax{ -1.f };
-			float m_Time{ -1.f };
-			float m_Flip{ 0.f };
-			float m_Flip_Y{ 0.f };
+			unsigned int	m_Color{ 0 };
+			char			m_Message[64]{};
+			float			m_TimeStart{ -1.f };
+			float			m_TimeMax{ -1.f };
+			float			m_Time{ -1.f };
+			float			m_Flip{ 0.f };
+			float			m_Flip_Y{ 0.f };
 		public:
-			void AddFlip(float value) noexcept { m_Flip += value; }
+			void AddFlip(float value) noexcept { this->m_Flip += value; }
 			template <typename... Args>
 			void SetData(float second, float startSec, unsigned int Color, const char* Mes, Args&&... args) noexcept {
-				snprintfDx(m_Message, 64, Mes, args...);
-				m_TimeStart = startSec;
-				m_TimeMax = second;
-				m_Time = m_TimeStart + m_TimeMax;
-				m_Flip = 0.f;
-				m_Flip_Y = -1.f;
-				m_Color = Color;
+				snprintfDx(this->m_Message, 64, Mes, args...);
+				this->m_TimeStart = startSec;
+				this->m_TimeMax = second;
+				this->m_Time = this->m_TimeStart + this->m_TimeMax;
+				this->m_Flip = 0.f;
+				this->m_Flip_Y = -1.f;
+				this->m_Color = Color;
 			}
 			void UpdateActive(void) noexcept;
 		public:
-			float GetFlip(void) const noexcept { return m_Flip_Y; }
+			float GetFlip(void) const noexcept { return this->m_Flip_Y; }
 			float ActivePer(void) const noexcept {
-				if (m_Time > m_TimeMax) {
+				if (this->m_Time > this->m_TimeMax) {
 					return 0.f;
 				}
-				else if (m_Time > 1.f) {
-					return std::clamp((m_TimeMax - m_Time) * 10.f + 0.1f, 0.f, 1.f);
+				else if (this->m_Time > 1.f) {
+					return std::clamp((this->m_TimeMax - this->m_Time) * 10.f + 0.1f, 0.f, 1.f);
 				}
 				else {
-					return std::clamp(m_Time, 0.f, 1.f);
+					return std::clamp(this->m_Time, 0.f, 1.f);
 				}
 			}
-			const char* GetMsg(void) const noexcept { return m_Message; }
-			unsigned int GetMsgColor(void) const noexcept { return m_Color; }
+			const char* GetMsg(void) const noexcept { return this->m_Message; }
+			unsigned int GetMsgColor(void) const noexcept { return this->m_Color; }
 		};
 	private:
 		std::array<SideLogData, 16> data;
@@ -725,7 +725,7 @@ namespace DXLibRef {
 			for (auto& d : data) {
 				d.AddFlip(1.f);
 			}
-			data.at(m_LastSel).SetData(second, startSec, Color, Mes, args...);
+			data.at(this->m_LastSel).SetData(second, startSec, Color, Mes, args...);
 			++m_LastSel %= data.size();
 			SelYadd = 10.f;
 		}
@@ -775,7 +775,7 @@ namespace DXLibRef {
 			void Draw(int x, int y) const noexcept;
 		};
 		class KeyGuideOnce {
-			std::shared_ptr<KeyGuideGraph> m_GuideGraph;
+			std::shared_ptr<KeyGuideGraph>	m_GuideGraph;
 			std::string GuideString;
 		public:
 			KeyGuideOnce(void) noexcept {}
@@ -787,12 +787,12 @@ namespace DXLibRef {
 			~KeyGuideOnce(void) noexcept {}
 		public:
 			void AddGuide(const std::shared_ptr<KeyGuideGraph>& pGuide, const std::string& GuideStr) noexcept {
-				m_GuideGraph = pGuide;
+				this->m_GuideGraph = pGuide;
 				GuideString = GuideStr;
 			}
 			void Dispose(void) noexcept {
-				if (m_GuideGraph) {
-					m_GuideGraph.reset();
+				if (this->m_GuideGraph) {
+					this->m_GuideGraph.reset();
 				}
 				GuideString = "";
 			}
@@ -810,24 +810,24 @@ namespace DXLibRef {
 			return Controls::GetIDtoOffset(Pad->GetPadsInfo(PAD).GetAssign(), Pad->GetControlType());
 		}
 	public:
-		void SetGuideFlip(void) noexcept { m_IsFlipGuide = true; }
+		void SetGuideFlip(void) noexcept { this->m_IsFlipGuide = true; }
 		void ChangeGuide(std::function<void()>Guide_Pad) noexcept;
 		void AddGuide(int graphOffset, const std::string& GuideStr) noexcept {
-			m_Key.emplace_back(std::make_unique<KeyGuideOnce>());
-			m_Key.back()->AddGuide((graphOffset != InvalidID) ? m_DerivationGuideImage.at(graphOffset) : nullptr, GuideStr);
+			this->m_Key.emplace_back(std::make_unique<KeyGuideOnce>());
+			this->m_Key.back()->AddGuide((graphOffset != InvalidID) ? this->m_DerivationGuideImage.at(graphOffset) : nullptr, GuideStr);
 		}
 		void Dispose(void) noexcept {
-			for (auto& k : m_Key) {
+			for (auto& k : this->m_Key) {
 				k->Dispose();
 				k.reset();
 			}
-			m_Key.clear();
+			this->m_Key.clear();
 		}
 	public:
 		//ƒKƒCƒh•\Ž¦‚Ì•`‰æ
 		void Draw(void) const noexcept;
 		//ƒL[’P‘Ì‚Ì•`‰æ
-		void DrawButton(int x, int y, int graphOffset) const noexcept { m_DerivationGuideImage.at(graphOffset)->Draw(x, y); }
-		int GetDrawSize(int graphOffset) const noexcept { return m_DerivationGuideImage.at(graphOffset)->GetDrawSize(); }
+		void DrawButton(int x, int y, int graphOffset) const noexcept { this->m_DerivationGuideImage.at(graphOffset)->Draw(x, y); }
+		int GetDrawSize(int graphOffset) const noexcept { return this->m_DerivationGuideImage.at(graphOffset)->GetDrawSize(); }
 	};
 }

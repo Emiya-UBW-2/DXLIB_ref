@@ -148,8 +148,8 @@ namespace DXLibRef {
 		void		StartCount(void) noexcept;			// ループの最初に通す
 		bool		WaitCount(void) const noexcept;		// 表画面に反映し、垂直同期または一定のFPSまで待機する
 	public:
-		const auto& GetDeltaTime(void) const noexcept { return m_DeltaTime; }		// 1フレームにかかった時間を取得
-		const auto	GetFps(void) const noexcept { return 1.f / m_DeltaTime; }		// FPS値の取得
+		const auto& GetDeltaTime(void) const noexcept { return this->m_DeltaTime; }		// 1フレームにかかった時間を取得
+		const auto	GetFps(void) const noexcept { return 1.f / this->m_DeltaTime; }		// FPS値の取得
 	public:
 		void		SetWaitVSync(void) noexcept;		//垂直同期のフラグ設定
 	public:

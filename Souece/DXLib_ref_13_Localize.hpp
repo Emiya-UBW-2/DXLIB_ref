@@ -10,8 +10,8 @@ namespace DXLibRef {
 		typedef int LocalizeID;
 	private:
 		struct LocalizeStr {
-			LocalizeID m_ID{ 0 };
-			char m_Str[512]{};
+			LocalizeID	m_ID{ 0 };
+			char		m_Str[512]{};
 		public:
 			LocalizeStr(LocalizeID ID, const char* Str) {
 				this->m_ID = ID;

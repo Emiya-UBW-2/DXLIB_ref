@@ -33,7 +33,7 @@ namespace DXLibRef {
 		Load(&this->m_col, this->m_FilePath + this->m_ColFileName, "", DX_LOADMODEL_PHYSICS_DISABLE);
 	}
 	void			ResourceModel::LoadModelData(const std::shared_ptr<BaseObject>& pBase) noexcept {
-		if (m_IsEndLoadData) { return; }
+		if (this->m_IsEndLoadData) { return; }
 		// ƒtƒŒ[ƒ€
 		{
 			this->m_Frames.clear();
@@ -107,7 +107,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		m_IsEndLoadData = true;
+		this->m_IsEndLoadData = true;
 	}
 
 	void			ResourceModel::SaveModel(bool UseToonWhenCreateFile) noexcept {
@@ -256,10 +256,10 @@ namespace DXLibRef {
 	}
 	void			BaseObject::CheckDraw(int Range) noexcept {
 		if (!IsActive()) { return; }
-		if (Range == -1) { return; }
+		if (Range == InvalidID) { return; }
 		if (CheckCameraViewClip_Box(
-			(GetObj().GetMatrix().pos() + m_MinAABB).get(),
-			(GetObj().GetMatrix().pos() + m_MaxAABB).get()) == FALSE
+			(GetObj().GetMatrix().pos() + this->m_MinAABB).get(),
+			(GetObj().GetMatrix().pos() + this->m_MaxAABB).get()) == FALSE
 			) {
 			this->m_IsDraw.at(Range) |= true;
 		}

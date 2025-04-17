@@ -758,19 +758,19 @@ namespace DXLibRef {
 	// キー押し判定(押した瞬間やリピート、離した瞬間などにも対応)
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class switchs {
-		const float m_RepeatWaitTime = 0.5f;			//リピート時の1～2打間の時間間隔
-		const float m_RepeatTime = 0.04f;				//リピート時の2打以降の判定間隔
+		const float	m_RepeatWaitTime = 0.5f;			//リピート時の1～2打間の時間間隔
+		const float	m_RepeatTime = 0.04f;				//リピート時の2打以降の判定間隔
 	private:
+		bool		m_prevpress{ false };				// 押し続けたかどうかの判定判定
 		bool		m_press{ false };					// 押し続けたかどうかの判定判定
-		int8_t		m_presscount{ 0 };					// 押し続けたフレーム数を記憶しておく　おしたら2までカウントアップ、離したら0までカウントダウン
 		bool		m_repeat{ false };					// 押し続けた際の繰り返し判定
-		float		m_repeatcount{ m_RepeatWaitTime };	// 繰り返し判定に使うタイマー
+		float		m_repeatcount{ 0.f };				// 繰り返し判定に使うタイマー
 	public:
 		//コンストラクタ
 		switchs(void) noexcept {
-			m_presscount = 0;
-			m_repeatcount = m_RepeatWaitTime;
-			m_press = false;
+			this->m_repeatcount = 0.f;
+			this->m_prevpress = false;
+			this->m_press = false;
 		}
 		//デストラクタ
 		~switchs(void) noexcept {}
@@ -778,15 +778,15 @@ namespace DXLibRef {
 		// 更新
 		void			Update(bool key) noexcept;
 		// 押した瞬間
-		bool			trigger(void) const noexcept { return m_press && (m_presscount == 1); }//押していて、尚且つカウントが1のフレーム
+		bool			trigger(void) const noexcept { return this->m_press && !this->m_prevpress; }
 		// 押している間
-		bool			press(void) const noexcept { return m_press; }
+		bool			press(void) const noexcept { return this->m_press; }
 		// 押している間リピート
-		bool			repeat(void) const noexcept { return m_repeat; }
+		bool			repeat(void) const noexcept { return this->m_repeat; }
 		// 離した瞬間
-		bool			release_trigger(void) const noexcept { return (!m_press) && (m_presscount == 1); }//離していて、尚且つカウントが1のフレーム
+		bool			release_trigger(void) const noexcept { return !this->m_press && this->m_prevpress; }
 		// 離している間
-		bool			release(void) const noexcept { return !m_press; }
+		bool			release(void) const noexcept { return !this->m_press; }
 	};
 	// マウスと矩形の判定
 	extern bool IntoMouse(int x1, int y1, int x2, int y2) noexcept;
@@ -798,7 +798,7 @@ namespace DXLibRef {
 		friend class SingletonBase<PadControl>;
 	private:
 		class PadsInfo {
-			switchs m_Key;
+			switchs	m_Key;
 			int		m_assign = 0;
 			int		m_reserve = 0;
 			bool	m_IsUse{ true };
@@ -820,7 +820,7 @@ namespace DXLibRef {
 			const auto IsEnableSelectReserve(void) const noexcept { return this->m_reserve != InvalidID; }
 		};
 	private:
-		std::array<PadsInfo, static_cast<int>(Controls::PADS::MAX)>	m_PadsInfo;								// ボタン入力を保持
+		std::array<PadsInfo, static_cast<size_t>(Controls::PADS::MAX)>	m_PadsInfo;								// ボタン入力を保持
 		float													m_Look_XradAdd{ 0.f };						// 右スティック入力を保持
 		float													m_Look_YradAdd{ 0.f };						// 右スティック入力を保持
 		int														m_MouseX{ 0 };								//マウスのDXLIBからの値を保持しておく
@@ -841,15 +841,15 @@ namespace DXLibRef {
 		// デストラクタはシングルトンなので呼ばれません
 	public:
 		//今認識しているコントロールタイプを得る
-		const auto& GetControlType(void) const noexcept { return m_ControlType; }
+		const auto& GetControlType(void) const noexcept { return this->m_ControlType; }
 		//視点移動に相当する入力を得る
-		const auto& GetLS_X(void) const noexcept { return m_Look_XradAdd; }
-		const auto& GetLS_Y(void) const noexcept { return m_Look_YradAdd; }
+		const auto& GetLS_X(void) const noexcept { return this->m_Look_XradAdd; }
+		const auto& GetLS_Y(void) const noexcept { return this->m_Look_YradAdd; }
 		//マウスの位置や入力を返す(UIのクリックなど専用)
-		const auto& GetMS_X(void) const noexcept { return m_MouseX; }
-		const auto& GetMS_Y(void) const noexcept { return m_MouseY; }
-		const auto& GetMouseClick(void) const noexcept { return m_MouseClick; }
-		const auto& GetMouseWheelRot(void) const noexcept { return m_MouseWheelRot; }
+		const auto& GetMS_X(void) const noexcept { return this->m_MouseX; }
+		const auto& GetMS_Y(void) const noexcept { return this->m_MouseY; }
+		const auto& GetMouseClick(void) const noexcept { return this->m_MouseClick; }
+		const auto& GetMouseWheelRot(void) const noexcept { return this->m_MouseWheelRot; }
 		//各キーコンフィグに対応した入力を入れる
 		const auto& GetPadsInfo(Controls::PADS select) const noexcept { return this->m_PadsInfo.at(static_cast<size_t>(select)); }
 
@@ -905,7 +905,7 @@ namespace DXLibRef {
 		}
 	public:
 		//FPSなどのマウスを表示しない操作方法を用いるかどうか指定
-		void SetMouseMoveEnable(bool value) noexcept { m_MouseMoveEnable = value; }
+		void SetMouseMoveEnable(bool value) noexcept { this->m_MouseMoveEnable = value; }
 		//キーコンフィグとしてReserveに暫定値を入れる処理
 		//これを通る間、同じキーを押すと自身のキーを外す。キーアサインが外れているか違うキーを押すとそのキーを設定する
 		bool ChangeConfig(Controls::PADS select) noexcept {
@@ -989,8 +989,8 @@ namespace DXLibRef {
 		float				m_AddyRad{ 0.f };
 		float				m_xRad{ 0.f };
 		float				m_yRad{ 0.f };
-		unsigned long long	m_Flag{ 0 };
-		unsigned long long	m_Prev{ 0 };
+		size_t				m_Flag{ 0 };
+		size_t				m_Prev{ 0 };
 	public:
 		InputControl(void) noexcept {}
 		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
@@ -1014,10 +1014,10 @@ namespace DXLibRef {
 		void			SetyRad(float yRad) noexcept { this->m_yRad = yRad; }
 		void			SetInputPADS(Controls::PADS select, bool value) noexcept {
 			if (value) {
-				this->m_Flag |= ((unsigned long long)1 << (0 + static_cast<int>(select)));
+				this->m_Flag |= (static_cast<size_t>(1) << static_cast<size_t>(select));
 			}
 			else {
-				this->m_Flag &= ~((unsigned long long)1 << (0 + static_cast<int>(select)));
+				this->m_Flag &= ~(static_cast<size_t>(1) << static_cast<size_t>(select));
 			}
 		}
 	public:
@@ -1025,8 +1025,8 @@ namespace DXLibRef {
 		const auto&		GetAddyRad(void) const noexcept { return this->m_AddyRad; }
 		const auto&		GetxRad(void) const noexcept { return this->m_xRad; }
 		const auto&		GetyRad(void) const noexcept { return this->m_yRad; }
-		auto			GetPADSPress(Controls::PADS select) const noexcept { return (this->m_Flag & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0; }
-		auto			GetPADSTrigger(Controls::PADS select) const noexcept { return !((this->m_Prev & ((unsigned long long)1 << (0 + static_cast<int>(select)))) != 0) && GetPADSPress(select); }
+		auto			GetPADSPress(Controls::PADS select) const noexcept { return (this->m_Flag & (static_cast<size_t>(1) << static_cast<size_t>(select))) != 0; }
+		auto			GetPADSTrigger(Controls::PADS select) const noexcept { return !((this->m_Prev & (static_cast<size_t>(1) << static_cast<size_t>(select))) != 0) && GetPADSPress(select); }
 	public:
 		void			SetKeyInputFlags(const InputControl& o) noexcept {
 			this->m_Prev = o.m_Prev;

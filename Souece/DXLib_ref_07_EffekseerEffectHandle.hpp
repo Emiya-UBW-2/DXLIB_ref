@@ -91,7 +91,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<EffectResource>;
 	public:
-		std::vector<EffekseerEffectResourceHandle> m_Sorce;
+		std::vector<EffekseerEffectResourceHandle>	m_Sorce;
 	private:
 		EffectResource(void) noexcept;
 		EffectResource(const EffectResource&) = delete;
@@ -100,7 +100,7 @@ namespace DXLibRef {
 		EffectResource& operator=(EffectResource&& o) = delete;
 
 		~EffectResource(void) noexcept {
-			for (auto& e : m_Sorce) {
+			for (auto& e : this->m_Sorce) {
 				e.Dispose();
 			}
 		}
@@ -208,15 +208,15 @@ namespace DXLibRef {
 
 		typedef size_t Effect;
 	private:
-		static const int EffectNum = 16;
-		std::vector<std::pair<int, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>> m_effect;// エフェクト
+		static const size_t EffectNum = 16;
+		std::vector<std::pair<size_t, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>>		m_effect;// エフェクト
 	public:
 		const auto& GetEffect(Effect ID) const noexcept { return this->m_effect.at(ID); }
 		auto& GetEffect(Effect ID) noexcept { return this->m_effect.at(ID); }
 		// 複数エフェクトの再生
 		void		SetOnce_Any(Effect ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
-			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
-			GetEffect(ID).second[static_cast<size_t>(GetEffect(ID).first)]->SetEffectSpeed(speed);
+			GetEffect(ID).second[GetEffect(ID).first]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
+			GetEffect(ID).second[GetEffect(ID).first]->SetEffectSpeed(speed);
 			++GetEffect(ID).first %= EffectNum;
 		}
 		auto		CheckEffectCount(void) const noexcept {
