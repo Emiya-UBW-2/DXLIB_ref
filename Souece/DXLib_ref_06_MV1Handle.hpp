@@ -136,7 +136,7 @@ namespace DXLibRef {
 		Matrix4x4DX		GetFrameLocalMatrix(int frame) const noexcept { return MV1GetFrameLocalMatrix(DXHandle::get(), frame); }
 		Matrix4x4DX		GetFrameLocalWorldMatrix(int frame) const noexcept { return MV1GetFrameLocalWorldMatrix(DXHandle::get(), frame); }
 		Matrix4x4DX		GetMatrix(void) const noexcept { return MV1GetMatrix(DXHandle::get()); }
-		auto			GetFramePosition(int frame) const noexcept { return MV1GetFramePosition(DXHandle::get(), frame); }
+		Vector3DX		GetFramePosition(int frame) const noexcept { return MV1GetFramePosition(DXHandle::get(), frame); }
 		auto			GetFrameNum(void) const noexcept { return MV1GetFrameNum(DXHandle::get()); }
 		auto			GetFrameParent(int frame) const noexcept { return MV1GetFrameParent(DXHandle::get(), frame); }
 		auto			GetFrameChild(int frame, int p2) const noexcept { return MV1GetFrameChild(DXHandle::get(), frame, p2); }
