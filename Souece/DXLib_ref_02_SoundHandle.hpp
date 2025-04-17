@@ -104,6 +104,11 @@ namespace DXLibRef {
 			++nowSelect %= handle.size();
 			return Answer;
 		}
+		void			SetPosition(const Vector3DX& pos_t) noexcept {
+			for (auto& h : handle) {
+				h.SetPosition(pos_t);
+			}
+		}
 		// サウンドをすべて停止
 		void			StopAll(void) noexcept {
 			for (auto& h : handle) {
@@ -152,6 +157,7 @@ namespace DXLibRef {
 		//再生
 		const auto		Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = TRUE, int panpal = -256) noexcept { return this->m_Handles->Play(type_t, Flag_t, panpal); }
 		const auto		Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept { return this->m_Handles->Play3D(pos_t, radius, type_t); }
+		void			SetPosition(const Vector3DX& pos_t) noexcept { this->m_Handles->SetPosition(pos_t); }
 		// 音声の総裁性時間をミリ秒で取得
 		LONGLONG		GetTotalTIme(void) noexcept { return this->m_Handles->GetTotalTIme(); }
 		// その音量でのみの音量設定
