@@ -188,7 +188,7 @@ namespace DXLibRef {
 		moves(const moves& tgt) noexcept { *this = tgt; }
 		moves(moves&& tgt) noexcept { *this = tgt; }
 		// moves& operator=(const moves&) = delete;
-		// moves& operator=(moves&& o) = delete;
+		// moves& operator=(moves&&) = delete;
 		~moves(void) noexcept {}
 
 		void			operator=(const moves& tgt) noexcept {
@@ -247,9 +247,9 @@ namespace DXLibRef {
 			Load();
 		}
 		SaveData(const SaveData&) = delete;
-		SaveData(SaveData&& o) = delete;
+		SaveData(SaveData&&) = delete;
 		SaveData& operator=(const SaveData&) = delete;
-		SaveData& operator=(SaveData&& o) = delete;
+		SaveData& operator=(SaveData&&) = delete;
 	public:
 		SaveParam* GetData(std::string_view Name) noexcept {
 			for (auto& d : this->m_data) {
@@ -375,9 +375,9 @@ namespace DXLibRef {
 	public:
 		CheckPCSpec(void) noexcept {}
 		CheckPCSpec(const CheckPCSpec&) = delete;
-		CheckPCSpec(CheckPCSpec&& o) = delete;
+		CheckPCSpec(CheckPCSpec&&) = delete;
 		CheckPCSpec& operator=(const CheckPCSpec&) = delete;
-		CheckPCSpec& operator=(CheckPCSpec&& o) = delete;
+		CheckPCSpec& operator=(CheckPCSpec&&) = delete;
 		~CheckPCSpec(void) noexcept {
 			if (this->m_thread.joinable()) {
 				this->m_thread.detach();

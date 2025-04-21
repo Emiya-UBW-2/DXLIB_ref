@@ -16,15 +16,15 @@ namespace DXLibRef {
 	void SceneControl::FPSDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		// m_FPSAvgCountの番号に対して今のフレームレートを保存
-		this->m_FPSAvgs.at(this->m_FPSAvgCount) = DXLib_refParts->GetFps();
+		this->m_FPSAvgs[this->m_FPSAvgCount] = DXLib_refParts->GetFps();
 		// 保存する場所をずらす
-		++m_FPSAvgCount %= this->m_FPSAvgs.size();
+		++m_FPSAvgCount %= this->m_Size;
 		// 保存している過去のFPS値の平均をとる
 		this->m_FPSAvg = 0.f;
 		for (auto& f : this->m_FPSAvgs) {
 			this->m_FPSAvg += f;
 		}
-		this->m_FPSAvg = this->m_FPSAvg / static_cast<float>(this->m_FPSAvgs.size());
+		this->m_FPSAvg = this->m_FPSAvg / static_cast<float>(this->m_Size);
 	}
 	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
@@ -265,7 +265,7 @@ namespace DXLibRef {
 		OptionWindowParts->Update();
 		Set3DSoundListenerPosAndFrontPosAndUpVec(CameraParts->SetMainCamera().GetCamPos().get(), CameraParts->SetMainCamera().GetCamVec().get(), CameraParts->SetMainCamera().GetCamUp().get());		// 音位置指定
 #if defined(_USE_OPENVR_)
-		VRControl::Instance()->Execute();
+		VRControl::Instance()->Update();
 #endif
 		Camera3D::Instance()->Update();
 		SideLogParts->Update();

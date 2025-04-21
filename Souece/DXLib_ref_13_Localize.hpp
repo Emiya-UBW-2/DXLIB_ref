@@ -23,9 +23,9 @@ namespace DXLibRef {
 	private:
 		LocalizePool(void) noexcept;
 		LocalizePool(const LocalizePool&) = delete;
-		LocalizePool(LocalizePool&& o) = delete;
+		LocalizePool(LocalizePool&&) = delete;
 		LocalizePool& operator=(const LocalizePool&) = delete;
-		LocalizePool& operator=(LocalizePool&& o) = delete;
+		LocalizePool& operator=(LocalizePool&&) = delete;
 	public:
 		void Load(void) noexcept;
 		void Dispose(void) noexcept {

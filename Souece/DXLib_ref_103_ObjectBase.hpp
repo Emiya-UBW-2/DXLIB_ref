@@ -25,9 +25,9 @@ namespace DXLibRef {
 	public:
 		ResourceModel(void) noexcept { this->m_IsEndLoadData = false; }
 		ResourceModel(const ResourceModel&) = delete;
-		ResourceModel(ResourceModel&& o) = delete;
+		ResourceModel(ResourceModel&&) = delete;
 		ResourceModel& operator=(const ResourceModel&) = delete;
-		ResourceModel& operator=(ResourceModel&& o) = delete;
+		ResourceModel& operator=(ResourceModel&&) = delete;
 
 		virtual ~ResourceModel(void) noexcept {}
 	public:
@@ -45,13 +45,13 @@ namespace DXLibRef {
 		const auto&		GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
 		const auto&		GetFilePath(void) const noexcept { return this->m_FilePath; }
 	public:
-		auto			GetPathCompare(const char* filepath, const char* objfilename, const char* colfilename) const noexcept {
+		auto			GetPathCompare(std::string_view filepath, std::string_view objfilename, std::string_view colfilename) const noexcept {
 			return ((this->m_FilePath == filepath) && (this->m_ObjFileName == objfilename) && (this->m_ColFileName == colfilename));
 		}
 	public:
 		void			SetShapePer(int pShape, float Per) noexcept { this->m_Shapes[static_cast<size_t>(pShape)].second = Per; }
 	public:
-		void			LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename = "model", const char* colfilename = "col") noexcept;
+		void			LoadModel(PHYSICS_SETUP TYPE, std::string_view filepath, std::string_view objfilename = "model", std::string_view colfilename = "col") noexcept;
 		void			LoadModelData(const std::shared_ptr<BaseObject>& pBase) noexcept;
 		void			SaveModel(bool UseToonWhenCreateFile) noexcept;
 		void			CopyModel(const std::shared_ptr<ResourceModel>& pBase) noexcept;
@@ -62,6 +62,7 @@ namespace DXLibRef {
 	class BaseObject : public ResourceModel {
 	private:
 		bool										m_IsActive{ true };
+		std::array<bool, 2>							m_IsDrawTrans{ true };
 		std::array<bool, 3>							m_IsDraw{ true };
 		bool										m_IsDelete{ false };
 		Vector3DX									m_MinAABB = Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate);
@@ -88,7 +89,7 @@ namespace DXLibRef {
 		const auto&			GetMove(void) const noexcept { return this->m_move; }
 		const auto&			IsActive(void) const noexcept { return this->m_IsActive; }
 		const auto&			GetIsDelete(void) const noexcept { return this->m_IsDelete; }
-		const auto			IsDraw(int Range) const noexcept { return (Range == InvalidID) ? true : this->m_IsDraw.at(Range); }
+		const auto			IsDraw(int Range) const noexcept { return (Range == InvalidID) ? true : this->m_IsDraw[Range]; }
 	public:
 		void				SetMinAABB(const Vector3DX& value) noexcept { this->m_MinAABB = value; }
 		void				SetMaxAABB(const Vector3DX& value) noexcept { this->m_MaxAABB = value; }
@@ -156,16 +157,16 @@ namespace DXLibRef {
 	public:
 		BaseObject(void) noexcept {}
 		BaseObject(const BaseObject&) = delete;
-		BaseObject(BaseObject&& o) = delete;
+		BaseObject(BaseObject&&) = delete;
 		BaseObject& operator=(const BaseObject&) = delete;
-		BaseObject& operator=(BaseObject&& o) = delete;
+		BaseObject& operator=(BaseObject&&) = delete;
 
 		virtual ~BaseObject(void) noexcept {}
 	public:
 		void			Init(void) noexcept;
-		virtual void	FirstExecute(void) noexcept {}
-		void			ExecuteCommon(void) noexcept;
-		virtual void	LateExecute(void) noexcept {}
+		virtual void	FirstUpdate(void) noexcept {}
+		void			UpdateCommon(void) noexcept;
+		virtual void	LateUpdate(void) noexcept {}
 		virtual void	DrawShadow(void) noexcept;
 		void			CheckDraw(int Range) noexcept;
 		virtual void	Draw(bool isDrawSemiTrans, int Range) noexcept;

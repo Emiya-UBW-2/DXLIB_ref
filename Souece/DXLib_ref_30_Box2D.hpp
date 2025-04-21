@@ -42,7 +42,7 @@ namespace DXLibRef {
 			this->body->SetLinearVelocity(position);
 		}
 
-		void		Execute(const Vector3DX& add, float yradadd) noexcept {
+		void		Update(const Vector3DX& add, float yradadd) noexcept {
 			this->body->SetLinearVelocity(b2Vec2(add.x, add.z));
 			this->body->SetAngularVelocity(yradadd);
 		}

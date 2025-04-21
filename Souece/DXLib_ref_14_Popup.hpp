@@ -25,9 +25,9 @@ namespace DXLibRef {
 		public:
 			PopUpDraw(void) noexcept {}
 			PopUpDraw(const PopUpDraw&) = delete;
-			PopUpDraw(PopUpDraw&& o) = delete;
+			PopUpDraw(PopUpDraw&&) = delete;
 			PopUpDraw& operator=(const PopUpDraw&) = delete;
-			PopUpDraw& operator=(PopUpDraw&& o) = delete;
+			PopUpDraw& operator=(PopUpDraw&&) = delete;
 
 			~PopUpDraw(void) noexcept {}
 		public:
@@ -51,16 +51,17 @@ namespace DXLibRef {
 			auto IsEnd(void) const noexcept { return !this->m_Active && !(this->m_ActivePer > 1.f / 255.f); }
 		};
 	private:
-		std::array<PopUpDraw, 24>	m_que;
+		static const size_t			m_Size{ 24 };
+		std::array<PopUpDraw, m_Size>	m_que;
 		size_t						m_NowSel{ 0 };
 		size_t						m_LastSel{ 0 };
 		bool						m_PrevPause{ false };
 	private:
 		PopUp(void) noexcept {}
 		PopUp(const PopUp&) = delete;
-		PopUp(PopUp&& o) = delete;
+		PopUp(PopUp&&) = delete;
 		PopUp& operator=(const PopUp&) = delete;
-		PopUp& operator=(PopUp&& o) = delete;
+		PopUp& operator=(PopUp&&) = delete;
 	public:
 		auto IsActivePop(void) const noexcept { return (this->m_NowSel != this->m_LastSel); }
 	public:
@@ -75,7 +76,7 @@ namespace DXLibRef {
 			if (!IsActivePop()) {
 				return;
 			}
-			this->m_que.at(this->m_NowSel).Draw(xcenter, ycenter);
+			this->m_que[this->m_NowSel].Draw(xcenter, ycenter);
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -126,6 +127,7 @@ namespace DXLibRef {
 			size_t							m_id{ 0 };
 			std::string						m_name;
 			std::vector<OptionElementsInfo>	m_Elements;
+			size_t							m_Size{};
 		protected:
 			virtual void Init_Sub(void) noexcept {}
 		public:
@@ -138,8 +140,9 @@ namespace DXLibRef {
 				this->m_id = ID;
 				this->m_name = name;
 				Init_Sub();
+				this->m_Size = this->m_Elements.size();
 			}
-			void Execute(size_t* select, bool CanPress) noexcept;
+			void Update(size_t* select, bool CanPress) noexcept;
 			void Draw(int xpos, int ypos, int xsize, bool isActive, size_t* TabSel, size_t* select) noexcept;
 
 			void DrawInfo(int xpos, int ypos, size_t select) noexcept;
@@ -171,9 +174,9 @@ namespace DXLibRef {
 		public:
 			GraphicTabsInfo(void) noexcept {}
 			GraphicTabsInfo(const GraphicTabsInfo&) = delete;
-			GraphicTabsInfo(GraphicTabsInfo&& o) = delete;
+			GraphicTabsInfo(GraphicTabsInfo&&) = delete;
 			GraphicTabsInfo& operator=(const GraphicTabsInfo&) = delete;
-			GraphicTabsInfo& operator=(GraphicTabsInfo&& o) = delete;
+			GraphicTabsInfo& operator=(GraphicTabsInfo&&) = delete;
 
 			virtual ~GraphicTabsInfo(void) noexcept {}
 		protected:
@@ -196,9 +199,11 @@ namespace DXLibRef {
 			void Init_Sub(void) noexcept override;
 		};
 	private:
+		static const size_t							m_Size{ 4 };
+
 		size_t											m_tabsel{ 0 };
 		size_t											m_select{ 0 };
-		std::array<std::unique_ptr<OptionTabsInfo>, 4>	m_Tabs;
+		std::array<std::unique_ptr<OptionTabsInfo>, m_Size>	m_Tabs;
 		bool											m_Active{ false };
 		bool											m_ActiveSwitch{ false };
 		bool											m_RestartSwitch{ false };
@@ -216,9 +221,9 @@ namespace DXLibRef {
 	private:
 		OptionPopup(void) noexcept {}
 		OptionPopup(const OptionPopup&) = delete;
-		OptionPopup(OptionPopup&& o) = delete;
+		OptionPopup(OptionPopup&&) = delete;
 		OptionPopup& operator=(const OptionPopup&) = delete;
-		OptionPopup& operator=(OptionPopup&& o) = delete;
+		OptionPopup& operator=(OptionPopup&&) = delete;
 	public:
 		void Init(void) noexcept;
 		void Update(void)noexcept;

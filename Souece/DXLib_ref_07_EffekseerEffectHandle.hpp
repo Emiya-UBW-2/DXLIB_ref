@@ -92,17 +92,20 @@ namespace DXLibRef {
 		friend class SingletonBase<EffectResource>;
 	public:
 		std::vector<EffekseerEffectResourceHandle>	m_Sorce;
+		size_t										m_Size;
 	private:
 		EffectResource(void) noexcept;
 		EffectResource(const EffectResource&) = delete;
-		EffectResource(EffectResource&& o) = delete;
+		EffectResource(EffectResource&&) = delete;
 		EffectResource& operator=(const EffectResource&) = delete;
-		EffectResource& operator=(EffectResource&& o) = delete;
+		EffectResource& operator=(EffectResource&&) = delete;
 
 		~EffectResource(void) noexcept {
 			for (auto& e : this->m_Sorce) {
 				e.Dispose();
 			}
+			this->m_Sorce.clear();
+			this->m_Size = 0;
 		}
 	};
 	// エフェクトコントロール
@@ -120,9 +123,9 @@ namespace DXLibRef {
 		public:
 			EffectS(void) noexcept {}
 			EffectS(const EffectS&) = delete;
-			EffectS(EffectS&& o) = delete;
+			EffectS(EffectS&&) = delete;
 			EffectS& operator=(const EffectS&) = delete;
-			EffectS& operator=(EffectS&& o) = delete;
+			EffectS& operator=(EffectS&&) = delete;
 
 			~EffectS(void) noexcept {}
 		public:
@@ -189,7 +192,7 @@ namespace DXLibRef {
 				}
 			}
 		public:
-			void			Execute(void) noexcept {
+			void			Update(void) noexcept {
 				if (this->m_IsLoop) {
 					this->m_IsFirst = false;
 					Ef_Update();
@@ -211,11 +214,11 @@ namespace DXLibRef {
 		static const size_t EffectNum = 16;
 		std::vector<std::pair<size_t, std::array<std::unique_ptr<EffectS>, EffectNum + 1>>>		m_effect;// エフェクト
 	public:
-		const auto& GetEffect(EffectID ID) const noexcept { return this->m_effect.at(ID); }
-		auto& GetEffect(EffectID ID) noexcept { return this->m_effect.at(ID); }
+		const auto& GetEffect(EffectID ID) const noexcept { return this->m_effect[ID]; }
+		auto& GetEffect(EffectID ID) noexcept { return this->m_effect[ID]; }
 		// 複数エフェクトの再生
 		void		SetOnce_Any(EffectID ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f, float speed = 1.f) noexcept {
-			GetEffect(ID).second[GetEffect(ID).first]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
+			GetEffect(ID).second[GetEffect(ID).first]->SetOnce(EffectResource::Instance()->m_Sorce[ID], pos_t, nomal_t, scale);
 			GetEffect(ID).second[GetEffect(ID).first]->SetEffectSpeed(speed);
 			++GetEffect(ID).first %= EffectNum;
 		}
@@ -235,13 +238,13 @@ namespace DXLibRef {
 			return GetEffect(ID).second[EffectNum]->GetIsPlaying();
 		}
 		void		SetLoop(EffectID ID, const Vector3DX& pos_t) noexcept {
-			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->m_Sorce.at(ID), pos_t);
+			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->m_Sorce[ID], pos_t);
 		}
 		void		Update_LoopEffect(EffectID ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			GetEffect(ID).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
 		}
 		void		SetOnce(EffectID ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
-			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->m_Sorce.at(ID), pos_t, nomal_t, scale);
+			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->m_Sorce[ID], pos_t, nomal_t, scale);
 		}
 		void		StopEffect(EffectID ID) noexcept { GetEffect(ID).second[EffectNum]->StopEffect(); }
 		void		SetEffectSpeed(EffectID ID, float value) noexcept { GetEffect(ID).second[EffectNum]->SetEffectSpeed(value); }
@@ -250,15 +253,15 @@ namespace DXLibRef {
 	public:
 		EffectControl(void) noexcept {}
 		EffectControl(const EffectControl&) = delete;
-		EffectControl(EffectControl&& o) = delete;
+		EffectControl(EffectControl&&) = delete;
 		EffectControl& operator=(const EffectControl&) = delete;
-		EffectControl& operator=(EffectControl&& o) = delete;
+		EffectControl& operator=(EffectControl&&) = delete;
 
 		~EffectControl(void) noexcept {}
 	public:
 		// 全体の更新
 		void		Init(void) noexcept {
-			this->m_effect.resize(EffectResource::Instance()->m_Sorce.size());
+			this->m_effect.resize(EffectResource::Instance()->m_Size);
 			for (auto& ef : this->m_effect) {
 				ef.first = 0;
 				for (auto& t : ef.second) {
@@ -266,10 +269,10 @@ namespace DXLibRef {
 				}
 			}
 		}
-		void		Execute(void) noexcept {
+		void		Update(void) noexcept {
 			for (auto& ef : this->m_effect) {
 				for (auto& t : ef.second) {
-					t->Execute();
+					t->Update();
 				}
 			}
 		}

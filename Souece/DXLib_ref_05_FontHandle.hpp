@@ -186,9 +186,9 @@ namespace DXLibRef {
 		public:
 			Fonthave(FontType type, int fontSize, int edgeSize) noexcept;
 			Fonthave(const Fonthave&) = delete;
-			Fonthave(Fonthave&& o) = delete;
+			Fonthave(Fonthave&&) = delete;
 			Fonthave& operator=(const Fonthave&) = delete;
-			Fonthave& operator=(Fonthave&& o) = delete;
+			Fonthave& operator=(Fonthave&&) = delete;
 
 			~Fonthave(void) noexcept {
 				this->m_Handle.Dispose();
@@ -237,9 +237,9 @@ namespace DXLibRef {
 		private:
 			FontPool(void) noexcept {}
 			FontPool(const FontPool&) = delete;
-			FontPool(FontPool&& o) = delete;
+			FontPool(FontPool&&) = delete;
 			FontPool& operator=(const FontPool&) = delete;
-			FontPool& operator=(FontPool&& o) = delete;
+			FontPool& operator=(FontPool&&) = delete;
 		public:
 			std::unique_ptr<Fonthave>& Get(FontType type, int fontSize, int edgeSize) noexcept {
 				auto Find = std::find_if(this->m_Pools.begin(), this->m_Pools.end(), [&](const std::unique_ptr<Fonthave>& tgt) {return tgt->Equal(type, fontSize, edgeSize); });

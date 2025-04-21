@@ -137,9 +137,9 @@ namespace DXLibRef {
 	private:// コンストラクタ
 		VRControl(void) noexcept{}
 		VRControl(const VRControl&) = delete;
-		VRControl(VRControl&& o) = delete;
+		VRControl(VRControl&&) = delete;
 		VRControl& operator=(const VRControl&) = delete;
-		VRControl& operator=(VRControl&& o) = delete;
+		VRControl& operator=(VRControl&&) = delete;
 	public:
 		const VRDevice* Get_VR_Hand1Device(void) const noexcept { return (this->m_VR_Hand1ID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_Hand1ID) : nullptr; }
 		const VRDevice* Get_VR_Hand2Device(void) const noexcept { return (this->m_VR_Hand2ID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_Hand2ID) : nullptr; }
@@ -194,7 +194,7 @@ namespace DXLibRef {
 	public:
 		void Init(void) noexcept;
 		void SetupBuffer(void) noexcept;
-		void Execute(void) noexcept;
+		void Update(void) noexcept;
 		void Submit(char eye_type) noexcept;
 		void SetUpBackUI(std::function<void()> doingUI) noexcept;
 		void SubmitDraw(char eye_type, const GraphHandle& MainDrawScreen, std::function<void()> doingUI2) noexcept;

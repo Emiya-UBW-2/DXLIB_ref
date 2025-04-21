@@ -60,7 +60,8 @@ namespace DXLibRef {
 	// 同じ音声を多重に持つクラス(1ハンドルで鳴らせる音は一つであるため)
 	class SoundHandles {
 	private:
-		std::vector<SoundHandle> handle;
+		std::vector<SoundHandle> m_HandleList;
+		size_t Size = 0;
 		size_t nowSelect = 0;
 	public:
 		// コンストラクタ
@@ -68,62 +69,62 @@ namespace DXLibRef {
 			if (is3Dsound) {
 				SetCreate3DSoundFlag(TRUE);
 			}
-			this->handle.resize(buffersize);
-			this->handle[0].Load(path_t);
-			for (size_t loop = 1; loop < buffersize; ++loop) {
-				this->handle.at(loop).Duplicate(this->handle[0]);
+			this->Size = buffersize;
+			this->m_HandleList.resize(this->Size);
+			this->m_HandleList[0].Load(path_t);
+			for (size_t loop = 1; loop < this->Size; ++loop) {
+				this->m_HandleList[loop].Duplicate(this->m_HandleList[0]);
 			}
 			SetCreate3DSoundFlag(FALSE);
 		}
 		SoundHandles(void) noexcept = delete;
 		SoundHandles(const SoundHandles&) = delete;// コピーしてはいけないのですべてdelete
-		SoundHandles(SoundHandles&& o) = delete;
+		SoundHandles(SoundHandles&&) = delete;
 		SoundHandles& operator=(const SoundHandles&) = delete;
-		SoundHandles& operator=(SoundHandles&& o) = delete;
+		SoundHandles& operator=(SoundHandles&&) = delete;
 		// デストラクタ
 		~SoundHandles(void) noexcept {
 			StopAll();
-			handle.clear();
+			this->m_HandleList.clear();
 		}
 	public:
 		// サウンドが再生中かどうかを取得
-		bool	CheckPlay(void) const noexcept { return handle[nowSelect].CheckPlay(); }
+		bool	CheckPlay(void) const noexcept { return this->m_HandleList[this->nowSelect].CheckPlay(); }
 		// サウンドを一つ再生
 		const auto		Play(int type_t = DX_PLAYTYPE_BACK, int Flag_t = 1, int panpal = -256) noexcept {
-			auto Answer = nowSelect;
-			auto& NowHandle = handle[nowSelect];
+			auto Answer = this->nowSelect;
+			auto& NowHandle = this->m_HandleList[this->nowSelect];
 			NowHandle.Play(type_t, Flag_t);
 			if (panpal != -256) { NowHandle.Pan(panpal); }
-			++nowSelect %= handle.size();
+			++this->nowSelect %= this->Size;
 			return Answer;
 		}
 		const auto		Play3D(const Vector3DX& pos_t, float radius, int type_t = DX_PLAYTYPE_BACK) noexcept {
-			auto Answer = nowSelect;
-			auto& NowHandle = handle[nowSelect];
-			NowHandle.Play3D(pos_t, radius, type_t);
-			++nowSelect %= handle.size();
+			auto Answer = this->nowSelect;
+			this->m_HandleList[this->nowSelect].Play3D(pos_t, radius, type_t);
+			++this->nowSelect %= this->Size;
 			return Answer;
 		}
 		void			SetPosition(const Vector3DX& pos_t) noexcept {
-			for (auto& h : handle) {
+			for (auto& h : this->m_HandleList) {
 				h.SetPosition(pos_t);
 			}
 		}
 		// サウンドをすべて停止
 		void			StopAll(void) noexcept {
-			for (auto& h : handle) {
+			for (auto& h : this->m_HandleList) {
 				h.Stop();
 			}
 		}
 		// サウンドの音量をすべて変更
 		void			SetVolAll(int vol) noexcept {
-			for (auto& h : handle) {
+			for (auto& h : this->m_HandleList) {
 				h.SetVol(vol);
 			}
 		}
 	public:
-		// ミリ秒単位で総裁性時間を取得
-		LONGLONG		GetTotalTIme(void) noexcept { return handle[0].GetTotalTIme(); }
+		// ミリ秒単位で総再生時間を取得
+		LONGLONG		GetTotalTIme(void) noexcept { return this->m_HandleList[0].GetTotalTIme(); }
 	};
 	// SoundTypeごとに分かれた音声管理クラス
 	class Soundhave {
@@ -179,9 +180,9 @@ namespace DXLibRef {
 		// コンストラクタ
 		SoundPool(void) noexcept {}// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
 		SoundPool(const SoundPool&) = delete;
-		SoundPool(SoundPool&& o) = delete;
+		SoundPool(SoundPool&&) = delete;
 		SoundPool& operator=(const SoundPool&) = delete;
-		SoundPool& operator=(SoundPool&& o) = delete;
+		SoundPool& operator=(SoundPool&&) = delete;
 		// デストラクタはシングルトンなので呼ばれません
 	public:
 		// 特定のIDにサウンドを追加
@@ -202,7 +203,7 @@ namespace DXLibRef {
 					return h;
 				}
 			}
-			return this->m_SoundHas[static_cast<size_t>(Type)].at(0);// 探したいサウンドがなかった　エラー処理は特にしていませんので注意
+			return this->m_SoundHas[static_cast<size_t>(Type)][0];// 探したいサウンドがなかった　エラー処理は特にしていませんので注意
 		}
 		// 保持している音声すべての音量を反映
 		void			FlipVolume(void) noexcept {

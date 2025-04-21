@@ -4320,9 +4320,9 @@ class exception : public std::exception
     exception(int id_, const char* what_arg) : id(id_), m(what_arg) {} // NOLINT(bugprone-throw-keyword-missing)
 
     //exception(const exception&) = delete;
-    //exception(exception&& o) = delete;
-    //exception& operator=(const exception& o) = delete;
-    //exception& operator=(exception&& o) = delete;
+    //exception(exception&&) = delete;
+    //exception& operator=(const exception&) = delete;
+    //exception& operator=(exception&&) = delete;
 
 
     static std::string name(const std::string& ename, int id_)
@@ -4452,9 +4452,9 @@ class parse_error : public exception
         : exception(id_, what_arg), byte(byte_) {}
 
     //parse_error(const  parse_error&) = delete;
-    //parse_error(parse_error&& o) = delete;
+    //parse_error(parse_error&&) = delete;
     //parse_error& operator=(const  parse_error&) = delete;
-    //parse_error& operator=(parse_error&& o) = delete;
+    //parse_error& operator=(parse_error&&) = delete;
 
     static std::string position_string(const position_t& pos)
     {
@@ -4481,9 +4481,9 @@ class invalid_iterator : public exception
         : exception(id_, what_arg) {}
 
     //invalid_iterator(const invalid_iterator&) = delete;
-    //invalid_iterator(invalid_iterator&& o) = delete;
+    //invalid_iterator(invalid_iterator&&) = delete;
     invalid_iterator& operator=(const invalid_iterator&) = delete;
-    //invalid_iterator& operator=(invalid_iterator&& o) = delete;
+    //invalid_iterator& operator=(invalid_iterator&&) = delete;
 };
 
 /// @brief exception indicating executing a member function with a wrong type
@@ -4503,9 +4503,9 @@ class type_error : public exception
     type_error(int id_, const char* what_arg) : exception(id_, what_arg) {}
 
     //type_error(const type_error&) = delete;
-    //type_error(type_error&& o) = delete;
+    //type_error(type_error&&) = delete;
     type_error& operator=(const type_error&) = delete;
-    //type_error& operator=(type_error&& o) = delete;
+    //type_error& operator=(type_error&&) = delete;
 };
 
 /// @brief exception indicating access out of the defined range
@@ -4525,9 +4525,9 @@ class out_of_range : public exception
     out_of_range(int id_, const char* what_arg) : exception(id_, what_arg) {}
 
     //out_of_range(const out_of_range&) = delete;
-    //out_of_range(out_of_range&& o) = delete;
+    //out_of_range(out_of_range&&) = delete;
     //out_of_range& operator=(const out_of_range&) = delete;
-    //out_of_range& operator=(out_of_range&& o) = delete;
+    //out_of_range& operator=(out_of_range&&) = delete;
 };
 
 /// @brief exception indicating other library errors
@@ -4547,9 +4547,9 @@ class other_error : public exception
     other_error(int id_, const char* what_arg) : exception(id_, what_arg) {}
 
     //other_error(const other_error&) = delete;
-    //other_error(other_error&& o) = delete;
+    //other_error(other_error&&) = delete;
     other_error& operator=(const other_error&) = delete;
-    //other_error& operator=(other_error&& o) = delete;
+    //other_error& operator=(other_error&&) = delete;
 };
 
 }  // namespace detail
@@ -4975,8 +4975,8 @@ std::tuple<Args...> from_json_tuple_impl_base(BasicJsonType&& j, index_sequence<
 template < typename BasicJsonType, class A1, class A2 >
 std::pair<A1, A2> from_json_tuple_impl(BasicJsonType&& j, identity_tag<std::pair<A1, A2>> /*unused*/, priority_tag<0> /*unused*/)
 {
-    return {std::forward<BasicJsonType>(j).at(0).template get<A1>(),
-            std::forward<BasicJsonType>(j).at(1).template get<A2>()};
+    return {std::forward<BasicJsonType>(j)[0].template get<A1>(),
+            std::forward<BasicJsonType>(j)[1].template get<A2>()};
 }
 
 template<typename BasicJsonType, typename A1, typename A2>
@@ -5025,7 +5025,7 @@ inline void from_json(const BasicJsonType& j, std::map<Key, Value, Compare, Allo
         {
             JSON_THROW(type_error::create(302, concat("type must be array, but is ", p.type_name()), &j));
         }
-        m.emplace(p.at(0).template get<Key>(), p.at(1).template get<Value>());
+        m.emplace(p[0].template get<Key>(), p[1].template get<Value>());
     }
 }
 
@@ -5045,7 +5045,7 @@ inline void from_json(const BasicJsonType& j, std::unordered_map<Key, Value, Has
         {
             JSON_THROW(type_error::create(302, concat("type must be array, but is ", p.type_name()), &j));
         }
-        m.emplace(p.at(0).template get<Key>(), p.at(1).template get<Value>());
+        m.emplace(p[0].template get<Key>(), p[1].template get<Value>());
     }
 }
 
@@ -11274,7 +11274,7 @@ class binary_reader
                 {
                     return false;
                 }
-                if (dim.size() == 1 || (dim.size() == 2 && dim.at(0) == 1)) // return normal array size if 1D row vector
+                if (dim.size() == 1 || (dim.size() == 2 && dim[0] == 1)) // return normal array size if 1D row vector
                 {
                     result = dim.at(dim.size() - 1);
                     return true;
@@ -12219,9 +12219,9 @@ class parser
     }
 
     parser(const parser&) = delete;
-    parser(parser&& o) = delete;
+    parser(parser&&) = delete;
     parser& operator=(const parser&) = delete;
-    parser& operator=(parser&& o) = delete;
+    parser& operator=(parser&&) = delete;
 
     /*!
     @brief public parser interface
@@ -17041,9 +17041,9 @@ struct boundaries
     diyfp plus;
 
     boundaries(const boundaries&) = delete;
-    boundaries(boundaries&& o) = delete;
+    boundaries(boundaries&&) = delete;
     boundaries& operator=(const boundaries&) = delete;
-    boundaries& operator=(boundaries&& o) = delete;
+    boundaries& operator=(boundaries&&) = delete;
 };
 
 /*!

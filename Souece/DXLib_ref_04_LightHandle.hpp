@@ -34,14 +34,15 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<LightPool>;
 	private:
-		std::array<LightHandle, 5>	handles;
-		size_t						m_now = 0;
+		static const size_t Size = 5;
+		std::array<LightHandle, Size>	handles;
+		size_t							m_now = 0;
 	private:
 		LightPool(void) noexcept {}
 		LightPool(const LightPool&) = delete;
-		LightPool(LightPool&& o) = delete;
+		LightPool(LightPool&&) = delete;
 		LightPool& operator=(const LightPool&) = delete;
-		LightPool& operator=(LightPool&& o) = delete;
+		LightPool& operator=(LightPool&&) = delete;
 	public:
 		const LightHandle& Put(LightType Lighttype, const Vector3DX& pos) noexcept {
 			size_t prev = this->m_now;
@@ -60,7 +61,7 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			++m_now %= handles.size();
+			++m_now %= Size;
 			return handles[prev];
 		}
 		void			Update(void) noexcept {

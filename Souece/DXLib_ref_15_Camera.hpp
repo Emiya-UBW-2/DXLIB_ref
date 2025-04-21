@@ -31,9 +31,9 @@ namespace DXLibRef {
 	private:
 		Camera3D(void) noexcept {}
 		Camera3D(const Camera3D&) = delete;
-		Camera3D(Camera3D&& o) = delete;
+		Camera3D(Camera3D&&) = delete;
 		Camera3D& operator=(const Camera3D&) = delete;
-		Camera3D& operator=(Camera3D&& o) = delete;
+		Camera3D& operator=(Camera3D&&) = delete;
 
 		virtual ~Camera3D(void) noexcept {}
 	public:

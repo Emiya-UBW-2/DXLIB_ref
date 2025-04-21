@@ -75,10 +75,12 @@ namespace DXLibRef {
 		};
 	private:
 		std::vector<AnimControler>	m_AnimControler;
+		size_t m_AnimControlerSize{};
 	protected:
 		void			Dispose_Sub(void) noexcept override {
 			MV1DeleteModel(DXHandle::get());
 			this->m_AnimControler.clear();
+			this->m_AnimControlerSize = 0;
 		}
 	public:
 		/*読み込み*/
@@ -101,6 +103,7 @@ namespace DXLibRef {
 				MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
 			}
 			targetMV1->m_AnimControler.clear();
+			targetMV1->m_AnimControlerSize = 0;
 			return;
 		}
 		static void		SetAnime(MV1* targetMV1, const MV1& animPaletteMV1) noexcept {
@@ -118,7 +121,8 @@ namespace DXLibRef {
 				printfDx("error");
 				WaitKey();
 			}
-			targetMV1->m_AnimControler.resize(static_cast<size_t>(MV1GetAnimNum(animPaletteMV1.get())));
+			targetMV1->m_AnimControlerSize = static_cast<size_t>(MV1GetAnimNum(animPaletteMV1.get()));
+			targetMV1->m_AnimControler.resize(targetMV1->m_AnimControlerSize);
 			if (targetMV1->GetAnimNum() > 0) {
 				for (size_t loop : std::views::iota(static_cast<size_t>(0), targetMV1->GetAnimNum())) {
 					targetMV1->SetAnim(loop).Set(targetMV1, loop, &animPaletteMV1);
@@ -185,9 +189,9 @@ namespace DXLibRef {
 		void			SetPrioritizePhysicsOverAnimFlag(bool flag) const noexcept { MV1SetPrioritizePhysicsOverAnimFlag(DXHandle::get(), flag ? TRUE : FALSE); }
 
 		/*アニメーション*/
-		AnimControler&	SetAnim(size_t animeID) noexcept { return this->m_AnimControler.at(animeID); }
-		const auto&		GetAnim(size_t animeID) const noexcept { return this->m_AnimControler.at(animeID); }
-		size_t			GetAnimNum(void) const noexcept { return this->m_AnimControler.size(); }
+		AnimControler&	SetAnim(size_t animeID) noexcept { return this->m_AnimControler[animeID]; }
+		const auto&		GetAnim(size_t animeID) const noexcept { return this->m_AnimControler[animeID]; }
+		size_t			GetAnimNum(void) const noexcept { return this->m_AnimControlerSize; }
 		auto			UpdateAnim(size_t animeID) noexcept { SetAnim(animeID).UpdateAnim(); }
 		auto			UpdateAnimAll(void) noexcept {
 			for (auto& a : this->m_AnimControler) {

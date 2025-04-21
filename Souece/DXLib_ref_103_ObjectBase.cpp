@@ -1,7 +1,7 @@
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
-	void			ResourceModel::LoadModel(PHYSICS_SETUP TYPE, const char* filepath, const char* objfilename, const char* colfilename) noexcept {
+	void			ResourceModel::LoadModel(PHYSICS_SETUP TYPE, std::string_view filepath, std::string_view objfilename, std::string_view colfilename) noexcept {
 		this->m_PHYSICS_SETUP = TYPE;
 		this->m_FilePath = filepath;
 		this->m_ObjFileName = objfilename;
@@ -39,11 +39,9 @@ namespace DXLibRef {
 			this->m_Frames.clear();
 			if (pBase->GetFrameNum() > 0) {
 				this->m_Frames.resize(static_cast<size_t>(pBase->GetFrameNum()));
-			}
-			for (auto& f : this->m_Frames) {
-				f.first = InvalidID;
-			}
-			if (this->m_Frames.size() > 0) {
+				for (auto& f : this->m_Frames) {
+					f.first = InvalidID;
+				}
 				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetFrameNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(static_cast<int>(count))) {
@@ -67,11 +65,9 @@ namespace DXLibRef {
 			this->m_Materials.clear();
 			if (pBase->GetMaterialNum() > 0) {
 				this->m_Materials.resize(static_cast<size_t>(pBase->GetMaterialNum()));
-			}
-			for (auto& f : this->m_Materials) {
-				f = InvalidID;
-			}
-			if (this->m_Materials.size() > 0) {
+				for (auto& f : this->m_Materials) {
+					f = InvalidID;
+				}
 				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetMaterialNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(static_cast<int>(count))) {
@@ -173,24 +169,24 @@ namespace DXLibRef {
 		// フレーム
 		this->m_Frames.resize(pBase->m_Frames.size());
 		for (size_t index = 0; auto & f : this->m_Frames) {
-			f.first = pBase->m_Frames.at(index).first;
+			f.first = pBase->m_Frames[index].first;
 			if (f.first != InvalidID) {
-				f.second = pBase->m_Frames.at(index).second;
+				f.second = pBase->m_Frames[index].second;
 			}
 			++index;
 		}
 		// フレーム
 		this->m_Materials.resize(pBase->m_Materials.size());
 		for (size_t index = 0; auto & f : this->m_Materials) {
-			f = pBase->m_Materials.at(index);
+			f = pBase->m_Materials[index];
 			++index;
 		}
 		// シェイプ
 		this->m_Shapes.resize(pBase->m_Shapes.size());
 		for (size_t index = 0; auto & f : this->m_Shapes) {
-			f.first = pBase->m_Shapes.at(index).first;
+			f.first = pBase->m_Shapes[index].first;
 			if (f.first != InvalidID) {
-				f.second = pBase->m_Shapes.at(index).second;
+				f.second = pBase->m_Shapes[index].second;
 			}
 			++index;
 		}
@@ -207,10 +203,27 @@ namespace DXLibRef {
 		SetActive(true);
 		this->m_IsResetPhysics = true;
 		this->m_IsFirstLoop = true;
+
+		if (GetObj().IsActive()) {
+			this->m_IsDrawTrans[0] = false;
+			this->m_IsDrawTrans[1] = false;
+			for (int loop : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {
+				if (GetObj().GetMeshSemiTransState(loop)) {
+					this->m_IsDrawTrans[1] = true;
+				}
+				else {
+					this->m_IsDrawTrans[0] = true;
+				}
+			}
+		}
+		else {
+			this->m_IsDrawTrans[0] = true;
+			this->m_IsDrawTrans[1] = true;
+		}
 		Init_Sub();
 	}
 	// 
-	void			BaseObject::ExecuteCommon(void) noexcept {
+	void			BaseObject::UpdateCommon(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = GetObj().GetMatrix();
@@ -220,7 +233,7 @@ namespace DXLibRef {
 			if (index == 0) {
 				continue;
 			}
-			GetObj().SetShapeRate(f.first, (1.f - GetShapesList().at(0).second) * f.second);
+			GetObj().SetShapeRate(f.first, (1.f - GetShapesList()[0].second) * f.second);
 			++index;
 		}
 		// 物理更新
@@ -250,23 +263,21 @@ namespace DXLibRef {
 	}
 
 	void			BaseObject::DrawShadow(void) noexcept {
-		if (!IsActive()) { return; }
 		if (!GetObj().IsActive()) { return; }
 		GetObj().DrawModel();
 	}
 	void			BaseObject::CheckDraw(int Range) noexcept {
-		if (!IsActive()) { return; }
 		if (Range == InvalidID) { return; }
 		if (CheckCameraViewClip_Box(
 			(GetObj().GetMatrix().pos() + this->m_MinAABB).get(),
 			(GetObj().GetMatrix().pos() + this->m_MaxAABB).get()) == FALSE
 			) {
-			this->m_IsDraw.at(Range) |= true;
+			this->m_IsDraw[Range] |= true;
 		}
 		CheckDraw_Sub(Range);
 	}
 	void			BaseObject::Draw(bool isDrawSemiTrans, int Range) noexcept {
-		if (!IsActive()) { return; }
+		//if (!this->m_IsDrawTrans[isDrawSemiTrans ? 1 : 0]) { return; }
 		if (!IsDraw(Range)) { return; }
 		if (!GetObj().IsActive()) { return; }
 		for (int loop : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {

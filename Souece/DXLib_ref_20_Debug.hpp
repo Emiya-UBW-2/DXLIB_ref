@@ -20,9 +20,9 @@ namespace DXLibRef {
 	private:
 		DebugDraw(void) noexcept;
 		DebugDraw(const DebugDraw&) = delete;
-		DebugDraw(DebugDraw&& o) = delete;
+		DebugDraw(DebugDraw&&) = delete;
 		DebugDraw& operator=(const DebugDraw&) = delete;
-		DebugDraw& operator=(DebugDraw&& o) = delete;
+		DebugDraw& operator=(DebugDraw&&) = delete;
 	public:
 		void SetStartPoint(void) noexcept;
 		void SetPoint(const char* DebugMes) noexcept;

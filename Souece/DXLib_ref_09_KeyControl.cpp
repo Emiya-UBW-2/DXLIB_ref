@@ -130,10 +130,10 @@ namespace DXLibRef {
 					s_key = (130.f <= deg || deg <= -130.f);
 					d_key = (40.f <= deg && deg <= 140.f);
 				}
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_W)).Update(w_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_S)).Update(s_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_A)).Update(a_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_D)).Update(d_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_W)].Update(w_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_S)].Update(s_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_A)].Update(a_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_D)].Update(d_key);
 			}
 			// 右スティック
 			{
@@ -182,10 +182,10 @@ namespace DXLibRef {
 					s_key = (130.f <= deg || deg <= -130.f);
 					d_key = (40.f <= deg && deg <= 140.f);
 				}
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_W)).Update(w_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_S)).Update(s_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_A)).Update(a_key);
-				this->m_PadsInfo.at(static_cast<size_t>(Controls::PADS::MOVE_D)).Update(d_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_W)].Update(w_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_S)].Update(s_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_A)].Update(a_key);
+				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_D)].Update(d_key);
 			}
 			// 右スティック
 			{

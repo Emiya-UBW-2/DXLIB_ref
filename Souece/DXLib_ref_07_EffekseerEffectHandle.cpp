@@ -18,6 +18,7 @@ namespace DXLibRef {
 				this->m_Sorce.back().load("data/effect/" + p);
 			}
 		}
+		this->m_Size = this->m_Sorce.size();
 	}
 #endif
 };

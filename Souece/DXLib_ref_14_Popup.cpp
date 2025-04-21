@@ -100,7 +100,7 @@ namespace DXLibRef {
 		std::function<void()> ExitDoing,
 		std::function<void()> GuideDoing,
 		bool IsInsert) noexcept {
-		auto& Last = this->m_que.at(this->m_LastSel);
+		auto& Last = this->m_que[this->m_LastSel];
 		Last.Set(WindowName, sizex, sizey, doing, ExitDoing, GuideDoing);
 		if (!IsActivePop()) {
 			Last.Start();
@@ -109,28 +109,28 @@ namespace DXLibRef {
 			SceneParts->ChangePause(true);
 		}
 		else if (IsInsert) {
-			this->m_que.at(this->m_NowSel).End();
+			this->m_que[this->m_NowSel].End();
 			this->m_NowSel = this->m_LastSel;
 			Last.Start();
 		}
-		++m_LastSel %= this->m_que.size();
+		++m_LastSel %= this->m_Size;
 	}
 	void PopUp::EndAll(void) noexcept {
 		if (!IsActivePop()) {
 			return;
 		}
-		this->m_que.at(this->m_NowSel).End();
+		this->m_que[this->m_NowSel].End();
 		this->m_NowSel = this->m_LastSel;
 	}
 	void PopUp::Update(void) noexcept {
 		if (!IsActivePop()) {
 			return;
 		}
-		this->m_que.at(this->m_NowSel).Update();
-		if (this->m_que.at(this->m_NowSel).IsEnd()) {
-			++m_NowSel %= this->m_que.size();
+		this->m_que[this->m_NowSel].Update();
+		if (this->m_que[this->m_NowSel].IsEnd()) {
+			++m_NowSel %= this->m_Size;
 			if (IsActivePop()) {
-				this->m_que.at(this->m_NowSel).Start();
+				this->m_que[this->m_NowSel].Start();
 			}
 			else {
 				if (!this->m_PrevPause) {
@@ -282,40 +282,40 @@ namespace DXLibRef {
 		this->m_Draw(xpos + (720 - 324), ypos, isMine);
 	}
 	// 
-	void OptionPopup::OptionTabsInfo::Execute(size_t* select, bool CanPress) noexcept {
-		if ((*select) >= this->m_Elements.size()) {
+	void OptionPopup::OptionTabsInfo::Update(size_t* select, bool CanPress) noexcept {
+		if ((*select) >= this->m_Size) {
 			return;
 		}
 		auto* SE = SoundPool::Instance();
 		auto* Pad = PadControl::Instance();
-		this->m_Elements.at(*select).GetAnyDoing();
+		this->m_Elements[*select].GetAnyDoing();
 		if (CanPress) {
 			if (Pad->GetPadsInfo(Controls::PADS::MOVE_W).GetKey().trigger()) {
 				if ((*select) <= 0) {
-					(*select) = this->m_Elements.size() - 1;
+					(*select) = this->m_Size - 1;
 				}
 				else {
 					--(*select);
 				}
-				this->m_Elements.at(*select).m_selanim = 3.f;
+				this->m_Elements[*select].m_selanim = 3.f;
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetPadsInfo(Controls::PADS::MOVE_S).GetKey().trigger()) {
 				++(*select);
-				if ((*select) > this->m_Elements.size() - 1) {
+				if ((*select) > this->m_Size - 1) {
 					(*select) = 0;
 				}
-				this->m_Elements.at(*select).m_selanim = -3.f;
+				this->m_Elements[*select].m_selanim = -3.f;
 				SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 			}
 			if (Pad->GetPadsInfo(Controls::PADS::MOVE_A).GetKey().repeat()) {
-				this->m_Elements.at(*select).GetLeftPush();
+				this->m_Elements[*select].GetLeftPush();
 			}
 			if (Pad->GetPadsInfo(Controls::PADS::MOVE_D).GetKey().repeat()) {
-				this->m_Elements.at(*select).GetRightPush();
+				this->m_Elements[*select].GetRightPush();
 			}
 			if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || Pad->GetMouseClick().trigger()) {
-				this->m_Elements.at(*select).GetOKPush();
+				this->m_Elements[*select].GetOKPush();
 			}
 		}
 		for (auto& e : this->m_Elements) {
@@ -336,12 +336,12 @@ namespace DXLibRef {
 		// 内容
 		if (isActive) {
 			int yp1 = ypos + LineHeight * 2;
-			for (size_t loop : std::views::iota(static_cast<size_t>(0), this->m_Elements.size())) {
+			for (size_t loop : std::views::iota(static_cast<size_t>(0), this->m_Size)) {
 				yp1 += (LineHeight + (6));
 				if (IntoMouse(xpos, yp1, xpos + xsize, yp1 + (LineHeight + (6)))) {
 					*select = loop;
 				}
-				this->m_Elements.at(loop).Draw(xpos, yp1, (*select == loop));
+				this->m_Elements[loop].Draw(xpos, yp1, (*select == loop));
 			}
 		}
 	}
@@ -350,7 +350,7 @@ namespace DXLibRef {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 			FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos,
-			White, Black, LocalizeParts->Get(this->m_Elements.at(select).GetInfoTextID()));
+			White, Black, LocalizeParts->Get(this->m_Elements[select].GetInfoTextID()));
 	}
 	// 
 	void OptionPopup::SoundTabsInfo::Init_Sub(void) noexcept {
@@ -1456,14 +1456,14 @@ namespace DXLibRef {
 	// 
 	void OptionPopup::Init(void) noexcept {
 		// 
-		this->m_Tabs.at(0) = std::make_unique<SoundTabsInfo>();
-		this->m_Tabs.at(0)->Init(0, "Sound");
-		this->m_Tabs.at(1) = std::make_unique<GraphicTabsInfo>();
-		this->m_Tabs.at(1)->Init(1, "Graphic");
-		this->m_Tabs.at(2) = std::make_unique<ElseTabsInfo>();
-		this->m_Tabs.at(2)->Init(2, "Else");
-		this->m_Tabs.at(3) = std::make_unique<ControlTabsInfo>();
-		this->m_Tabs.at(3)->Init(3, "Control");
+		this->m_Tabs[0] = std::make_unique<SoundTabsInfo>();
+		this->m_Tabs[0]->Init(0, "Sound");
+		this->m_Tabs[1] = std::make_unique<GraphicTabsInfo>();
+		this->m_Tabs[1]->Init(1, "Graphic");
+		this->m_Tabs[2] = std::make_unique<ElseTabsInfo>();
+		this->m_Tabs[2]->Init(2, "Else");
+		this->m_Tabs[3] = std::make_unique<ControlTabsInfo>();
+		this->m_Tabs[3]->Init(3, "Control");
 		// 
 	}
 	void OptionPopup::Update(void) noexcept {
@@ -1482,11 +1482,11 @@ namespace DXLibRef {
 						t->Draw(xmin + 24, ymin, (xmax - 24) - (xmin + 24), this->m_tabsel == t->GetID(), &this->m_tabsel, &this->m_select);
 					}
 					// ガイド
-					this->m_Tabs.at(this->m_tabsel)->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, this->m_select);
+					this->m_Tabs[this->m_tabsel]->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, this->m_select);
 					// 
 					if (Pad->GetPadsInfo(Controls::PADS::LEAN_L).GetKey().trigger() && (this->m_tabsel != 3)) {
 						if (this->m_tabsel <= 0) {
-							this->m_tabsel = this->m_Tabs.size() - 1;
+							this->m_tabsel = this->m_Size - 1;
 						}
 						else {
 							--m_tabsel;
@@ -1496,14 +1496,14 @@ namespace DXLibRef {
 					}
 					if (Pad->GetPadsInfo(Controls::PADS::LEAN_R).GetKey().trigger() && (this->m_tabsel != 3)) {
 						++m_tabsel;
-						if (this->m_tabsel > this->m_Tabs.size() - 1) {
+						if (this->m_tabsel > this->m_Size - 1) {
 							this->m_tabsel = 0;
 						}
 						this->m_select = 0;
 						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
 					}
 
-					this->m_Tabs.at(this->m_tabsel)->Execute(&this->m_select, (this->m_tabsel != 3));
+					this->m_Tabs[this->m_tabsel]->Update(&this->m_select, (this->m_tabsel != 3));
 					// 
 					if (EndSwitch) {
 						KeyGuideParts->SetGuideFlip();

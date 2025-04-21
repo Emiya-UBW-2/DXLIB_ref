@@ -41,9 +41,9 @@ namespace DXLibRef {
 	private:// コンストラクタ
 		WindowSizeControl(void) noexcept{}
 		WindowSizeControl(const WindowSizeControl&) = delete;
-		WindowSizeControl(WindowSizeControl&& o) = delete;
+		WindowSizeControl(WindowSizeControl&&) = delete;
 		WindowSizeControl& operator=(const WindowSizeControl&) = delete;
-		WindowSizeControl& operator=(WindowSizeControl&& o) = delete;
+		WindowSizeControl& operator=(WindowSizeControl&&) = delete;
 	public:
 		void			SetupWindowSize(void) noexcept;
 	};

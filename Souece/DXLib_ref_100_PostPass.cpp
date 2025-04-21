@@ -95,9 +95,9 @@ namespace DXLibRef {
 	public:
 		PostPassSSR(void) noexcept {}
 		PostPassSSR(const PostPassSSR&) = delete;
-		PostPassSSR(PostPassSSR&& o) = delete;
+		PostPassSSR(PostPassSSR&&) = delete;
 		PostPassSSR& operator=(const PostPassSSR&) = delete;
-		PostPassSSR& operator=(PostPassSSR&& o) = delete;
+		PostPassSSR& operator=(PostPassSSR&&) = delete;
 
 		virtual ~PostPassSSR(void) noexcept {}
 	protected:
@@ -193,9 +193,9 @@ namespace DXLibRef {
 	public:
 		PostPassDoF(void) noexcept {}
 		PostPassDoF(const PostPassDoF&) = delete;
-		PostPassDoF(PostPassDoF&& o) = delete;
+		PostPassDoF(PostPassDoF&&) = delete;
 		PostPassDoF& operator=(const PostPassDoF&) = delete;
-		PostPassDoF& operator=(PostPassDoF&& o) = delete;
+		PostPassDoF& operator=(PostPassDoF&&) = delete;
 
 		virtual ~PostPassDoF(void) noexcept {}
 	protected:
@@ -245,9 +245,9 @@ namespace DXLibRef {
 	public:
 		PostPassBloom(void) noexcept {}
 		PostPassBloom(const PostPassBloom&) = delete;
-		PostPassBloom(PostPassBloom&& o) = delete;
+		PostPassBloom(PostPassBloom&&) = delete;
 		PostPassBloom& operator=(const PostPassBloom&) = delete;
-		PostPassBloom& operator=(PostPassBloom&& o) = delete;
+		PostPassBloom& operator=(PostPassBloom&&) = delete;
 
 		virtual ~PostPassBloom(void) noexcept {}
 	protected:
@@ -283,9 +283,9 @@ namespace DXLibRef {
 	public:
 		PostPassAberration(void) noexcept {}
 		PostPassAberration(const PostPassAberration&) = delete;
-		PostPassAberration(PostPassAberration&& o) = delete;
+		PostPassAberration(PostPassAberration&&) = delete;
 		PostPassAberration& operator=(const PostPassAberration&) = delete;
-		PostPassAberration& operator=(PostPassAberration&& o) = delete;
+		PostPassAberration& operator=(PostPassAberration&&) = delete;
 
 		virtual ~PostPassAberration(void) noexcept {}
 	protected:
@@ -342,16 +342,16 @@ namespace DXLibRef {
 		public:
 			BlurScreen(void) noexcept {}
 			BlurScreen(const BlurScreen&) = delete;
-			BlurScreen(BlurScreen&& o) = delete;
+			BlurScreen(BlurScreen&&) = delete;
 			BlurScreen& operator=(const BlurScreen&) = delete;
-			BlurScreen& operator=(BlurScreen&& o) = delete;
+			BlurScreen& operator=(BlurScreen&&) = delete;
 
 			~BlurScreen(void) noexcept {}
 		public:
 			void		Init(int t_alpha, int t_offsetX1, int t_offsetY1, int t_offsetX2, int t_offsetY2) noexcept {
 				auto* WindowSizeParts = WindowSizeControl::Instance();
 				for (size_t loop : std::views::iota(static_cast<size_t>(0), MAX)) {
-					this->m_screen.at(loop).Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+					this->m_screen[loop].Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 				}
 				this->m_current = 0;
 				this->m_alpha = t_alpha;
@@ -364,7 +364,7 @@ namespace DXLibRef {
 			}
 			void		Release(void) noexcept {
 				for (size_t loop : std::views::iota(static_cast<size_t>(0), MAX)) {
-					this->m_screen.at(loop).Dispose();
+					this->m_screen[loop].Dispose();
 				}
 			}
 		public:
@@ -393,9 +393,9 @@ namespace DXLibRef {
 	public:
 		PostPassMotionBlur(void) noexcept {}
 		PostPassMotionBlur(const PostPassMotionBlur&) = delete;
-		PostPassMotionBlur(PostPassMotionBlur&& o) = delete;
+		PostPassMotionBlur(PostPassMotionBlur&&) = delete;
 		PostPassMotionBlur& operator=(const PostPassMotionBlur&) = delete;
-		PostPassMotionBlur& operator=(PostPassMotionBlur&& o) = delete;
+		PostPassMotionBlur& operator=(PostPassMotionBlur&&) = delete;
 
 		virtual ~PostPassMotionBlur(void) noexcept {}
 	protected:
@@ -427,9 +427,9 @@ namespace DXLibRef {
 	public:
 		PostPassCornerBlur(void) noexcept {}
 		PostPassCornerBlur(const PostPassCornerBlur&) = delete;
-		PostPassCornerBlur(PostPassCornerBlur&& o) = delete;
+		PostPassCornerBlur(PostPassCornerBlur&&) = delete;
 		PostPassCornerBlur& operator=(const PostPassCornerBlur&) = delete;
-		PostPassCornerBlur& operator=(PostPassCornerBlur&& o) = delete;
+		PostPassCornerBlur& operator=(PostPassCornerBlur&&) = delete;
 
 		virtual ~PostPassCornerBlur(void) noexcept {}
 	protected:
@@ -486,9 +486,9 @@ namespace DXLibRef {
 	public:
 		PostPassVignette(void) noexcept {}
 		PostPassVignette(const PostPassVignette&) = delete;
-		PostPassVignette(PostPassVignette&& o) = delete;
+		PostPassVignette(PostPassVignette&&) = delete;
 		PostPassVignette& operator=(const PostPassVignette&) = delete;
-		PostPassVignette& operator=(PostPassVignette&& o) = delete;
+		PostPassVignette& operator=(PostPassVignette&&) = delete;
 
 		virtual ~PostPassVignette(void) noexcept {}
 	protected:
@@ -537,9 +537,9 @@ namespace DXLibRef {
 	public:
 		PostPassDistortion(void) noexcept {}
 		PostPassDistortion(const PostPassDistortion&) = delete;
-		PostPassDistortion(PostPassDistortion&& o) = delete;
+		PostPassDistortion(PostPassDistortion&&) = delete;
 		PostPassDistortion& operator=(const PostPassDistortion&) = delete;
-		PostPassDistortion& operator=(PostPassDistortion&& o) = delete;
+		PostPassDistortion& operator=(PostPassDistortion&&) = delete;
 
 		virtual ~PostPassDistortion(void) noexcept {}
 	private:
@@ -581,14 +581,14 @@ namespace DXLibRef {
 			// 外周部分用の Sin, Cos テーブルを作成する
 			Angle = 0.0f;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
-				AngleSinTable.at(loop) = std::sin(Angle);
-				AngleCosTable.at(loop) = std::cos(Angle);
+				AngleSinTable[loop] = std::sin(Angle);
+				AngleCosTable[loop] = std::cos(Angle);
 			}
 
 			// 内側の盛り上がっているように見せる箇所で使用する Cos テーブルを作成する
 			Angle = 0.0f;
 			for (size_t loop = 0; loop < CIRCLE_RADIUS_VERTEX_NUM; ++loop, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
-				InCircleCosTable.at(loop) = std::cos(Angle);
+				InCircleCosTable[loop] = std::cos(Angle);
 			}
 
 			// ポリゴン頂点インデックスの準備
@@ -620,8 +620,8 @@ namespace DXLibRef {
 			Vert = Vertex;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
 				// 使用する Sin, Cos の値をセット
-				Sin = AngleSinTable.at(loop);
-				Cos = AngleCosTable.at(loop);
+				Sin = AngleSinTable[loop];
+				Cos = AngleCosTable[loop];
 
 				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
 					// 円の中心までの距離を算出
@@ -659,8 +659,8 @@ namespace DXLibRef {
 			Vert = Vertex;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
 				// 使用する Sin, Cos の値をセット
-				Sin = AngleSinTable.at(loop);
-				Cos = AngleCosTable.at(loop);
+				Sin = AngleSinTable[loop];
+				Cos = AngleCosTable[loop];
 
 				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
 					// 円の中心までの距離を算出
@@ -751,9 +751,9 @@ namespace DXLibRef {
 	public:
 		PostPassGodRay(void) noexcept {}
 		PostPassGodRay(const PostPassGodRay&) = delete;
-		PostPassGodRay(PostPassGodRay&& o) = delete;
+		PostPassGodRay(PostPassGodRay&&) = delete;
 		PostPassGodRay& operator=(const PostPassGodRay&) = delete;
-		PostPassGodRay& operator=(PostPassGodRay&& o) = delete;
+		PostPassGodRay& operator=(PostPassGodRay&&) = delete;
 
 		virtual ~PostPassGodRay(void) noexcept {}
 	protected:
@@ -848,9 +848,9 @@ namespace DXLibRef {
 	public:
 		PostPassScope(void) noexcept {}
 		PostPassScope(const PostPassScope&) = delete;
-		PostPassScope(PostPassScope&& o) = delete;
+		PostPassScope(PostPassScope&&) = delete;
 		PostPassScope& operator=(const PostPassScope&) = delete;
-		PostPassScope& operator=(PostPassScope&& o) = delete;
+		PostPassScope& operator=(PostPassScope&&) = delete;
 
 		virtual ~PostPassScope(void) noexcept {}
 	protected:
@@ -881,9 +881,9 @@ namespace DXLibRef {
 	public:
 		PostPassBlackout(void) noexcept {}
 		PostPassBlackout(const PostPassBlackout&) = delete;
-		PostPassBlackout(PostPassBlackout&& o) = delete;
+		PostPassBlackout(PostPassBlackout&&) = delete;
 		PostPassBlackout& operator=(const PostPassBlackout&) = delete;
-		PostPassBlackout& operator=(PostPassBlackout&& o) = delete;
+		PostPassBlackout& operator=(PostPassBlackout&&) = delete;
 
 		virtual ~PostPassBlackout(void) noexcept {}
 	protected:
@@ -930,8 +930,8 @@ namespace DXLibRef {
 		DepthScreenHandle.SetRenderTargetToShader(2);
 		{
 			SetupCam(Center, this->m_Scale);
-			this->m_CamViewMatrix.at(0) = GetCameraViewMatrix();
-			this->m_CamProjectionMatrix.at(0) = GetCameraProjectionMatrix();
+			this->m_CamViewMatrix[0] = GetCameraViewMatrix();
+			this->m_CamProjectionMatrix[0] = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, InvalidID);
@@ -946,8 +946,8 @@ namespace DXLibRef {
 		DepthFarScreenHandle.SetRenderTargetToShader(2);
 		{
 			SetupCam(Center, this->m_ScaleFar);
-			this->m_CamViewMatrix.at(1) = GetCameraViewMatrix();
-			this->m_CamProjectionMatrix.at(1) = GetCameraProjectionMatrix();
+			this->m_CamViewMatrix[1] = GetCameraViewMatrix();
+			this->m_CamProjectionMatrix[1] = GetCameraProjectionMatrix();
 			Shadowdoing();
 		}
 		SetRenderTargetToShader(0, InvalidID);
@@ -965,12 +965,12 @@ namespace DXLibRef {
 		tmp_cam.FlipCamInfo();
 		{
 			this->m_Shader.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), this->m_Scale * 180.f, 0.f, 0.f);
-			this->m_Shader.SetVertexCameraMatrix(4, this->m_CamViewMatrix.at(0), this->m_CamProjectionMatrix.at(0));
-			this->m_Shader.SetVertexCameraMatrix(5, this->m_CamViewMatrix.at(1), this->m_CamProjectionMatrix.at(1));
+			this->m_Shader.SetVertexCameraMatrix(4, this->m_CamViewMatrix[0], this->m_CamProjectionMatrix[0]);
+			this->m_Shader.SetVertexCameraMatrix(5, this->m_CamViewMatrix[1], this->m_CamProjectionMatrix[1]);
 			this->m_Shader.Draw_lamda(doing);
 			this->m_ShaderRigid.SetPixelParam(3, static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::shadow)), this->m_Scale * 180.f, 0.f, 0.f);
-			this->m_ShaderRigid.SetVertexCameraMatrix(4, this->m_CamViewMatrix.at(0), this->m_CamProjectionMatrix.at(0));
-			this->m_ShaderRigid.SetVertexCameraMatrix(5, this->m_CamViewMatrix.at(1), this->m_CamProjectionMatrix.at(1));
+			this->m_ShaderRigid.SetVertexCameraMatrix(4, this->m_CamViewMatrix[0], this->m_CamProjectionMatrix[0]);
+			this->m_ShaderRigid.SetVertexCameraMatrix(5, this->m_CamViewMatrix[1], this->m_CamProjectionMatrix[1]);
 			this->m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
 		SetUseTextureToShader(1, InvalidID);				// 使用テクスチャの設定を解除
@@ -1034,19 +1034,19 @@ namespace DXLibRef {
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
 		// ポストエフェクト
 		int now = 0;
-		this->m_PostPass.at(now) = std::make_unique<PostPassBloom>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassDoF>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassSSR>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassSSAO>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassGodRay>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassDistortion>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassAberration>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassMotionBlur>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassVignette>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassCornerBlur>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassFXAA>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassScope>(); ++now;
-		this->m_PostPass.at(now) = std::make_unique<PostPassBlackout>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassBloom>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassDoF>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassSSR>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassSSAO>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassGodRay>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassDistortion>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassAberration>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassMotionBlur>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassVignette>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassCornerBlur>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassFXAA>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassScope>(); ++now;
+		this->m_PostPass[now] = std::make_unique<PostPassBlackout>(); ++now;
 
 		this->m_ShadowDraw = std::make_unique<ShadowDraw>();
 		// シェーダー

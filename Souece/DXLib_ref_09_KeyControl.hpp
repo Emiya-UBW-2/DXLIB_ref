@@ -835,9 +835,9 @@ namespace DXLibRef {
 		// コンストラクタ
 		PadControl(void) noexcept { Load(); }
 		PadControl(const PadControl&) = delete;		// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
-		PadControl(PadControl&& o) = delete;
+		PadControl(PadControl&&) = delete;
 		PadControl& operator=(const PadControl&) = delete;
-		PadControl& operator=(PadControl&& o) = delete;
+		PadControl& operator=(PadControl&&) = delete;
 		// デストラクタはシングルトンなので呼ばれません
 	public:
 		//今認識しているコントロールタイプを得る
@@ -851,9 +851,9 @@ namespace DXLibRef {
 		const auto& GetMouseClick(void) const noexcept { return this->m_MouseClick; }
 		const auto& GetMouseWheelRot(void) const noexcept { return this->m_MouseWheelRot; }
 		//各キーコンフィグに対応した入力を入れる
-		const auto& GetPadsInfo(Controls::PADS select) const noexcept { return this->m_PadsInfo.at(static_cast<size_t>(select)); }
+		const auto& GetPadsInfo(Controls::PADS select) const noexcept { return this->m_PadsInfo[static_cast<size_t>(select)]; }
 
-		void SetIsUseButton(Controls::PADS select, bool IsUse) noexcept { this->m_PadsInfo.at(static_cast<size_t>(select)).SetUse(IsUse); }
+		void SetIsUseButton(Controls::PADS select, bool IsUse) noexcept { this->m_PadsInfo[static_cast<size_t>(select)].SetUse(IsUse); }
 	private:
 		//セーブデータが入る場所を占めるパス
 		const char* GetSavePath(void) const noexcept {
@@ -901,7 +901,7 @@ namespace DXLibRef {
 				}
 			}
 			//設定
-			this->m_PadsInfo.at(static_cast<size_t>(select)).SetReserve(SetID);
+			this->m_PadsInfo[static_cast<size_t>(select)].SetReserve(SetID);
 		}
 	public:
 		//FPSなどのマウスを表示しない操作方法を用いるかどうか指定
@@ -909,7 +909,7 @@ namespace DXLibRef {
 		//キーコンフィグとしてReserveに暫定値を入れる処理
 		//これを通る間、同じキーを押すと自身のキーを外す。キーアサインが外れているか違うキーを押すとそのキーを設定する
 		bool ChangeConfig(Controls::PADS select) noexcept {
-			auto& P = this->m_PadsInfo.at(static_cast<size_t>(select));
+			auto& P = this->m_PadsInfo[static_cast<size_t>(select)];
 			auto Prev = P.GetReserve();
 
 			//変更前と同じキーを押してる
@@ -996,7 +996,7 @@ namespace DXLibRef {
 		InputControl(const InputControl& tgt) noexcept { *this = tgt; }
 		InputControl(InputControl&& tgt) noexcept { *this = tgt; }
 		// InputControl& operator=(const InputControl&) = delete;
-		// InputControl& operator=(InputControl&& o) = delete;
+		// InputControl& operator=(InputControl&&) = delete;
 		virtual ~InputControl(void) noexcept {}
 	public:
 		void			ResetKeyInput(void) noexcept {

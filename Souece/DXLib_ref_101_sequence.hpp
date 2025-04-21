@@ -15,8 +15,8 @@ namespace DXLibRef {
 		size_t			m_Next_Select{ 0 };
 		bool			m_Is3DActive{ true };
 	public:
-		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { this->m_pNextSceneList.at(static_cast<size_t>(index)) = Next_scenes_ptr_t; }
-		auto&		Get_Next(void) noexcept { return this->m_pNextSceneList.at(this->m_Next_Select); }
+		void		SetNextSceneList(int index, const std::shared_ptr<TEMPSCENE>& Next_scenes_ptr_t) noexcept { this->m_pNextSceneList[static_cast<size_t>(index)] = Next_scenes_ptr_t; }
+		auto&		Get_Next(void) noexcept { return this->m_pNextSceneList[this->m_Next_Select]; }
 		void		SetNextSelect(size_t value) noexcept { this->m_Next_Select = value; }
 		void		Set3DActive(bool value) noexcept { this->m_Is3DActive = value; }
 		const auto	PopIsUpdateFarShadow(void) noexcept {
@@ -31,9 +31,9 @@ namespace DXLibRef {
 	public:// コンストラクタ
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;
-		TEMPSCENE(TEMPSCENE&& o) = delete;
+		TEMPSCENE(TEMPSCENE&&) = delete;
 		TEMPSCENE& operator=(const TEMPSCENE&) = delete;
-		TEMPSCENE& operator=(TEMPSCENE&& o) = delete;
+		TEMPSCENE& operator=(TEMPSCENE&&) = delete;
 		virtual ~TEMPSCENE(void) noexcept {}
 	public:// メイン更新
 		void Load(void) noexcept {
@@ -106,7 +106,9 @@ namespace DXLibRef {
 	private:
 		// FPS表示用クラス
 		class FPSDrawer {
-			std::array<float, 60>		m_FPSAvgs{};
+			static const size_t			m_Size{ 60 };
+		private:
+			std::array<float, m_Size>	m_FPSAvgs{};
 			size_t						m_FPSAvgCount{ 0 };
 			float						m_FPSAvg{ 0.f };
 		public:
@@ -134,9 +136,9 @@ namespace DXLibRef {
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;
-		SceneControl(SceneControl&& o) = delete;
+		SceneControl(SceneControl&&) = delete;
 		SceneControl& operator=(const SceneControl&) = delete;
-		SceneControl& operator=(SceneControl&& o) = delete;
+		SceneControl& operator=(SceneControl&&) = delete;
 	public:
 		const auto& GetNowScene(void) const noexcept { return this->m_NowScenesPtr; }
 		void		SetIsUpdateFarShadowActive() noexcept { this->m_NowScenesPtr->SetIsUpdateFarShadowActive(); }

@@ -152,7 +152,7 @@ namespace DXLibRef {
 		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			auto& BufferHandle = LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4));
+			auto& BufferHandle = LightCameraMatrixConstantBufferHandle[static_cast<size_t>(Slot - 4)];
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(BufferHandle);
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -164,7 +164,7 @@ namespace DXLibRef {
 		// 頂点シェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			auto& BufferHandle = this->m_VertexShadercbhandle.at(static_cast<size_t>(Slot - 4));
+			auto& BufferHandle = this->m_VertexShadercbhandle[static_cast<size_t>(Slot - 4)];
 			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);		// 頂点シェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
@@ -238,7 +238,7 @@ namespace DXLibRef {
 		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=4)
 		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			auto& BufferHandle = LightCameraMatrixConstantBufferHandle.at(static_cast<size_t>(Slot - 4));
+			auto& BufferHandle = LightCameraMatrixConstantBufferHandle[static_cast<size_t>(Slot - 4)];
 			// 設定したカメラのビュー行列と射影行列を取得しておく
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(BufferHandle);
 			LightCameraMatrixConst->ViewMatrix = View.get();
@@ -261,7 +261,7 @@ namespace DXLibRef {
 		// ピクセルシェーダ―のSlot番目のレジスタに情報をセット(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			auto& BufferHandle = this->m_PixelShadercbhandle.at(static_cast<size_t>(Slot - 3));
+			auto& BufferHandle = this->m_PixelShadercbhandle[static_cast<size_t>(Slot - 3)];
 			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);				// ピクセルシェーダー用の定数バッファのアドレスを取得
 			f4->x = param1;
 			f4->y = param2;
@@ -307,9 +307,9 @@ namespace DXLibRef {
 	public:
 		RealTimeCubeMap(void) noexcept {}
 		RealTimeCubeMap(const RealTimeCubeMap&) = delete;
-		RealTimeCubeMap(RealTimeCubeMap&& o) = delete;
+		RealTimeCubeMap(RealTimeCubeMap&&) = delete;
 		RealTimeCubeMap& operator=(const RealTimeCubeMap&) = delete;
-		RealTimeCubeMap& operator=(RealTimeCubeMap&& o) = delete;
+		RealTimeCubeMap& operator=(RealTimeCubeMap&&) = delete;
 
 		~RealTimeCubeMap(void) noexcept {}
 	public:
@@ -359,13 +359,15 @@ namespace DXLibRef {
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	/*スクリーンバッファのつかいまわし																											*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	struct PostPassScreenBuffer {
+	class PostPassScreenBuffer {
+		static const size_t			m_Size = 3;
+	public:
 		int xSize{};
 		int ySize{};
 		bool isTrans{};
 		bool m_isDepth{};
 		int m_ZBufferBitDepth{};
-		std::array<GraphHandle, 3>	m_Screen{};
+		std::array<GraphHandle, m_Size>	m_Screen{};
 		int m_UsedLocal = 0;
 		int m_Used = 0;
 		int m_UnUse = 0;
@@ -403,11 +405,11 @@ namespace DXLibRef {
 		}
 	public:
 		const GraphHandle* PopBlankScreen(void) noexcept {
-			if (this->m_UsedLocal >= m_Screen.size()) {
+			if (this->m_UsedLocal >= this->m_Size) {
 				MessageBox(NULL, "None Blank PostPassScreenBuffer", "", MB_OK);
 				exit(InvalidID);
 			}
-			auto* Ret = &this->m_Screen.at(this->m_UsedLocal);
+			auto* Ret = &this->m_Screen[this->m_UsedLocal];
 			++this->m_Used;
 			++this->m_UsedLocal;
 			return Ret;
@@ -421,9 +423,9 @@ namespace DXLibRef {
 	private:
 		PostPassScreenBufferPool(void) noexcept {}
 		PostPassScreenBufferPool(const PostPassScreenBufferPool&) = delete;
-		PostPassScreenBufferPool(PostPassScreenBufferPool&& o) = delete;
+		PostPassScreenBufferPool(PostPassScreenBufferPool&&) = delete;
 		PostPassScreenBufferPool& operator=(const PostPassScreenBufferPool&) = delete;
-		PostPassScreenBufferPool& operator=(PostPassScreenBufferPool&& o) = delete;
+		PostPassScreenBufferPool& operator=(PostPassScreenBufferPool&&) = delete;
 		virtual ~PostPassScreenBufferPool(void) noexcept {}
 	public:
 		const GraphHandle* PopBlankScreen(int xsize, int ysize, bool trans, bool isDepth = false, int ZBufferBitDepth = InvalidID) noexcept {
@@ -457,7 +459,7 @@ namespace DXLibRef {
 			}
 			//5フレーム間使われていないスクリーンバッファは消す
 			for (size_t loop = 0, max = this->m_ScreenBuffer.size(); loop < max; ++loop) {
-				auto& s = this->m_ScreenBuffer.at(loop);
+				auto& s = this->m_ScreenBuffer[loop];
 				if (s->m_UnUse > 5) {
 					s.reset();
 					std::swap(s, this->m_ScreenBuffer.back());
@@ -526,9 +528,9 @@ namespace DXLibRef {
 	public:
 		ShadowDraw(void) noexcept {}
 		ShadowDraw(const ShadowDraw&) = delete;
-		ShadowDraw(ShadowDraw&& o) = delete;
+		ShadowDraw(ShadowDraw&&) = delete;
 		ShadowDraw& operator=(const ShadowDraw&) = delete;
-		ShadowDraw& operator=(ShadowDraw&& o) = delete;
+		ShadowDraw& operator=(ShadowDraw&&) = delete;
 		~ShadowDraw(void) noexcept { Dispose(); }
 	public:
 		const auto&		GetCamViewMatrix(bool isFar) const noexcept { return this->m_CamViewMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
@@ -651,9 +653,9 @@ namespace DXLibRef {
 	private:
 		PostPassEffect(void) noexcept;
 		PostPassEffect(const PostPassEffect&) = delete;
-		PostPassEffect(PostPassEffect&& o) = delete;
+		PostPassEffect(PostPassEffect&&) = delete;
 		PostPassEffect& operator=(const PostPassEffect&) = delete;
-		PostPassEffect& operator=(PostPassEffect&& o) = delete;
+		PostPassEffect& operator=(PostPassEffect&&) = delete;
 		virtual ~PostPassEffect(void) noexcept {
 			PostPassScreenBufferPool::Release();
 			Dispose();

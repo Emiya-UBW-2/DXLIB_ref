@@ -25,7 +25,7 @@ namespace DXLibRef {
 			return;
 		}
 		if (this->m_PointSel < PointMax) {
-			this->m_Point.at(0)[m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - this->m_StartTime) / 1000.0f;
+			this->m_Point[0][m_PointSel] = static_cast<float>(GetNowHiPerformanceCount() - this->m_StartTime) / 1000.0f;
 			this->m_Str[m_PointSel] = DebugMes;
 			++m_PointSel;
 			return;

@@ -64,7 +64,7 @@ namespace DXLibRef {
 			UI_Screen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);	// UI
 		}
 	}
-	void VRControl::Execute(void) noexcept {
+	void VRControl::Update(void) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 			for (auto& c : this->m_VR_DeviceInfo) {

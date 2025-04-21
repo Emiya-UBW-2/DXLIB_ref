@@ -307,11 +307,11 @@ namespace DXLibRef {
 			std::string								m_string;
 		public:
 			void InputType(DrawType type) noexcept { this->m_type = type; }
-			void InputintParam(int ID, int param) noexcept { this->m_intParam.at(ID) = param; }
-			void InputUintParam(int ID, unsigned int param) noexcept { this->m_UintParam.at(ID) = param; }
-			void InputfloatParam(int ID, float param) noexcept { this->m_floatParam.at(ID) = param; }
-			void InputboolParam(int ID, bool param) noexcept { this->m_boolParam.at(ID) = param; }
-			void InputGraphHandleParam(int ID, const GraphHandle* param) noexcept { this->m_GraphHandleParam.at(ID) = param; }
+			void InputintParam(int ID, int param) noexcept { this->m_intParam[ID] = param; }
+			void InputUintParam(int ID, unsigned int param) noexcept { this->m_UintParam[ID] = param; }
+			void InputfloatParam(int ID, float param) noexcept { this->m_floatParam[ID] = param; }
+			void InputboolParam(int ID, bool param) noexcept { this->m_boolParam[ID] = param; }
+			void InputGraphHandleParam(int ID, const GraphHandle* param) noexcept { this->m_GraphHandleParam[ID] = param; }
 			void InputStringParam(std::string_view param) noexcept { this->m_string = param; }
 		public:
 			void Output(void) const noexcept;
@@ -362,10 +362,10 @@ namespace DXLibRef {
 			DrawControl(void) noexcept;
 		private:
 			DrawData* GetBack(DrawLayer Layer) noexcept {
-				auto& LayerData = this->m_DrawDatas.at(this->m_DrawNow).at(static_cast<int>(Layer));
+				auto& LayerData = this->m_DrawDatas[this->m_DrawNow][static_cast<int>(Layer)];
 				++LayerData.second;
 				//LayerData.second %= DrawMax;
-				return &LayerData.first.at(static_cast<size_t>(LayerData.second - 1));
+				return &LayerData.first[static_cast<size_t>(LayerData.second - 1)];
 			}
 		public:
 			bool	IsDrawOnWindow(int x1, int y1, int x2, int y2) noexcept {
@@ -559,7 +559,7 @@ namespace DXLibRef {
 			// 
 		public:
 			void	ClearList(void) noexcept {
-				for (auto& d : this->m_DrawDatas.at(this->m_DrawNow)) {
+				for (auto& d : this->m_DrawDatas[this->m_DrawNow]) {
 					d.second = 0;
 				}
 				this->m_DrawNow = 1 - this->m_DrawNow;
@@ -706,8 +706,9 @@ namespace DXLibRef {
 			unsigned int GetMsgColor(void) const noexcept { return this->m_Color; }
 		};
 	private:
-		std::array<SideLogData, 16> data;
-		size_t		m_LastSel{ 0 };
+		static const size_t				m_Size{ 16 };
+		std::array<SideLogData, m_Size>	m_List;
+		size_t							m_LastSel{ 0 };
 
 		GraphHandle					m_SelectBackImage;
 		float SelYadd{ 0.f };
@@ -716,21 +717,21 @@ namespace DXLibRef {
 			this->m_SelectBackImage.Load("CommonData/UI/select.png");
 		}
 		SideLog(const SideLog&) = delete;
-		SideLog(SideLog&& o) = delete;
+		SideLog(SideLog&&) = delete;
 		SideLog& operator=(const SideLog&) = delete;
-		SideLog& operator=(SideLog&& o) = delete;
+		SideLog& operator=(SideLog&&) = delete;
 	public:
 		template <typename... Args>
 		void Add(float second, float startSec, unsigned int Color, const char* Mes, Args&&... args) noexcept {
-			for (auto& d : data) {
+			for (auto& d : this->m_List) {
 				d.AddFlip(1.f);
 			}
-			data.at(this->m_LastSel).SetData(second, startSec, Color, Mes, args...);
-			++m_LastSel %= data.size();
+			this->m_List[this->m_LastSel].SetData(second, startSec, Color, Mes, args...);
+			++this->m_LastSel %= this->m_Size;
 			SelYadd = 10.f;
 		}
 		void Update(void) noexcept {
-			for (auto& d : data) {
+			for (auto& d : this->m_List) {
 				d.UpdateActive();
 			}
 			Easing(&SelYadd, 0.f, 0.9f, EasingType::OutExpo);
@@ -748,9 +749,9 @@ namespace DXLibRef {
 		KeyGuide(void) noexcept;
 		// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
 		KeyGuide(const KeyGuide&) = delete;
-		KeyGuide(KeyGuide&& o) = delete;
+		KeyGuide(KeyGuide&&) = delete;
 		KeyGuide& operator=(const KeyGuide&) = delete;
-		KeyGuide& operator=(KeyGuide&& o) = delete;
+		KeyGuide& operator=(KeyGuide&&) = delete;
 		// デストラクタはシングルトンなので呼ばれません
 	private:
 		class KeyGuideGraph {
@@ -759,9 +760,9 @@ namespace DXLibRef {
 		public:
 			KeyGuideGraph(void) noexcept {}
 			KeyGuideGraph(const KeyGuideGraph&) = delete;
-			KeyGuideGraph(KeyGuideGraph&& o) = delete;
+			KeyGuideGraph(KeyGuideGraph&&) = delete;
 			KeyGuideGraph& operator=(const KeyGuideGraph&) = delete;
-			KeyGuideGraph& operator=(KeyGuideGraph&& o) = delete;
+			KeyGuideGraph& operator=(KeyGuideGraph&&) = delete;
 
 			~KeyGuideGraph(void) noexcept {}
 		public:
@@ -780,9 +781,9 @@ namespace DXLibRef {
 		public:
 			KeyGuideOnce(void) noexcept {}
 			KeyGuideOnce(const KeyGuideOnce&) = delete;
-			KeyGuideOnce(KeyGuideOnce&& o) = delete;
+			KeyGuideOnce(KeyGuideOnce&&) = delete;
 			KeyGuideOnce& operator=(const KeyGuideOnce&) = delete;
-			KeyGuideOnce& operator=(KeyGuideOnce&& o) = delete;
+			KeyGuideOnce& operator=(KeyGuideOnce&&) = delete;
 
 			~KeyGuideOnce(void) noexcept {}
 		public:
@@ -814,7 +815,7 @@ namespace DXLibRef {
 		void ChangeGuide(std::function<void()>Guide_Pad) noexcept;
 		void AddGuide(int graphOffset, const std::string& GuideStr) noexcept {
 			this->m_Key.emplace_back(std::make_unique<KeyGuideOnce>());
-			this->m_Key.back()->AddGuide((graphOffset != InvalidID) ? this->m_DerivationGuideImage.at(graphOffset) : nullptr, GuideStr);
+			this->m_Key.back()->AddGuide((graphOffset != InvalidID) ? this->m_DerivationGuideImage[graphOffset] : nullptr, GuideStr);
 		}
 		void Dispose(void) noexcept {
 			for (auto& k : this->m_Key) {
@@ -827,7 +828,7 @@ namespace DXLibRef {
 		//ガイド表示の描画
 		void Draw(void) const noexcept;
 		//キー単体の描画
-		void DrawButton(int x, int y, int graphOffset) const noexcept { this->m_DerivationGuideImage.at(graphOffset)->Draw(x, y); }
-		int GetDrawSize(int graphOffset) const noexcept { return this->m_DerivationGuideImage.at(graphOffset)->GetDrawSize(); }
+		void DrawButton(int x, int y, int graphOffset) const noexcept { this->m_DerivationGuideImage[graphOffset]->Draw(x, y); }
+		int GetDrawSize(int graphOffset) const noexcept { return this->m_DerivationGuideImage[graphOffset]->GetDrawSize(); }
 	};
 }
