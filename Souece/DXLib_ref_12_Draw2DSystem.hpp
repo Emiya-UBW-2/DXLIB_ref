@@ -271,7 +271,7 @@ namespace DXLibRef {
 	}
 	// ƒJƒvƒZƒ‹•`‰æ
 	static bool DrawCapsule_3D(const Vector3DX& p1, const Vector3DX& p2, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
-		return DxLib::DrawCapsule3D(p1.get(), p2.get(), range, 8, color, speccolor, TRUE) == TRUE;
+		return DxLib::DrawCapsule3D(p1.get(), p2.get(), range, 4, color, speccolor, TRUE) == TRUE;
 	}
 	// ‹…•`‰æ
 	static bool DrawSphere_3D(const Vector3DX& p1, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
