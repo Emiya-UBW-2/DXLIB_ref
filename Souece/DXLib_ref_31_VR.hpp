@@ -151,7 +151,7 @@ namespace DXLibRef {
 		void			GetHMDPosition(Vector3DX* pos_, Matrix4x4DX* mat) noexcept {
 			auto* HMDPtr = (this->m_VR_HMDID >= 0) ? &this->m_VR_DeviceInfo.at(this->m_VR_HMDID) : nullptr;
 			if (HMDPtr) {
-				*mat = Matrix4x4DX::Axis1(HMDPtr->GetMat().yvec(), HMDPtr->GetMat().zvec() * -1.f);
+				*mat = Matrix4x4DX::Axis1(HMDPtr->GetMat().yvec(), HMDPtr->GetMat().zvec2());
 				if (!HMDPtr->IsActive()) {
 					this->m_VR_HMD_StartFlag = true;
 				}

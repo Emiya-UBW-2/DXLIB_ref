@@ -71,8 +71,8 @@ namespace DXLibRef {
 		inline static Vector3DX		Cross(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x); }
 		inline static float			Distance(const Vector3DX& A, const Vector3DX& B) noexcept { return (A - B).magnitude(); }
 		inline static float			Dot(const Vector3DX& A, const Vector3DX& B) noexcept { return A.x * B.x + A.y * B.y + A.z * B.z; }
-		// static Vector3DX		Lerp(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
-		// LerpUnclamped
+		//static Vector3DX			LerpVector3DX(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
+		//static Vector3DX			LerpUnclampedVector3DX(const Vector3DX& A, const Vector3DX& B, float Per) noexcept { return Lerp<Vector3DX>(A, B, Per); }
 		inline static Vector3DX		Max(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y), std::max(A.z, B.z)); }
 		inline static Vector3DX		Min(const Vector3DX& A, const Vector3DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y), std::min(A.z, B.z)); }
 		// MoveTowards
@@ -83,7 +83,7 @@ namespace DXLibRef {
 		inline static Vector3DX		Reflect(const Vector3DX& inDirection, const Vector3DX& inNormal) noexcept { return inDirection + inNormal * (Dot(inNormal, inDirection * -1.f)) * 2.f; }
 		// RotateTowards
 		inline static Vector3DX		Scale(const Vector3DX& A, const Vector3DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y), (A.z * B.z)); }
-		// SignedAngle
+		inline static float			SignedAngle(const Vector3DX& A, const Vector3DX& B, const Vector3DX& Axis) noexcept { return Angle(A, B) * (Dot(Cross(Axis, A), B) > 0.f ? 1.f : -1.f); }
 		// Slerp
 		// SlerpUnclamped
 		// SmoothDamp
@@ -160,8 +160,8 @@ namespace DXLibRef {
 		inline static float			Cross(const Vector2DX& A, const Vector2DX& B) noexcept { return A.x * B.y - A.y * B.x; }
 		inline static float			Distance(const Vector2DX& A, const Vector2DX& B) noexcept { return (A - B).magnitude(); }
 		inline static float			Dot(const Vector2DX& A, const Vector2DX& B) noexcept { return A.x * B.x + A.y * B.y; }
-		// static Vector2DX		Lerp(const Vector2DX& A, const Vector2DX& B, float Per) noexcept { return Lerp<Vector2DX>(A, B, Per); }
-		// LerpUnclamped
+		//static Vector2DX			LerpVector2DX(const Vector2DX& A, const Vector2DX& B, float Per) noexcept { return Lerp<Vector2DX>(A, B, Per); }
+		//static Vector2DX			LerpUnclampedVector2DX(const Vector2DX& A, const Vector2DX& B, float Per) noexcept { return Lerp<Vector2DX>(A, B, Per); }
 		inline static Vector2DX		Max(const Vector2DX& A, const Vector2DX& B) noexcept { return vget(std::max(A.x, B.x), std::max(A.y, B.y)); }
 		inline static Vector2DX		Min(const Vector2DX& A, const Vector2DX& B) noexcept { return vget(std::min(A.x, B.x), std::min(A.y, B.y)); }
 		// MoveTowards
@@ -172,7 +172,7 @@ namespace DXLibRef {
 		inline static Vector2DX		Reflect(const Vector2DX& inDirection, const Vector2DX& inNormal) noexcept { return inDirection + inNormal * (Dot(inNormal, inDirection * -1.f)) * 2.f; }
 		// RotateTowards
 		inline static Vector2DX		Scale(const Vector2DX& A, const Vector2DX& B) noexcept { return vget((A.x * B.x), (A.y * B.y)); }
-		// SignedAngle
+		inline static float			SignedAngle(const Vector2DX& A, const Vector2DX& B) { return std::atan2f(Cross(A, B), Dot(A, B)); }
 		// Slerp
 		// SlerpUnclamped
 		// SmoothDamp
@@ -234,6 +234,7 @@ namespace DXLibRef {
 		Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), rotation()); }
 		Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), rotation()); }
 		Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), rotation()); }
+		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), rotation()); }//ç∂éËç¿ïWånÇ≈âEéËç¿ïWånÇÃÉLÉÉÉâÇï`âÊÇµÇΩç€ÇÃê≥ñ 
 		// 
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
@@ -601,6 +602,7 @@ namespace DXLibRef {
 		Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), *this); }
 		Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), *this); }
 		Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), *this); }
+		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), *this); }//ç∂éËç¿ïWånÇ≈âEéËç¿ïWånÇÃÉLÉÉÉâÇï`âÊÇµÇΩç€ÇÃê≥ñ 
 		// 
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;

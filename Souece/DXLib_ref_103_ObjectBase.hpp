@@ -65,8 +65,8 @@ namespace DXLibRef {
 		std::array<bool, 2>							m_IsDrawTrans{ true };
 		std::array<bool, 3>							m_IsDraw{ true };
 		bool										m_IsDelete{ false };
-		Vector3DX									m_MinAABB = Vector3DX::vget(-1.f * Scale3DRate, -0.f * Scale3DRate, -1.f * Scale3DRate);
-		Vector3DX									m_MaxAABB = Vector3DX::vget(1.f * Scale3DRate, 1.f * Scale3DRate, 1.f * Scale3DRate);
+		Vector3DX									m_MinAABB = Vector3DX::vget(-1.f, -0.f, -1.f) * Scale3DRate;
+		Vector3DX									m_MaxAABB = Vector3DX::vget(1.f, 1.f, 1.f) * Scale3DRate;
 
 		int											m_ObjectID{ InvalidID };
 		bool										m_ColActive{ false };

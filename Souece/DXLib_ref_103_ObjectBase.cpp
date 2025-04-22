@@ -277,7 +277,7 @@ namespace DXLibRef {
 		CheckDraw_Sub(Range);
 	}
 	void			BaseObject::Draw(bool isDrawSemiTrans, int Range) noexcept {
-		//if (!this->m_IsDrawTrans[isDrawSemiTrans ? 1 : 0]) { return; }
+		if (!this->m_IsDrawTrans[isDrawSemiTrans ? 1 : 0]) { return; }
 		if (!IsDraw(Range)) { return; }
 		if (!GetObj().IsActive()) { return; }
 		for (int loop : std::views::iota(0, static_cast<int>(GetObj().GetMeshNum()))) {
