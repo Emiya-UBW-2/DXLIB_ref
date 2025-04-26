@@ -331,7 +331,7 @@ namespace DXLibRef {
 	class PostPassMotionBlur : public PostPassBase {
 	private:
 		class BlurScreen {
-			static const size_t MAX = 3;
+			static const size_t MAX = 5;
 		private:
 			std::array<GraphHandle, MAX>	m_screen;
 			size_t							m_current{ 0 };

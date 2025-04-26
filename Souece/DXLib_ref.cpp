@@ -365,9 +365,6 @@ namespace DXLibRef {
 				UpdateEffekseer3D();
 			}
 #endif
-#if defined(DEBUG)
-			DebugParts->SetPoint("-----DrawStart-----");
-#endif // DEBUG
 			// シーンの描画を行う処理
 			SceneParts->DrawMainLoop();
 			// デバッグ

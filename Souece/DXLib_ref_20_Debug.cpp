@@ -174,7 +174,7 @@ namespace DXLibRef {
 				size_t loop = PointMax;
 				DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 					FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
-					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, this->m_Point[PointFrame][loop], this->m_Str[loop - 1].c_str());
+					Colors[loop], DarkGreen, "%02d(%5.2fms)[%s]", loop, this->m_Point[PointFrame][loop], this->m_Str[this->m_PointSel].c_str());
 				++num;
 			}
 		}

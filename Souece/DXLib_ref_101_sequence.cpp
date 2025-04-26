@@ -75,6 +75,9 @@ namespace DXLibRef {
 	}
 	//
 	void SceneControl::DrawMain(const Camera3DInfo& camInfo, bool Is3D) const noexcept {
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("Draw=Start");
+#endif // DEBUG
 		auto* PostPassParts = PostPassEffect::Instance();
 		// 全ての画面を初期化
 		PostPassParts->ResetBuffer();
@@ -84,7 +87,7 @@ namespace DXLibRef {
 			// 空
 			PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
 			// 遠距離
-			PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
+			PostPassParts->DrawGBuffer(camInfo.GetCamFar(), 1000000.f, [this]() {
 #if defined(_USE_EFFEKSEER_)
 				Effekseer_Sync3DSetting();
 #endif
@@ -112,7 +115,7 @@ namespace DXLibRef {
 				this->m_NowScenesPtr->MainDrawFront(1);
 				});
 			// 至近
-			PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
+			PostPassParts->DrawGBuffer(0.01f, camInfo.GetCamNear(), [this]() {
 #if defined(_USE_EFFEKSEER_)
 				Effekseer_Sync3DSetting();
 #endif
@@ -138,8 +141,14 @@ namespace DXLibRef {
 		}
 		// ポストプロセス
 		PostPassParts->DrawPostProcess();
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("Draw=End");
+#endif // DEBUG
 	}
 	void SceneControl::DrawUICommon(void) const noexcept {
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("DrawUI=Start");
+#endif // DEBUG
 		auto* SideLogParts = SideLog::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
 		//
@@ -153,6 +162,9 @@ namespace DXLibRef {
 		KeyGuideParts->Draw();
 		SideLogParts->Draw();
 		PopUp::Instance()->Draw(BaseScreenWidth / 2, BaseScreenHeight / 2);
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("DrawUI=End");
+#endif // DEBUG
 #if defined(DEBUG)
 		DebugDraw::Instance()->DebugWindow(BaseScreenWidth - (350), (150));
 #endif // DEBUG
@@ -195,6 +207,9 @@ namespace DXLibRef {
 		this->m_FPSDrawer.Initialize();
 	}
 	void SceneControl::Update(void) noexcept {
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("Update=Start");
+#endif // DEBUG
 		auto* Pad = PadControl::Instance();
 		auto* PopUpParts = PopUp::Instance();
 		auto* OptionWindowParts = OptionPopup::Instance();
@@ -280,6 +295,9 @@ namespace DXLibRef {
 		}
 		// FPS表示機能の更新
 		this->m_FPSDrawer.Update();
+#if defined(DEBUG)
+		DebugDraw::Instance()->SetPoint("Update=End");
+#endif // DEBUG
 	}
 	void SceneControl::DrawMainLoop(void) const noexcept {
 #if defined(_USE_OPENVR_)
