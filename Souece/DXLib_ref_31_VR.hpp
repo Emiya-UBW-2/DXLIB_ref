@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -21,7 +21,7 @@ namespace DXLibRef {
 			vr::ETrackedDeviceClass 	m_type{ vr::TrackedDeviceClass_Invalid };
 			bool						m_isInitialized{ false };
 			bool						m_isActive{ false };
-			// ˆÊ’u‚âƒ{ƒ^ƒ“”»’è
+			// ä½ç½®ã‚„ãƒœã‚¿ãƒ³åˆ¤å®š
 			uint64_t					m_ButtonPressFlag{ 0 };
 			uint64_t					m_ButtonTouchFlag{ 0 };
 			Vector3DX					m_TouchPadPoint{ Vector3DX::zero() };
@@ -132,9 +132,9 @@ namespace DXLibRef {
 		bool						m_VR_HMD_StartFlag{ true };
 		Matrix4x4DX					m_VR_HMD_StartPoint;
 		// 
-		GraphHandle					m_OutScreen;							// ƒXƒNƒŠ[ƒ“ƒoƒbƒtƒ@
+		GraphHandle					m_OutScreen;							// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡
 		GraphHandle					UI_Screen;								// UI
-	private:// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	private:// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		VRControl(void) noexcept{}
 		VRControl(const VRControl&) = delete;
 		VRControl(VRControl&&) = delete;

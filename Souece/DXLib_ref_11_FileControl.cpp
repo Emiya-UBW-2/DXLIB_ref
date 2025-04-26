@@ -1,4 +1,4 @@
-#include "DXLib_ref_11_FileControl.hpp"
+﻿#include "DXLib_ref_11_FileControl.hpp"
 
 namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------

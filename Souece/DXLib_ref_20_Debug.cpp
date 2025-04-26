@@ -1,9 +1,9 @@
-#include "DXLib_ref_20_Debug.hpp"
+ï»¿#include "DXLib_ref_20_Debug.hpp"
 
 namespace DXLibRef {
 #if defined(DEBUG)
 	// --------------------------------------------------------------------------------------------------
-	// ƒVƒ“ƒOƒ‹ƒgƒ“
+	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³
 	// --------------------------------------------------------------------------------------------------
 	const DebugDraw* SingletonBase<DebugDraw>::m_Singleton = nullptr;
 
@@ -41,7 +41,7 @@ namespace DXLibRef {
 			return;
 		}
 		auto PMax = PointMax + 1;
-		// ÅŒã‚Ì‰‰Z
+		// æœ€å¾Œã®æ¼”ç®—
 		SetPoint("-----End-----");
 		for (size_t loop : std::views::iota(static_cast<size_t>(0), PMax)) {
 			if (this->m_PointSel <= loop) {
@@ -55,7 +55,7 @@ namespace DXLibRef {
 				this->m_Point[loop2][loop] = this->m_Point[loop2 - 1][loop];
 			}
 
-			// •½‹Ï
+			// å¹³å‡
 			this->m_Point[PointFrame][loop] = 0.f;
 			for (size_t loop2 : std::views::iota(static_cast<size_t>(0), PointFrame)) {
 				this->m_Point[PointFrame][loop] += this->m_Point[loop2][loop];
@@ -104,12 +104,12 @@ namespace DXLibRef {
 			const int wide = (340);
 			const int height = (360);
 			const int border = height * 2 / 3;
-			// ”wŒi
+			// èƒŒæ™¯
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos, ypos, xpos + wide, ypos + height, White, true);
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
 
 			{
-				// “à—e
+				// å†…å®¹
 				float FPSLimit = static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit));
 				const float xsize = static_cast<float>(wide) / PointFrame;
 				const float ysize = static_cast<float>(border) / (1000.0f / FPSLimit);
@@ -137,21 +137,21 @@ namespace DXLibRef {
 					}
 					//*/
 				}
-				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xpos, yend - border, xpos + wide, yend - border, White);// Šî€ü
+				DrawCtrls->SetDrawLine(WindowSystem::DrawLayer::Normal, xpos, yend - border, xpos + wide, yend - border, White);// åŸºæº–ç·š
 			}
 			ypos += height;
 		}
 		{
 			const int wide = (350);
 			const int height = static_cast<int>(this->m_PointSel + 3 + 1) * LineHeight + (10);
-			// ”wŒi
+			// èƒŒæ™¯
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos, ypos, xpos + wide, ypos + height, White, true);
 			DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, xpos + 1, ypos + 1, xpos + wide - 1, ypos + height - 1, Black, true);
 
 			xpos += (2);
 			ypos += (2);
 			int num = 0;
-			// “à—e
+			// å†…å®¹
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 				FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xpos, ypos + (num * LineHeight),
 				White, Black, "AsyncCount :%d", GetASyncLoadNum());

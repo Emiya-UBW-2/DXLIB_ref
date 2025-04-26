@@ -1,12 +1,12 @@
-#pragma once
+ï»¿#pragma once
 // #include "DXLib_ref.h"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-/*DXLIB‚É’¼Ú‚©‚©‚í‚è‚Ì‚È‚¢•Ö—˜ƒ‚ƒm																											*/
+/*DXLIBã«ç›´æ¥ã‹ã‹ã‚ã‚Šã®ãªã„ä¾¿åˆ©ãƒ¢ãƒ																											*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
-	// ƒVƒ“ƒOƒ‹ƒgƒ“
+	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³
 	// --------------------------------------------------------------------------------------------------
 	template <class T>
 	class SingletonBase {
@@ -36,7 +36,7 @@ namespace DXLibRef {
 		SingletonBase(SingletonBase&&) = delete;
 		SingletonBase& operator=(SingletonBase&&) = delete;
 	};
-	// q‚ÌƒTƒ“ƒvƒ‹
+	// å­ã®ã‚µãƒ³ãƒ—ãƒ«
 	/*
 	class A : public SingletonBase<A> {
 	private:
@@ -45,7 +45,7 @@ namespace DXLibRef {
 	//*/
 
 	// --------------------------------------------------------------------------------------------------
-	// DXLIB‚Ìƒnƒ“ƒhƒ‹‘€ìŒn‚ÌŠî’êƒNƒ‰ƒX
+	// DXLIBã®ãƒãƒ³ãƒ‰ãƒ«æ“ä½œç³»ã®åŸºåº•ã‚¯ãƒ©ã‚¹
 	// --------------------------------------------------------------------------------------------------
 	class DXHandle {
 	private:
@@ -83,36 +83,36 @@ namespace DXLibRef {
 	};
 
 	// --------------------------------------------------------------------------------------------------
-	// •¶š•ÏŠ·
+	// æ–‡å­—å¤‰æ›
 	// --------------------------------------------------------------------------------------------------
-	/*wstring‚ğstring‚Ö•ÏŠ·*/
+	/*wstringã‚’stringã¸å¤‰æ›*/
 	static std::string WStringToString(std::wstring_view oWString) noexcept {
-		// wstring ¨ SJIS
+		// wstring â†’ SJIS
 		int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), static_cast<int>(oWString.size() + 1), nullptr, 0, NULL, NULL);
-		// ƒoƒbƒtƒ@‚Ìæ“¾
+		// ãƒãƒƒãƒ•ã‚¡ã®å–å¾—
 		CHAR* cpMultiByte = new CHAR[static_cast<size_t>(iBufferSize)];
-		// wstring ¨ SJIS
+		// wstring â†’ SJIS
 		WideCharToMultiByte(CP_OEMCP, 0, oWString.data(), static_cast<int>(oWString.size() + 1), cpMultiByte, iBufferSize, NULL, NULL);
-		// string‚Ì¶¬
+		// stringã®ç”Ÿæˆ
 		std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
-		// ƒoƒbƒtƒ@‚Ì”jŠü
+		// ãƒãƒƒãƒ•ã‚¡ã®ç ´æ£„
 		delete[] cpMultiByte;
-		// •ÏŠ·Œ‹‰Ê‚ğ•Ô‚·
+		// å¤‰æ›çµæœã‚’è¿”ã™
 		return oRet;
 	}
-	/*string‚ğwstring‚Ö•ÏŠ·‚·‚é*/
+	/*stringã‚’wstringã¸å¤‰æ›ã™ã‚‹*/
 	static std::wstring StringToWString(std::string_view oString) noexcept {
-		// SJIS ¨ wstring
+		// SJIS â†’ wstring
 		int iBufferSize = MultiByteToWideChar(CP_ACP, 0, oString.data(), static_cast<int>(oString.size() + 1), nullptr, 0);
-		// ƒoƒbƒtƒ@‚Ìæ“¾
+		// ãƒãƒƒãƒ•ã‚¡ã®å–å¾—
 		wchar_t* cpUCS2 = new wchar_t[static_cast<size_t>(iBufferSize)];
-		// SJIS ¨ wstring
+		// SJIS â†’ wstring
 		MultiByteToWideChar(CP_ACP, 0, oString.data(), static_cast<int>(oString.size() + 1), cpUCS2, iBufferSize);
-		// string‚Ì¶¬
+		// stringã®ç”Ÿæˆ
 		std::wstring oRet(cpUCS2, cpUCS2 + iBufferSize - 1);
-		// ƒoƒbƒtƒ@‚Ì”jŠü
+		// ãƒãƒƒãƒ•ã‚¡ã®ç ´æ£„
 		delete[] cpUCS2;
-		// •ÏŠ·Œ‹‰Ê‚ğ•Ô‚·
+		// å¤‰æ›çµæœã‚’è¿”ã™
 		return oRet;
 	}
 }

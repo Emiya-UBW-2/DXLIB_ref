@@ -1,4 +1,4 @@
-#include "DXLib_ref_12_Draw2DSystem.hpp"
+ï»¿#include "DXLib_ref_12_Draw2DSystem.hpp"
 //#include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -139,7 +139,7 @@ namespace DXLibRef {
 		}
 		void DrawControl::Draw(void) noexcept {
 			bool IsHit = false;
-			// “¯‚¶‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN
+			// åŒã˜ã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯
 			for (auto & d : this->m_DrawDatas[this->m_DrawNow]) {
 				int index = static_cast<int>(&d - &this->m_DrawDatas[this->m_DrawNow].front());
 				auto& pd = this->m_DrawDatas[static_cast<size_t>(1 - this->m_DrawNow)][index];
@@ -157,7 +157,7 @@ namespace DXLibRef {
 					break;
 				}
 			}
-			// “à—e‚ª“¯‚¶‚È‚çƒXƒ‹[ ‚¿‚ª‚¤‚È‚çƒoƒbƒtƒ@[‚ğXV
+			// å†…å®¹ãŒåŒã˜ãªã‚‰ã‚¹ãƒ«ãƒ¼ ã¡ãŒã†ãªã‚‰ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’æ›´æ–°
 			if (IsHit) {
 				auto NowScreen = GetDrawScreen();
 				this->m_BufferScreen.SetDraw_Screen(true);
@@ -173,7 +173,7 @@ namespace DXLibRef {
 				}
 				GraphHandle::SetDraw_Screen(NowScreen, false);
 			}
-			// ƒoƒbƒtƒ@[‚ğo—Í
+			// ãƒãƒƒãƒ•ã‚¡ãƒ¼ã‚’å‡ºåŠ›
 			this->m_BufferScreen.DrawGraph(0, 0, true);
 		}
 	};
@@ -264,7 +264,7 @@ namespace DXLibRef {
 				if (FileStream.ComeEof()) { break; }
 				auto ALL = FileStream.SeekLineAndGetStr();
 				if (ALL == "") { continue; }
-				//=‚Ì‰E‘¤‚Ì•¶š‚ğƒJƒ“ƒ}‹æØ‚è‚Æ‚µ‚Ä¯•Ê‚·‚é
+				//=ã®å³å´ã®æ–‡å­—ã‚’ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã¨ã—ã¦è­˜åˆ¥ã™ã‚‹
 				auto RIGHT = FileStreamDX::getright(ALL);
 				std::array<int, 4> Args{};
 				int now = 0;
@@ -281,7 +281,7 @@ namespace DXLibRef {
 						break;
 					}
 				}
-				//“¾‚½î•ñ‚ğ‚à‚Æ‚É•ªŠ„‚µ‚½‰æ‘œ‚ğ“¾‚é
+				//å¾—ãŸæƒ…å ±ã‚’ã‚‚ã¨ã«åˆ†å‰²ã—ãŸç”»åƒã‚’å¾—ã‚‹
 				this->m_DerivationGuideImage.emplace_back(std::make_shared<KeyGuideGraph>());
 				this->m_DerivationGuideImage.back()->AddGuide(Args[0], Args[1], Args[2], Args[3], this->m_GuideBaseImage);
 				++count;
@@ -292,11 +292,11 @@ namespace DXLibRef {
 		if (this->m_IsFlipGuide) {
 			this->m_IsFlipGuide = false;
 			Dispose();
-			// â‘Îo‚·ƒKƒCƒh
+			// çµ¶å¯¾å‡ºã™ã‚¬ã‚¤ãƒ‰
 			auto* LocalizeParts = LocalizePool::Instance();
 			AddGuide(GetPADStoOffset(Controls::PADS::Escape), LocalizeParts->Get(9990));
 			AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));
-			// ’Ç‰Á‚ÌƒKƒCƒh
+			// è¿½åŠ ã®ã‚¬ã‚¤ãƒ‰
 			Guide_Pad();
 		}
 	}
@@ -306,7 +306,7 @@ namespace DXLibRef {
 		for (const auto& k : this->m_Key) {
 			k->Draw(x, y);
 			x += k->GetDrawSize();
-			//Ÿ‚Ìs‚ÖˆÚs
+			//æ¬¡ã®è¡Œã¸ç§»è¡Œ
 			if (x > BaseScreenWidth / 2) {
 				x = 32;
 				y -= 28;

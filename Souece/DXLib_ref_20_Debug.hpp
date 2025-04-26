@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {

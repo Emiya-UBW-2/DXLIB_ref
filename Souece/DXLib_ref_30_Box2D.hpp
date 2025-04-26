@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 #if defined(_USE_BOX2D_)
 
-// Box2DŠg’£
+// Box2Dæ‹¡å¼µ
 namespace std {
 	template <>
 	struct default_delete<b2Body> {
@@ -24,18 +24,18 @@ namespace DXLibRef {
 	}
 	class b2Pats {
 	private:
-		b2FixtureDef				fixtureDef;				// “®“Iƒ{ƒfƒBƒtƒBƒNƒXƒ`ƒƒ‚ğ’è‹`‚µ‚Ü‚·
+		b2FixtureDef				fixtureDef;				// å‹•çš„ãƒœãƒ‡ã‚£ãƒ•ã‚£ã‚¯ã‚¹ãƒãƒ£ã‚’å®šç¾©ã—ã¾ã™
 		std::unique_ptr<b2Body>		body;					// 
 		b2Fixture* playerfix{ nullptr };	// 
 	public:
-		Vector3DX					pos;// ‰¼
+		Vector3DX					pos;// ä»®
 	public:
 		void		Set(b2Body* body_ptr, b2Shape* dynamicBox) noexcept {
 			fixtureDef.shape = dynamicBox;								// 
-			fixtureDef.density = 1.0f;									// ƒ{ƒbƒNƒX–§“x‚ğƒ[ƒˆÈŠO‚Éİ’è‚·‚é‚ÆA“®“I‚É‚È‚é
-			fixtureDef.friction = 0.3f;									// ƒfƒtƒHƒ‹ƒg‚Ì–€C‚ğƒI[ƒo[ƒ‰ƒCƒh
+			fixtureDef.density = 1.0f;									// ãƒœãƒƒã‚¯ã‚¹å¯†åº¦ã‚’ã‚¼ãƒ­ä»¥å¤–ã«è¨­å®šã™ã‚‹ã¨ã€å‹•çš„ã«ãªã‚‹
+			fixtureDef.friction = 0.3f;									// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®æ‘©æ“¦ã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰
 			this->body.reset(body_ptr);									// 
-			this->playerfix = this->body->CreateFixture(&fixtureDef);	// ƒVƒFƒCƒv‚ğƒ{ƒfƒB‚É’Ç‰Á
+			this->playerfix = this->body->CreateFixture(&fixtureDef);	// ã‚·ã‚§ã‚¤ãƒ—ã‚’ãƒœãƒ‡ã‚£ã«è¿½åŠ 
 		}
 
 		void		SetLinearVelocity(const b2Vec2& position) noexcept {

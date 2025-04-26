@@ -1,18 +1,18 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
 	constexpr int BaseDPI = 96;
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// •âŠ®
+	// è£œå®Œ
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒC[ƒWƒ“ƒO
+	// ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°
 	enum class EasingType {
 		OutExpo,
 	};
 	extern float GetEasingRatio(EasingType EasingType, float ratio) noexcept;
-	// üŒ`•âŠ®
+	// ç·šå½¢è£œå®Œ
 	template <class T>
 	inline T Lerp(const T& A, const T& B, float Per) noexcept {
 		if (Per == 0.f) {
@@ -25,7 +25,7 @@ namespace DXLibRef {
 			return A + (T)((B - A) * Per);
 		}
 	}
-	// Matrix”Å‚ÌüŒ`•âŠ®
+	// Matrixç‰ˆã®ç·šå½¢è£œå®Œ
 	inline Matrix4x4DX Lerp(const Matrix4x4DX& A, const Matrix4x4DX& B, float Per) noexcept {
 		return Matrix4x4DX::Axis1(
 			Lerp(A.yvec(), B.yvec(), Per).normalized(),
@@ -41,14 +41,14 @@ namespace DXLibRef {
 	template <class T>
 	static void Easing(T* A, const T& B, float ratio, EasingType EasingType) noexcept { *A = Lerp(*A, B, GetEasingRatio(EasingType, ratio)); }
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ŠÖ”																																		*/
+	/*é–¢æ•°																																		*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒ}ƒEƒX‚Æ‹éŒ`‚Ì”»’è
+	// ãƒã‚¦ã‚¹ã¨çŸ©å½¢ã®åˆ¤å®š
 	extern bool IntoMouse(int x1, int y1, int x2, int y2) noexcept;
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*DXLIBƒ‰ƒbƒp[																																*/
+	/*DXLIBãƒ©ãƒƒãƒ‘ãƒ¼																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒ‰ƒ“ƒ_ƒ€
+	// ãƒ©ãƒ³ãƒ€ãƒ 
 	static float GetRandf(float arg) noexcept { return -arg + static_cast<float>(GetRand(static_cast<int>(arg * 2.f * 10000.f))) / 10000.f; }
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	// IK
@@ -67,23 +67,23 @@ namespace DXLibRef {
 		pObj->ResetFrameUserLocalMatrix(Arm2);
 		pObj->ResetFrameUserLocalMatrix(Wrist);
 		auto matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Arm)).inverse();
-		// Šî€
-		auto vec_a1 = Matrix3x3DX::Vtrans((DirPos - pObj->GetFramePosition(Arm)).normalized(), matBase);// Šî€
-		auto vec_a1L1 = Vector3DX(Vector3DX::vget(XPer, -1.f, vec_a1.y / -abs(vec_a1.z))).normalized();// x=0‚Æ‚·‚é
+		// åŸºæº–
+		auto vec_a1 = Matrix3x3DX::Vtrans((DirPos - pObj->GetFramePosition(Arm)).normalized(), matBase);// åŸºæº–
+		auto vec_a1L1 = Vector3DX(Vector3DX::vget(XPer, -1.f, vec_a1.y / -abs(vec_a1.z))).normalized();// x=0ã¨ã™ã‚‹
 		float cos_t = GetCosFormula((Vector3DX(pObj->GetFramePosition(Wrist)) - pObj->GetFramePosition(Arm2)).magnitude(), (Vector3DX(pObj->GetFramePosition(Arm2)) - pObj->GetFramePosition(Arm)).magnitude(), (Vector3DX(pObj->GetFramePosition(Arm)) - DirPos).magnitude());
 		auto vec_t = vec_a1 * cos_t + vec_a1L1 * std::sqrtf(1.f - cos_t * cos_t);
-		// ã˜r
+		// ä¸Šè…•
 		pObj->SetFrameLocalMatrix(Arm, Matrix3x3DX::RotVec2(
 			Matrix3x3DX::Vtrans(Vector3DX(pObj->GetFramePosition(Arm2)) - pObj->GetFramePosition(Arm), matBase),
 			vec_t
 		).Get44DX() * FrameBaseLocalMatArm);
-		// ‰º˜r
+		// ä¸‹è…•
 		matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Arm2)).inverse();
 		pObj->SetFrameLocalMatrix(Arm2, Matrix3x3DX::RotVec2(
 			Matrix3x3DX::Vtrans(Vector3DX(pObj->GetFramePosition(Wrist)) - pObj->GetFramePosition(Arm2), matBase),
 			Matrix3x3DX::Vtrans(DirPos - pObj->GetFramePosition(Arm2), matBase)
 		).Get44DX() * FrameBaseLocalMatArm2);
-		// è
+		// æ‰‹
 		matBase = Matrix3x3DX::Get33DX(pObj->GetParentFrameWorldMatrix(Wrist)).inverse();
 		{
 			Matrix3x3DX mat1;
@@ -131,13 +131,13 @@ namespace DXLibRef {
 			DirMat.pos(), DirMat.yvec(), DirMat.zvec());
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒJƒƒ‰‚©‚ç‰æ–Êã‚ÌÀ•W‚ğæ“¾
+	// ã‚«ãƒ¡ãƒ©ã‹ã‚‰ç”»é¢ä¸Šã®åº§æ¨™ã‚’å–å¾—
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept;
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ƒNƒ‰ƒX																																	*/
+	/*ã‚¯ãƒ©ã‚¹																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒ‚ƒfƒ‹‚ÌƒtƒŒ[ƒ€î•ñ•Û
+	// ãƒ¢ãƒ‡ãƒ«ã®ãƒ•ãƒ¬ãƒ¼ãƒ æƒ…å ±ä¿æŒ
 	class frames {
 		int			m_FrameID{ InvalidID };
 		Matrix4x4DX	m_WorldPos;
@@ -163,22 +163,22 @@ namespace DXLibRef {
 		const auto&		GetFrameLocalPosition(void) const noexcept { return this->m_LocalPos; }
 	};
 
-	// ˆÊ’uî•ñ
+	// ä½ç½®æƒ…å ±
 	class moves {
-		Vector3DX pos;		// ”½‰f—pÀ•W
-		Vector3DX posbuf;	// ‰‰Z—pÀ•W
-		Vector3DX repos;	// ‘OƒtƒŒ[ƒ€‚ÌÀ•W
-		Vector3DX vec;		// ‰Á‘¬
-		Matrix3x3DX mat;	// ‰ñ“]
-		Matrix3x3DX matbuf;	// ‰ñ“]
+		Vector3DX pos;		// åæ˜ ç”¨åº§æ¨™
+		Vector3DX posbuf;	// æ¼”ç®—ç”¨åº§æ¨™
+		Vector3DX repos;	// å‰ãƒ•ãƒ¬ãƒ¼ãƒ ã®åº§æ¨™
+		Vector3DX vec;		// åŠ é€Ÿ
+		Matrix3x3DX mat;	// å›è»¢
+		Matrix3x3DX matbuf;	// å›è»¢
 	public:
 		const auto&		GetPos(void) const noexcept { return pos; }
 		const auto&		GetRePos(void) const noexcept { return repos; }
 		const auto&		GetVec(void) const noexcept { return vec; }
 		const auto&		GetMat(void) const noexcept { return mat; }
 
-		const auto&		GetPosBuf(void) const noexcept { return posbuf; }// ‰‰ZˆÈŠO‚Å‚Íg‚¤‚È
-		const auto&		GetMatBuf(void) const noexcept { return matbuf; }// ‰‰ZˆÈŠO‚Å‚Íg‚¤‚È
+		const auto&		GetPosBuf(void) const noexcept { return posbuf; }// æ¼”ç®—ä»¥å¤–ã§ã¯ä½¿ã†ãª
+		const auto&		GetMatBuf(void) const noexcept { return matbuf; }// æ¼”ç®—ä»¥å¤–ã§ã¯ä½¿ã†ãª
 	public:
 		void			SetPos(const Vector3DX& tgt) noexcept { this->posbuf = tgt; }
 		void			SetVec(const Vector3DX& tgt) noexcept { this->vec = tgt; }
@@ -234,7 +234,7 @@ namespace DXLibRef {
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ”Ä—pƒZ[ƒuƒf[ƒ^
+	// æ±ç”¨ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	typedef std::pair<std::string, int64_t> SaveParam;
 	class SaveData : public SingletonBase<SaveData> {
@@ -290,18 +290,18 @@ namespace DXLibRef {
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*UDP’ÊM																																	*/
+	/*UDPé€šä¿¡																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class UDPNetWorkDX {
-		int			m_Handle{ InvalidID };				// ƒlƒbƒgƒ[ƒNƒnƒ“ƒhƒ‹
-		IPDATA		m_SendIP{ 127,0,0,1 };		// ‘—M—p‚h‚oƒAƒhƒŒƒXƒf[ƒ^
-		int			m_SendPort{ InvalidID };				// ’ÊM—pƒ|[ƒg
-		IPDATA		m_RecvIp{ 127,0,0,1 };			// óM—p‚h‚oƒAƒhƒŒƒXƒf[ƒ^
-		int			m_RecvPort{ 0 };				// óM—pƒ|[ƒg
+		int			m_Handle{ InvalidID };				// ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒãƒ³ãƒ‰ãƒ«
+		IPDATA		m_SendIP{ 127,0,0,1 };		// é€ä¿¡ç”¨ï¼©ï¼°ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ‡ãƒ¼ã‚¿
+		int			m_SendPort{ InvalidID };				// é€šä¿¡ç”¨ãƒãƒ¼ãƒˆ
+		IPDATA		m_RecvIp{ 127,0,0,1 };			// å—ä¿¡ç”¨ï¼©ï¼°ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ‡ãƒ¼ã‚¿
+		int			m_RecvPort{ 0 };				// å—ä¿¡ç”¨ãƒãƒ¼ãƒˆ
 	public:
 		auto			IsActive(void) const noexcept { return (this->m_Handle != InvalidID); }
 	public:
-		void			SetServerIP(const IPDATA& pIP) noexcept { this->m_SendIP = pIP; }// ƒNƒ‰ƒCƒAƒ“ƒg‚Í•K‚¸s‚¤
+		void			SetServerIP(const IPDATA& pIP) noexcept { this->m_SendIP = pIP; }// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¯å¿…ãšè¡Œã†
 		bool			Init(bool IsServer, int PORT = InvalidID) noexcept {
 			if (!IsActive()) {
 				this->m_SendPort = PORT;
@@ -311,7 +311,7 @@ namespace DXLibRef {
 		}
 		void			Dispose(void) noexcept {
 			if (IsActive()) {
-				DeleteUDPSocket(this->m_Handle);	// ‚t‚c‚oƒ\ƒPƒbƒgƒnƒ“ƒhƒ‹‚Ìíœ
+				DeleteUDPSocket(this->m_Handle);	// ï¼µï¼¤ï¼°ã‚½ã‚±ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«ã®å‰Šé™¤
 				this->m_Handle = InvalidID;
 				this->m_SendPort = InvalidID;
 			}
@@ -325,19 +325,19 @@ namespace DXLibRef {
 			return InvalidID;
 		}
 	public:
-		// ‘—M
+		// é€ä¿¡
 		template<class T>
 		int				SendData(const T& Data) noexcept { return SendData(this->m_SendIP, this->m_SendPort, Data); }
-		// óM
+		// å—ä¿¡
 		template<class T>
 		bool			RecvData(T* Data, int* RecvReturn, bool IsPeek) noexcept {
 			*RecvReturn = InvalidID;
 			if (IsActive()) {
 				switch (CheckNetWorkRecvUDP(this->m_Handle)) {
 				case TRUE:
-					*RecvReturn = NetWorkRecvUDP(this->m_Handle, &this->m_RecvIp, &this->m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// óM
+					*RecvReturn = NetWorkRecvUDP(this->m_Handle, &this->m_RecvIp, &this->m_RecvPort, Data, sizeof(T), IsPeek ? TRUE : FALSE);		// å—ä¿¡
 					return true;
-				case FALSE:// ‘Ò‹@
+				case FALSE:// å¾…æ©Ÿ
 					break;
 				default:// error
 					break;
@@ -345,13 +345,13 @@ namespace DXLibRef {
 			}
 			return false;
 		}
-		// •Ô‘—
+		// è¿”é€
 		template<class T>
 		int				ReturnData(const T& Data) noexcept { return SendData(this->m_RecvIp, this->m_RecvPort, Data); }
 	};
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// PC‚Ìî•ñ‚ğ‘–¸
+	// PCã®æƒ…å ±ã‚’èµ°æŸ»
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class CheckPCSpec {
 		struct MatchScore {

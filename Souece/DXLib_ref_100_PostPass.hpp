@@ -1,22 +1,22 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 //#define _USE_WAVECALC_
 namespace DXLibRef {
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ƒVƒF[ƒ_[																																*/
+	/*ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼																																*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒVƒF[ƒ_[‚ğg—p‚·‚éÛ‚Ì•â•ƒNƒ‰ƒX
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ä½¿ç”¨ã™ã‚‹éš›ã®è£œåŠ©ã‚¯ãƒ©ã‚¹
 	class ShaderController {
 	public:
-		// 2D‚ÉƒVƒF[ƒ_[‚ğ“K—p‚·‚éÛ‚Ég—p‚·‚é‰æ–ÊƒTƒCƒY‚Ì’¸“_î•ñ
+		// 2Dã«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’é©ç”¨ã™ã‚‹éš›ã«ä½¿ç”¨ã™ã‚‹ç”»é¢ã‚µã‚¤ã‚ºã®é ‚ç‚¹æƒ…å ±
 		class ScreenVertex {
 			VERTEX3DSHADER Screen_vertex[6] = {};
 		public:
-			// ’¸“_ƒf[ƒ^‚Ìæ“¾
+			// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã®å–å¾—
 			const auto* GetScreenVertex(void) const noexcept { return Screen_vertex; }
-			// ’¸“_ƒf[ƒ^‚Ì€”õ
+			// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã®æº–å‚™
 			void			SetScreenVertex(int dispx, int dispy) noexcept {
 				int xp1 = 0;
 				int yp1 = dispy;
@@ -38,18 +38,18 @@ namespace DXLibRef {
 				Screen_vertex[5] = Screen_vertex[1];
 			}
 		};
-		// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚ğì¬‚µ‚½Û‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ
+		// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã‚’ä½œæˆã—ãŸéš›ã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—
 		struct LIGHTCAMERA_MATRIX {
 			MATRIX ViewMatrix;
 			MATRIX ProjectionMatrix;
 		};
-		// DXLIB‚©‚çˆø‚Á’£‚Á‚Ä‚«‚½ƒVƒF[ƒ_[—p‚Ì’è‹`
+		// DXLIBã‹ã‚‰å¼•ã£å¼µã£ã¦ããŸã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šç¾©
 		typedef float DX_D3D11_SHADER_FLOAT2[2];
 		typedef float DX_D3D11_SHADER_FLOAT4[4];
 		//
 		struct DX_D3D11_GS_CONST_BUFFER_BASE {
-			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4]{};											// ƒrƒ…[@¨@ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3]{};												// ƒ[ƒ‹ƒh@¨@ƒrƒ…[s—ñ
+			DX_D3D11_SHADER_FLOAT4		ProjectionMatrix[4]{};											// ãƒ“ãƒ¥ãƒ¼ã€€â†’ã€€ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
+			DX_D3D11_SHADER_FLOAT4		ViewMatrix[3]{};												// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã€€â†’ã€€ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—
 		};
 #if defined(_USE_WAVECALC_)
 		struct Wave {
@@ -62,12 +62,12 @@ namespace DXLibRef {
 		};
 #endif
 	private:
-		// ƒVƒF[ƒ_[ƒnƒ“ƒhƒ‹
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒãƒ³ãƒ‰ãƒ«
 		int					m_VertexShaderhandle{ InvalidID };
 		int					m_GeometryShaderhandle{ InvalidID };
 		int					m_PixelShaderhandle{ InvalidID };
-		// ƒVƒF[ƒ_[‚É“n‚·’Ç‰Áƒpƒ‰ƒ[ƒ^[‚ğ”z‚·‚éƒnƒ“ƒhƒ‹
-		std::array<int, 2>	LightCameraMatrixConstantBufferHandle{};	// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚ğì¬‚µ‚½Û‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğİ’è‚·‚é‚½‚ß‚Ì’è”ƒoƒbƒtƒ@
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã«æ¸¡ã™è¿½åŠ ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’é…ã™ã‚‹ãƒãƒ³ãƒ‰ãƒ«
+		std::array<int, 2>	LightCameraMatrixConstantBufferHandle{};	// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã‚’ä½œæˆã—ãŸéš›ã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡
 		std::array<int, 4>	m_VertexShadercbhandle{};
 		int					m_GeometryShaderMatcbhandle{ InvalidID };
 		int					m_PixelShaderSendDispSizeHandle{ InvalidID };
@@ -76,14 +76,14 @@ namespace DXLibRef {
 		ImmutableCB WaveData{};
 		int	m_VertexShadercbWaveDataHandle{ InvalidID };
 #endif
-		ScreenVertex	m_ScreenVertex;					// ’¸“_ƒf[ƒ^
+		ScreenVertex	m_ScreenVertex;					// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
 	public:
 		ShaderController(void) noexcept {
-			// ƒVƒF[ƒ_[ƒnƒ“ƒhƒ‹
+			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒãƒ³ãƒ‰ãƒ«
 			this->m_VertexShaderhandle = InvalidID;
 			this->m_GeometryShaderhandle = InvalidID;
 			this->m_PixelShaderhandle = InvalidID;
-			// ƒVƒF[ƒ_[‚É“n‚·’Ç‰Áƒpƒ‰ƒ[ƒ^[‚ğ”z‚·‚éƒnƒ“ƒhƒ‹
+			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã«æ¸¡ã™è¿½åŠ ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’é…ã™ã‚‹ãƒãƒ³ãƒ‰ãƒ«
 			for (auto& h : this->m_VertexShadercbhandle) {
 				h = InvalidID;
 			}
@@ -97,10 +97,10 @@ namespace DXLibRef {
 			Dispose();
 		}
 	public:
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		void			Init(const char* VertexShader, const char* PixelShader) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// ’¸“_ƒVƒF[ƒ_[ü‚è
+			// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å‘¨ã‚Š
 #if defined(_USE_WAVECALC_)
 			this->m_VertexShadercbWaveDataHandle = CreateShaderConstantBuffer(sizeof(ImmutableCB));
 #endif
@@ -108,13 +108,13 @@ namespace DXLibRef {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
 			this->m_VertexShaderhandle = LoadVertexShader(VertexShader);
-			// ƒsƒNƒZƒ‹ƒVƒF[ƒ_\ü‚è
+			// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€â€•å‘¨ã‚Š
 			this->m_PixelShaderSendDispSizeHandle = CreateShaderConstantBuffer(sizeof(float) * 4);
 			for (auto& h : this->m_PixelShadercbhandle) {
 				h = CreateShaderConstantBuffer(sizeof(float) * 4);
 			}
 			this->m_PixelShaderhandle = LoadPixelShader(PixelShader);
-			// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚ğì¬‚µ‚½Û‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğİ’è‚·‚é‚½‚ß‚Ì’è”ƒoƒbƒtƒ@‚Ìì¬
+			// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã‚’ä½œæˆã—ãŸéš›ã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆ
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				h = CreateShaderConstantBuffer(sizeof(LIGHTCAMERA_MATRIX));
 			}
@@ -124,10 +124,10 @@ namespace DXLibRef {
 			this->m_GeometryShaderMatcbhandle = CreateShaderConstantBuffer(sizeof(DX_D3D11_GS_CONST_BUFFER_BASE));
 			this->m_GeometryShaderhandle = LoadGeometryShader(GeometryShader);
 		}
-		// Œãn––
+		// å¾Œå§‹æœ«
 		void			Dispose(void) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
-			// ’¸“_ƒVƒF[ƒ_[ü‚è
+			// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼å‘¨ã‚Š
 			for (auto& h : LightCameraMatrixConstantBufferHandle) {
 				DeleteShaderConstantBuffer(h);
 			}
@@ -141,7 +141,7 @@ namespace DXLibRef {
 			// 
 			DeleteShaderConstantBuffer(this->m_GeometryShaderMatcbhandle);
 			DeleteShader(this->m_GeometryShaderhandle);
-			// ƒsƒNƒZƒ‹ƒVƒF[ƒ_\ü‚è
+			// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€â€•å‘¨ã‚Š
 			DeleteShaderConstantBuffer(this->m_PixelShaderSendDispSizeHandle);
 			for (auto& h : this->m_PixelShadercbhandle) {
 				DeleteShaderConstantBuffer(h);
@@ -149,29 +149,29 @@ namespace DXLibRef {
 			DeleteShader(this->m_PixelShaderhandle);
 		}
 	public:
-		// ’¸“_ƒVƒF[ƒ_\‚ÌSlot”Ô–Ú‚ÌƒŒƒWƒXƒ^‚Éî•ñ‚ğƒZƒbƒg(Slot>=4)
+		// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€â€•ã®Slotç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ(Slot>=4)
 		void			SetVertexCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			auto& BufferHandle = LightCameraMatrixConstantBufferHandle[static_cast<size_t>(Slot - 4)];
-			// İ’è‚µ‚½ƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğæ“¾‚µ‚Ä‚¨‚­
+			// è¨­å®šã—ãŸã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å–å¾—ã—ã¦ãŠã
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(BufferHandle);
 			LightCameraMatrixConst->ViewMatrix = View.get();
 			LightCameraMatrixConst->ProjectionMatrix = Projection.get();
 
 			UpdateShaderConstantBuffer(BufferHandle);
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_VERTEX, Slot);		// ‰e—p[“x‹L˜^‰æ‘œ‚ğ•`‰æ‚µ‚½‚Æ‚«‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğ’è”‚Éİ’è‚·‚é
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_VERTEX, Slot);		// å½±ç”¨æ·±åº¦è¨˜éŒ²ç”»åƒã‚’æç”»ã—ãŸã¨ãã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å®šæ•°ã«è¨­å®šã™ã‚‹
 		}
-		// ’¸“_ƒVƒF[ƒ_\‚ÌSlot”Ô–Ú‚ÌƒŒƒWƒXƒ^‚Éî•ñ‚ğƒZƒbƒg(Slot>=4)
+		// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€â€•ã®Slotç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ(Slot>=4)
 		void			SetVertexParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			auto& BufferHandle = this->m_VertexShadercbhandle[static_cast<size_t>(Slot - 4)];
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);		// ’¸“_ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒX‚ğæ“¾
+			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);		// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
 			f4->w = param4;
-			UpdateShaderConstantBuffer(BufferHandle);								// ’¸“_ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ğXV‚µ‚Ä‘‚«‚ñ‚¾“à—e‚ğ”½‰f‚·‚é
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_VERTEX, Slot);		// ’¸“_ƒVƒF[ƒ_[‚Ì’è”ƒoƒbƒtƒ@‚ğ’è”ƒoƒbƒtƒ@ƒŒƒWƒXƒ^‚S‚ÉƒZƒbƒg
+			UpdateShaderConstantBuffer(BufferHandle);								// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã—ã¦æ›¸ãè¾¼ã‚“ã å†…å®¹ã‚’åæ˜ ã™ã‚‹
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_VERTEX, Slot);		// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¬ã‚¸ã‚¹ã‚¿ï¼”ã«ã‚»ãƒƒãƒˆ
 		}
 		// 
 #if defined(_USE_WAVECALC_)
@@ -194,14 +194,14 @@ namespace DXLibRef {
 			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_VERTEX, 5);
 		}
 #endif
-		// ƒVƒF[ƒ_\‚ÌSlot”Ô–Ú‚ÌƒŒƒWƒXƒ^‚Éî•ñ‚ğƒZƒbƒg(Slot>=4)
+		// ã‚·ã‚§ãƒ¼ãƒ€â€•ã®Slotç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ(Slot>=4)
 		void			SetGeometryCONSTBUFFER(int Slot, const MATRIX* ViewMatrix, const MATRIX* ProjectionMatrix) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			if (this->m_GeometryShaderhandle == InvalidID) { return; }
 			auto& BufferHandle = this->m_GeometryShaderMatcbhandle;
 			DX_D3D11_GS_CONST_BUFFER_BASE* LightCameraMatrixConst = (DX_D3D11_GS_CONST_BUFFER_BASE*)GetBufferShaderConstantBuffer(BufferHandle);
 
-			// ƒrƒ…[•ÏŠ·—ps—ñ‚ğƒZƒbƒg‚·‚é
+			// ãƒ“ãƒ¥ãƒ¼å¤‰æ›ç”¨è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
 			LightCameraMatrixConst->ViewMatrix[0][0] = ViewMatrix->m[0][0];
 			LightCameraMatrixConst->ViewMatrix[0][1] = ViewMatrix->m[1][0];
 			LightCameraMatrixConst->ViewMatrix[0][2] = ViewMatrix->m[2][0];
@@ -214,7 +214,7 @@ namespace DXLibRef {
 			LightCameraMatrixConst->ViewMatrix[2][1] = ViewMatrix->m[1][2];
 			LightCameraMatrixConst->ViewMatrix[2][2] = ViewMatrix->m[2][2];
 			LightCameraMatrixConst->ViewMatrix[2][3] = ViewMatrix->m[3][2];
-			// “Š‰e•ÏŠ·—ps—ñ‚ğƒZƒbƒg‚·‚é
+			// æŠ•å½±å¤‰æ›ç”¨è¡Œåˆ—ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
 			LightCameraMatrixConst->ProjectionMatrix[0][0] = ProjectionMatrix->m[0][0];
 			LightCameraMatrixConst->ProjectionMatrix[0][1] = ProjectionMatrix->m[1][0];
 			LightCameraMatrixConst->ProjectionMatrix[0][2] = ProjectionMatrix->m[2][0];
@@ -233,52 +233,52 @@ namespace DXLibRef {
 			LightCameraMatrixConst->ProjectionMatrix[3][3] = ProjectionMatrix->m[3][3];
 
 			UpdateShaderConstantBuffer(BufferHandle);
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_GEOMETRY, Slot);		// ‰e—p[“x‹L˜^‰æ‘œ‚ğ•`‰æ‚µ‚½‚Æ‚«‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğ’è”‚Éİ’è‚·‚é
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_GEOMETRY, Slot);		// å½±ç”¨æ·±åº¦è¨˜éŒ²ç”»åƒã‚’æç”»ã—ãŸã¨ãã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å®šæ•°ã«è¨­å®šã™ã‚‹
 		}
-		// ƒsƒNƒZƒ‹ƒVƒF[ƒ_\‚ÌSlot”Ô–Ú‚ÌƒŒƒWƒXƒ^‚Éî•ñ‚ğƒZƒbƒg(Slot>=4)
+		// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€â€•ã®Slotç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ(Slot>=4)
 		void			SetPixelCameraMatrix(int Slot, const Matrix4x4DX& View, const Matrix4x4DX& Projection) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			auto& BufferHandle = LightCameraMatrixConstantBufferHandle[static_cast<size_t>(Slot - 4)];
-			// İ’è‚µ‚½ƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğæ“¾‚µ‚Ä‚¨‚­
+			// è¨­å®šã—ãŸã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å–å¾—ã—ã¦ãŠã
 			LIGHTCAMERA_MATRIX* LightCameraMatrixConst = (LIGHTCAMERA_MATRIX*)GetBufferShaderConstantBuffer(BufferHandle);
 			LightCameraMatrixConst->ViewMatrix = View.get();
 			LightCameraMatrixConst->ProjectionMatrix = Projection.get();
 
 			UpdateShaderConstantBuffer(BufferHandle);
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, Slot);		// ‰e—p[“x‹L˜^‰æ‘œ‚ğ•`‰æ‚µ‚½‚Æ‚«‚ÌƒJƒƒ‰‚Ìƒrƒ…[s—ñ‚ÆË‰es—ñ‚ğ’è”‚Éİ’è‚·‚é
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, Slot);		// å½±ç”¨æ·±åº¦è¨˜éŒ²ç”»åƒã‚’æç”»ã—ãŸã¨ãã®ã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã‚’å®šæ•°ã«è¨­å®šã™ã‚‹
 		}
-		// ƒsƒNƒZƒ‹ƒVƒF[ƒ_\‚Ì2”Ô–Ú‚ÌƒŒƒWƒXƒ^‚É‰æ–ÊƒTƒCƒY‚Ìî•ñ‚ğƒZƒbƒg
+		// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€â€•ã®2ç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«ç”»é¢ã‚µã‚¤ã‚ºã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 		void			SetPixelDispSize(int dispx, int dispy) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			auto& BufferHandle = this->m_PixelShaderSendDispSizeHandle;
-			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(BufferHandle);	// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒX‚ğæ“¾
+			FLOAT2* dispsize = (FLOAT2*)GetBufferShaderConstantBuffer(BufferHandle);	// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 			dispsize->u = static_cast<float>(dispx);
 			dispsize->v = static_cast<float>(dispy);
-			UpdateShaderConstantBuffer(BufferHandle);									// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ğXV‚µ‚Ä‘‚«‚ñ‚¾“à—e‚ğ”½‰f‚·‚é
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, 2);				// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ğ’è”ƒoƒbƒtƒ@ƒŒƒWƒXƒ^2‚ÉƒZƒbƒg
+			UpdateShaderConstantBuffer(BufferHandle);									// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã—ã¦æ›¸ãè¾¼ã‚“ã å†…å®¹ã‚’åæ˜ ã™ã‚‹
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, 2);				// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¬ã‚¸ã‚¹ã‚¿2ã«ã‚»ãƒƒãƒˆ
 			this->m_ScreenVertex.SetScreenVertex(dispx, dispy);
 		}
-		// ƒsƒNƒZƒ‹ƒVƒF[ƒ_\‚ÌSlot”Ô–Ú‚ÌƒŒƒWƒXƒ^‚Éî•ñ‚ğƒZƒbƒg(Slot>=3)
+		// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€â€•ã®Slotç•ªç›®ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ(Slot>=3)
 		void			SetPixelParam(int Slot, float param1, float param2, float param3, float param4) noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			auto& BufferHandle = this->m_PixelShadercbhandle[static_cast<size_t>(Slot - 3)];
-			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);				// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ÌƒAƒhƒŒƒX‚ğæ“¾
+			FLOAT4* f4 = (FLOAT4*)GetBufferShaderConstantBuffer(BufferHandle);				// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 			f4->x = param1;
 			f4->y = param2;
 			f4->z = param3;
 			f4->w = param4;
-			UpdateShaderConstantBuffer(BufferHandle);											// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ğXV‚µ‚Ä‘‚«‚ñ‚¾“à—e‚ğ”½‰f‚·‚é
-			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, Slot);					// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@‚ğ’è”ƒoƒbƒtƒ@ƒŒƒWƒXƒ^3‚ÉƒZƒbƒg
+			UpdateShaderConstantBuffer(BufferHandle);											// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã—ã¦æ›¸ãè¾¼ã‚“ã å†…å®¹ã‚’åæ˜ ã™ã‚‹
+			SetShaderConstantBuffer(BufferHandle, DX_SHADERTYPE_PIXEL, Slot);					// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ¬ã‚¸ã‚¹ã‚¿3ã«ã‚»ãƒƒãƒˆ
 		}
-		// 3D‹óŠÔ‚É“K—p‚·‚éê‡‚ÌŠÖ”(ˆø”‚É3D•`‰æ‚Ìƒ‰ƒ€ƒ_®‚ğ‘ã“ü)
+		// 3Dç©ºé–“ã«é©ç”¨ã™ã‚‹å ´åˆã®é–¢æ•°(å¼•æ•°ã«3Dæç”»ã®ãƒ©ãƒ ãƒ€å¼ã‚’ä»£å…¥)
 		void			Draw_lamda(std::function<void()> doing) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) {
 				doing();
 				return;
 			}
-			SetUseVertexShader(this->m_VertexShaderhandle);											// g—p‚·‚é’¸“_ƒVƒF[ƒ_[‚ğƒZƒbƒg
-			SetUsePixelShader(this->m_PixelShaderhandle);											// g—p‚·‚éƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ğƒZƒbƒg
-			SetUseGeometryShader(this->m_GeometryShaderhandle);										// g—p‚·‚éƒWƒIƒƒgƒŠƒVƒF[ƒ_[‚ğƒZƒbƒg
+			SetUseVertexShader(this->m_VertexShaderhandle);											// ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ã‚»ãƒƒãƒˆ
+			SetUsePixelShader(this->m_PixelShaderhandle);											// ä½¿ç”¨ã™ã‚‹ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ã‚»ãƒƒãƒˆ
+			SetUseGeometryShader(this->m_GeometryShaderhandle);										// ä½¿ç”¨ã™ã‚‹ã‚¸ã‚ªãƒ¡ãƒˆãƒªã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ã‚»ãƒƒãƒˆ
 			MV1SetUseOrigShader(TRUE);
 			doing();
 			MV1SetUseOrigShader(FALSE);
@@ -286,23 +286,23 @@ namespace DXLibRef {
 			SetUsePixelShader(InvalidID);
 			SetUseGeometryShader(InvalidID);
 		}
-		// 2D‰æ‘œ‚É“K—p‚·‚éê‡‚ÌŠÖ”
+		// 2Dç”»åƒã«é©ç”¨ã™ã‚‹å ´åˆã®é–¢æ•°
 		void			Draw(void) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([this] {DrawPolygon3DToShader(this->m_ScreenVertex.GetScreenVertex(), 2); });
 		}
-		// 2D‰æ‘œ‚É“K—p‚·‚éê‡‚ÌŠÖ”
+		// 2Dç”»åƒã«é©ç”¨ã™ã‚‹å ´åˆã®é–¢æ•°
 		void			Draw(const ScreenVertex& Screenvertex) const noexcept {
 			if (GetUseDirect3DVersion() != DX_DIRECT3D_11) { return; }
 			Draw_lamda([&] {DrawPolygon3DToShader(Screenvertex.GetScreenVertex(), 2); });
 		}
 	};
-	// ƒLƒ…[ƒuƒ}ƒbƒv¶¬
+	// ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ç”Ÿæˆ
 	class RealTimeCubeMap {
 	private:
-		GraphHandle dynamicCubeTex;		// üˆÍ‚ğ‰ñ‚é¬‚³‚¢ƒ‚ƒfƒ‹‚½‚¿‚ğ‰f‚è‚±‚Ü‚¹‚é‚½‚ß‚Ì•`‰æ‘ÎÛ‚É‚Å‚«‚éƒLƒ…[ƒuƒ}ƒbƒvƒeƒNƒXƒ`ƒƒ
-		Vector3DX lookAt[6]{};	// ‰f‚è‚±‚ŞüˆÍ‚ÌŠÂ‹«‚ğ•`‰æ‚·‚éÛ‚ÌƒJƒƒ‰‚Ì’‹“_
-		Vector3DX up[6]{};		// ˆÚ‚è‚±‚ŞüˆÍ‚ÌŠÂ‹«‚ğ•`‰æ‚·‚éÛ‚ÌƒJƒƒ‰‚Ìã•ûŒü
+		GraphHandle dynamicCubeTex;		// å‘¨å›²ã‚’å›ã‚‹å°ã•ã„ãƒ¢ãƒ‡ãƒ«ãŸã¡ã‚’æ˜ ã‚Šã“ã¾ã›ã‚‹ãŸã‚ã®æç”»å¯¾è±¡ã«ã§ãã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ãƒ†ã‚¯ã‚¹ãƒãƒ£
+		Vector3DX lookAt[6]{};	// æ˜ ã‚Šã“ã‚€å‘¨å›²ã®ç’°å¢ƒã‚’æç”»ã™ã‚‹éš›ã®ã‚«ãƒ¡ãƒ©ã®æ³¨è¦–ç‚¹
+		Vector3DX up[6]{};		// ç§»ã‚Šã“ã‚€å‘¨å›²ã®ç’°å¢ƒã‚’æç”»ã™ã‚‹éš›ã®ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘
 		int MIPLEVEL = 2;
 	public:
 		RealTimeCubeMap(void) noexcept {}
@@ -314,13 +314,13 @@ namespace DXLibRef {
 		~RealTimeCubeMap(void) noexcept {}
 	public:
 		void Init(void) noexcept {
-			// •`‰æ‘ÎÛ‚É‚Å‚«‚éƒLƒ…[ƒuƒ}ƒbƒvƒeƒNƒXƒ`ƒƒ‚ğì¬
+			// æç”»å¯¾è±¡ã«ã§ãã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆ
 			SetCreateDrawValidGraphMipLevels(MIPLEVEL);
 			SetCubeMapTextureCreateFlag(TRUE);
 			dynamicCubeTex.Make(512, 512, true);
 			SetCubeMapTextureCreateFlag(FALSE);
 			SetCreateDrawValidGraphMipLevels(0);
-			// ‰f‚è‚±‚ŞŠÂ‹«‚ğ•`‰æ‚·‚éÛ‚Ég—p‚·‚éƒJƒƒ‰‚Ì’‹“_‚ÆƒJƒƒ‰‚Ìã•ûŒü‚ğİ’è
+			// æ˜ ã‚Šã“ã‚€ç’°å¢ƒã‚’æç”»ã™ã‚‹éš›ã«ä½¿ç”¨ã™ã‚‹ã‚«ãƒ¡ãƒ©ã®æ³¨è¦–ç‚¹ã¨ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã‚’è¨­å®š
 			lookAt[0] = Vector3DX::right();
 			lookAt[1] = Vector3DX::left();
 			lookAt[2] = Vector3DX::up();
@@ -336,14 +336,14 @@ namespace DXLibRef {
 		}
 
 		void ReadyDraw(const Vector3DX& Pos, const std::function<void()>& Doing) noexcept {
-			for (size_t loop : std::views::iota(0, 6)) {		// ‰f‚è‚±‚ŞŠÂ‹«‚ğ•`‰æ‚·‚é–Ê‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
-				for (int loop2 : std::views::iota(0, MIPLEVEL)) {			// ƒ~ƒbƒvƒ}ƒbƒv‚Ì”‚¾‚¯ŒJ‚è•Ô‚µ
-					dynamicCubeTex.SetRenderTargetToShader(0, static_cast<int>(loop), loop2);		// •`‰ææ”Ô†‚O”Ô‚Ì•`‰æ‘ÎÛ‚ğ•`‰æ‘ÎÛ‚É‚Å‚«‚éƒLƒ…[ƒuƒ}ƒbƒv‚Ìloop”Ô–Ú‚Ì–Ê‚Éİ’è
-					ClearDrawScreen();										// ƒNƒŠƒA
+			for (size_t loop : std::views::iota(0, 6)) {		// æ˜ ã‚Šã“ã‚€ç’°å¢ƒã‚’æç”»ã™ã‚‹é¢ã®æ•°ã ã‘ç¹°ã‚Šè¿”ã—
+				for (int loop2 : std::views::iota(0, MIPLEVEL)) {			// ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ã®æ•°ã ã‘ç¹°ã‚Šè¿”ã—
+					dynamicCubeTex.SetRenderTargetToShader(0, static_cast<int>(loop), loop2);		// æç”»å…ˆç•ªå·ï¼ç•ªã®æç”»å¯¾è±¡ã‚’æç”»å¯¾è±¡ã«ã§ãã‚‹ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ã®loopç•ªç›®ã®é¢ã«è¨­å®š
+					ClearDrawScreen();										// ã‚¯ãƒªã‚¢
 					{
-						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// ƒJƒƒ‰‚Ì‰æŠp‚Í90“x‚Éİ’è
-						SetCameraNearFar(0.5f * Scale3DRate, 1000.0f * Scale3DRate);									// NearƒNƒŠƒbƒv–Ê‚ÆFarƒNƒŠƒbƒv–Ê‚Ì‹——£‚ğİ’è
-						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[loop]).get(), up[loop].get());	// ƒJƒƒ‰‚ÌˆÊ’u‚Æ’‹“_AƒJƒƒ‰‚Ìã•ûŒü‚ğİ’è
+						SetupCamera_Perspective(90.0f / 180.0f * DX_PI_F);								// ã‚«ãƒ¡ãƒ©ã®ç”»è§’ã¯90åº¦ã«è¨­å®š
+						SetCameraNearFar(0.5f * Scale3DRate, 1000.0f * Scale3DRate);									// Nearã‚¯ãƒªãƒƒãƒ—é¢ã¨Farã‚¯ãƒªãƒƒãƒ—é¢ã®è·é›¢ã‚’è¨­å®š
+						SetCameraPositionAndTargetAndUpVec(Pos.get(), (Pos + lookAt[loop]).get(), up[loop].get());	// ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã¨æ³¨è¦–ç‚¹ã€ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘ã‚’è¨­å®š
 						Doing();
 					}
 				}
@@ -357,7 +357,7 @@ namespace DXLibRef {
 		const auto&		GetCubeMapTex(void) const noexcept { return dynamicCubeTex; }
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ƒXƒNƒŠ[ƒ“ƒoƒbƒtƒ@‚Ì‚Â‚©‚¢‚Ü‚í‚µ																											*/
+	/*ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ã®ã¤ã‹ã„ã¾ã‚ã—																											*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class PostPassScreenBuffer {
 		static const size_t			m_Size = 3;
@@ -419,7 +419,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<PostPassScreenBufferPool>;
 	private:
-		std::vector<std::unique_ptr<PostPassScreenBuffer>>	m_ScreenBuffer;		// •`‰æƒXƒNƒŠ[ƒ“
+		std::vector<std::unique_ptr<PostPassScreenBuffer>>	m_ScreenBuffer;		// æç”»ã‚¹ã‚¯ãƒªãƒ¼ãƒ³
 	private:
 		PostPassScreenBufferPool(void) noexcept {}
 		PostPassScreenBufferPool(const PostPassScreenBufferPool&) = delete;
@@ -457,7 +457,7 @@ namespace DXLibRef {
 				s->m_UsedLocal = 0;
 				s->m_Used = 0;
 			}
-			//5ƒtƒŒ[ƒ€ŠÔg‚í‚ê‚Ä‚¢‚È‚¢ƒXƒNƒŠ[ƒ“ƒoƒbƒtƒ@‚ÍÁ‚·
+			//5ãƒ•ãƒ¬ãƒ¼ãƒ é–“ä½¿ã‚ã‚Œã¦ã„ãªã„ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ã¯æ¶ˆã™
 			for (size_t loop = 0, max = this->m_ScreenBuffer.size(); loop < max; ++loop) {
 				auto& s = this->m_ScreenBuffer[loop];
 				if (s->m_UnUse > 5) {
@@ -471,9 +471,9 @@ namespace DXLibRef {
 		}
 	};
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ƒ|ƒXƒgƒvƒƒZƒX																															*/
+	/*ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹																															*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒx[ƒX
+	// ãƒ™ãƒ¼ã‚¹
 	class PostPassBase {
 	protected:
 		bool	m_PrevActive{ false };
@@ -536,7 +536,7 @@ namespace DXLibRef {
 		const auto&		GetCamViewMatrix(bool isFar) const noexcept { return this->m_CamViewMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
 		const auto&		GetCamProjectionMatrix(bool isFar) const noexcept { return this->m_CamProjectionMatrix[static_cast<size_t>(isFar ? 1 : 0)]; }
 		const auto&		GetDepthScreen(void) const noexcept { return DepthScreenHandle; }
-		const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//–¢g—p
+		const auto&		GetDepthFarScreen(void) const noexcept { return DepthFarScreenHandle; }//æœªä½¿ç”¨
 		const auto&		GetShadowDir(void) const noexcept { return this->m_ShadowVec; }
 	public:
 		void			SetVec(const Vector3DX& Vec) noexcept { this->m_ShadowVec = Vec; }
@@ -558,10 +558,10 @@ namespace DXLibRef {
 		std::array<std::unique_ptr<PostPassBase>, 16>	m_PostPass;
 		//
 		bool						m_IsActiveGBuffer{ false };
-		GraphHandle					m_BufferScreen;	// •`‰æƒXƒNƒŠ[ƒ“
-		GraphHandle					m_ColorScreen;	// ‚»‚Ì‚Ü‚Ü“§‰ß‚È‚µ‚É‚µ‚½ƒXƒNƒŠ[ƒ“
-		GraphHandle					m_NormalScreen;	// –@ü‚ÌGƒoƒbƒtƒ@
-		GraphHandle					m_DepthScreen;	// [“x‚ÌGƒoƒbƒtƒ@
+		GraphHandle					m_BufferScreen;	// æç”»ã‚¹ã‚¯ãƒªãƒ¼ãƒ³
+		GraphHandle					m_ColorScreen;	// ãã®ã¾ã¾é€éãªã—ã«ã—ãŸã‚¹ã‚¯ãƒªãƒ¼ãƒ³
+		GraphHandle					m_NormalScreen;	// æ³•ç·šã®Gãƒãƒƒãƒ•ã‚¡
+		GraphHandle					m_DepthScreen;	// æ·±åº¦ã®Gãƒãƒƒãƒ•ã‚¡
 		// 
 		float						m_near_DoF = 0.f;
 		float						m_far_DoF = 0.f;
@@ -628,7 +628,7 @@ namespace DXLibRef {
 		void			SetGodRayPerByPostPass(float value) noexcept { Easing(&this->m_GodRayPerByPostPass, value, 0.975f, EasingType::OutExpo); }
 		void			SetDistortionPer(float value) noexcept { this->m_DistortionPer = value; }
 		void			SetShadowScale(float value) noexcept { this->m_ShadowScale = value; }
-		// ƒ{ƒPn‚ß‚éêŠ‚ğw’è(Š®‘S‚Éƒ{ƒP‚é‚Ì‚ÍƒjƒAƒtƒ@[‚ÌŒÀ“x)
+		// ãƒœã‚±å§‹ã‚ã‚‹å ´æ‰€ã‚’æŒ‡å®š(å®Œå…¨ã«ãƒœã‚±ã‚‹ã®ã¯ãƒ‹ã‚¢ãƒ•ã‚¡ãƒ¼ã®é™åº¦)
 		void			Set_DoFNearFar(float near_d, float far_d, float near_m, float far_m) noexcept {
 			this->m_near_DoF = near_d;
 			this->m_far_DoF = far_d;
@@ -647,7 +647,7 @@ namespace DXLibRef {
 			Set_Per_Blackout(0.f);
 			Set_is_lens(false);
 			Set_zoom_lens(1.f);
-			// ŠÂ‹«Œõ‚Æ‰e‚Ì‰Šú‰»
+			// ç’°å¢ƒå…‰ã¨å½±ã®åˆæœŸåŒ–
 			SetAmbientLight(Vector3DX::vget(0.25f, -1.f, 0.25f));
 		}
 	private:

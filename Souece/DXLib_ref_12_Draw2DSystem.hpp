@@ -1,17 +1,17 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
-// ƒŠƒTƒCƒY
+// ãƒªã‚µã‚¤ã‚º
 constexpr auto EdgeSize = (2);
 constexpr auto LineHeight = (18);
 
 namespace DXLibRef {
 
-	// ŒÅ’è‚ÅA8R8G8B8‚ğo‚·
+	// å›ºå®šã§A8R8G8B8ã‚’å‡ºã™
 	constexpr uint32_t GetColorFix(uint8_t Red, uint8_t Green, uint8_t Blue) {
 		return 0xff000000 | (((uint32_t)Red) << 16) | (((uint32_t)Green) << 8) | ((uint32_t)Blue);
 	}
 
-	// ƒJƒ‰[w’è
+	// ã‚«ãƒ©ãƒ¼æŒ‡å®š
 	static constexpr unsigned int Red{ GetColorFix(255, 0, 0) };
 	static constexpr unsigned int Red25{ GetColorFix(192, 0, 0) };
 	static constexpr unsigned int Red50{ GetColorFix(128, 0, 0) };
@@ -42,12 +42,12 @@ namespace DXLibRef {
 	static constexpr unsigned int Gray95{ GetColorFix(255 * 5 / 100, 255 * 5 / 100, 255 * 5 / 100) };
 	static constexpr unsigned int Black{ GetColorFix(0, 0, 0) };
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// •`‰æ
+	// æç”»
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒOƒ‰ƒf[ƒVƒ‡ƒ“‚Ì‚ ‚é‹éŒ`‚ğ•`‰æ
+	// ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚ã‚‹çŸ©å½¢ã‚’æç”»
 	static void DrawGradationBox_2D(int x1, int y1, int x2, int y2, COLOR_U8 color1, COLOR_U8 color2, const unsigned char UorL = 255) noexcept {
 		VERTEX2D Vertex[6]{};
-		// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 		Vertex[0].pos.x = static_cast<float>(x1);
 		Vertex[0].pos.y = static_cast<float>(y1);
 		Vertex[0].pos.z = 0.0f;
@@ -56,7 +56,7 @@ namespace DXLibRef {
 		Vertex[0].u = 0.0f;
 		Vertex[0].v = 0.0f;
 
-		// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 		Vertex[1].pos.x = static_cast<float>(x2);
 		Vertex[1].pos.y = static_cast<float>(y1);
 		Vertex[1].pos.z = 0.0f;
@@ -67,7 +67,7 @@ namespace DXLibRef {
 
 		Vertex[5] = Vertex[1];
 
-		// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 		Vertex[2].pos.x = static_cast<float>(x1);
 		Vertex[2].pos.y = static_cast<float>(y2);
 		Vertex[2].pos.z = 0.0f;
@@ -78,7 +78,7 @@ namespace DXLibRef {
 
 		Vertex[4] = Vertex[2];
 
-		// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 		Vertex[3].pos.x = static_cast<float>(x2);
 		Vertex[3].pos.y = static_cast<float>(y2);
 		Vertex[3].pos.z = 0.0f;
@@ -87,92 +87,92 @@ namespace DXLibRef {
 		Vertex[3].v = 0.0f;
 
 		switch (UorL) {
-		case 3:// ‰¡(‰E)
-			// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		case 3:// æ¨ª(å³)
+			// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[0].dif = color1;
-			// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[1].dif = color2;
 			Vertex[5] = Vertex[1];
-			// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[2].dif = color1;
 			Vertex[4] = Vertex[2];
-			// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[3].dif = color2;
 			break;
-		case 2:// c(‰º)
-			// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		case 2:// ç¸¦(ä¸‹)
+			// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[0].dif = color1;
-			// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[1].dif = color1;
 			Vertex[5] = Vertex[1];
-			// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[2].dif = color2;
 			Vertex[4] = Vertex[2];
-			// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[3].dif = color2;
 			break;
-		case 1:// ‰¡(¶)
-			// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		case 1:// æ¨ª(å·¦)
+			// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[0].dif = color2;
-			// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[1].dif = color1;
 			Vertex[5] = Vertex[1];
-			// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[2].dif = color2;
 			Vertex[4] = Vertex[2];
-			// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[3].dif = color1;
 			break;
-		case 0:// c(ã)
-			// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+		case 0:// ç¸¦(ä¸Š)
+			// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[0].dif = color2;
-			// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[1].dif = color2;
 			Vertex[5] = Vertex[1];
-			// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[2].dif = color1;
 			Vertex[4] = Vertex[2];
-			// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[3].dif = color1;
 			break;
 		default:
-			// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[0].dif = color1;
-			// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[1].dif = color1;
 			Vertex[5] = Vertex[1];
-			// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[2].dif = color1;
 			Vertex[4] = Vertex[2];
-			// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			Vertex[3].dif = color1;
 			break;
 		}
-		// ƒ|ƒŠƒSƒ“‚ğ2ŒÂ•`‰æ
+		// ãƒãƒªã‚´ãƒ³ã‚’2å€‹æç”»
 		DrawPolygon2D(Vertex, 2, DX_NONE_GRAPH, FALSE);
 	}
-	// 	x1,y1 Angle‚ª0‚Ìê‡‚Ì¶ãÀ•W
-	// 	x2,y2 Angle‚ª0‚Ìê‡‚Ì‰E‰ºÀ•W
-	// 	xminp,yminp ¶ãŠp‚©‚ç‚ÌŒÅ’è’·‚³
-	// 	xmaxp,ymaxp ‰E‰ºŠp‚©‚ç‚ÌŒÅ’è’·‚³
-	// 	XCenter,YCenter@@: ‰æ‘œ‚ğ‰ñ“]•`‰æ‚·‚é‰æ‘œã‚Ì’†SÀ•W(¶ã‚ğ(0.0f,0.0f)A‰E‰º‚ğ(1.0f,1.0f)‚Æ‚µ‚½Š„‡)
-	// 	Angle@@@: •`‰æŠp“xiƒ‰ƒWƒAƒ“w’èj
-	// 	GrHandle@ : •`‰æ‚·‚éƒOƒ‰ƒtƒBƒbƒN‚Ì¯•Ê”Ô†iƒOƒ‰ƒtƒBƒbƒNƒnƒ“ƒhƒ‹j
-	// 	TransFlag@: ‰æ‘œ‚Ì“§–¾“x‚ğ—LŒø‚É‚·‚é‚©‚Ç‚¤‚©( TRUEF—LŒø‚É‚·‚é@FALSEF–³Œø‚É‚·‚é )
-	// 	TilingFlag : ŠpˆÈŠO‚Ì•”•ª‚ğƒ^ƒCƒŠƒ“ƒO‚·‚é‚©Šgk‚³‚¹‚é‚©( TRUEFƒ^ƒCƒŠƒ“ƒO@FALSEFŠgk )
+	// 	x1,y1 AngleãŒ0ã®å ´åˆã®å·¦ä¸Šåº§æ¨™
+	// 	x2,y2 AngleãŒ0ã®å ´åˆã®å³ä¸‹åº§æ¨™
+	// 	xminp,yminp å·¦ä¸Šè§’ã‹ã‚‰ã®å›ºå®šé•·ã•
+	// 	xmaxp,ymaxp å³ä¸‹è§’ã‹ã‚‰ã®å›ºå®šé•·ã•
+	// 	XCenter,YCenterã€€ã€€: ç”»åƒã‚’å›è»¢æç”»ã™ã‚‹ç”»åƒä¸Šã®ä¸­å¿ƒåº§æ¨™(å·¦ä¸Šã‚’(0.0f,0.0f)ã€å³ä¸‹ã‚’(1.0f,1.0f)ã¨ã—ãŸå‰²åˆ)
+	// 	Angleã€€ã€€ã€€: æç”»è§’åº¦ï¼ˆãƒ©ã‚¸ã‚¢ãƒ³æŒ‡å®šï¼‰
+	// 	GrHandleã€€ : æç”»ã™ã‚‹ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã®è­˜åˆ¥ç•ªå·ï¼ˆã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒãƒ³ãƒ‰ãƒ«ï¼‰
+	// 	TransFlagã€€: ç”»åƒã®é€æ˜åº¦ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã‹ã©ã†ã‹( TRUEï¼šæœ‰åŠ¹ã«ã™ã‚‹ã€€FALSEï¼šç„¡åŠ¹ã«ã™ã‚‹ )
+	// 	TilingFlag : è§’ä»¥å¤–ã®éƒ¨åˆ†ã‚’ã‚¿ã‚¤ãƒªãƒ³ã‚°ã™ã‚‹ã‹æ‹¡ç¸®ã•ã›ã‚‹ã‹( TRUEï¼šã‚¿ã‚¤ãƒªãƒ³ã‚°ã€€FALSEï¼šæ‹¡ç¸® )
 	static void Draw9SliceGraph(
 		int x1, int y1, int x2, int y2,
 		int xminp, int yminp, int xmaxp, int ymaxp,
 		float XCenter, float YCenter, float Angle,
 		int GrHandle, bool TransFlag, bool TilingFlag) noexcept {
-		// Å’áŒÀ‚ÌƒTƒCƒY‚ğw’è
+		// æœ€ä½é™ã®ã‚µã‚¤ã‚ºã‚’æŒ‡å®š
 		if (x2 < x1 + xminp + xmaxp) {
 			x2 = x1 + xminp + xmaxp;
 		}
 		if (y2 < y1 + yminp + ymaxp) {
 			y2 = y1 + yminp + ymaxp;
 		}
-		// —pˆÓ‚·‚é’¸“_î•ñ
+		// ç”¨æ„ã™ã‚‹é ‚ç‚¹æƒ…å ±
 		std::vector<VERTEX2D> Vertex;
 		std::vector<unsigned short> Index;
 
@@ -201,14 +201,14 @@ namespace DXLibRef {
 			return (unsigned short)(Vertex.size() - 1);
 			};
 		auto SetUpBox = [&](float xmin, float ymin, float xmax, float ymax, int xc, int yc) {
-			Index.emplace_back(SetUpPoint(xmin, ymin, xc, yc));// ¶ã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			Index.emplace_back(SetUpPoint(xmin, ymin, xc, yc));// å·¦ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			auto RU = SetUpPoint(xmax, ymin, xc + 1, yc);
 			auto LD = SetUpPoint(xmin, ymax, xc, yc + 1);
-			Index.emplace_back(RU);// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
-			Index.emplace_back(LD);// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
-			Index.emplace_back(SetUpPoint(xmax, ymax, xc + 1, yc + 1));// ‰E‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
-			Index.emplace_back(LD);// ¶‰º‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
-			Index.emplace_back(RU);// ‰Eã‚Ì’¸“_‚Ìî•ñ‚ğƒZƒbƒg
+			Index.emplace_back(RU);// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
+			Index.emplace_back(LD);// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
+			Index.emplace_back(SetUpPoint(xmax, ymax, xc + 1, yc + 1));// å³ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
+			Index.emplace_back(LD);// å·¦ä¸‹ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
+			Index.emplace_back(RU);// å³ä¸Šã®é ‚ç‚¹ã®æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ
 			};
 
 		float xminpt = static_cast<float>(xminp) / xs;
@@ -223,7 +223,7 @@ namespace DXLibRef {
 
 		int xtile = 1;
 		int ytile = 1;
-		// ƒ^ƒCƒŠƒ“ƒO
+		// ã‚¿ã‚¤ãƒªãƒ³ã‚°
 		if (TilingFlag) {
 			xtile = static_cast<int>(xmidt / ((xminpt + xmaxpt) / 2.f)) + 1;
 			if (xtile <= 0) {
@@ -245,7 +245,7 @@ namespace DXLibRef {
 			int yc = 0;
 			for (int y : std::views::iota(0, ytile + 2)) {
 				SetUpBox(xmin, ymin, xmax, ymax, xc, yc);
-				// Ÿ
+				// æ¬¡
 				ymin = ymax;
 				ymax = TilingFlag ? (ymin + ymidt / static_cast<float>(ytile)) : ymaxt;
 				if (y == 0) {
@@ -256,7 +256,7 @@ namespace DXLibRef {
 					yc = 2;
 				}
 			}
-			// Ÿ
+			// æ¬¡
 			xmin = xmax;
 			xmax = TilingFlag ? (xmin + xmidt / static_cast<float>(xtile)) : xmaxt;
 			if (x == 0) {
@@ -269,16 +269,16 @@ namespace DXLibRef {
 		}
 		DrawPolygonIndexed2D(Vertex.data(), static_cast<int>(Vertex.size()), Index.data(), static_cast<int>(Index.size()) / 3, GrHandle, TransFlag ? TRUE : FALSE);
 	}
-	// ƒJƒvƒZƒ‹•`‰æ
+	// ã‚«ãƒ—ã‚»ãƒ«æç”»
 	static bool DrawCapsule_3D(const Vector3DX& p1, const Vector3DX& p2, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawCapsule3D(p1.get(), p2.get(), range, 4, color, speccolor, TRUE) == TRUE;
 	}
-	// ‹…•`‰æ
+	// çƒæç”»
 	static bool DrawSphere_3D(const Vector3DX& p1, float range, const unsigned int& color, const unsigned int& speccolor) noexcept {
 		return DxLib::DrawSphere3D(p1.get(), range, 8, color, speccolor, TRUE) == TRUE;
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// •`‰æ
+	// æç”»
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	namespace WindowSystem {
 		// 
@@ -393,7 +393,7 @@ namespace DXLibRef {
 			}
 			// 
 			void	SetDrawBox(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, bool IsFill, int thickness = 1) noexcept {
-				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Box);
 				Back->InputintParam(0, x1);
@@ -432,7 +432,7 @@ namespace DXLibRef {
 			}
 			// 
 			void	SetDrawLine(DrawLayer Layer, int x1, int y1, int x2, int y2, unsigned int color1, int   Thickness = 1) noexcept {
-				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::Line);
 				Back->InputintParam(0, x1);
@@ -454,7 +454,7 @@ namespace DXLibRef {
 				Back->InputboolParam(0, trns);
 			}
 			void	SetDrawExtendGraph(DrawLayer Layer, const GraphHandle* pGraphHandle, int x1, int y1, int x2, int y2, bool trns) noexcept {
-				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::ExtendGraph);
 				Back->InputGraphHandleParam(0, pGraphHandle);
@@ -471,13 +471,13 @@ namespace DXLibRef {
 				int xSize = FontSystem::FontPool::Instance()->Get(FontSystem::FontType::MS_Gothic, fontSize, 3)->GetStringWidth(Str.c_str(), args...);
 				switch (FontX) {
 				case FontSystem::FontXCenter::LEFT:
-					if (!IsDrawOnWindow((x), (y - fontSize), (x + xSize), (y + fontSize))) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+					if (!IsDrawOnWindow((x), (y - fontSize), (x + xSize), (y + fontSize))) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 					break;
 				case FontSystem::FontXCenter::MIDDLE:
-					if (!IsDrawOnWindow((x - xSize / 2), (y - fontSize), (x + xSize / 2), (y + fontSize))) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+					if (!IsDrawOnWindow((x - xSize / 2), (y - fontSize), (x + xSize / 2), (y + fontSize))) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 					break;
 				case FontSystem::FontXCenter::RIGHT:
-					if (!IsDrawOnWindow((x - xSize), (y - fontSize), (x), (y + fontSize))) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+					if (!IsDrawOnWindow((x - xSize), (y - fontSize), (x), (y + fontSize))) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 					break;
 				default:
 					break;
@@ -538,7 +538,7 @@ namespace DXLibRef {
 				int xminp, int yminp, int xmaxp, int ymaxp,
 				float XCenter, float YCenter, float Angle,
 				bool TransFlag, bool TilingFlag) noexcept {
-				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ‰æ–ÊŠO‚Í•\¦‚µ‚È‚¢
+				if (!IsDrawOnWindow(x1, y1, x2, y2)) { return; }				// ç”»é¢å¤–ã¯è¡¨ç¤ºã—ãªã„
 				DrawData* Back = GetBack(Layer);
 				Back->InputType(DrawType::NineSliceGraph);
 				Back->InputGraphHandleParam(0, pGraphHandle);
@@ -574,7 +574,7 @@ namespace DXLibRef {
 				}
 			}
 		};
-		// ƒNƒŠƒbƒN‚Å‚«‚é•¶š•t‚Ìƒ{ƒbƒNƒX
+		// ã‚¯ãƒªãƒƒã‚¯ã§ãã‚‹æ–‡å­—ä»˜ã®ãƒœãƒƒã‚¯ã‚¹
 		template <typename... Args>
 		extern bool SetMsgClickBox(int xp1, int yp1, int xp2, int yp2, int StringYSizeMax, unsigned int defaultcolor, bool IsRepeat, bool IsActive, std::string_view String, Args&&... args) noexcept {
 			auto* DrawCtrls = DrawControl::Instance();
@@ -662,7 +662,7 @@ namespace DXLibRef {
 		//*/
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒTƒCƒhƒƒO
+	// ã‚µã‚¤ãƒ‰ãƒ­ã‚°
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class SideLog : public SingletonBase<SideLog> {
 	private:
@@ -739,20 +739,20 @@ namespace DXLibRef {
 		void Draw(void) noexcept;
 	};
 	// --------------------------------------------------------------------------------------------------
-	// ƒL[ƒKƒCƒh
+	// ã‚­ãƒ¼ã‚¬ã‚¤ãƒ‰
 	// --------------------------------------------------------------------------------------------------
 	class KeyGuide : public SingletonBase<KeyGuide> {
 	private:
 		friend class SingletonBase<KeyGuide>;
 	private:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		KeyGuide(void) noexcept;
-		// ƒRƒs[‚µ‚Ä‚Í‚¢‚¯‚È‚¢‚Ì‚Å’Êí‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^ˆÈŠO‚ğ‚·‚×‚Ädelete
+		// ã‚³ãƒ”ãƒ¼ã—ã¦ã¯ã„ã‘ãªã„ã®ã§é€šå¸¸ã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ä»¥å¤–ã‚’ã™ã¹ã¦delete
 		KeyGuide(const KeyGuide&) = delete;
 		KeyGuide(KeyGuide&&) = delete;
 		KeyGuide& operator=(const KeyGuide&) = delete;
 		KeyGuide& operator=(KeyGuide&&) = delete;
-		// ƒfƒXƒgƒ‰ƒNƒ^‚ÍƒVƒ“ƒOƒ‹ƒgƒ“‚È‚Ì‚ÅŒÄ‚Î‚ê‚Ü‚¹‚ñ
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¯ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ãªã®ã§å‘¼ã°ã‚Œã¾ã›ã‚“
 	private:
 		class KeyGuideGraph {
 			int xsize{ 0 }, ysize{ 0 };
@@ -801,10 +801,10 @@ namespace DXLibRef {
 			void Draw(int x, int y) const noexcept;
 		};
 	private:
-		bool													m_IsFlipGuide{ true };				// ƒKƒCƒh‚ÌXVƒtƒ‰ƒO
-		GraphHandle												m_GuideBaseImage;					// •ªŠ„‘O‚Ì‰æ‘œ
-		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;				// •ªŠ„Œã‚Ì‰æ‘œ
-		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;								// ƒKƒCƒh
+		bool													m_IsFlipGuide{ true };				// ã‚¬ã‚¤ãƒ‰ã®æ›´æ–°ãƒ•ãƒ©ã‚°
+		GraphHandle												m_GuideBaseImage;					// åˆ†å‰²å‰ã®ç”»åƒ
+		std::vector<std::shared_ptr<KeyGuideGraph>>				m_DerivationGuideImage;				// åˆ†å‰²å¾Œã®ç”»åƒ
+		std::vector<std::unique_ptr<KeyGuideOnce>>				m_Key;								// ã‚¬ã‚¤ãƒ‰
 	public:
 		static const int GetPADStoOffset(Controls::PADS PAD) noexcept {
 			auto* Pad = PadControl::Instance();
@@ -825,9 +825,9 @@ namespace DXLibRef {
 			this->m_Key.clear();
 		}
 	public:
-		//ƒKƒCƒh•\¦‚Ì•`‰æ
+		//ã‚¬ã‚¤ãƒ‰è¡¨ç¤ºã®æç”»
 		void Draw(void) const noexcept;
-		//ƒL[’P‘Ì‚Ì•`‰æ
+		//ã‚­ãƒ¼å˜ä½“ã®æç”»
 		void DrawButton(int x, int y, int graphOffset) const noexcept { this->m_DerivationGuideImage[graphOffset]->Draw(x, y); }
 		int GetDrawSize(int graphOffset) const noexcept { return this->m_DerivationGuideImage[graphOffset]->GetDrawSize(); }
 	};

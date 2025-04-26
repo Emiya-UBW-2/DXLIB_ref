@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -581,7 +581,7 @@ namespace DXLibRef {
 
 			"share",
 		};
-		//•¶š‚©‚çKEY_INPUT_BACK‚È‚Ç‚ÌID‚ğæ“¾
+		//æ–‡å­—ã‹ã‚‰KEY_INPUT_BACKãªã©ã®IDã‚’å–å¾—
 		static const auto GetStrtoID(const char* Str, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
@@ -610,7 +610,7 @@ namespace DXLibRef {
 			}
 			return InvalidID;
 		}
-		//KEY_INPUT_BACK‚È‚Ç‚ÌID‚©‚ç•¶š‚ğæ“¾
+		//KEY_INPUT_BACKãªã©ã®IDã‹ã‚‰æ–‡å­—ã‚’å–å¾—
 		static const std::string	GetIDtoStr(int ID, ControlType controlType) noexcept {
 			switch (controlType) {
 			case ControlType::XBox:
@@ -675,7 +675,7 @@ namespace DXLibRef {
 			{
 				XINPUT_STATE input;
 				GetJoypadXInputState(DX_INPUT_PAD1, &input);
-				// ƒ{ƒ^ƒ“
+				// ãƒœã‚¿ãƒ³
 				if (ID >= 0xF100) {
 					switch (ID) {
 					case 0xF100:
@@ -695,9 +695,9 @@ namespace DXLibRef {
 			{
 				DINPUT_JOYSTATE input;
 				GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-				// ƒ{ƒ^ƒ“
+				// ãƒœã‚¿ãƒ³
 				if (ID >= 0xF010) {
-					// \šƒL[
+					// åå­—ã‚­ãƒ¼
 					float deg = static_cast<float>(input.POV[0]) / 100.f;
 					bool w_key = false;
 					bool s_key = false;
@@ -728,7 +728,7 @@ namespace DXLibRef {
 			}
 			break;
 			case ControlType::PC:
-				// ƒ{ƒ^ƒ“
+				// ãƒœã‚¿ãƒ³
 				if (0 <= ID) {
 					if ((ID & 0xF00) != 0) {
 						if (GetWindowActiveFlag()) {
@@ -755,40 +755,40 @@ namespace DXLibRef {
 		}
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ƒL[‰Ÿ‚µ”»’è(‰Ÿ‚µ‚½uŠÔ‚âƒŠƒs[ƒgA—£‚µ‚½uŠÔ‚È‚Ç‚É‚à‘Î‰)
+	// ã‚­ãƒ¼æŠ¼ã—åˆ¤å®š(æŠ¼ã—ãŸç¬é–“ã‚„ãƒªãƒ”ãƒ¼ãƒˆã€é›¢ã—ãŸç¬é–“ãªã©ã«ã‚‚å¯¾å¿œ)
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class switchs {
-		const float	m_RepeatWaitTime = 0.5f;			//ƒŠƒs[ƒg‚Ì1`2‘ÅŠÔ‚ÌŠÔŠÔŠu
-		const float	m_RepeatTime = 0.04f;				//ƒŠƒs[ƒg‚Ì2‘ÅˆÈ~‚Ì”»’èŠÔŠu
+		const float	m_RepeatWaitTime = 0.5f;			//ãƒªãƒ”ãƒ¼ãƒˆæ™‚ã®1ï½2æ‰“é–“ã®æ™‚é–“é–“éš”
+		const float	m_RepeatTime = 0.04f;				//ãƒªãƒ”ãƒ¼ãƒˆæ™‚ã®2æ‰“ä»¥é™ã®åˆ¤å®šé–“éš”
 	private:
-		bool		m_prevpress{ false };				// ‰Ÿ‚µ‘±‚¯‚½‚©‚Ç‚¤‚©‚Ì”»’è”»’è
-		bool		m_press{ false };					// ‰Ÿ‚µ‘±‚¯‚½‚©‚Ç‚¤‚©‚Ì”»’è”»’è
-		bool		m_repeat{ false };					// ‰Ÿ‚µ‘±‚¯‚½Û‚ÌŒJ‚è•Ô‚µ”»’è
-		float		m_repeatcount{ 0.f };				// ŒJ‚è•Ô‚µ”»’è‚Ég‚¤ƒ^ƒCƒ}[
+		bool		m_prevpress{ false };				// æŠ¼ã—ç¶šã‘ãŸã‹ã©ã†ã‹ã®åˆ¤å®šåˆ¤å®š
+		bool		m_press{ false };					// æŠ¼ã—ç¶šã‘ãŸã‹ã©ã†ã‹ã®åˆ¤å®šåˆ¤å®š
+		bool		m_repeat{ false };					// æŠ¼ã—ç¶šã‘ãŸéš›ã®ç¹°ã‚Šè¿”ã—åˆ¤å®š
+		float		m_repeatcount{ 0.f };				// ç¹°ã‚Šè¿”ã—åˆ¤å®šã«ä½¿ã†ã‚¿ã‚¤ãƒãƒ¼
 	public:
-		//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		switchs(void) noexcept {
 			this->m_repeatcount = 0.f;
 			this->m_prevpress = false;
 			this->m_press = false;
 		}
-		//ƒfƒXƒgƒ‰ƒNƒ^
+		//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~switchs(void) noexcept {}
 	public:
-		// XV
+		// æ›´æ–°
 		void			Update(bool key) noexcept;
-		// ‰Ÿ‚µ‚½uŠÔ
+		// æŠ¼ã—ãŸç¬é–“
 		bool			trigger(void) const noexcept { return this->m_press && !this->m_prevpress; }
-		// ‰Ÿ‚µ‚Ä‚¢‚éŠÔ
+		// æŠ¼ã—ã¦ã„ã‚‹é–“
 		bool			press(void) const noexcept { return this->m_press; }
-		// ‰Ÿ‚µ‚Ä‚¢‚éŠÔƒŠƒs[ƒg
+		// æŠ¼ã—ã¦ã„ã‚‹é–“ãƒªãƒ”ãƒ¼ãƒˆ
 		bool			repeat(void) const noexcept { return this->m_repeat; }
-		// —£‚µ‚½uŠÔ
+		// é›¢ã—ãŸç¬é–“
 		bool			release_trigger(void) const noexcept { return !this->m_press && this->m_prevpress; }
-		// —£‚µ‚Ä‚¢‚éŠÔ
+		// é›¢ã—ã¦ã„ã‚‹é–“
 		bool			release(void) const noexcept { return !this->m_press; }
 	};
-	// ƒ}ƒEƒX‚Æ‹éŒ`‚Ì”»’è
+	// ãƒã‚¦ã‚¹ã¨çŸ©å½¢ã®åˆ¤å®š
 	extern bool IntoMouse(int x1, int y1, int x2, int y2) noexcept;
 	// --------------------------------------------------------------------------------------------------
 	// 
@@ -820,42 +820,42 @@ namespace DXLibRef {
 			const auto IsEnableSelectReserve(void) const noexcept { return this->m_reserve != InvalidID; }
 		};
 	private:
-		std::array<PadsInfo, static_cast<size_t>(Controls::PADS::MAX)>	m_PadsInfo;								// ƒ{ƒ^ƒ““ü—Í‚ğ•Û
-		float													m_Look_XradAdd{ 0.f };						// ‰EƒXƒeƒBƒbƒN“ü—Í‚ğ•Û
-		float													m_Look_YradAdd{ 0.f };						// ‰EƒXƒeƒBƒbƒN“ü—Í‚ğ•Û
-		int														m_MouseX{ 0 };								//ƒ}ƒEƒX‚ÌDXLIB‚©‚ç‚Ì’l‚ğ•Û‚µ‚Ä‚¨‚­
-		int														m_MouseY{ 0 };								//ƒ}ƒEƒX‚ÌDXLIB‚©‚ç‚Ì’l‚ğ•Û‚µ‚Ä‚¨‚­
-		switchs													m_MouseClick;								//¶ƒNƒŠƒbƒN
-		int														m_MouseWheelRot{ 0 };						//ƒ}ƒEƒXƒzƒC[ƒ‹‚Ì‰ñ“]—Ê‚ğ•Û‚µ‚Ä‚¨‚­
+		std::array<PadsInfo, static_cast<size_t>(Controls::PADS::MAX)>	m_PadsInfo;								// ãƒœã‚¿ãƒ³å…¥åŠ›ã‚’ä¿æŒ
+		float													m_Look_XradAdd{ 0.f };						// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ›ã‚’ä¿æŒ
+		float													m_Look_YradAdd{ 0.f };						// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ›ã‚’ä¿æŒ
+		int														m_MouseX{ 0 };								//ãƒã‚¦ã‚¹ã®DXLIBã‹ã‚‰ã®å€¤ã‚’ä¿æŒã—ã¦ãŠã
+		int														m_MouseY{ 0 };								//ãƒã‚¦ã‚¹ã®DXLIBã‹ã‚‰ã®å€¤ã‚’ä¿æŒã—ã¦ãŠã
+		switchs													m_MouseClick;								//å·¦ã‚¯ãƒªãƒƒã‚¯
+		int														m_MouseWheelRot{ 0 };						//ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®å›è»¢é‡ã‚’ä¿æŒã—ã¦ãŠã
 		// 
-		bool													m_MouseMoveEnable{ false };					//FPS‚È‚Ç‚Ìƒ}ƒEƒX‚ğ•\¦‚µ‚È‚¢‘€ì•û–@‚ğ—p‚¢‚é‚©‚Ç‚¤‚©
-		Controls::ControlType									m_ControlType{ Controls::ControlType::PC };	//Œ»İ‚ÌƒRƒ“ƒgƒ[ƒ‹ƒ^ƒCƒv
+		bool													m_MouseMoveEnable{ false };					//FPSãªã©ã®ãƒã‚¦ã‚¹ã‚’è¡¨ç¤ºã—ãªã„æ“ä½œæ–¹æ³•ã‚’ç”¨ã„ã‚‹ã‹ã©ã†ã‹
+		Controls::ControlType									m_ControlType{ Controls::ControlType::PC };	//ç¾åœ¨ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ—
 		bool													m_PrevIsActiveLS{ false };
 	private:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		PadControl(void) noexcept { Load(); }
-		PadControl(const PadControl&) = delete;		// ƒRƒs[‚µ‚Ä‚Í‚¢‚¯‚È‚¢‚Ì‚Å’Êí‚ÌƒRƒ“ƒXƒgƒ‰ƒNƒ^ˆÈŠO‚ğ‚·‚×‚Ädelete
+		PadControl(const PadControl&) = delete;		// ã‚³ãƒ”ãƒ¼ã—ã¦ã¯ã„ã‘ãªã„ã®ã§é€šå¸¸ã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ä»¥å¤–ã‚’ã™ã¹ã¦delete
 		PadControl(PadControl&&) = delete;
 		PadControl& operator=(const PadControl&) = delete;
 		PadControl& operator=(PadControl&&) = delete;
-		// ƒfƒXƒgƒ‰ƒNƒ^‚ÍƒVƒ“ƒOƒ‹ƒgƒ“‚È‚Ì‚ÅŒÄ‚Î‚ê‚Ü‚¹‚ñ
+		// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¯ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ãªã®ã§å‘¼ã°ã‚Œã¾ã›ã‚“
 	public:
-		//¡”F¯‚µ‚Ä‚¢‚éƒRƒ“ƒgƒ[ƒ‹ƒ^ƒCƒv‚ğ“¾‚é
+		//ä»Šèªè­˜ã—ã¦ã„ã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ—ã‚’å¾—ã‚‹
 		const auto& GetControlType(void) const noexcept { return this->m_ControlType; }
-		//‹“_ˆÚ“®‚É‘Š“–‚·‚é“ü—Í‚ğ“¾‚é
+		//è¦–ç‚¹ç§»å‹•ã«ç›¸å½“ã™ã‚‹å…¥åŠ›ã‚’å¾—ã‚‹
 		const auto& GetLS_X(void) const noexcept { return this->m_Look_XradAdd; }
 		const auto& GetLS_Y(void) const noexcept { return this->m_Look_YradAdd; }
-		//ƒ}ƒEƒX‚ÌˆÊ’u‚â“ü—Í‚ğ•Ô‚·(UI‚ÌƒNƒŠƒbƒN‚È‚Çê—p)
+		//ãƒã‚¦ã‚¹ã®ä½ç½®ã‚„å…¥åŠ›ã‚’è¿”ã™(UIã®ã‚¯ãƒªãƒƒã‚¯ãªã©å°‚ç”¨)
 		const auto& GetMS_X(void) const noexcept { return this->m_MouseX; }
 		const auto& GetMS_Y(void) const noexcept { return this->m_MouseY; }
 		const auto& GetMouseClick(void) const noexcept { return this->m_MouseClick; }
 		const auto& GetMouseWheelRot(void) const noexcept { return this->m_MouseWheelRot; }
-		//ŠeƒL[ƒRƒ“ƒtƒBƒO‚É‘Î‰‚µ‚½“ü—Í‚ğ“ü‚ê‚é
+		//å„ã‚­ãƒ¼ã‚³ãƒ³ãƒ•ã‚£ã‚°ã«å¯¾å¿œã—ãŸå…¥åŠ›ã‚’å…¥ã‚Œã‚‹
 		const auto& GetPadsInfo(Controls::PADS select) const noexcept { return this->m_PadsInfo[static_cast<size_t>(select)]; }
 
 		void SetIsUseButton(Controls::PADS select, bool IsUse) noexcept { this->m_PadsInfo[static_cast<size_t>(select)].SetUse(IsUse); }
 	private:
-		//ƒZ[ƒuƒf[ƒ^‚ª“ü‚éêŠ‚ğè‚ß‚éƒpƒX
+		//ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿ãŒå…¥ã‚‹å ´æ‰€ã‚’å ã‚ã‚‹ãƒ‘ã‚¹
 		const char* GetSavePath(void) const noexcept {
 			switch (GetControlType()) {
 			case Controls::ControlType::XBox:
@@ -882,10 +882,10 @@ namespace DXLibRef {
 			}
 			return "NONE";
 		};
-		//ƒL[ƒRƒ“ƒtƒBƒO‚ÌŠeƒ{ƒ^ƒ“‚Ìİ’è
+		//ã‚­ãƒ¼ã‚³ãƒ³ãƒ•ã‚£ã‚°ã®å„ãƒœã‚¿ãƒ³ã®è¨­å®š
 		void ChangeConfigOnce(Controls::PADS select, int SetID) noexcept {
 			bool isHit = false;
-			// •ÏX•s‰Â‚Ì‚à‚Ì‚Åİ’è‚µ‚½‚¢‚à‚Ì‚ÆID‚ª‚©‚Ô‚Á‚Ä‚¢‚éê‡•s‰Â”\
+			// å¤‰æ›´ä¸å¯ã®ã‚‚ã®ã§è¨­å®šã—ãŸã„ã‚‚ã®ã¨IDãŒã‹ã¶ã£ã¦ã„ã‚‹å ´åˆä¸å¯èƒ½
 			for (auto& p : this->m_PadsInfo) {
 				if (!p.IsUse() && (p.GetAssign() == SetID)) {
 					isHit = true;
@@ -893,43 +893,43 @@ namespace DXLibRef {
 				}
 			}
 			if (isHit) { return; }
-			// Šù‚É“K—pÏ‚Ì‚à‚Ì‚ª‚ ‚Á‚½ê‡‚»‚¢‚Â‚ğ–³Œø‰»‚µ‚Ä‚â‚é
+			// æ—¢ã«é©ç”¨æ¸ˆã®ã‚‚ã®ãŒã‚ã£ãŸå ´åˆãã„ã¤ã‚’ç„¡åŠ¹åŒ–ã—ã¦ã‚„ã‚‹
 			for (auto& p : this->m_PadsInfo) {
 				if (p.GetReserve() == SetID) {
 					p.SetReserve(InvalidID);
 					break;
 				}
 			}
-			//İ’è
+			//è¨­å®š
 			this->m_PadsInfo[static_cast<size_t>(select)].SetReserve(SetID);
 		}
 	public:
-		//FPS‚È‚Ç‚Ìƒ}ƒEƒX‚ğ•\¦‚µ‚È‚¢‘€ì•û–@‚ğ—p‚¢‚é‚©‚Ç‚¤‚©w’è
+		//FPSãªã©ã®ãƒã‚¦ã‚¹ã‚’è¡¨ç¤ºã—ãªã„æ“ä½œæ–¹æ³•ã‚’ç”¨ã„ã‚‹ã‹ã©ã†ã‹æŒ‡å®š
 		void SetMouseMoveEnable(bool value) noexcept { this->m_MouseMoveEnable = value; }
-		//ƒL[ƒRƒ“ƒtƒBƒO‚Æ‚µ‚ÄReserve‚Éb’è’l‚ğ“ü‚ê‚éˆ—
-		//‚±‚ê‚ğ’Ê‚éŠÔA“¯‚¶ƒL[‚ğ‰Ÿ‚·‚Æ©g‚ÌƒL[‚ğŠO‚·BƒL[ƒAƒTƒCƒ“‚ªŠO‚ê‚Ä‚¢‚é‚©ˆá‚¤ƒL[‚ğ‰Ÿ‚·‚Æ‚»‚ÌƒL[‚ğİ’è‚·‚é
+		//ã‚­ãƒ¼ã‚³ãƒ³ãƒ•ã‚£ã‚°ã¨ã—ã¦Reserveã«æš«å®šå€¤ã‚’å…¥ã‚Œã‚‹å‡¦ç†
+		//ã“ã‚Œã‚’é€šã‚‹é–“ã€åŒã˜ã‚­ãƒ¼ã‚’æŠ¼ã™ã¨è‡ªèº«ã®ã‚­ãƒ¼ã‚’å¤–ã™ã€‚ã‚­ãƒ¼ã‚¢ã‚µã‚¤ãƒ³ãŒå¤–ã‚Œã¦ã„ã‚‹ã‹é•ã†ã‚­ãƒ¼ã‚’æŠ¼ã™ã¨ãã®ã‚­ãƒ¼ã‚’è¨­å®šã™ã‚‹
 		bool ChangeConfig(Controls::PADS select) noexcept {
 			auto& P = this->m_PadsInfo[static_cast<size_t>(select)];
 			auto Prev = P.GetReserve();
 
-			//•ÏX‘O‚Æ“¯‚¶ƒL[‚ğ‰Ÿ‚µ‚Ä‚é
+			//å¤‰æ›´å‰ã¨åŒã˜ã‚­ãƒ¼ã‚’æŠ¼ã—ã¦ã‚‹
 			if (P.GetKey().press()) {
-				if (P.GetKey().trigger()) {//‰Ÿ‚µ‚½uŠÔ‚¾‚¯
-					// SetID‚Æselect‚Åİ’è‚µ‚Ä‚¢‚éƒ{ƒ^ƒ“‚ª“¯‚¶‚¾‚Á‚½‚ç=> SetID==Assign
-					// Reserve‚É‰½‚©“ü‚Á‚Ä‚¢‚½‚ç‹ó‚ÉA“ü‚Á‚Ä‚¢‚È‚©‚Á‚½‚çAssign‚Æ‚·‚é
+				if (P.GetKey().trigger()) {//æŠ¼ã—ãŸç¬é–“ã ã‘
+					// SetIDã¨selectã§è¨­å®šã—ã¦ã„ã‚‹ãƒœã‚¿ãƒ³ãŒåŒã˜ã ã£ãŸã‚‰=> SetID==Assign
+					// Reserveã«ä½•ã‹å…¥ã£ã¦ã„ãŸã‚‰ç©ºã«ã€å…¥ã£ã¦ã„ãªã‹ã£ãŸã‚‰Assignã¨ã™ã‚‹
 					if (P.IsEnableSelectReserve()) {
 						P.SetReserve(InvalidID);
 					}
 					else {
 						ChangeConfigOnce(select, P.GetAssign());
 					}
-					//Œ³‚Æˆá‚¤İ’è‚É‚È‚Á‚Ä‚¢‚½‚çtrue
+					//å…ƒã¨é•ã†è¨­å®šã«ãªã£ã¦ã„ãŸã‚‰true
 					return true;
 				}
-				//‰Ÿ‚µ‘±‚¯‚Ä‚¢‚éê‡‚ÍˆÈ‰º‚Ìˆ—‚ğ’Ê‚³‚È‚¢
+				//æŠ¼ã—ç¶šã‘ã¦ã„ã‚‹å ´åˆã¯ä»¥ä¸‹ã®å‡¦ç†ã‚’é€šã•ãªã„
 				return false;
 			}
-			//‰Ÿ‚³‚ê‚Ä‚¢‚½‚ç‚»‚ÌƒL[‚Éİ’è‚·‚é
+			//æŠ¼ã•ã‚Œã¦ã„ãŸã‚‰ãã®ã‚­ãƒ¼ã«è¨­å®šã™ã‚‹
 			switch (GetControlType()) {
 			case Controls::ControlType::XBox:
 				for (size_t loop = 0; loop < Controls::XBoxNum; ++loop) {
@@ -958,31 +958,31 @@ namespace DXLibRef {
 			default:
 				break;
 			}
-			//Œ³‚Æˆá‚¤İ’è‚É‚È‚Á‚Ä‚¢‚½‚çtrue
+			//å…ƒã¨é•ã†è¨­å®šã«ãªã£ã¦ã„ãŸã‚‰true
 			return (Prev != P.GetReserve());
 		}
-		//“K—p‚µ‚Ä‚¢‚È‚¢•ÏX‚ÌƒŠƒZƒbƒg
+		//é©ç”¨ã—ã¦ã„ãªã„å¤‰æ›´ã®ãƒªã‚»ãƒƒãƒˆ
 		void ResetAssign(void) noexcept {
 			for (auto& p : this->m_PadsInfo) {
 				p.ResetAssign();
 			}
 		}
-		//“K—p‚µ‚Ä‚¢‚È‚¢•ÏX‚ğ“K—p
+		//é©ç”¨ã—ã¦ã„ãªã„å¤‰æ›´ã‚’é©ç”¨
 		void FlipAssign(void) noexcept {
 			for (auto& p : this->m_PadsInfo) {
 				p.FlipAssign();
 			}
 		}
 	public:
-		//Š’è‚Ìƒtƒ@ƒCƒ‹‚©‚ç¡İ’è‚³‚ê‚Ä‚¢‚éƒL[ƒRƒ“ƒtƒBƒO‚ğ“Ç‚İæ‚é
+		//æ‰€å®šã®ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ä»Šè¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚­ãƒ¼ã‚³ãƒ³ãƒ•ã‚£ã‚°ã‚’èª­ã¿å–ã‚‹
 		void Load(void) noexcept;
-		//¡İ’è‚µ‚Ä‚¢‚éó‘Ô‚ğƒtƒ@ƒCƒ‹‚É•Û‘¶
+		//ä»Šè¨­å®šã—ã¦ã„ã‚‹çŠ¶æ…‹ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜
 		void Save(void) const noexcept;
 	public:
-		//“ü—Íˆ—‚ÆƒRƒ“ƒgƒ[ƒ‹ƒ^ƒCƒv‚ÌXV
+		//å…¥åŠ›å‡¦ç†ã¨ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ—ã®æ›´æ–°
 		void Update(void) noexcept;
 	};
-	// “ü—Í
+	// å…¥åŠ›
 	class InputControl {
 	private:
 		float				m_AddxRad{ 0.f };

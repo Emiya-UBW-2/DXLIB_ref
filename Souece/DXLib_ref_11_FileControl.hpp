@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
-	// ƒtƒ@ƒCƒ‹‘€ì
+	// ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œ
 	// --------------------------------------------------------------------------------------------------
-	// ƒfƒBƒŒƒNƒgƒŠ“à‚Ìƒtƒ@ƒCƒ‹‘–¸
+	// ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªå†…ã®ãƒ•ã‚¡ã‚¤ãƒ«èµ°æŸ»
 	static void GetFileNamesInDirectory(const char* pPath, std::vector<WIN32_FIND_DATA>* pData) noexcept {
 		pData->clear();
 		WIN32_FIND_DATA win32fdt;
@@ -20,7 +20,7 @@ namespace DXLibRef {
 		} // else{ return false; }
 		FindClose(hFind);
 	}
-	// ƒtƒ@ƒCƒ‹‘I‘ğƒ_ƒCƒAƒƒO
+	// ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 	class DialogManager {
 		OPENFILENAME	ofn;
 		TCHAR			strFile[MAX_PATH]{ 0 };
@@ -28,8 +28,8 @@ namespace DXLibRef {
 	public:
 		DialogManager(void) noexcept {
 			char Path[MAX_PATH];
-			GetModuleFileName(NULL, Path, MAX_PATH);			// EXE‚Ì‚ ‚éƒtƒHƒ‹ƒ_‚ÌƒpƒX‚ğæ“¾
-			SetCurrentDirectory(Path);							// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚Ìİ’è
+			GetModuleFileName(NULL, Path, MAX_PATH);			// EXEã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã®ãƒ‘ã‚¹ã‚’å–å¾—
+			SetCurrentDirectory(Path);							// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®è¨­å®š
 		}
 		~DialogManager(void) noexcept {}
 	public:
@@ -52,11 +52,11 @@ namespace DXLibRef {
 			ofn.lpstrTitle = "";
 		}
 		bool			Open(void) noexcept {
-			ofn.lpstrTitle = "ŠJ‚­";
+			ofn.lpstrTitle = "é–‹ã";
 			return GetOpenFileName(&ofn);
 		}
 		bool			Save(void) noexcept {
-			ofn.lpstrTitle = "•Û‘¶";
+			ofn.lpstrTitle = "ä¿å­˜";
 			return GetSaveFileName(&ofn);
 		}
 		const auto* GetPath(void) noexcept {
@@ -66,9 +66,9 @@ namespace DXLibRef {
 	};
 
 	// --------------------------------------------------------------------------------------------------
-	// ‹N“®
+	// èµ·å‹•
 	// --------------------------------------------------------------------------------------------------
-	// ‹N“®
+	// èµ·å‹•
 	static void CreateOurProcess(char* szCmd, DWORD flag, bool fWait) noexcept {
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
@@ -76,38 +76,38 @@ namespace DXLibRef {
 		memset(&pi, 0, sizeof(PROCESS_INFORMATION));
 		si.cb = sizeof(STARTUPINFO);
 		CreateProcess(NULL, szCmd, NULL, NULL, FALSE, flag, NULL, NULL, &si, &pi);
-		if (fWait) WaitForSingleObject(pi.hProcess, INFINITE);	// I—¹‚ğ‘Ò‚Â.
+		if (fWait) WaitForSingleObject(pi.hProcess, INFINITE);	// çµ‚äº†ã‚’å¾…ã¤.
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
-	// ©g‚ğ‘½d‹N“®
+	// è‡ªèº«ã‚’å¤šé‡èµ·å‹•
 	static void StartMe(void) noexcept {
 		char Path[MAX_PATH];
-		// EXE‚Ì‚ ‚éƒtƒHƒ‹ƒ_‚ÌƒpƒX‚ğæ“¾
+		// EXEã®ã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€ã®ãƒ‘ã‚¹ã‚’å–å¾—
 		::GetModuleFileName(NULL, Path, MAX_PATH);
 		CreateOurProcess(Path, SW_HIDE, false);
 	}
-	// ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 	static bool IsFileExist(const char* Path) noexcept {
 		return std::filesystem::is_regular_file(Path);
-		//DXLIB_Init‚ğ’Ê‚Á‚Ä‚©‚ç‚Å‚È‚¢‚Æ“®ì‚µ‚È‚¢
+		//DXLIB_Initã‚’é€šã£ã¦ã‹ã‚‰ã§ãªã„ã¨å‹•ä½œã—ãªã„
 		/*
 		FILEINFO FileInfo;
 		return (FileRead_findFirst(Path, &FileInfo) != (DWORD_PTR)InvalidID);
 		//*/
 	}
-	// ƒNƒŠƒbƒvƒ{[ƒh‚É‰æ‘œ‚ğƒRƒs[
+	// ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ç”»åƒã‚’ã‚³ãƒ”ãƒ¼
 	static auto GetClipBoardGraphHandle(GraphHandle* RetHandle) noexcept {
 		HWND  hwnd = GetMainWindowHandle();
 
 		if (IsClipboardFormatAvailable(CF_BITMAP) == FALSE) {
 			return false;
-		}	// w’è‚µ‚½Œ`®‚Ìƒf[ƒ^‚ªƒNƒŠƒbƒvƒ{[ƒh‚É‚ ‚é‚©‚ğ–â‚¢‡‚í‚¹‚é
+		}	// æŒ‡å®šã—ãŸå½¢å¼ã®ãƒ‡ãƒ¼ã‚¿ãŒã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚ã‚‹ã‹ã‚’å•ã„åˆã‚ã›ã‚‹
 		if (OpenClipboard(hwnd) == FALSE) {
 			return false;
-		}						// ƒI[ƒvƒ“
-		HBITMAP hBitmap = (HBITMAP)GetClipboardData(CF_BITMAP);					// ƒf[ƒ^æ“¾
-		CloseClipboard();														// ƒNƒ[ƒY
+		}						// ã‚ªãƒ¼ãƒ—ãƒ³
+		HBITMAP hBitmap = (HBITMAP)GetClipboardData(CF_BITMAP);					// ãƒ‡ãƒ¼ã‚¿å–å¾—
+		CloseClipboard();														// ã‚¯ãƒ­ãƒ¼ã‚º
 		if (hBitmap == NULL) {
 			return false;
 		}
@@ -130,35 +130,35 @@ namespace DXLibRef {
 		ReleaseDC(hwnd, hDC);
 		DeleteObject(hBitmap);
 
-		RetHandle->CreateGraphFromBmp(&bmpInfo, bmpData);	// ƒnƒ“ƒhƒ‹‚É•ÏŠ·
+		RetHandle->CreateGraphFromBmp(&bmpInfo, bmpData);	// ãƒãƒ³ãƒ‰ãƒ«ã«å¤‰æ›
 		delete[] bmpData;
 		return true;
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*DXLIB‚Ìƒtƒ@ƒCƒ‹“Ç‚İ‚İ•â•ƒNƒ‰ƒX																											*/
+	/*DXLIBã®ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿è£œåŠ©ã‚¯ãƒ©ã‚¹																											*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 	class FileStreamDX {
 		int mdata = InvalidID;
 	public:
-		//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		FileStreamDX(void) noexcept {}
-		//éŒ¾‚Éƒtƒ@ƒCƒ‹ƒI[ƒvƒ“”Å
+		//å®£è¨€æ™‚ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ç‰ˆ
 		FileStreamDX(const char* FilePath) noexcept { Open(FilePath); }
-		//ƒfƒXƒgƒ‰ƒNƒ^
+		//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		~FileStreamDX(void) noexcept { Close(); }
 	public:
-		//ƒtƒ@ƒCƒ‹‚ğŠJ‚«A’Tõƒ|ƒCƒ“ƒg‚ğn“_‚ÉˆÚ“®
+		//ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€æ¢ç´¢ãƒã‚¤ãƒ³ãƒˆã‚’å§‹ç‚¹ã«ç§»å‹•
 		void Open(const char* FilePath) noexcept { mdata = DxLib::FileRead_open(FilePath, FALSE); }
-		// 1s‚»‚Ì‚Ü‚Üæ“¾‚µAŸ‚Ìs‚É’Tõƒ|ƒCƒ“ƒg‚ğˆÚ‚é
+		// 1è¡Œãã®ã¾ã¾å–å¾—ã—ã€æ¬¡ã®è¡Œã«æ¢ç´¢ãƒã‚¤ãƒ³ãƒˆã‚’ç§»ã‚‹
 		std::string SeekLineAndGetStr(void) const noexcept {
 			const int charLength = 512;
 			char mstr[charLength] = "";
 			DxLib::FileRead_gets(mstr, charLength, mdata);
 			return std::string(mstr);
 		}
-		// ’Tõƒ|ƒCƒ“ƒg‚ªI’[(EOF)‚ÅI‚í‚é
+		// æ¢ç´¢ãƒã‚¤ãƒ³ãƒˆãŒçµ‚ç«¯(EOF)ã§çµ‚ã‚ã‚‹
 		bool ComeEof(void) const noexcept { return DxLib::FileRead_eof(mdata) != 0; }
-		//@•Â‚¶‚é
+		//ã€€é–‰ã˜ã‚‹
 		void Close(void) noexcept {
 			if (mdata != InvalidID) {
 				DxLib::FileRead_close(mdata);
@@ -166,9 +166,9 @@ namespace DXLibRef {
 			}
 		}
 	public:
-		// •¶š—ñ‚©‚ç=‚æ‚è‰E‚Ì’læ“¾
+		// æ–‡å­—åˆ—ã‹ã‚‰=ã‚ˆã‚Šå³ã®å€¤å–å¾—
 		static std::string getleft(std::string tempname) noexcept { return tempname.substr(0, tempname.find('=')); }
-		// •¶š—ñ‚©‚ç=‚æ‚è‰E‚Ì’læ“¾
+		// æ–‡å­—åˆ—ã‹ã‚‰=ã‚ˆã‚Šå³ã®å€¤å–å¾—
 		static std::string getright(std::string tempname) noexcept { return tempname.substr(tempname.find('=') + 1); }
 	};
 

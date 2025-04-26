@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-/*ƒrƒ‹ƒhİ’è																																	*/
+/*ãƒ“ãƒ«ãƒ‰è¨­å®š																																	*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 #define DEBUG
 //#define _USE_OPENVR_
@@ -28,7 +28,7 @@
 
 #endif // _USE_BOX2D_
 
-// ƒGƒ‰[,Œxæ‚è
+// ã‚¨ãƒ©ãƒ¼,è­¦å‘Šå–ã‚Š
 #define NOMINMAX
 /*
 #pragma warning(disable:4710)
@@ -54,7 +54,7 @@
 #include "Box2D/Box2D.h"
 #endif // _USE_BOX2D_
 
-// ‹¤’Ê
+// å…±é€š
 // #pragma warning( push, 3 )
 
 #include <stdint.h>
@@ -77,19 +77,19 @@
 #include <shlwapi.h>
 #include <thread>
 #pragma comment(lib, "shlwapi.lib")
-// ’Ç‰Á•¨
+// è¿½åŠ ç‰©
 #include "json.hpp"
 
 // #pragma warning( pop )
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*const																																		*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-constexpr float		FrameRate{ 60.f };								/*ˆ—‚ÌŠî€‚É‚È‚éƒtƒŒ[ƒ€ƒŒ[ƒg*/
-constexpr float		Scale3DRate{ 12.5f };							/*1m‚É‘Š“–‚·‚é3D‹óŠÔã‚Ì’·‚³*/
-constexpr float		GravityRate{ -9.8f * Scale3DRate };				/*d—Í‰Á‘¬“x*/
-constexpr int		InvalidID{ -1 };								/*‹¤’Ê‚Ì–³Œø’l*/
-constexpr int		BaseScreenWidth{ 1920 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
-constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
+constexpr float		FrameRate{ 60.f };								/*å‡¦ç†ã®åŸºæº–ã«ãªã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ*/
+constexpr float		Scale3DRate{ 12.5f };							/*1mã«ç›¸å½“ã™ã‚‹3Dç©ºé–“ä¸Šã®é•·ã•*/
+constexpr float		GravityRate{ -9.8f * Scale3DRate };				/*é‡åŠ›åŠ é€Ÿåº¦*/
+constexpr int		InvalidID{ -1 };								/*å…±é€šã®ç„¡åŠ¹å€¤*/
+constexpr int		BaseScreenWidth{ 1920 };						/*UIæç”»ãªã©ã®åŸºæº–ã¨ãªã‚‹è§£åƒåº¦*/
+constexpr int		BaseScreenHeight{ 1080 };						/*UIæç”»ãªã©ã®åŸºæº–ã¨ãªã‚‹è§£åƒåº¦*/
 
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 /*include DXLIB																																*/
@@ -99,7 +99,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #if defined(_USE_EFFEKSEER_)
 #include "EffekseerForDXLib.h"
 #endif
-// ’Ç‰Á
+// è¿½åŠ 
 #include "DXLib_ref_00_Util.hpp"
 #include "DXLib_ref_01_Algorithm.hpp"
 #include "DXLib_ref_02_SoundHandle.hpp"
@@ -124,7 +124,7 @@ constexpr int		BaseScreenHeight{ 1080 };						/*UI•`‰æ‚È‚Ç‚ÌŠî€‚Æ‚È‚é‰ğ‘œ“x*/
 #include "DXLib_ref_101_sequence.hpp"
 #include "DXLib_ref_102_ObjectManager.hpp"
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
-/*•K{ƒIƒuƒWƒFƒNƒg																															*/
+/*å¿…é ˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ																															*/
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 namespace DXLibRef {
 	class DXLib_ref : public SingletonBase<DXLib_ref> {
@@ -132,26 +132,26 @@ namespace DXLibRef {
 		friend class SingletonBase<DXLib_ref>;
 	private:
 		bool						m_IsFirstBoot{ false };
-		LONGLONG					m_Update_effect_was = 0;					// ƒGƒtƒFƒNƒg‚ÌƒAƒbƒvƒf[ƒgƒ^ƒCƒ~ƒ“ƒOƒ^ƒCƒ}[
+		LONGLONG					m_Update_effect_was = 0;					// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚¿ã‚¤ãƒãƒ¼
 
-		float						m_DeltaTime{ 0.f };		//1ƒtƒŒ[ƒ€‚É‚©‚©‚Á‚½ŠÔ ƒ}ƒCƒNƒ•b
-		LONGLONG					m_StartTime{ 0 };		// 1ƒtƒŒ[ƒ€‚ªn‚Ü‚Á‚Ä‚©‚ç‚ÌŒo‰ßŠÔ ƒ}ƒCƒNƒ•b
+		float						m_DeltaTime{ 0.f };		//1ãƒ•ãƒ¬ãƒ¼ãƒ ã«ã‹ã‹ã£ãŸæ™‚é–“ ãƒã‚¤ã‚¯ãƒ­ç§’
+		LONGLONG					m_StartTime{ 0 };		// 1ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå§‹ã¾ã£ã¦ã‹ã‚‰ã®çµŒéæ™‚é–“ ãƒã‚¤ã‚¯ãƒ­ç§’
 
 		CheckPCSpec					m_CheckPCSpec;
-	private:// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	private:// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		DXLib_ref(void) noexcept;
 		DXLib_ref(const DXLib_ref&) = delete;
 		DXLib_ref(DXLib_ref&&) = delete;
 		DXLib_ref& operator=(const DXLib_ref&) = delete;
 		DXLib_ref& operator=(DXLib_ref&&) = delete;
 	private:
-		void		StartCount(void) noexcept;			// ƒ‹[ƒv‚ÌÅ‰‚É’Ê‚·
-		bool		WaitCount(void) const noexcept;		// •\‰æ–Ê‚É”½‰f‚µA‚’¼“¯Šú‚Ü‚½‚Íˆê’è‚ÌFPS‚Ü‚Å‘Ò‹@‚·‚é
+		void		StartCount(void) noexcept;			// ãƒ«ãƒ¼ãƒ—ã®æœ€åˆã«é€šã™
+		bool		WaitCount(void) const noexcept;		// è¡¨ç”»é¢ã«åæ˜ ã—ã€å‚ç›´åŒæœŸã¾ãŸã¯ä¸€å®šã®FPSã¾ã§å¾…æ©Ÿã™ã‚‹
 	public:
-		const auto& GetDeltaTime(void) const noexcept { return this->m_DeltaTime; }		// 1ƒtƒŒ[ƒ€‚É‚©‚©‚Á‚½ŠÔ‚ğæ“¾
-		const auto	GetFps(void) const noexcept { return 1.f / this->m_DeltaTime; }		// FPS’l‚Ìæ“¾
+		const auto& GetDeltaTime(void) const noexcept { return this->m_DeltaTime; }		// 1ãƒ•ãƒ¬ãƒ¼ãƒ ã«ã‹ã‹ã£ãŸæ™‚é–“ã‚’å–å¾—
+		const auto	GetFps(void) const noexcept { return 1.f / this->m_DeltaTime; }		// FPSå€¤ã®å–å¾—
 	public:
-		void		SetWaitVSync(void) noexcept;		//‚’¼“¯Šú‚Ìƒtƒ‰ƒOİ’è
+		void		SetWaitVSync(void) noexcept;		//å‚ç›´åŒæœŸã®ãƒ•ãƒ©ã‚°è¨­å®š
 	public:
 		bool		FirstBootSetting(void) noexcept;
 		void		StartLogic(void) noexcept;

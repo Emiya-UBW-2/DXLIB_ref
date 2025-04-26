@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -7,8 +7,8 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	class TEMPSCENE {
 	private:
-		bool			m_IsUpdateFarShadow{ true };			// ‰‰ñƒ`ƒFƒbƒN
-		bool			m_IsFirstLoop{ true };			// ‰‰ñƒ`ƒFƒbƒN
+		bool			m_IsUpdateFarShadow{ true };			// åˆå›ãƒã‚§ãƒƒã‚¯
+		bool			m_IsFirstLoop{ true };			// åˆå›ãƒã‚§ãƒƒã‚¯
 		bool			m_IsLoading{ false };
 		bool			m_IsLoadingEnd{ false };
 		std::array<std::shared_ptr<TEMPSCENE>, 10>	m_pNextSceneList{ nullptr };
@@ -25,17 +25,17 @@ namespace DXLibRef {
 			return Ret;
 		}
 		void		SetIsUpdateFarShadowActive() noexcept { this->m_IsUpdateFarShadow = true; }
-	public:// ƒQƒbƒ^[
+	public:// ã‚²ãƒƒã‚¿ãƒ¼
 		const auto& GetIsFirstLoop(void) const noexcept { return this->m_IsFirstLoop; }
 		const auto& Get3DActive(void) const noexcept { return this->m_Is3DActive; }
-	public:// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	public:// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		TEMPSCENE(void) noexcept {}
 		TEMPSCENE(const TEMPSCENE&) = delete;
 		TEMPSCENE(TEMPSCENE&&) = delete;
 		TEMPSCENE& operator=(const TEMPSCENE&) = delete;
 		TEMPSCENE& operator=(TEMPSCENE&&) = delete;
 		virtual ~TEMPSCENE(void) noexcept {}
-	public:// ƒƒCƒ“XV
+	public:// ãƒ¡ã‚¤ãƒ³æ›´æ–°
 		void Load(void) noexcept {
 			if (!this->m_IsLoading) {
 				this->m_IsLoading = true;
@@ -77,7 +77,7 @@ namespace DXLibRef {
 		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
-	protected:// Œp³•¨
+	protected:// ç¶™æ‰¿ç‰©
 		virtual void Load_Sub(void) noexcept {}
 		virtual void LoadEnd_Sub(void) noexcept {}
 		virtual void Set_Sub(void) noexcept {}
@@ -104,7 +104,7 @@ namespace DXLibRef {
 	private:
 		friend class SingletonBase<SceneControl>;
 	private:
-		// FPS•\¦—pƒNƒ‰ƒX
+		// FPSè¡¨ç¤ºç”¨ã‚¯ãƒ©ã‚¹
 		class FPSDrawer {
 			static const size_t			m_Size{ 60 };
 		private:
@@ -112,12 +112,12 @@ namespace DXLibRef {
 			size_t						m_FPSAvgCount{ 0 };
 			float						m_FPSAvg{ 0.f };
 		public:
-			// FPS•\¦
+			// FPSè¡¨ç¤º
 			void	Initialize(void) noexcept;
 			void	Update(void) noexcept;
 			void	DrawFPSCounter(void) const noexcept;
 		};
-		// ƒ|[ƒY‰æ–Ê•\¦—pƒNƒ‰ƒX
+		// ãƒãƒ¼ã‚ºç”»é¢è¡¨ç¤ºç”¨ã‚¯ãƒ©ã‚¹
 		class PauseDrawer {
 			float						m_PauseFlashCount{ 0.f };
 		public:
@@ -126,13 +126,13 @@ namespace DXLibRef {
 		};
 	private:
 		std::shared_ptr<TEMPSCENE>	m_NowScenesPtr;
-		bool						m_IsEndScene{ false };		// Œ»İ‚ÌƒV[ƒ“‚ªI—¹‚µ‚½ƒtƒ‰ƒO
-		bool						m_IsEndGame{ false };		// ƒQ[ƒ€I—¹ƒtƒ‰ƒO
-		bool						m_IsExitSelect{ false };	// I—¹ƒ|ƒbƒvƒAƒbƒv‚ªŠJ‚¢‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		bool						m_IsRestartSelect{ false };	// Ä‹N“®ƒ|ƒbƒvƒAƒbƒv‚ªŠJ‚¢‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		FPSDrawer					m_FPSDrawer;				// FPS•\¦—pƒNƒ‰ƒX‚ÌÀ‘Ì
-		PauseDrawer					m_PauseDrawer;				// ƒ|[ƒY‰æ–Ê•\¦—pƒNƒ‰ƒX‚ÌÀ‘Ì
-		bool						m_IsPauseActive{ false };	// ƒ|[ƒY’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+		bool						m_IsEndScene{ false };		// ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒçµ‚äº†ã—ãŸãƒ•ãƒ©ã‚°
+		bool						m_IsEndGame{ false };		// ã‚²ãƒ¼ãƒ çµ‚äº†ãƒ•ãƒ©ã‚°
+		bool						m_IsExitSelect{ false };	// çµ‚äº†ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãŒé–‹ã„ã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
+		bool						m_IsRestartSelect{ false };	// å†èµ·å‹•ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãŒé–‹ã„ã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
+		FPSDrawer					m_FPSDrawer;				// FPSè¡¨ç¤ºç”¨ã‚¯ãƒ©ã‚¹ã®å®Ÿä½“
+		PauseDrawer					m_PauseDrawer;				// ãƒãƒ¼ã‚ºç”»é¢è¡¨ç¤ºç”¨ã‚¯ãƒ©ã‚¹ã®å®Ÿä½“
+		bool						m_IsPauseActive{ false };	// ãƒãƒ¼ã‚ºä¸­ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;

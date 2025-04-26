@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
@@ -29,13 +29,13 @@ namespace DXLibRef {
 		void			AddObject(const SharedObj& NewObj) noexcept;
 		void			LoadModelAfter(const SharedObj& pObj, const SharedObj& pAnim, std::string_view filepath, std::string_view objfilename = "model", std::string_view colfilename = "col") noexcept;
 	public:
-		//‚ ‚ç‚©‚¶‚ßƒ‚ƒfƒ‹‚ğ“Ç‚İ‚ñ‚Å‚¨‚­
+		//ã‚ã‚‰ã‹ã˜ã‚ãƒ¢ãƒ‡ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ãŠã
 		const SharedModel*	LoadModelBefore(std::string_view filepath, std::string_view objfilename = "model", std::string_view colfilename = "col") noexcept;
-		//ƒ‚ƒfƒ‹–¢g—pƒo[ƒWƒ‡ƒ“
+		//ãƒ¢ãƒ‡ãƒ«æœªä½¿ç”¨ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 		void			InitObject(const SharedObj& pObj) noexcept;
-		//ƒ‚ƒfƒ‹g—pƒo[ƒWƒ‡ƒ“
+		//ãƒ¢ãƒ‡ãƒ«ä½¿ç”¨ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 		void			InitObject(const SharedObj& pObj, std::string_view filepath, std::string_view objfilename = "model", std::string_view colfilename = "col") noexcept;
-		//ƒAƒjƒ[ƒVƒ‡ƒ“Œ“–±ƒ‚ƒfƒ‹ƒo[ƒWƒ‡ƒ“
+		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å…¼å‹™ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 		void			InitObject(const SharedObj& pObj, const SharedObj& pAnim, std::string_view filepath, std::string_view objfilename = "model", std::string_view colfilename = "col") noexcept;
 	public:
 		SharedObj*		GetObj(int ModelType, int num) noexcept;

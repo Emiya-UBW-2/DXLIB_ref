@@ -1,18 +1,18 @@
-#include "DXLib_ref_100_PostPass.hpp"
+ï»¿#include "DXLib_ref_100_PostPass.hpp"
 
 namespace DXLibRef {
 	// 
 	const PostPassScreenBufferPool* SingletonBase<PostPassScreenBufferPool>::m_Singleton = nullptr;
 	const PostPassEffect* SingletonBase<PostPassEffect>::m_Singleton = nullptr;
 	// --------------------------------------------------------------------------------------------------
-	// ƒ|ƒXƒgƒvƒƒZƒXƒGƒtƒFƒNƒg
+	// ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	// --------------------------------------------------------------------------------------------------
-	// Œp³ƒNƒ‰ƒX
+	// ç¶™æ‰¿ã‚¯ãƒ©ã‚¹
 	class PostPassSSAO : public PostPassBase {
 		static const int EXTEND = 4;
 	private:
-		ShaderController				m_ShaderSSAO;		// ƒVƒF[ƒ_[
-		ShaderController				m_ShaderBlur;		// ƒVƒF[ƒ_[
+		ShaderController				m_ShaderSSAO;		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
+		ShaderController				m_ShaderBlur;		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	protected:
 		void		Load_Sub(void) noexcept override {
 			this->m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
@@ -43,7 +43,7 @@ namespace DXLibRef {
 			pDepthScreen->GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			pScreenBuffer->SetDraw_Screen();
 
-			// ƒVƒF[ƒ_[‚ğ“K—p
+			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’é©ç”¨
 			pScreenBuffer2->SetDraw_Screen(false);
 			{
 				pColorScreen->SetUseTextureToShader(0);
@@ -58,10 +58,10 @@ namespace DXLibRef {
 				SetUseTextureToShader(1, InvalidID);
 				SetUseTextureToShader(2, InvalidID);
 			}
-			// ‚Ú‚©‚µ‚ğ“ü‚ê‚é
+			// ã¼ã‹ã—ã‚’å…¥ã‚Œã‚‹
 			pScreenBuffer->SetDraw_Screen(false);
 			{
-				pScreenBuffer2->SetUseTextureToShader(0);	// g—p‚·‚éƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg
+				pScreenBuffer2->SetUseTextureToShader(0);	// ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ
 
 				this->m_ShaderBlur.SetPixelDispSize(xsize, ysize);
 				this->m_ShaderBlur.Draw();
@@ -85,13 +85,13 @@ namespace DXLibRef {
 		}
 	};
 	class PostPassSSR : public PostPassBase {
-		static const int RayInterval = 200;// ƒŒƒC‚Ì•ªŠ„ŠÔŠu
+		static const int RayInterval = 200;// ãƒ¬ã‚¤ã®åˆ†å‰²é–“éš”
 		const float DepthThreshold = 17.f;
 		static const int EXTEND = 4;
 	private:
-		GraphHandle						m_bkScreen2;	// ƒuƒŒƒ“ƒh
-		ShaderController::ScreenVertex	m_ScreenVertex;	// ’¸“_ƒf[ƒ^
-		ShaderController				m_Shader;		// ƒVƒF[ƒ_[
+		GraphHandle						m_bkScreen2;	// ãƒ–ãƒ¬ãƒ³ãƒ‰
+		ShaderController::ScreenVertex	m_ScreenVertex;	// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
+		ShaderController				m_Shader;		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	public:
 		PostPassSSR(void) noexcept {}
 		PostPassSSR(const PostPassSSR&) = delete;
@@ -189,7 +189,7 @@ namespace DXLibRef {
 	};
 	class PostPassDoF : public PostPassBase {
 	private:
-		ShaderController				m_Shader;			// ƒVƒF[ƒ_[
+		ShaderController				m_Shader;			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	public:
 		PostPassDoF(void) noexcept {}
 		PostPassDoF(const PostPassDoF&) = delete;
@@ -543,17 +543,17 @@ namespace DXLibRef {
 
 		virtual ~PostPassDistortion(void) noexcept {}
 	private:
-		// ‰æ–Ê‚ğ˜c‚Ü‚¹‚È‚ª‚ç•`‰æ‚·‚éŠÖ”
+		// ç”»é¢ã‚’æ­ªã¾ã›ãªãŒã‚‰æç”»ã™ã‚‹é–¢æ•°
 		void		DrawCircleScreen(
-			int CenterX,			// ‰~‚Ì’†SÀ•WX
-			int CenterY,			// ‰~‚Ì’†SÀ•WY
-			float Radius,			// ‰~‚ÌƒTƒCƒY
-			float Absorption,		// “à‘¤‚Ì‰~‚Éˆø‚«‚Ü‚ê‚éƒhƒbƒg”
-			const GraphHandle& ScreenHandle// ‰æ–ÊƒOƒ‰ƒtƒBƒbƒNƒnƒ“ƒhƒ‹
+			int CenterX,			// å††ã®ä¸­å¿ƒåº§æ¨™X
+			int CenterY,			// å††ã®ä¸­å¿ƒåº§æ¨™Y
+			float Radius,			// å††ã®ã‚µã‚¤ã‚º
+			float Absorption,		// å†…å´ã®å††ã«å¼•ãè¾¼ã¾ã‚Œã‚‹ãƒ‰ãƒƒãƒˆæ•°
+			const GraphHandle& ScreenHandle// ç”»é¢ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒãƒ³ãƒ‰ãƒ«
 		) {
 			auto* WindowSizeParts = WindowSizeControl::Instance();
-			const int CIRCLE_ANGLE_VERTEX_NUM = 16;			// ‰~ü‚Ì’¸“_”
-			const int CIRCLE_RADIUS_VERTEX_NUM = 8;			// ”¼Œa‚Ì’¸“_”
+			const int CIRCLE_ANGLE_VERTEX_NUM = 16;			// å††å‘¨ã®é ‚ç‚¹æ•°
+			const int CIRCLE_RADIUS_VERTEX_NUM = 8;			// åŠå¾„ã®é ‚ç‚¹æ•°
 
 			float CenterDistance;
 			float GraphCenterDistance;
@@ -568,30 +568,30 @@ namespace DXLibRef {
 			std::array<float, CIRCLE_ANGLE_VERTEX_NUM> AngleSinTable{};
 			std::array<float, CIRCLE_RADIUS_VERTEX_NUM> InCircleCosTable{};
 
-			// ƒXƒ^ƒbƒN‚ÉÏ‚Ş‚É‚Í‘å‚«‚¢‚Ì‚Å static ”z—ñ‚É‚µ‚Ü‚µ‚½
+			// ã‚¹ã‚¿ãƒƒã‚¯ã«ç©ã‚€ã«ã¯å¤§ãã„ã®ã§ static é…åˆ—ã«ã—ã¾ã—ãŸ
 			static VERTEX2D Vertex[CIRCLE_RADIUS_VERTEX_NUM * CIRCLE_ANGLE_VERTEX_NUM];
 			static WORD Index[CIRCLE_ANGLE_VERTEX_NUM * 6 * (CIRCLE_RADIUS_VERTEX_NUM - 1)];
 
-			// Å‰‚É•’Ê‚É•`‰æ
+			// æœ€åˆã«æ™®é€šã«æç”»
 			ScreenHandle.DrawGraph(0, 0, false);
 
-			// •`‰æƒJƒ‰[‚ğì¬‚µ‚Ä‚¨‚­
+			// æç”»ã‚«ãƒ©ãƒ¼ã‚’ä½œæˆã—ã¦ãŠã
 			DiffuseColor = GetColorU8(255, 255, 255, 255);
 
-			// ŠOü•”•ª—p‚Ì Sin, Cos ƒe[ƒuƒ‹‚ğì¬‚·‚é
+			// å¤–å‘¨éƒ¨åˆ†ç”¨ã® Sin, Cos ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½œæˆã™ã‚‹
 			Angle = 0.0f;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop, Angle += DX_PI_F * 2.0f / CIRCLE_ANGLE_VERTEX_NUM) {
 				AngleSinTable[loop] = std::sin(Angle);
 				AngleCosTable[loop] = std::cos(Angle);
 			}
 
-			// “à‘¤‚Ì·‚èã‚ª‚Á‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¹‚é‰ÓŠ‚Åg—p‚·‚é Cos ƒe[ƒuƒ‹‚ğì¬‚·‚é
+			// å†…å´ã®ç››ã‚Šä¸ŠãŒã£ã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ã›ã‚‹ç®‡æ‰€ã§ä½¿ç”¨ã™ã‚‹ Cos ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½œæˆã™ã‚‹
 			Angle = 0.0f;
 			for (size_t loop = 0; loop < CIRCLE_RADIUS_VERTEX_NUM; ++loop, Angle += (DX_PI_F / 2.0f) / (CIRCLE_RADIUS_VERTEX_NUM - 1)) {
 				InCircleCosTable[loop] = std::cos(Angle);
 			}
 
-			// ƒ|ƒŠƒSƒ“’¸“_ƒCƒ“ƒfƒbƒNƒX‚Ì€”õ
+			// ãƒãƒªã‚´ãƒ³é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®æº–å‚™
 			Ind = Index;
 			for (int loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
 				for (WORD loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM - 1; ++loop2, Ind += 6) {
@@ -610,81 +610,81 @@ namespace DXLibRef {
 				}
 			}
 
-			// ƒoƒCƒŠƒjƒA•âŠÔ•`‰æ‚É‚·‚é
+			// ãƒã‚¤ãƒªãƒ‹ã‚¢è£œé–“æç”»ã«ã™ã‚‹
 			SetDrawMode(DX_DRAWMODE_BILINEAR);
 
 
-			// ŠO‘¤‚Ìƒh[ƒiƒc•”•ª‚ğ•`‰æ
+			// å¤–å´ã®ãƒ‰ãƒ¼ãƒŠãƒ„éƒ¨åˆ†ã‚’æç”»
 
-			// ’†S‚ÉŒü‚©‚¤‚É‚µ‚½‚ª‚Á‚Ä’†S•ûŒü‚ÉƒeƒNƒXƒ`ƒƒÀ•W‚ğ‚¸‚ç‚·
+			// ä¸­å¿ƒã«å‘ã‹ã†ã«ã—ãŸãŒã£ã¦ä¸­å¿ƒæ–¹å‘ã«ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã‚’ãšã‚‰ã™
 			Vert = Vertex;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
-				// g—p‚·‚é Sin, Cos ‚Ì’l‚ğƒZƒbƒg
+				// ä½¿ç”¨ã™ã‚‹ Sin, Cos ã®å€¤ã‚’ã‚»ãƒƒãƒˆ
 				Sin = AngleSinTable[loop];
 				Cos = AngleCosTable[loop];
 
 				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
-					// ‰~‚Ì’†S‚Ü‚Å‚Ì‹——£‚ğZo
+					// å††ã®ä¸­å¿ƒã¾ã§ã®è·é›¢ã‚’ç®—å‡º
 					CenterDistance = Radius;
 
-					// ’†S‚Éˆø‚«‚Ü‚ê‚é‹——£‚ğZo
+					// ä¸­å¿ƒã«å¼•ãè¾¼ã¾ã‚Œã‚‹è·é›¢ã‚’ç®—å‡º
 					AbsorptionDistance = Absorption * static_cast<float>(loop2) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
-					// ’†S‚ÉŒü‚©‚Á‚ÄˆÚ“®‚·‚é‹——£‚ğZo
+					// ä¸­å¿ƒã«å‘ã‹ã£ã¦ç§»å‹•ã™ã‚‹è·é›¢ã‚’ç®—å‡º
 					AbsorptionMoveX = Cos * AbsorptionDistance;
 					AbsorptionMoveY = Sin * AbsorptionDistance;
 
-					// ƒXƒNƒŠ[ƒ“À•W‚ÌŒˆ’è
+					// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã®æ±ºå®š
 					Vert->pos.x = Cos * CenterDistance + static_cast<float>(CenterX);
 					Vert->pos.y = Sin * CenterDistance + static_cast<float>(CenterY);
 					Vert->pos.z = 0.0f;
 
-					// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌƒZƒbƒg
+					// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®ã‚»ãƒƒãƒˆ
 					Vert->u = (Vert->pos.x + AbsorptionMoveX) / static_cast<float>(WindowSizeParts->GetScreenXMax());
 					Vert->v = (Vert->pos.y + AbsorptionMoveY) / static_cast<float>(WindowSizeParts->GetScreenYMax());
 
-					// ‚»‚Ì‘¼‚Ìƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg
+					// ãã®ä»–ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆ
 					Vert->rhw = 1.0f;
 					Vert->dif = DiffuseColor;
 				}
 			}
 
-			// ˜c‚ñ‚¾ƒh[ƒiƒc‚Ì•`‰æ
+			// æ­ªã‚“ã ãƒ‰ãƒ¼ãƒŠãƒ„ã®æç”»
 			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
 
 
-			// “à‘¤‚Ì·‚èã‚ª‚Á‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚é•”•ª‚ğ•`‰æ
+			// å†…å´ã®ç››ã‚Šä¸ŠãŒã£ã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ãˆã‚‹éƒ¨åˆ†ã‚’æç”»
 
-			// Cosƒe[ƒuƒ‹‚É‚µ‚½‚ª‚Á‚ÄƒeƒNƒXƒ`ƒƒÀ•W‚ğ‚¸‚ç‚·
+			// Cosãƒ†ãƒ¼ãƒ–ãƒ«ã«ã—ãŸãŒã£ã¦ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã‚’ãšã‚‰ã™
 			Vert = Vertex;
 			for (size_t loop = 0; loop < CIRCLE_ANGLE_VERTEX_NUM; ++loop) {
-				// g—p‚·‚é Sin, Cos ‚Ì’l‚ğƒZƒbƒg
+				// ä½¿ç”¨ã™ã‚‹ Sin, Cos ã®å€¤ã‚’ã‚»ãƒƒãƒˆ
 				Sin = AngleSinTable[loop];
 				Cos = AngleCosTable[loop];
 
 				for (int loop2 = 0; loop2 < CIRCLE_RADIUS_VERTEX_NUM; ++loop2, ++Vert) {
-					// ‰~‚Ì’†S‚Ü‚Å‚Ì‹——£‚ğZo
+					// å††ã®ä¸­å¿ƒã¾ã§ã®è·é›¢ã‚’ç®—å‡º
 					CenterDistance = InCircleCosTable[static_cast<size_t>(loop2)] * Radius;
 
-					// ‰æ‘œÀ•W‹“_‚Å‚Ì‰~‚Ì’†S‚Ü‚Å‚Ì‹——£‚ğZo
+					// ç”»åƒåº§æ¨™è¦–ç‚¹ã§ã®å††ã®ä¸­å¿ƒã¾ã§ã®è·é›¢ã‚’ç®—å‡º
 					GraphCenterDistance = static_cast<float>((CIRCLE_RADIUS_VERTEX_NUM - 1) - loop2) * (Absorption + Radius) / static_cast<float>(CIRCLE_RADIUS_VERTEX_NUM - 1);
 
-					// ƒXƒNƒŠ[ƒ“À•W‚ÌŒˆ’è
+					// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã®æ±ºå®š
 					Vert->pos.x = Cos * CenterDistance + static_cast<float>(CenterX);
 					Vert->pos.y = Sin * CenterDistance + static_cast<float>(CenterY);
 					Vert->pos.z = 0.0f;
 
-					// ƒeƒNƒXƒ`ƒƒÀ•W‚ÌƒZƒbƒg
+					// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®ã‚»ãƒƒãƒˆ
 					Vert->u = (Cos * GraphCenterDistance + static_cast<float>(CenterX)) / static_cast<float>(WindowSizeParts->GetScreenXMax());
 					Vert->v = (Sin * GraphCenterDistance + static_cast<float>(CenterY)) / static_cast<float>(WindowSizeParts->GetScreenYMax());
 
-					// ‚»‚Ì‘¼‚Ìƒpƒ‰ƒ[ƒ^‚ğƒZƒbƒg
+					// ãã®ä»–ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆ
 					Vert->rhw = 1.0f;
 					Vert->dif = DiffuseColor;
 				}
 			}
 
-			// ’†S‚Ì·‚èã‚ª‚Á‚ÄŒ©‚¦‚é•”•ª‚ğ•`‰æ
+			// ä¸­å¿ƒã®ç››ã‚Šä¸ŠãŒã£ã¦è¦‹ãˆã‚‹éƒ¨åˆ†ã‚’æç”»
 			DrawPrimitiveIndexed2D(Vertex, sizeof(Vertex) / sizeof(VERTEX2D), Index, sizeof(Index) / sizeof(WORD), DX_PRIMTYPE_TRIANGLELIST, ScreenHandle.get(), FALSE);
 		}
 	protected:
@@ -703,7 +703,7 @@ namespace DXLibRef {
 			// TargetGraph->GraphFilterBlt(*pScreenBuffer, DX_GRAPH_FILTER_DOWN_SCALE, 1);
 			TargetGraph->SetDraw_Screen();
 			{
-				// ‰æ–Ê‚ğ˜c‚Ü‚¹‚Ä•`‰æ
+				// ç”»é¢ã‚’æ­ªã¾ã›ã¦æç”»
 				DrawCircleScreen(
 					WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2,
 					static_cast<float>(WindowSizeParts->GetScreenXMax() * 2 / 3), static_cast<float>(WindowSizeParts->GetScreenY(static_cast<int>(PostPassParts->GetDistortionPer()))), *pScreenBuffer);
@@ -741,12 +741,12 @@ namespace DXLibRef {
 	class PostPassGodRay : public PostPassBase {
 		static const int EXTEND = 8;
 	private:
-		GraphHandle						m_Min;			// •`‰æƒXƒNƒŠ[ƒ“
+		GraphHandle						m_Min;			// æç”»ã‚¹ã‚¯ãƒªãƒ¼ãƒ³
 		SoftImageHandle					m_SoftImage;
 		int								GodRayRed = InvalidID;
 		float							GodRayTime = 0.f;
-		ShaderController::ScreenVertex	m_ScreenVertex;					// ’¸“_ƒf[ƒ^
-		ShaderController				m_Shader;			// ƒVƒF[ƒ_[
+		ShaderController::ScreenVertex	m_ScreenVertex;					// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
+		ShaderController				m_Shader;			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 		float							range = 1.f;
 	public:
 		PostPassGodRay(void) noexcept {}
@@ -844,7 +844,7 @@ namespace DXLibRef {
 	};
 	class PostPassScope : public PostPassBase {
 	private:
-		ShaderController				m_Shader;			// ƒVƒF[ƒ_[
+		ShaderController				m_Shader;			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	public:
 		PostPassScope(void) noexcept {}
 		PostPassScope(const PostPassScope&) = delete;
@@ -864,12 +864,12 @@ namespace DXLibRef {
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			if (!PostPassParts->is_lens()) { return; }
-			// ƒŒƒ“ƒY
+			// ãƒ¬ãƒ³ã‚º
 			TargetGraph->SetDraw_Screen(false);
 			{
 				this->m_Shader.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 				this->m_Shader.SetPixelParam(3, PostPassParts->zoom_xpos(), PostPassParts->zoom_ypos(), PostPassParts->zoom_size(), PostPassParts->zoom_lens());
-				ColorGraph->SetUseTextureToShader(0);	// g—p‚·‚éƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg
+				ColorGraph->SetUseTextureToShader(0);	// ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ
 				this->m_Shader.Draw();
 				SetUseTextureToShader(0, InvalidID);
 			}
@@ -877,7 +877,7 @@ namespace DXLibRef {
 	};
 	class PostPassBlackout : public PostPassBase {
 	private:
-		ShaderController				m_Shader;			// ƒVƒF[ƒ_[
+		ShaderController				m_Shader;			// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 	public:
 		PostPassBlackout(void) noexcept {}
 		PostPassBlackout(const PostPassBlackout&) = delete;
@@ -897,12 +897,12 @@ namespace DXLibRef {
 			auto* PostPassParts = PostPassEffect::Instance();
 			auto* WindowSizeParts = WindowSizeControl::Instance();
 			if (!PostPassParts->is_Blackout()) { return; }
-			// ƒŒƒ“ƒY
+			// ãƒ¬ãƒ³ã‚º
 			TargetGraph->SetDraw_Screen(false);
 			{
 				this->m_Shader.SetPixelDispSize(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
 				this->m_Shader.SetPixelParam(3, PostPassParts->GetBlackoutPer(), 0.f, 0.f, 0.f);
-				ColorGraph->SetUseTextureToShader(0);	// g—p‚·‚éƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg
+				ColorGraph->SetUseTextureToShader(0);	// ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ
 				this->m_Shader.Draw();
 				SetUseTextureToShader(0, InvalidID);
 			}
@@ -913,9 +913,9 @@ namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
 	void		ShadowDraw::SetupCam(Vector3DX Center, float scale) const noexcept {
 		ClearDrawScreen();
-		SetupCamera_Ortho(30.f * scale * Scale3DRate);		// ƒJƒƒ‰‚Ìƒ^ƒCƒv‚ğ³Ë‰eƒ^ƒCƒv‚ÉƒZƒbƒgA•`‰æ”ÍˆÍ‚àw’è
-		SetCameraNearFar(0.05f * scale * Scale3DRate, 60.f * scale * Scale3DRate);		// •`‰æ‚·‚é‰œs‚«”ÍˆÍ‚ğƒZƒbƒg
-		// ƒJƒƒ‰‚ÌˆÊ’u‚Æ’‹“_‚ÍƒXƒe[ƒW‘S‘Ì‚ªŒ©“n‚¹‚éˆÊ’u
+		SetupCamera_Ortho(30.f * scale * Scale3DRate);		// ã‚«ãƒ¡ãƒ©ã®ã‚¿ã‚¤ãƒ—ã‚’æ­£å°„å½±ã‚¿ã‚¤ãƒ—ã«ã‚»ãƒƒãƒˆã€æç”»ç¯„å›²ã‚‚æŒ‡å®š
+		SetCameraNearFar(0.05f * scale * Scale3DRate, 60.f * scale * Scale3DRate);		// æç”»ã™ã‚‹å¥¥è¡Œãç¯„å›²ã‚’ã‚»ãƒƒãƒˆ
+		// ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã¨æ³¨è¦–ç‚¹ã¯ã‚¹ãƒ†ãƒ¼ã‚¸å…¨ä½“ãŒè¦‹æ¸¡ã›ã‚‹ä½ç½®
 		auto Vec = this->m_ShadowVec;
 		if (this->m_ShadowVec.x == 0.f && this->m_ShadowVec.z == 0.f) {
 			Vec.z = (0.1f);
@@ -924,7 +924,7 @@ namespace DXLibRef {
 	}
 	void		ShadowDraw::Update(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
 		this->m_Scale = Scale;
-		// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚Ì€”õ‚ğs‚¤
+		// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã®æº–å‚™ã‚’è¡Œã†
 		DepthBaseScreenHandle.SetRenderTargetToShader(0);
 		SetRenderTargetToShader(1, InvalidID);
 		DepthScreenHandle.SetRenderTargetToShader(2);
@@ -940,7 +940,7 @@ namespace DXLibRef {
 	}
 	void		ShadowDraw::UpdateFar(std::function<void()> Shadowdoing, Vector3DX Center, float Scale) noexcept {
 		this->m_ScaleFar = Scale;
-		// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚Ì€”õ‚ğs‚¤
+		// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã®æº–å‚™ã‚’è¡Œã†
 		DepthBaseScreenHandle.SetRenderTargetToShader(0);
 		SetRenderTargetToShader(1, InvalidID);
 		DepthFarScreenHandle.SetRenderTargetToShader(2);
@@ -956,10 +956,10 @@ namespace DXLibRef {
 	}
 	void		ShadowDraw::SetDraw(std::function<void()> doing_rigid, std::function<void()> doing, Camera3DInfo tmp_cam) noexcept {
 		auto* OptionParts = OptionManager::Instance();
-		BaseShadowHandle.SetUseTextureToShader(0);				// ‰e—p[“x‹L˜^‰æ‘œ‚ğƒeƒNƒXƒ`ƒƒ‚ÉƒZƒbƒg
+		BaseShadowHandle.SetUseTextureToShader(0);				// å½±ç”¨æ·±åº¦è¨˜éŒ²ç”»åƒã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã«ã‚»ãƒƒãƒˆ
 		DepthScreenHandle.SetUseTextureToShader(1);
 		DepthFarScreenHandle.SetUseTextureToShader(2);
-		// ‰e‚ÌŒ‹‰Ê‚ğo—Í
+		// å½±ã®çµæœã‚’å‡ºåŠ›
 		tmp_cam.SetCamInfo(tmp_cam.GetCamFov(), 0.01f * Scale3DRate, 30.f * Scale3DRate);
 		BaseShadowHandle.SetDraw_Screen();
 		tmp_cam.FlipCamInfo();
@@ -973,9 +973,9 @@ namespace DXLibRef {
 			this->m_ShaderRigid.SetVertexCameraMatrix(5, this->m_CamViewMatrix[1], this->m_CamProjectionMatrix[1]);
 			this->m_ShaderRigid.Draw_lamda(doing_rigid);
 		}
-		SetUseTextureToShader(1, InvalidID);				// g—pƒeƒNƒXƒ`ƒƒ‚Ìİ’è‚ğ‰ğœ
-		SetUseTextureToShader(2, InvalidID);				// g—pƒeƒNƒXƒ`ƒƒ‚Ìİ’è‚ğ‰ğœ
-		// Œãˆ—
+		SetUseTextureToShader(1, InvalidID);				// ä½¿ç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®šã‚’è§£é™¤
+		SetUseTextureToShader(2, InvalidID);				// ä½¿ç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®šã‚’è§£é™¤
+		// å¾Œå‡¦ç†
 		BaseShadowHandle.GraphBlend(DepthBaseScreenHandle, 255, DX_GRAPH_BLEND_RGBA_SELECT_MIX,
 			DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_G, DX_RGBA_SELECT_SRC_R);
 	}
@@ -1000,9 +1000,9 @@ namespace DXLibRef {
 		this->m_PrevShadow = OptionParts->GetParamInt(EnumSaveParam::shadow) > 0;
 		BaseShadowHandle.Make(WindowSizeParts->GetScreenXMax() / EXTEND, WindowSizeParts->GetScreenYMax() / EXTEND, TRUE);
 		int size = 2 << 10;
-		DepthBaseScreenHandle.Make(size, size, FALSE);			// [“xƒoƒbƒtƒ@—p‚Ìì¬
-		DepthScreenHandle.MakeDepth(size, size);					// [“xƒoƒbƒtƒ@‚Ìì¬
-		DepthFarScreenHandle.MakeDepth(size, size);				// [“xƒoƒbƒtƒ@‚Ìì¬
+		DepthBaseScreenHandle.Make(size, size, FALSE);			// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ç”¨ã®ä½œæˆ
+		DepthScreenHandle.MakeDepth(size, size);					// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆ
+		DepthFarScreenHandle.MakeDepth(size, size);				// æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆ
 		this->m_Shader.Init("CommonData/shader/VS_SoftShadow.vso", "CommonData/shader/PS_SoftShadow.pso");
 		this->m_ShaderRigid.Init("CommonData/shader/VS_SoftShadow_Rigid.vso", "CommonData/shader/PS_SoftShadow.pso");
 	}
@@ -1032,7 +1032,7 @@ namespace DXLibRef {
 		this->m_BufferScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 		this->m_ColorScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), false);
 		SetCreateDrawValidGraphZBufferBitDepth(Prev);
-		// ƒ|ƒXƒgƒGƒtƒFƒNƒg
+		// ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 		int now = 0;
 		this->m_PostPass[now] = std::make_unique<PostPassBloom>(); ++now;
 		this->m_PostPass[now] = std::make_unique<PostPassDoF>(); ++now;
@@ -1049,7 +1049,7 @@ namespace DXLibRef {
 		this->m_PostPass[now] = std::make_unique<PostPassBlackout>(); ++now;
 
 		this->m_ShadowDraw = std::make_unique<ShadowDraw>();
-		// ƒVƒF[ƒ_[
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamBoolean(EnumProjectSettingParam::PBR)) {
 			this->m_PBR_Shader.Init("CommonData/shader/VS_PBR3D.vso", "CommonData/shader/PS_PBR3D.pso");
@@ -1058,12 +1058,12 @@ namespace DXLibRef {
 	}
 	void		PostPassEffect::Init(void) noexcept {
 		UpdateActive();
-		// ‰e¶¬
+		// å½±ç”Ÿæˆ
 		this->m_ShadowDraw->UpdateActive();
 	}
 	void		PostPassEffect::Dispose(void) noexcept {
 		ResetAllBuffer();
-		// ƒ|ƒXƒgƒGƒtƒFƒNƒg
+		// ãƒã‚¹ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 		for (auto& P : this->m_PostPass) {
 			if (!P) { continue; }
 			P.reset();
@@ -1099,7 +1099,7 @@ namespace DXLibRef {
 	}
 	void		PostPassEffect::ResetBuffer(void) noexcept {
 		if (this->m_IsActiveGBuffer) {
-			// ƒŠƒZƒbƒg‘Ö‚í‚è
+			// ãƒªã‚»ãƒƒãƒˆæ›¿ã‚ã‚Š
 			this->m_ColorScreen.SetDraw_Screen();
 			this->m_NormalScreen.SetDraw_Screen();
 			this->m_NormalScreen.FillGraph(128, 128, 255);
@@ -1108,7 +1108,7 @@ namespace DXLibRef {
 		}
 	}
 	void		PostPassEffect::DrawGBuffer(float near_len, float far_len, std::function<void()> done) noexcept {
-		// ƒJƒ‰[ƒoƒbƒtƒ@‚ğ•`‰æ‘ÎÛ0‚ÉA–@üƒoƒbƒtƒ@‚ğ•`‰æ‘ÎÛ1‚Éİ’è
+		// ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã‚’æç”»å¯¾è±¡0ã«ã€æ³•ç·šãƒãƒƒãƒ•ã‚¡ã‚’æç”»å¯¾è±¡1ã«è¨­å®š
 		this->m_BufferScreen.SetRenderTargetToShader(0);
 		if (this->m_IsActiveGBuffer) {
 			this->m_NormalScreen.SetRenderTargetToShader(1);
@@ -1129,11 +1129,11 @@ namespace DXLibRef {
 
 	void		PostPassEffect::SetDrawShadow(const Camera3DInfo& camInfo, std::function<void()> setshadowdoing_rigid, std::function<void()> setshadowdoing) noexcept {
 		auto* OptionParts = OptionManager::Instance();
-		// ‰e
+		// å½±
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-			// ‰e‰æ‘œ‚Ì—pˆÓ
+			// å½±ç”»åƒã®ç”¨æ„
 			this->m_ShadowDraw->SetDraw(setshadowdoing_rigid, setshadowdoing, camInfo);
-			// ƒ\ƒtƒgƒVƒƒƒhƒEd‚Ë
+			// ã‚½ãƒ•ãƒˆã‚·ãƒ£ãƒ‰ã‚¦é‡ã­
 			this->m_BufferScreen.SetDraw_Screen(false);
 			{
 				this->m_ShadowDraw->Draw();
@@ -1142,10 +1142,10 @@ namespace DXLibRef {
 	}
 	void		PostPassEffect::DrawPostProcess(void) noexcept {
 		this->m_BufferScreen.SetDraw_Screen(false);
-		// F–¡•â³
+		// è‰²å‘³è£œæ­£
 		this->m_BufferScreen.GraphFilter(DX_GRAPH_FILTER_LEVEL, this->m_InColorPerMin, this->m_InColorPerMax, static_cast<int>(this->m_InColorGamma * 100), 0, 255);
 		PostPassScreenBufferPool::Instance()->FirstUpdate();
-		// ƒ|ƒXƒgƒpƒXƒGƒtƒFƒNƒg‚Ìbuf‚É•`‰æ
+		// ãƒã‚¹ãƒˆãƒ‘ã‚¹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®bufã«æç”»
 		if (this->m_IsActiveGBuffer) {
 			for (auto& P : this->m_PostPass) {
 				if (!P) { continue; }
@@ -1165,7 +1165,7 @@ namespace DXLibRef {
 	void		PostPassEffect::Update_Shadow(std::function<void()> doing, const Vector3DX& CenterPos, bool IsFar) noexcept {
 		auto* OptionParts = OptionManager::Instance();
 		if (OptionParts->GetParamInt(EnumSaveParam::shadow) > 0) {
-			// ‰e—p‚Ì[“x‹L˜^‰æ‘œ‚Ì€”õ‚ğs‚¤
+			// å½±ç”¨ã®æ·±åº¦è¨˜éŒ²ç”»åƒã®æº–å‚™ã‚’è¡Œã†
 			if (!IsFar) {
 				this->m_ShadowDraw->Update(doing, CenterPos, this->GetShadowScale());
 			}

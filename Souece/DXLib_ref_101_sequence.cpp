@@ -1,13 +1,13 @@
-#include "DXLib_ref_101_sequence.hpp"
+ï»¿#include "DXLib_ref_101_sequence.hpp"
 
 namespace DXLibRef {
 	const SceneControl* SingletonBase<SceneControl>::m_Singleton = nullptr;
 	// --------------------------------------------------------------------------------------------------
 	// 
 	// --------------------------------------------------------------------------------------------------
-	// FPS•\¦
+	// FPSè¡¨ç¤º
 	void SceneControl::FPSDrawer::Initialize(void) noexcept {
-		// ŠeX‚Ì”’l‚ğ‰Šú‰»
+		// å„ã€…ã®æ•°å€¤ã‚’åˆæœŸåŒ–
 		for (auto& f : this->m_FPSAvgs) {
 			f = FrameRate;
 		}
@@ -15,11 +15,11 @@ namespace DXLibRef {
 	}
 	void SceneControl::FPSDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		// m_FPSAvgCount‚Ì”Ô†‚É‘Î‚µ‚Ä¡‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg‚ğ•Û‘¶
+		// m_FPSAvgCountã®ç•ªå·ã«å¯¾ã—ã¦ä»Šã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’ä¿å­˜
 		this->m_FPSAvgs[this->m_FPSAvgCount] = DXLib_refParts->GetFps();
-		// •Û‘¶‚·‚éêŠ‚ğ‚¸‚ç‚·
+		// ä¿å­˜ã™ã‚‹å ´æ‰€ã‚’ãšã‚‰ã™
 		++m_FPSAvgCount %= this->m_Size;
-		// •Û‘¶‚µ‚Ä‚¢‚é‰ß‹‚ÌFPS’l‚Ì•½‹Ï‚ğ‚Æ‚é
+		// ä¿å­˜ã—ã¦ã„ã‚‹éå»ã®FPSå€¤ã®å¹³å‡ã‚’ã¨ã‚‹
 		this->m_FPSAvg = 0.f;
 		for (auto& f : this->m_FPSAvgs) {
 			this->m_FPSAvg += f;
@@ -29,44 +29,44 @@ namespace DXLibRef {
 	void SceneControl::FPSDrawer::DrawFPSCounter(void) const noexcept {
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 		auto* OptionParts = OptionManager::Instance();
-		// FPS‚Ì•½‹Ï’l‚ªİ’è‚µ‚Ä‚¢‚½ãŒÀ’l‚É‘Î‚µ‚Ä‚‚¢‚È‚ç—ÎA’á‚¢‚È‚ç‰©FÔF‚Æ•Ï‰»‚³‚¹‚é
+		// FPSã®å¹³å‡å€¤ãŒè¨­å®šã—ã¦ã„ãŸä¸Šé™å€¤ã«å¯¾ã—ã¦é«˜ã„ãªã‚‰ç·‘ã€ä½ã„ãªã‚‰é»„è‰²èµ¤è‰²ã¨å¤‰åŒ–ã•ã›ã‚‹
 		auto color = White;
 		if (this->m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 2)) {
-			color = Green;// \•ª‚ÉFPS‚ªo‚Ä‚¢‚é
+			color = Green;// ååˆ†ã«FPSãŒå‡ºã¦ã„ã‚‹
 		}
 		else if (this->m_FPSAvg > static_cast<float>(OptionParts->GetParamInt(EnumSaveParam::FpsLimit) - 10)) {
-			color = Yellow;// \•ª‚ÉFPS‚ªo‚Ä‚¢‚È‚¢
+			color = Yellow;// ååˆ†ã«FPSãŒå‡ºã¦ã„ãªã„
 		}
 		else {
-			color = Red;// ‚Ü‚Á‚½‚­FPS‚ªo‚Ä‚¢‚È‚¢
+			color = Red;// ã¾ã£ãŸãFPSãŒå‡ºã¦ã„ãªã„
 		}
-		// FPS’l‚Ì•\¦
+		// FPSå€¤ã®è¡¨ç¤º
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
 			BaseScreenWidth - 8, 8, color, Black, "%5.2f FPS", this->m_FPSAvg);
-		// ƒhƒ[ƒR[ƒ‹(DirectX‚É‰½‰ñ•`‰æw¦‚ğ‘—‚Á‚½‚©)‚Ì•\¦
+		// ãƒ‰ãƒ­ãƒ¼ã‚³ãƒ¼ãƒ«(DirectXã«ä½•å›æç”»æŒ‡ç¤ºã‚’é€ã£ãŸã‹)ã®è¡¨ç¤º
 		DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 			LineHeight, FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP,
 			BaseScreenWidth - 8, 8 + 20, White, Black, "%d Drawcall", GetDrawCallCount());
 	}
-	// ƒ|[ƒY‰æ–Ê
+	// ãƒãƒ¼ã‚ºç”»é¢
 	void SceneControl::PauseDrawer::Update(void) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		// ƒ|[ƒY‰æ–Ê‚Å‚Í“_–Å‚Ì‰‰Z‚ğs‚¤
+		// ãƒãƒ¼ã‚ºç”»é¢ã§ã¯ç‚¹æ»…ã®æ¼”ç®—ã‚’è¡Œã†
 		this->m_PauseFlashCount += DXLib_refParts->GetDeltaTime();
-		// 1•bŒo‚Á‚½‚ç0•b‚ÉƒŠƒZƒbƒg‚·‚é
+		// 1ç§’çµŒã£ãŸã‚‰0ç§’ã«ãƒªã‚»ãƒƒãƒˆã™ã‚‹
 		if (this->m_PauseFlashCount > 1.f) {
 			this->m_PauseFlashCount -= 1.f;
 		}
 	}
 	void SceneControl::PauseDrawer::DrawPause(void) const noexcept {
-		// ƒ|[ƒY‰æ–Ê‚É“ü‚Á‚Ä‚¢‚È‚¢ê‡‚ÍƒXƒ‹[‚·‚é
+		// ãƒãƒ¼ã‚ºç”»é¢ã«å…¥ã£ã¦ã„ãªã„å ´åˆã¯ã‚¹ãƒ«ãƒ¼ã™ã‚‹
 		auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-		// ”¼“§–¾‚ÌˆÃ–‹
+		// åŠé€æ˜ã®æš—å¹•
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 128);
 		DrawCtrls->SetDrawBox(WindowSystem::DrawLayer::Normal, 0, 0, BaseScreenWidth, BaseScreenHeight, Black, TRUE);
 		DrawCtrls->SetAlpha(WindowSystem::DrawLayer::Normal, 255);
-		// ƒJƒEƒ“ƒg‚ª0.5•bˆÈã‚Å‚ ‚ê‚Î Pause ‚Ì•¶š‚ğ•\¦
+		// ã‚«ã‚¦ãƒ³ãƒˆãŒ0.5ç§’ä»¥ä¸Šã§ã‚ã‚Œã° Pause ã®æ–‡å­—ã‚’è¡¨ç¤º
 		if (this->m_PauseFlashCount > 0.5f) {
 			DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic,
 				36, FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP,
@@ -76,14 +76,14 @@ namespace DXLibRef {
 	//
 	void SceneControl::DrawMain(const Camera3DInfo& camInfo, bool Is3D) const noexcept {
 		auto* PostPassParts = PostPassEffect::Instance();
-		// ‘S‚Ä‚Ì‰æ–Ê‚ğ‰Šú‰»
+		// å…¨ã¦ã®ç”»é¢ã‚’åˆæœŸåŒ–
 		PostPassParts->ResetBuffer();
 		if (Is3D) {
-			// ƒJƒƒ‰
+			// ã‚«ãƒ¡ãƒ©
 			PostPassParts->SetCamMat(camInfo);
-			// ‹ó
+			// ç©º
 			PostPassParts->DrawGBuffer(1000.0f, 50000.0f, [this]() { this->m_NowScenesPtr->BG_Draw(); });
-			// ‰“‹——£
+			// é è·é›¢
 			PostPassParts->DrawGBuffer(camInfo.GetCamFar() - 10.f, 1000000.f, [this]() {
 #if defined(_USE_EFFEKSEER_)
 				Effekseer_Sync3DSetting();
@@ -97,7 +97,7 @@ namespace DXLibRef {
 #endif
 				this->m_NowScenesPtr->MainDrawFront(0);
 				});
-			// ’†ŠÔ
+			// ä¸­é–“
 			PostPassParts->DrawGBuffer(camInfo.GetCamNear(), camInfo.GetCamFar(), [this]() {
 #if defined(_USE_EFFEKSEER_)
 				Effekseer_Sync3DSetting();
@@ -111,7 +111,7 @@ namespace DXLibRef {
 #endif
 				this->m_NowScenesPtr->MainDrawFront(1);
 				});
-			// Š‹ß
+			// è‡³è¿‘
 			PostPassParts->DrawGBuffer(0.1f, 0.1f + camInfo.GetCamNear(), [this]() {
 #if defined(_USE_EFFEKSEER_)
 				Effekseer_Sync3DSetting();
@@ -125,18 +125,18 @@ namespace DXLibRef {
 #endif
 				this->m_NowScenesPtr->MainDrawFront(2);
 				});
-			// ‰e
+			// å½±
 			PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
 		}
 		else {
-			// 2D•`‰æ
+			// 2Dæç”»
 			PostPassParts->GetBufferScreen().SetDraw_Screen();
 			{
 				this->m_NowScenesPtr->MainDraw(InvalidID);
 			}
-			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);	// Dof‚ğ–³Œø‰»
+			PostPassParts->Set_DoFNearFar(0.1f, 5.f, 0.05f, 6.f);	// Dofã‚’ç„¡åŠ¹åŒ–
 		}
-		// ƒ|ƒXƒgƒvƒƒZƒX
+		// ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹
 		PostPassParts->DrawPostProcess();
 	}
 	void SceneControl::DrawUICommon(void) const noexcept {
@@ -144,11 +144,11 @@ namespace DXLibRef {
 		auto* KeyGuideParts = KeyGuide::Instance();
 		//
 		this->m_NowScenesPtr->DrawUI_Base();
-		// ƒ|[ƒY•`‰æ‚ğİ’è
+		// ãƒãƒ¼ã‚ºæç”»ã‚’è¨­å®š
 		if (IsPause()) {
 			this->m_PauseDrawer.DrawPause();
 		}
-		// FPS•\¦•`‰æ‚ğİ’è
+		// FPSè¡¨ç¤ºæç”»ã‚’è¨­å®š
 		this->m_FPSDrawer.DrawFPSCounter();
 		KeyGuideParts->Draw();
 		SideLogParts->Draw();
@@ -169,7 +169,7 @@ namespace DXLibRef {
 			auto* KeyGuideParts = KeyGuide::Instance();
 			KeyGuideParts->SetGuideFlip();
 		}
-		//ƒ|ƒbƒvƒAƒbƒv‚ğ‚·‚×‚Äíœ‚Æ‚·‚é
+		//ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚’ã™ã¹ã¦å‰Šé™¤ã¨ã™ã‚‹
 		PopUpParts->EndAll();
 	}
 	//
@@ -185,13 +185,13 @@ namespace DXLibRef {
 		//
 		this->m_NowScenesPtr->Load();
 		//
-		SetUseMaskScreenFlag(FALSE);// ©ˆê•”‰æ–Ê‚ÅƒGƒtƒFƒNƒg‚ªo‚È‚­‚È‚é‚½‚ß“ü‚ê‚é
-		// ƒJƒƒ‰‚Ì‰Šúİ’è
+		SetUseMaskScreenFlag(FALSE);// â†ä¸€éƒ¨ç”»é¢ã§ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒå‡ºãªããªã‚‹ãŸã‚å…¥ã‚Œã‚‹
+		// ã‚«ãƒ¡ãƒ©ã®åˆæœŸè¨­å®š
 		CameraParts->SetMainCamera().SetCamInfo(deg2rad(OptionParts->GetParamBoolean(EnumSaveParam::usevr) ? 120 : OptionParts->GetParamInt(EnumSaveParam::fov)), 0.05f, 200.f);
 		//
 		this->m_NowScenesPtr->Set();
 		KeyGuideParts->SetGuideFlip();
-		// FPS•\¦‚Ì‰Šú‰»
+		// FPSè¡¨ç¤ºã®åˆæœŸåŒ–
 		this->m_FPSDrawer.Initialize();
 	}
 	void SceneControl::Update(void) noexcept {
@@ -209,7 +209,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
-					// ƒ^ƒCƒgƒ‹
+					// ã‚¿ã‚¤ãƒˆãƒ«
 					{
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xmin + 24, ymin + LineHeight, White, Black, LocalizeParts->Get(101));
@@ -221,7 +221,7 @@ namespace DXLibRef {
 
 						bool ret = WindowSystem::SetMsgClickBox(xp1 - 54, yp1, xp1 + 54, yp1 + LineHeight * 2, LineHeight, Gray15, false, true, LocalizeParts->Get(102));
 						if (Pad->GetPadsInfo(Controls::PADS::INTERACT).GetKey().trigger() || ret) {
-							// I—¹ƒtƒ‰ƒO‚ğ—§‚Ä‚é
+							// çµ‚äº†ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 							SetEndGame();
 						}
 					}
@@ -238,7 +238,7 @@ namespace DXLibRef {
 					auto* Pad = PadControl::Instance();
 					auto* DrawCtrls = WindowSystem::DrawControl::Instance();
 					auto* LocalizeParts = LocalizePool::Instance();
-					// ƒ^ƒCƒgƒ‹
+					// ã‚¿ã‚¤ãƒˆãƒ«
 					{
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
 							FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xmin + 24, ymin + LineHeight, White, Black, LocalizeParts->Get(2101));
@@ -261,24 +261,24 @@ namespace DXLibRef {
 			);
 		}
 		Pad->Update();
-		this->m_IsEndScene = !this->m_NowScenesPtr->Update();		// XV
+		this->m_IsEndScene = !this->m_NowScenesPtr->Update();		// æ›´æ–°
 		OptionWindowParts->Update();
-		Set3DSoundListenerPosAndFrontPosAndUpVec(CameraParts->SetMainCamera().GetCamPos().get(), CameraParts->SetMainCamera().GetCamVec().get(), CameraParts->SetMainCamera().GetCamUp().get());		// ‰¹ˆÊ’uw’è
+		Set3DSoundListenerPosAndFrontPosAndUpVec(CameraParts->SetMainCamera().GetCamPos().get(), CameraParts->SetMainCamera().GetCamVec().get(), CameraParts->SetMainCamera().GetCamUp().get());		// éŸ³ä½ç½®æŒ‡å®š
 #if defined(_USE_OPENVR_)
 		VRControl::Instance()->Update();
 #endif
 		Camera3D::Instance()->Update();
 		SideLogParts->Update();
 		PopUpParts->Update();
-		// ƒ|[ƒY‰æ–Ê‚ÌXV
+		// ãƒãƒ¼ã‚ºç”»é¢ã®æ›´æ–°
 		if (IsPause()) {
 			this->m_PauseDrawer.Update();
 		}
-		// ƒ|[ƒY“ü—Í‚É‚æ‚éƒIƒ“ƒIƒt
+		// ãƒãƒ¼ã‚ºå…¥åŠ›ã«ã‚ˆã‚‹ã‚ªãƒ³ã‚ªãƒ•
 		if (Pad->GetPadsInfo(Controls::PADS::INVENTORY).GetKey().trigger()) {
 			ChangePause(!IsPause());
 		}
-		// FPS•\¦‹@”\‚ÌXV
+		// FPSè¡¨ç¤ºæ©Ÿèƒ½ã®æ›´æ–°
 		this->m_FPSDrawer.Update();
 	}
 	void SceneControl::DrawMainLoop(void) const noexcept {
@@ -289,12 +289,12 @@ namespace DXLibRef {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* CameraParts = Camera3D::Instance();
 		if (this->m_NowScenesPtr->Get3DActive()) {
-			// ƒLƒ…[ƒuƒ}ƒbƒv‚ğƒZƒbƒg
+			// ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ã‚’ã‚»ãƒƒãƒˆ
 			{
 				Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos(); Pos.y *= -1.f;
 				PostPassParts->Update_CubeMap([this]() { this->m_NowScenesPtr->CubeMap(); }, Pos);
 			}
-			// ‰e‚ğƒZƒbƒg
+			// å½±ã‚’ã‚»ãƒƒãƒˆ
 			if (PostPassParts->UpdateShadowActive() || this->m_NowScenesPtr->GetIsFirstLoop() || this->m_NowScenesPtr->PopIsUpdateFarShadow()) {
 				Vector3DX Pos = CameraParts->GetMainCamera().GetCamPos();
 				Pos.x = 0.f;
@@ -303,14 +303,14 @@ namespace DXLibRef {
 			}
 			PostPassParts->Update_Shadow([this] { this->m_NowScenesPtr->ShadowDraw(); }, CameraParts->GetMainCamera().GetCamPos(), false);
 		}
-		// ‰æ–Ê‚É”½‰f
+		// ç”»é¢ã«åæ˜ 
 		if (this->m_NowScenesPtr->Get3DActive()) {
 #if defined(_USE_OPENVR_)
 			if (OptionParts->GetParamBoolean(EnumSaveParam::usevr)) {
 				auto* VRParts = VRControl::Instance();
-				// UI‚ğƒXƒNƒŠ[ƒ“‚É•`‰æ‚µ‚Ä‚¨‚­
+				// UIã‚’ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«æç”»ã—ã¦ãŠã
 				VRParts->SetUpBackUI([this]() { DrawUICommon(); });
-				// VR‚ÉˆÚ‚·
+				// VRã«ç§»ã™
 				for (char loop = 0; loop < 2; ++loop) {
 					Camera3DInfo tmp_cam = CameraParts->GetMainCamera();
 					tmp_cam.SetCamPos(
@@ -319,10 +319,10 @@ namespace DXLibRef {
 						tmp_cam.GetCamUp()
 					);
 					DrawMain(tmp_cam, true);
-					// ‚»‚ê‚¼‚ê‚Ì–Ú‚É“à—e‚ğ‘—M
+					// ãã‚Œãã‚Œã®ç›®ã«å†…å®¹ã‚’é€ä¿¡
 					VRParts->SubmitDraw(loop, PostPassParts->GetBufferScreen(), [this]() { DrawUIFront(); });
 				}
-				// ƒfƒBƒXƒvƒŒƒC•`‰æ
+				// ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤æç”»
 				GraphHandle::SetDraw_Screen((int32_t)(DX_SCREEN_BACK), true);
 				{
 					FillGraph(GetDrawScreen(), 0, 0, 0);
@@ -344,7 +344,7 @@ namespace DXLibRef {
 		if (!OptionParts->GetParamBoolean(EnumSaveParam::usevr))
 #endif
 		{
-			// ƒfƒBƒXƒvƒŒƒC•`‰æ
+			// ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤æç”»
 			GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 			{
 				int Prev = GetDrawMode();
@@ -359,15 +359,15 @@ namespace DXLibRef {
 	}
 	void SceneControl::NextMainLoop(void) noexcept {
 		LightPool::Instance()->Dispose();
-		this->m_NowScenesPtr->Dispose();										// ¡‚ÌƒV[ƒ“‚©‚ç‚Ì‰ğ•ú
+		this->m_NowScenesPtr->Dispose();										// ä»Šã®ã‚·ãƒ¼ãƒ³ã‹ã‚‰ã®è§£æ”¾
 		if (this->IsEndGame()) {
-			this->m_NowScenesPtr->Dispose_Load();								// ƒ[ƒh‚µ‚Ä‚¢‚½ƒf[ƒ^‚ğ”jŠü
+			this->m_NowScenesPtr->Dispose_Load();								// ãƒ­ãƒ¼ãƒ‰ã—ã¦ã„ãŸãƒ‡ãƒ¼ã‚¿ã‚’ç ´æ£„
 		}
 		else {
-			if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// ¡‚ÌƒV[ƒ“‚ÆŸ‚ÌƒV[ƒ“‚Æ‚ª•Ê‚ÌƒV[ƒ“‚È‚ç
-				this->m_NowScenesPtr->Dispose_Load();								// ƒ[ƒh‚µ‚Ä‚¢‚½ƒf[ƒ^‚ğ”jŠü
+			if (this->m_NowScenesPtr != this->m_NowScenesPtr->Get_Next()) {	// ä»Šã®ã‚·ãƒ¼ãƒ³ã¨æ¬¡ã®ã‚·ãƒ¼ãƒ³ã¨ãŒåˆ¥ã®ã‚·ãƒ¼ãƒ³ãªã‚‰
+				this->m_NowScenesPtr->Dispose_Load();								// ãƒ­ãƒ¼ãƒ‰ã—ã¦ã„ãŸãƒ‡ãƒ¼ã‚¿ã‚’ç ´æ£„
 			}
-			this->m_NowScenesPtr = this->m_NowScenesPtr->Get_Next();	// Ÿ‚ÌƒV[ƒ“‚Ö‘JˆÚ
+			this->m_NowScenesPtr = this->m_NowScenesPtr->Get_Next();	// æ¬¡ã®ã‚·ãƒ¼ãƒ³ã¸é·ç§»
 			Initialize();
 		}
 	}

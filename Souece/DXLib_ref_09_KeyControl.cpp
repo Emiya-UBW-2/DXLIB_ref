@@ -1,20 +1,20 @@
-#include "DXLib_ref.h"
+ï»¿#include "DXLib_ref.h"
 // #include "DXLib_ref_09_KeyControl.hpp"
 
 #include <fstream>
 
 namespace DXLibRef {
-	// ƒVƒ“ƒOƒ‹ƒgƒ“‚ÌÀ‘Ô’è‹`
+	// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã®å®Ÿæ…‹å®šç¾©
 	const PadControl* SingletonBase<PadControl>::m_Singleton = nullptr;
-	// “ü—Íˆ—‚ÉŠî‚Ã‚¢‚ÄXV
+	// å…¥åŠ›å‡¦ç†ã«åŸºã¥ã„ã¦æ›´æ–°
 	void			switchs::Update(bool key) noexcept {
 		auto* DXLib_refParts = DXLib_ref::Instance();
-		//‰Ÿ‚µ‚½‚Æ‹L˜^
+		//æŠ¼ã—ãŸã¨è¨˜éŒ²
 		this->m_prevpress = this->m_press;
 		this->m_press = key;
-		//ƒŠƒs[ƒgˆ—
-		this->m_repeat = trigger();//‰Ÿ‚µ‚½uŠÔ‚©A‚à‚µ‚­‚Í...
-		//‰Ÿ‚µ‚Ä‚©‚çˆê’èŠÔŒãAˆê’èŠÔŠu‚Åtrue‚É
+		//ãƒªãƒ”ãƒ¼ãƒˆå‡¦ç†
+		this->m_repeat = trigger();//æŠ¼ã—ãŸç¬é–“ã‹ã€ã‚‚ã—ãã¯...
+		//æŠ¼ã—ã¦ã‹ã‚‰ä¸€å®šæ™‚é–“å¾Œã€ä¸€å®šé–“éš”ã§trueã«
 		if (this->m_press) {
 			this->m_repeatcount += DXLib_refParts->GetDeltaTime();
 			if (this->m_repeatcount >= this->m_RepeatTime) {
@@ -23,7 +23,7 @@ namespace DXLibRef {
 			}
 		}
 		else {
-			//—£‚µ‚½‚ç‰Ÿ‚µ‚Ä‚©‚ç‚ÌƒJƒEƒ“ƒg‚ğƒŠƒZƒbƒg
+			//é›¢ã—ãŸã‚‰æŠ¼ã—ã¦ã‹ã‚‰ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆ
 			this->m_repeatcount = 0;
 		}
 	}
@@ -73,38 +73,38 @@ namespace DXLibRef {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
 		auto* OptionParts = OptionManager::Instance();
 		auto* KeyGuideParts = KeyGuide::Instance();
-		// ƒRƒ“ƒgƒ[ƒ‹ƒ^ƒCƒvŒˆ’è
+		// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ—æ±ºå®š
 		{
-			//Šî–{‚ÍPC
+			//åŸºæœ¬ã¯PC
 			Controls::ControlType NextControlType = Controls::ControlType::PC;
-			//ƒQ[ƒ€ƒpƒbƒh‚ğŒŸ’m‚µ‚½‚ç
+			//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã‚’æ¤œçŸ¥ã—ãŸã‚‰
 			if (GetJoypadNum() > 0) {
-				//ƒRƒ“ƒgƒ[ƒ‹ƒ^ƒCƒv‚É‡‚í‚¹‚½İ’è‚ğs‚¤
+				//ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ—ã«åˆã‚ã›ãŸè¨­å®šã‚’è¡Œã†
 				NextControlType = (Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
 			}
-			//ˆÈ‘O‚Ìİ’è‚ÆˆÙ‚È‚éê‡‚Í
+			//ä»¥å‰ã®è¨­å®šã¨ç•°ãªã‚‹å ´åˆã¯
 			if (this->m_ControlType != NextControlType) {
-				Save();									//Œ³‚ÌƒRƒ“ƒgƒ[ƒ‹ƒpƒbƒh‚Ìİ’è‚ğ•Û‘¶
-				this->m_ControlType = NextControlType;		//•ÏX
-				Load();									//Ÿ‚ÌƒRƒ“ƒgƒ[ƒ‹ƒpƒbƒh‚Ìî•ñ‚ğƒ[ƒh
-				KeyGuideParts->SetGuideFlip();			//ƒKƒCƒh•\¦‚ğƒAƒbƒvƒf[ƒg
+				Save();									//å…ƒã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒ‘ãƒƒãƒ‰ã®è¨­å®šã‚’ä¿å­˜
+				this->m_ControlType = NextControlType;		//å¤‰æ›´
+				Load();									//æ¬¡ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒ‘ãƒƒãƒ‰ã®æƒ…å ±ã‚’ãƒ­ãƒ¼ãƒ‰
+				KeyGuideParts->SetGuideFlip();			//ã‚¬ã‚¤ãƒ‰è¡¨ç¤ºã‚’ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ
 			}
 		}
-		//ƒ}ƒEƒXÀ•W‚ğæ“¾‚µ‚Ä‚¨‚­
+		//ãƒã‚¦ã‚¹åº§æ¨™ã‚’å–å¾—ã—ã¦ãŠã
 		int PrevX = this->m_MouseX;
 		int PrevY = this->m_MouseY;
-		//ƒ}ƒEƒXÀ•W‚ğæ“¾‚µ‚Ä‚¨‚­
+		//ãƒã‚¦ã‚¹åº§æ¨™ã‚’å–å¾—ã—ã¦ãŠã
 		GetMousePoint(&this->m_MouseX, &this->m_MouseY);
-		this->m_MouseX = this->m_MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UIÀ•WŒn‚É‡‚í‚¹‚Ä•ÏŠ·
-		this->m_MouseY = this->m_MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UIÀ•WŒn‚É‡‚í‚¹‚Ä•ÏŠ·
-		// ƒ^ƒCƒv‚É‡‚í‚¹‚½‘€ì
+		this->m_MouseX = this->m_MouseX * 1000 / WindowSizeParts->GetUIY(1000);//UIåº§æ¨™ç³»ã«åˆã‚ã›ã¦å¤‰æ›
+		this->m_MouseY = this->m_MouseY * 1000 / WindowSizeParts->GetUIY(1000);//UIåº§æ¨™ç³»ã«åˆã‚ã›ã¦å¤‰æ›
+		// ã‚¿ã‚¤ãƒ—ã«åˆã‚ã›ãŸæ“ä½œ
 		switch (GetControlType()) {
 		case Controls::ControlType::XBox:
 		{
-			SetMouseDispFlag(TRUE);//ƒ}ƒEƒX‚Í•K‚¸•\¦
+			SetMouseDispFlag(TRUE);//ãƒã‚¦ã‚¹ã¯å¿…ãšè¡¨ç¤º
 			XINPUT_STATE input;
 			GetJoypadXInputState(DX_INPUT_PAD1, &input);
-			// ¶ƒXƒeƒBƒbƒN
+			// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 			{
 				int LS_X = input.ThumbLX;
 				int LS_Y = -input.ThumbLY;
@@ -112,10 +112,10 @@ namespace DXLibRef {
 					LS_X = input.ThumbRX;
 					LS_Y = -input.ThumbRY;
 				}
-				//XInput‚ª-1000~1000‚É‚È‚é‚æ‚¤‚É•ÏŠ·
+				//XInputãŒ-1000~1000ã«ãªã‚‹ã‚ˆã†ã«å¤‰æ›
 				LS_X = 1000 * LS_X / 32768;
 				LS_Y = 1000 * LS_Y / 32768;
-				//•ÏŠ·‚É‚æ‚èŒë·‚ª”­¶‚µ‚¤‚é‚Ì‚Åƒfƒbƒhƒ][ƒ“‚ğw’è
+				//å¤‰æ›ã«ã‚ˆã‚Šèª¤å·®ãŒç™ºç”Ÿã—ã†ã‚‹ã®ã§ãƒ‡ãƒƒãƒ‰ã‚¾ãƒ¼ãƒ³ã‚’æŒ‡å®š
 				if (abs(LS_X) < 10) { LS_X = 0; }
 				if (abs(LS_Y) < 10) { LS_Y = 0; }
 
@@ -135,7 +135,7 @@ namespace DXLibRef {
 				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_A)].Update(a_key);
 				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_D)].Update(d_key);
 			}
-			// ‰EƒXƒeƒBƒbƒN
+			// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 			{
 				int RS_X = input.ThumbRX;
 				int RS_Y = -input.ThumbRY;
@@ -159,10 +159,10 @@ namespace DXLibRef {
 		break;
 		case Controls::ControlType::PS4:
 		{
-			SetMouseDispFlag(TRUE);//ƒ}ƒEƒX‚Í•K‚¸•\¦
+			SetMouseDispFlag(TRUE);//ãƒã‚¦ã‚¹ã¯å¿…ãšè¡¨ç¤º
 			DINPUT_JOYSTATE input;
 			GetJoypadDirectInputState(DX_INPUT_PAD1, &input);
-			// ¶ƒXƒeƒBƒbƒN
+			// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 			{
 				int LS_X = input.X;
 				int LS_Y = input.Y;
@@ -187,7 +187,7 @@ namespace DXLibRef {
 				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_A)].Update(a_key);
 				this->m_PadsInfo[static_cast<size_t>(Controls::PADS::MOVE_D)].Update(d_key);
 			}
-			// ‰EƒXƒeƒBƒbƒN
+			// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 			{
 				int RS_X = input.Z;
 				int RS_Y = input.Rz;
@@ -208,34 +208,34 @@ namespace DXLibRef {
 		break;
 		case Controls::ControlType::PC:
 		{
-			//ƒ}ƒEƒX‚É‚æ‚é“ü—Í(FPSATPS)‚Ìê‡
+			//ãƒã‚¦ã‚¹ã«ã‚ˆã‚‹å…¥åŠ›(FPSã€TPS)ã®å ´åˆ
 			if (this->m_MouseMoveEnable) {
-				//Å‘O–Ê‚Åƒ|[ƒY’†‚Å‚È‚¢ê‡
+				//æœ€å‰é¢ã§ãƒãƒ¼ã‚ºä¸­ã§ãªã„å ´åˆ
 				if ((GetMainWindowHandle() == GetForegroundWindow()) && !SceneParts->IsPause()) {
-					// ‹“_ˆÚ“®‚Í‘OƒtƒŒ[ƒ€‚©‚ç‚ÌˆÚ“®—Ê
+					// è¦–ç‚¹ç§»å‹•ã¯å‰ãƒ•ãƒ¬ãƒ¼ãƒ ã‹ã‚‰ã®ç§»å‹•é‡
 					this->m_Look_XradAdd = static_cast<float>(this->m_MouseX - WindowSizeParts->GetUIXMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
 					this->m_Look_YradAdd = -static_cast<float>(this->m_MouseY - WindowSizeParts->GetUIYMax() / 2 * 1000 / WindowSizeParts->GetUIY(1000)) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
-					//ˆÚ“®‚ğƒŠƒZƒbƒg
+					//ç§»å‹•ã‚’ãƒªã‚»ãƒƒãƒˆ
 					SetMousePoint(WindowSizeParts->GetUIXMax() / 2, WindowSizeParts->GetUIYMax() / 2);
-					//ƒ}ƒEƒX‚ğ•\¦‚µ‚È‚¢
+					//ãƒã‚¦ã‚¹ã‚’è¡¨ç¤ºã—ãªã„
 					SetMouseDispFlag(FALSE);
 				}
 				else {
-					//ƒ}ƒEƒX‚ğ•\¦
+					//ãƒã‚¦ã‚¹ã‚’è¡¨ç¤º
 					SetMouseDispFlag(TRUE);
-					// ‹“_ˆÚ“®‚Í‚È‚µ‚Æ‚µ‚Äã‘‚«
+					// è¦–ç‚¹ç§»å‹•ã¯ãªã—ã¨ã—ã¦ä¸Šæ›¸ã
 					this->m_Look_XradAdd = 0.f;
 					this->m_Look_YradAdd = 0.f;
 				}
 			}
 			else {
-				// ‹“_ˆÚ“®‚Í‘OƒtƒŒ[ƒ€‚©‚ç‚ÌˆÚ“®—Ê
+				// è¦–ç‚¹ç§»å‹•ã¯å‰ãƒ•ãƒ¬ãƒ¼ãƒ ã‹ã‚‰ã®ç§»å‹•é‡
 				this->m_Look_XradAdd = static_cast<float>(this->m_MouseX - PrevX) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
 				this->m_Look_YradAdd = -static_cast<float>(this->m_MouseY - PrevY) * 2.f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
-				//ƒ}ƒEƒX‚ğ•\¦
+				//ãƒã‚¦ã‚¹ã‚’è¡¨ç¤º
 				SetMouseDispFlag(TRUE);
 			}
-			//ˆÚ“®
+			//ç§»å‹•
 			for (size_t index = 0; auto & p : this->m_PadsInfo) {
 				Controls::PADS Pads = static_cast<Controls::PADS>(index);
 				++index;
@@ -253,7 +253,7 @@ namespace DXLibRef {
 		default:
 			break;
 		}
-		// ƒ{ƒ^ƒ“
+		// ãƒœã‚¿ãƒ³
 		for (size_t index = 0; auto& p : this->m_PadsInfo) {
 			Controls::PADS Pads = static_cast<Controls::PADS>(index);
 			++index;
@@ -267,14 +267,14 @@ namespace DXLibRef {
 			}
 			p.Update(Controls::GetButtonPress(GetControlType(), GetPadsInfo(Pads).GetAssign()));
 		}
-		// ‚»‚Ì‘¼“Áê“ü—Í
+		// ãã®ä»–ç‰¹æ®Šå…¥åŠ›
 		{
 			this->m_MouseClick.Update(GetWindowActiveFlag() ? ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) : false);
 			if (GetWindowActiveFlag()) {
 				this->m_MouseWheelRot = GetMouseWheelRotVol();
 			}
 			else {
-				GetMouseWheelRotVol();//‘O‰ñ‚Æ‚Ì·•ª‚ª“ü‚éd‘g‚İ‚È‚Ì‚ÅƒAƒNƒeƒBƒu‚Å‚È‚¢ê‡‚à’Ê‚µ‚Ä‚Í‚¨‚­‚æ‚¤‚É
+				GetMouseWheelRotVol();//å‰å›ã¨ã®å·®åˆ†ãŒå…¥ã‚‹ä»•çµ„ã¿ãªã®ã§ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã§ãªã„å ´åˆã‚‚é€šã—ã¦ã¯ãŠãã‚ˆã†ã«
 				this->m_MouseWheelRot = 0;
 			}
 		}

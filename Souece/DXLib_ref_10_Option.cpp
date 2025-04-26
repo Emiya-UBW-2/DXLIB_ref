@@ -1,4 +1,4 @@
-#include "DXLib_ref_10_Option.hpp"
+ï»¿#include "DXLib_ref_10_Option.hpp"
 
 namespace DXLibRef {
 	// --------------------------------------------------------------------------------------------------
@@ -51,12 +51,12 @@ namespace DXLibRef {
 				if (retVal > 0) {
 					SetParamInt(EnumSaveParam::Language, (StrCmpW(localeName, L"ja-JP") == 0) ? 0 : 1);
 				}
-				// ‹¤’Êİ’è€–Ú
+				// å…±é€šè¨­å®šé …ç›®
 				if (IsFileExist("data/Setting.txt")) {
 					FileStream.Open("data/Setting.txt");
 				}
 				else {
-					// ƒfƒtƒH’l
+					// ãƒ‡ãƒ•ã‚©å€¤
 					SetParamInt(EnumSaveParam::GraphicsPreset, 3);
 					SetParamInt(EnumSaveParam::DirectXVer, 1);
 					SetParamBoolean(EnumSaveParam::usevr, false);
@@ -94,7 +94,7 @@ namespace DXLibRef {
 				if (FileStream.ComeEof()) { break; }
 				auto ALL = FileStream.SeekLineAndGetStr();
 				if (ALL == "") { continue; }
-				//=‚Ì‰E‘¤‚Ì•¶š‚ğƒJƒ“ƒ}‹æØ‚è‚Æ‚µ‚Ä¯•Ê‚·‚é
+				//=ã®å³å´ã®æ–‡å­—ã‚’ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã¨ã—ã¦è­˜åˆ¥ã™ã‚‹
 				auto LEFT = FileStreamDX::getleft(ALL);
 				auto RIGHT = FileStreamDX::getright(ALL);
 				for (size_t loop : std::views::iota(0, static_cast<int>(EnumSaveParam::Max))) {
@@ -114,7 +114,7 @@ namespace DXLibRef {
 						}
 						break;
 					case EnumParamType::Float:
-						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));// todo ¬”‚©Šm”F
+						SetParamFloat((EnumSaveParam)loop, std::stof(RIGHT));// todo å°æ•°ã‹ç¢ºèª
 						break;
 					case EnumParamType::Else:
 						if (loop == static_cast<size_t>(EnumSaveParam::DirectXVer)) {
@@ -161,7 +161,7 @@ namespace DXLibRef {
 				if (FileStream.ComeEof()) { break; }
 				auto ALL = FileStream.SeekLineAndGetStr();
 				if (ALL == "") { continue; }
-				//=‚Ì‰E‘¤‚Ì•¶š‚ğƒJƒ“ƒ}‹æØ‚è‚Æ‚µ‚Ä¯•Ê‚·‚é
+				//=ã®å³å´ã®æ–‡å­—ã‚’ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã¨ã—ã¦è­˜åˆ¥ã™ã‚‹
 				auto LEFT = FileStreamDX::getleft(ALL);
 				auto RIGHT = FileStreamDX::getright(ALL);
 				for (size_t loop : std::views::iota(0, static_cast<int>(EnumProjectSettingParam::Max))) {
@@ -181,7 +181,7 @@ namespace DXLibRef {
 						}
 						break;
 					case EnumParamType::Float:
-						SetParamFloat((EnumProjectSettingParam)loop, std::stof(RIGHT));// todo ¬”‚©Šm”F
+						SetParamFloat((EnumProjectSettingParam)loop, std::stof(RIGHT));// todo å°æ•°ã‹ç¢ºèª
 						break;
 					case EnumParamType::Else:
 						break;

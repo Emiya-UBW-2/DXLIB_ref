@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -71,7 +71,7 @@ namespace DXLibRef {
 		int											m_ObjectID{ InvalidID };
 		bool										m_ColActive{ false };
 		moves										m_move;
-		Matrix4x4DX									m_PrevMat;// •¨—XV‚Ì‚½‚ß
+		Matrix4x4DX									m_PrevMat;// ç‰©ç†æ›´æ–°ã®ãŸã‚
 		bool										m_IsResetPhysics{ true };
 		bool										m_IsFirstLoop{ true };
 	protected:
@@ -111,7 +111,7 @@ namespace DXLibRef {
 				this->m_ColActive = false;
 			}
 		}
-		// ”»’è‹N“®
+		// åˆ¤å®šèµ·å‹•
 		void			SetupCol(void) noexcept {
 			if (GetCol().IsActive()) {
 				for (int loop : std::views::iota(0, static_cast<int>(GetCol().GetMeshNum()))) {
@@ -122,9 +122,9 @@ namespace DXLibRef {
 		auto			RefreshCol(const Vector3DX& StartPos, const Vector3DX& EndPos, float pRange) noexcept {
 			if (this->m_ColActive) {
 				return true;
-			}				// ‚·‚Å‚É‹N“®‚µ‚Ä‚¢‚é‚È‚ç–³‹
+			}				// ã™ã§ã«èµ·å‹•ã—ã¦ã„ã‚‹ãªã‚‰ç„¡è¦–
 			if (GetMinLenSegmentToPoint(StartPos, EndPos, this->m_move.GetPos()) <= pRange) {
-				// ”»’è‹N“®
+				// åˆ¤å®šèµ·å‹•
 				this->m_ColActive = true;
 				for (int loop : std::views::iota(0, static_cast<int>(GetCol().GetMeshNum()))) {
 					SetCol().RefreshCollInfo(InvalidID, loop);
@@ -133,7 +133,7 @@ namespace DXLibRef {
 			}
 			return false;
 		}
-		// ”»’èæ“¾
+		// åˆ¤å®šå–å¾—
 		auto			GetColCapsule(const Vector3DX& StartPos, const Vector3DX& EndPos, float range, const int sel = 0) const noexcept { return GetCol().CollCheck_Capsule(StartPos, EndPos, range, InvalidID, sel); }
 		auto			GetColLine(const Vector3DX& StartPos, const Vector3DX& EndPos, const int sel = 0) const noexcept { return GetCol().CollCheck_Line(StartPos, EndPos, InvalidID, sel); }
 		void			GetColNearestInAllMesh(const Vector3DX& StartPos, Vector3DX* EndPos) const noexcept {

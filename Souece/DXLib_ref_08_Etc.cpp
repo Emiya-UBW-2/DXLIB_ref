@@ -1,4 +1,4 @@
-#include "DXLib_ref.h"
+ï»¿#include "DXLib_ref.h"
 // #include "DXLib_ref_08_Etc.hpp"
 
 namespace DXLibRef {
@@ -17,11 +17,11 @@ namespace DXLibRef {
 	}
 	static Vector3DX GetScreenPos(const Vector3DX& campos, const Vector3DX& camvec, const Vector3DX& camup, float fov, float near_t, float far_t, const Vector3DX& worldpos) noexcept {
 		auto* WindowSizeParts = WindowSizeControl::Instance();
-		// ƒrƒ…[s—ñ‚ÆË‰es—ñ‚Ìæ“¾
+		// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨å°„å½±è¡Œåˆ—ã®å–å¾—
 		Camera3DInfo tmpcam;
 		tmpcam.SetCamPos(campos, camvec, camup);
 		tmpcam.SetCamInfo(fov, near_t, far_t);
-		// ƒrƒ…[ƒ|[ƒgs—ñiƒXƒNƒŠ[ƒ“s—ñj‚Ìì¬
+		// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆè¡Œåˆ—ï¼ˆã‚¹ã‚¯ãƒªãƒ¼ãƒ³è¡Œåˆ—ï¼‰ã®ä½œæˆ
 		float w = static_cast<float>(WindowSizeParts->GetScreenXMax()) / 2.0f;
 		float h = static_cast<float>(WindowSizeParts->GetScreenYMax()) / 2.0f;
 		MATRIX viewport = {
@@ -30,13 +30,13 @@ namespace DXLibRef {
 			0 , 0 , 1 , 0 ,
 			w , h , 0 , 1
 		};
-		// ƒrƒ…[•ÏŠ·‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“•ÏŠ·
+		// ãƒ“ãƒ¥ãƒ¼å¤‰æ›ã¨ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³å¤‰æ›
 		Vector3DX tmp = Matrix4x4DX::Vtrans(Matrix4x4DX::Vtrans(worldpos, tmpcam.GetViewMatrix()), tmpcam.GetProjectionMatrix());
-		// z‚ÅŠ„‚Á‚Ä-1~1‚Ì”ÍˆÍ‚Éû‚ß‚é
+		// zã§å‰²ã£ã¦-1~1ã®ç¯„å›²ã«åã‚ã‚‹
 		tmp /= tmp.z;
-		// ƒXƒNƒŠ[ƒ“•ÏŠ·
+		// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³å¤‰æ›
 		Vector3DX screenPos = Matrix4x4DX::Vtrans(tmp, viewport);
-		// [“xƒ`ƒFƒbƒN‚ğŠÈ‘f‚É’Ç‰Á
+		// æ·±åº¦ãƒã‚§ãƒƒã‚¯ã‚’ç°¡ç´ ã«è¿½åŠ 
 		if (Vector3DX::Dot(camvec - campos, worldpos - campos) > 0.f) {
 			screenPos.z = 0.5f;
 		}

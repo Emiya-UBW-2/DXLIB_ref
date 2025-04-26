@@ -1,20 +1,20 @@
-#pragma once
+ï»¿#pragma once
 // #include "DXLib_ref.h"
 
 namespace DXLibRef {
 
 	// --------------------------------------------------------------------------------------------------
-	// Šp“x•ÏŠ·
+	// è§’åº¦å¤‰æ›
 	// --------------------------------------------------------------------------------------------------
-	// Šp“x‚©‚çƒ‰ƒWƒAƒ“‚É
-	extern void* enabler;// ƒ_ƒ~[•Ï”
+	// è§’åº¦ã‹ã‚‰ãƒ©ã‚¸ã‚¢ãƒ³ã«
+	extern void* enabler;// ãƒ€ãƒŸãƒ¼å¤‰æ•°
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
 	constexpr float deg2rad(T p1) noexcept { return static_cast<float>(p1) * DX_PI_F / 180.f; }
-	// ƒ‰ƒWƒAƒ“‚©‚çŠp“x‚É
+	// ãƒ©ã‚¸ã‚¢ãƒ³ã‹ã‚‰è§’åº¦ã«
 	template <class T, typename std::enable_if<std::is_arithmetic<T>::value>::type*& = enabler>
 	constexpr float rad2deg(T p1) noexcept { return static_cast<float>(p1) * 180.f / DX_PI_F; }
 
-	// —]Œ·’è—
+	// ä½™å¼¦å®šç†
 	constexpr float GetCosFormula(float a, float b, float c) noexcept {
 		if (b + c > a && c + a > b && a + b > c) {
 			return std::clamp((b * b + c * c - a * a) / (2.f * b * c), -1.f, 1.f);
@@ -32,8 +32,8 @@ namespace DXLibRef {
 	public:
 		Vector3DX(void) noexcept : x(0), y(0), z(0) {}
 		Vector3DX(VECTOR value) noexcept { this->Set(value.x, value.y, value.z); }
-		inline VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					// •ÏŠ·
-		inline static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	// “ü—Í
+		inline VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, this->z); }					// å¤‰æ›
+		inline static const Vector3DX vget(float x, float y, float z) noexcept { return DxLib::VGet(x, y, z); }	// å…¥åŠ›
 		// 
 		inline static const Vector3DX back(void) noexcept { return vget(0.f, 0.f, -1.f); }
 		inline static const Vector3DX down(void) noexcept { return vget(0.f, -1.f, 0.f); }
@@ -49,15 +49,15 @@ namespace DXLibRef {
 		inline float magnitude(void) const noexcept {
 			float Square = sqrMagnitude();
 			return Square < 0.0000001f ? 0.0f : std::sqrtf(Square);
-		}// ƒTƒCƒY
+		}// ã‚µã‚¤ã‚º
 		inline Vector3DX normalized(void) const noexcept {
 			float Size = magnitude();
 			if (Size <= 0.0f) {
 				return vget(-1.0f, -1.0f, -1.0f);
 			}
 			return *this / Size;
-		}		// ³‹K‰»
-		inline float sqrMagnitude(void) const noexcept { return this->x * this->x + this->y * this->y + this->z * this->z; }		// ƒTƒCƒY
+		}		// æ­£è¦åŒ–
+		inline float sqrMagnitude(void) const noexcept { return this->x * this->x + this->y * this->y + this->z * this->z; }		// ã‚µã‚¤ã‚º
 		// 
 		inline bool Equals(const Vector3DX& obj) const noexcept { return *this == obj; }
 		inline void Set(float x1, float y1, float z1) noexcept {
@@ -88,31 +88,31 @@ namespace DXLibRef {
 		// SlerpUnclamped
 		// SmoothDamp
 
-		// ”äŠr
+		// æ¯”è¼ƒ
 		inline bool operator==(const Vector3DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
 		inline bool operator!=(const Vector3DX& obj) const noexcept { return !(*this == obj); }
-		// ‰ÁZ
+		// åŠ ç®—
 		inline Vector3DX operator+(const Vector3DX& obj) const noexcept { return vget(this->x + obj.x, this->y + obj.y, this->z + obj.z); }
 		inline void operator+=(const Vector3DX& obj) noexcept {
 			this->x += obj.x;
 			this->y += obj.y;
 			this->z += obj.z;
 		}
-		// Œ¸Z
+		// æ¸›ç®—
 		inline Vector3DX operator-(const Vector3DX& obj) const noexcept { return vget(this->x - obj.x, this->y - obj.y, this->z - obj.z); }
 		inline void operator-=(const Vector3DX& obj) noexcept {
 			this->x -= obj.x;
 			this->y -= obj.y;
 			this->z -= obj.z;
 		}
-		// æZ
+		// ä¹—ç®—
 		inline Vector3DX operator*(float p1) const noexcept { return vget(this->x * p1, this->y * p1, this->z * p1); }
 		inline void operator*=(float p1) noexcept {
 			this->x *= p1;
 			this->y *= p1;
 			this->z *= p1;
 		}
-		// œZ
+		// é™¤ç®—
 		inline Vector3DX operator/(float p1) const noexcept { return *this * (1.f / p1); }
 		inline void operator/=(float p1) noexcept { *this *= (1.f / p1); }
 	};
@@ -126,8 +126,8 @@ namespace DXLibRef {
 	public:
 		Vector2DX(void) noexcept : x(0), y(0) {}
 		Vector2DX(VECTOR value) noexcept { this->Set(value.x, value.y); }
-		inline VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, 0.f); }				// •ÏŠ·
-		inline static const Vector2DX vget(float x, float y) noexcept { return DxLib::VGet(x, y, 0.f); }	// “ü—Í
+		inline VECTOR get(void) const noexcept { return DxLib::VGet(this->x, this->y, 0.f); }				// å¤‰æ›
+		inline static const Vector2DX vget(float x, float y) noexcept { return DxLib::VGet(x, y, 0.f); }	// å…¥åŠ›
 		// 
 		static const Vector2DX down(void) noexcept { return vget(0.f, -1.f); }
 		static const Vector2DX left(void) noexcept { return vget(-1.f, 0.f); }
@@ -139,15 +139,15 @@ namespace DXLibRef {
 		inline float magnitude(void) const noexcept {
 			float Square = sqrMagnitude();
 			return Square < 0.0000001f ? 0.0f : std::sqrtf(Square);
-		}// ƒTƒCƒY
+		}// ã‚µã‚¤ã‚º
 		inline Vector2DX normalized(void) const noexcept {
 			float Size = magnitude();
 			if (Size <= 0.0f) {
 				return vget(-1.0f, -1.0f);
 			}
 			return *this / Size;
-		}		// ³‹K‰»
-		inline float sqrMagnitude(void) const noexcept { return this->x * this->x + this->y * this->y; }		// ƒTƒCƒY
+		}		// æ­£è¦åŒ–
+		inline float sqrMagnitude(void) const noexcept { return this->x * this->x + this->y * this->y; }		// ã‚µã‚¤ã‚º
 		// 
 		bool Equals(const Vector2DX& obj) const noexcept { return *this == obj; }
 		void Set(float x1, float y1) noexcept {
@@ -177,40 +177,40 @@ namespace DXLibRef {
 		// SlerpUnclamped
 		// SmoothDamp
 
-		// ”äŠr
+		// æ¯”è¼ƒ
 		inline bool operator==(const Vector2DX& obj) const noexcept { return (*this - obj).magnitude() <= 0.001f; }
 		inline bool operator!=(const Vector2DX& obj) const noexcept { return !(*this == obj); }
-		// ‰ÁZ
+		// åŠ ç®—
 		inline Vector2DX operator+(const Vector2DX& obj) const noexcept { return vget(this->x + obj.x, this->y + obj.y); }
 		inline void operator+=(const Vector2DX& obj) noexcept {
 			this->x += obj.x;
 			this->y += obj.y;
 		}
-		// Œ¸Z
+		// æ¸›ç®—
 		inline Vector2DX operator-(const Vector2DX& obj) const noexcept { return vget(this->x - obj.x, this->y - obj.y); }
 		inline void operator-=(const Vector2DX& obj) noexcept {
 			this->x -= obj.x;
 			this->y -= obj.y;
 		}
-		// æZ
+		// ä¹—ç®—
 		inline Vector2DX operator*(float p1) const noexcept { return vget(this->x * p1, this->y * p1); }
 		inline void operator*=(float p1) noexcept {
 			this->x *= p1;
 			this->y *= p1;
 		}
-		// œZ
+		// é™¤ç®—
 		inline Vector2DX operator/(float p1) const noexcept { return *this * (1.f / p1); }
 		inline void operator/=(float p1) noexcept { *this *= (1.f / p1); }
 	};
 	// ---------------------------------------------------------------------------------------------
-	// Matrix 4x4ƒo[ƒWƒ‡ƒ“
+	// Matrix 4x4ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 	// ---------------------------------------------------------------------------------------------
 	class Matrix4x4DX {
 		MATRIX value;
 	public:
 		Matrix4x4DX(void) noexcept : value(DxLib::MGetIdent()) {}
 		Matrix4x4DX(MATRIX value) noexcept { this->value = value; }
-		MATRIX get(void) const noexcept { return this->value; }		// •ÏŠ·
+		MATRIX get(void) const noexcept { return this->value; }		// å¤‰æ›
 		// 
 		static Matrix4x4DX identity(void) noexcept { return DxLib::MGetIdent(); }
 
@@ -223,22 +223,22 @@ namespace DXLibRef {
 		static Matrix4x4DX Mtrans(const Vector3DX& p1) noexcept { return DxLib::MGetTranslate(p1.get()); }
 		static Vector3DX Vtrans(const Vector3DX& p1, const Matrix4x4DX& p2) noexcept { return DxLib::VTransform(p1.get(), p2.get()); }
 		// 
-		Matrix4x4DX inverse(void) const noexcept { return DxLib::MInverse(this->get()); }		// ‹t
-		bool isIdentity(void) const noexcept { return *this == DxLib::MGetIdent(); }		// ‹t
+		Matrix4x4DX inverse(void) const noexcept { return DxLib::MInverse(this->get()); }		// é€†
+		bool isIdentity(void) const noexcept { return *this == DxLib::MGetIdent(); }		// é€†
 		// lossyScale
 		Vector3DX lossyScale(void) const noexcept { return DxLib::MGetSize(this->get()); }
-		Matrix4x4DX rotation(void) const noexcept { return DxLib::MGetRotElem(this->get()); }		// ‹t
-		Matrix4x4DX transpose(void) const noexcept { return DxLib::MTranspose(this->get()); }		// ‹t
+		Matrix4x4DX rotation(void) const noexcept { return DxLib::MGetRotElem(this->get()); }		// é€†
+		Matrix4x4DX transpose(void) const noexcept { return DxLib::MTranspose(this->get()); }		// é€†
 
 		Vector3DX pos(void) const noexcept { return Vtrans(Vector3DX::zero(), this->get()); }
 		Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), rotation()); }
 		Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), rotation()); }
 		Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), rotation()); }
-		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), rotation()); }//¶èÀ•WŒn‚Å‰EèÀ•WŒn‚ÌƒLƒƒƒ‰‚ğ•`‰æ‚µ‚½Û‚Ì³–Ê
+		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), rotation()); }//å·¦æ‰‹åº§æ¨™ç³»ã§å³æ‰‹åº§æ¨™ç³»ã®ã‚­ãƒ£ãƒ©ã‚’æç”»ã—ãŸéš›ã®æ­£é¢
 		// 
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
-			if (std::abs(value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1‚Ì
+			if (std::abs(value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1ã®æ™‚
 				if (angle_x) {
 					*angle_x = DX_PI_F / 2.f;
 				}
@@ -249,7 +249,7 @@ namespace DXLibRef {
 					*angle_z = std::atan2f(value.m[0][1], value.m[0][0]);
 				}
 			}
-			else if (std::abs(value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1‚Ì
+			else if (std::abs(value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1ã®æ™‚
 				if (angle_x) {
 					*angle_x = -DX_PI_F / 2.f;
 				}
@@ -283,7 +283,7 @@ namespace DXLibRef {
 			value.m[1][2] = std::sin(x);
 			value.m[2][2] = std::cos(x) * std::cos(y);
 		}
-		// ”äŠr
+		// æ¯”è¼ƒ
 		bool operator==(const Matrix4x4DX& obj) const noexcept {
 			for (int x : std::views::iota(0, 4)) {
 				for (int y : std::views::iota(0, 4)) {
@@ -297,18 +297,18 @@ namespace DXLibRef {
 
 		}
 		bool operator!=(const Matrix4x4DX& obj) const noexcept { return !(*this == obj); }
-		// æZ
+		// ä¹—ç®—
 		Matrix4x4DX operator*(const Matrix4x4DX& obj)  const noexcept { return DxLib::MMult(this->get(), obj.get()); }
 		void operator*=(const Matrix4x4DX& obj) noexcept { *this = *this * obj; }
 	};
 	// ---------------------------------------------------------------------------------------------
-	// Matrix 3x3ƒo[ƒWƒ‡ƒ“
+	// Matrix 3x3ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 	// ---------------------------------------------------------------------------------------------
-	// s—ñ\‘¢‘Ì
+	// è¡Œåˆ—æ§‹é€ ä½“
 	struct MATRIX33 {
 		float					m[3][3];
 	};
-	// ‘ŠŒİ•ÏŠ·
+	// ç›¸äº’å¤‰æ›
 	static void M33toMATRIX(MATRIX* pTarget, const MATRIX33& pAtr) noexcept {
 		*pTarget = DxLib::MGetIdent();
 		for (int x : std::views::iota(0, 3)) {
@@ -325,7 +325,7 @@ namespace DXLibRef {
 		}
 	}
 
-	// ’PˆÊs—ñ‚ğ“¾‚é
+	// å˜ä½è¡Œåˆ—ã‚’å¾—ã‚‹
 	static MATRIX33 M33GetIdent(void) noexcept {
 		static MATRIX33 Result =
 		{
@@ -337,7 +337,7 @@ namespace DXLibRef {
 		};
 		return Result;
 	}
-	// w’è‚Ì‚R²ƒ[ƒJƒ‹‚ÌƒxƒNƒgƒ‹‚ğŠî–{²ã‚ÌƒxƒNƒgƒ‹‚É•ÏŠ·‚·‚és—ñ‚ğ“¾‚é
+	// æŒ‡å®šã®ï¼“è»¸ãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’åŸºæœ¬è»¸ä¸Šã®ãƒ™ã‚¯ãƒˆãƒ«ã«å¤‰æ›ã™ã‚‹è¡Œåˆ—ã‚’å¾—ã‚‹
 	// x' = XAxis.x * x + YAixs.x * y + ZAxis.z * z + Pos.x
 	// y' = XAxis.y * x + YAixs.y * y + ZAxis.y * z + Pos.y
 	// z' = XAxis.z * x + YAixs.z * y + ZAxis.z * z + Pos.z
@@ -352,7 +352,7 @@ namespace DXLibRef {
 		};
 		return Result;
 	}
-	// Šî–{²ã‚ÌƒxƒNƒgƒ‹‚ğw’è‚Ì‚R²ã‚É“Š‰e‚µ‚½ƒxƒNƒgƒ‹‚É•ÏŠ·‚·‚és—ñ‚ğ“¾‚é
+	// åŸºæœ¬è»¸ä¸Šã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’æŒ‡å®šã®ï¼“è»¸ä¸Šã«æŠ•å½±ã—ãŸãƒ™ã‚¯ãƒˆãƒ«ã«å¤‰æ›ã™ã‚‹è¡Œåˆ—ã‚’å¾—ã‚‹
 	// x' = XAxis.x * ( x - Pos.x ) + XAxis.y * ( x - Pos.x ) + XAxis.z * ( x - Pos.x )
 	// y' = YAxis.x * ( x - Pos.x ) + YAxis.y * ( x - Pos.x ) + YAxis.z * ( x - Pos.x )
 	// z' = ZAxis.x * ( x - Pos.x ) + ZAxis.y * ( x - Pos.x ) + ZAxis.z * ( x - Pos.x )
@@ -367,7 +367,7 @@ namespace DXLibRef {
 		};
 		return Result;
 	}
-	// w’è²‚Åw’èŠp“x‰ñ“]‚·‚és—ñ‚ğ“¾‚é
+	// æŒ‡å®šè»¸ã§æŒ‡å®šè§’åº¦å›è»¢ã™ã‚‹è¡Œåˆ—ã‚’å¾—ã‚‹
 	static MATRIX33 M33GetRotAxis(const Vector3DX& RotateAxis, float Rotate) noexcept {
 		MATRIX33 Result{};
 		Vector3DX xv = Vector3DX::right(), yv = Vector3DX::up(), zv = Vector3DX::forward();
@@ -424,7 +424,7 @@ namespace DXLibRef {
 
 		return Result;
 	}
-	// In1 ‚ÌŒü‚«‚©‚ç In2 ‚ÌŒü‚«‚Ö•ÏŠ·‚·‚é‰ñ“]s—ñ‚ğ“¾‚é
+	// In1 ã®å‘ãã‹ã‚‰ In2 ã®å‘ãã¸å¤‰æ›ã™ã‚‹å›è»¢è¡Œåˆ—ã‚’å¾—ã‚‹
 	static MATRIX33 M33GetRotVec2(const Vector3DX& In1, const Vector3DX& In2) noexcept {
 		Vector3DX av = Vector3DX::Cross(In1, In2);
 		if (av.sqrMagnitude() < 0.0000001f) {
@@ -434,7 +434,7 @@ namespace DXLibRef {
 		return M33GetRotAxis(av, rad);
 	}
 
-	// ‹ts—ñ‚ğì¬‚·‚é
+	// é€†è¡Œåˆ—ã‚’ä½œæˆã™ã‚‹
 	static int CreateInverseMatrix33(MATRIX33* Out, const MATRIX33& In) {
 		float detA =
 			In.m[0][0] * In.m[1][1] * In.m[2][2] +
@@ -508,7 +508,7 @@ namespace DXLibRef {
 
 		return TRUE;
 	}
-	// ‹ts—ñ‚ğ“¾‚é
+	// é€†è¡Œåˆ—ã‚’å¾—ã‚‹
 	static MATRIX33 M33Inverse(const MATRIX33& InM) {
 		MATRIX33 Result;
 
@@ -519,7 +519,7 @@ namespace DXLibRef {
 		return Result;
 	}
 
-	// “]’us—ñ‚ğ“¾‚é
+	// è»¢ç½®è¡Œåˆ—ã‚’å¾—ã‚‹
 	static MATRIX33 M33Transpose(const MATRIX33& InM) noexcept {
 		MATRIX33 Result =
 		{
@@ -531,7 +531,7 @@ namespace DXLibRef {
 		};
 		return Result;
 	}
-	// s—ñ‚ÌæZ‚ğs‚¤
+	// è¡Œåˆ—ã®ä¹—ç®—ã‚’è¡Œã†
 	static MATRIX33 M33Mult(const MATRIX33& In1, const MATRIX33& In2) noexcept {
 		MATRIX33 Result =
 		{
@@ -555,7 +555,7 @@ namespace DXLibRef {
 		};
 		return Result;
 	}
-	// s—ñ‚ğg‚Á‚½À•W•ÏŠ·
+	// è¡Œåˆ—ã‚’ä½¿ã£ãŸåº§æ¨™å¤‰æ›
 	static const Vector3DX V33Transform(const Vector3DX& InV, const MATRIX33& InM) noexcept {
 		Vector3DX Result{};
 		Result.x = InV.x * InM.m[0][0] + InV.y * InM.m[1][0] + InV.z * InM.m[2][0];
@@ -569,22 +569,22 @@ namespace DXLibRef {
 	public:
 		Matrix3x3DX(void) noexcept : m_value(M33GetIdent()) {}
 		Matrix3x3DX(MATRIX33 value) noexcept { this->m_value = value; }
-		MATRIX33 get(void) const noexcept { return this->m_value; }		// •ÏŠ·
+		MATRIX33 get(void) const noexcept { return this->m_value; }		// å¤‰æ›
 		MATRIX Get44(void) const noexcept {
 			MATRIX Result;
 			M33toMATRIX(&Result, this->m_value);
 			return Result;
-		}// •ÏŠ·
+		}// å¤‰æ›
 		Matrix4x4DX Get44DX(void) const noexcept {
 			MATRIX Result;
 			M33toMATRIX(&Result, this->m_value);
 			return Result;
-		}// •ÏŠ·
+		}// å¤‰æ›
 		static Matrix3x3DX Get33DX(const Matrix4x4DX& value) noexcept {
 			MATRIX33 Result;
 			MATRIXtoM33(&Result, value.get());
 			return Result;
-		}// •ÏŠ·
+		}// å¤‰æ›
 		// 
 		static Matrix3x3DX identity(void) noexcept { return M33GetIdent(); }
 
@@ -594,19 +594,19 @@ namespace DXLibRef {
 		static Matrix3x3DX RotVec2(const Vector3DX& p1, const Vector3DX& p2) noexcept { return { M33GetRotVec2(p1, p2) }; }
 		static Vector3DX Vtrans(const Vector3DX& p1, const Matrix3x3DX& p2) noexcept { return V33Transform(p1, p2.get()); }
 		// 
-		Matrix3x3DX inverse(void) const noexcept { return M33Inverse(this->get()); }		// ‹t
-		bool isIdentity(void) const noexcept { return *this == M33GetIdent(); }		// ‹t
+		Matrix3x3DX inverse(void) const noexcept { return M33Inverse(this->get()); }		// é€†
+		bool isIdentity(void) const noexcept { return *this == M33GetIdent(); }		// é€†
 		// lossyScale
-		Matrix3x3DX transpose(void) const noexcept { return M33Transpose(this->get()); }		// ‹t
+		Matrix3x3DX transpose(void) const noexcept { return M33Transpose(this->get()); }		// é€†
 
 		Vector3DX xvec(void) const noexcept { return Vtrans(Vector3DX::right(), *this); }
 		Vector3DX yvec(void) const noexcept { return Vtrans(Vector3DX::up(), *this); }
 		Vector3DX zvec(void) const noexcept { return Vtrans(Vector3DX::forward(), *this); }
-		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), *this); }//¶èÀ•WŒn‚Å‰EèÀ•WŒn‚ÌƒLƒƒƒ‰‚ğ•`‰æ‚µ‚½Û‚Ì³–Ê
+		Vector3DX zvec2(void) const noexcept { return Vtrans(Vector3DX::back(), *this); }//å·¦æ‰‹åº§æ¨™ç³»ã§å³æ‰‹åº§æ¨™ç³»ã®ã‚­ãƒ£ãƒ©ã‚’æç”»ã—ãŸéš›ã®æ­£é¢
 		// 
 		void GetRadian(float* angle_x, float* angle_y, float* angle_z) const noexcept {
 			constexpr float threshold = 0.001f;
-			if (std::abs(this->m_value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1‚Ì
+			if (std::abs(this->m_value.m[1][2] - 1.0f) < threshold) { // R(2,1) = sin(x) = 1ã®æ™‚
 				if (angle_x) {
 					*angle_x = DX_PI_F / 2.f;
 				}
@@ -617,7 +617,7 @@ namespace DXLibRef {
 					*angle_z = std::atan2f(this->m_value.m[0][1], this->m_value.m[0][0]);
 				}
 			}
-			else if (std::abs(this->m_value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1‚Ì
+			else if (std::abs(this->m_value.m[1][2] + 1.0f) < threshold) { // R(2,1) = sin(x) = -1ã®æ™‚
 				if (angle_x) {
 					*angle_x = -DX_PI_F / 2.f;
 				}
@@ -651,7 +651,7 @@ namespace DXLibRef {
 			this->m_value.m[1][2] = std::sin(x);
 			this->m_value.m[2][2] = std::cos(x) * std::cos(y);
 		}
-		// ”äŠr
+		// æ¯”è¼ƒ
 		bool operator==(const Matrix3x3DX& obj) const noexcept {
 			for (int x : std::views::iota(0, 3)) {
 				for (int y : std::views::iota(0, 3)) {
@@ -663,16 +663,16 @@ namespace DXLibRef {
 			return true;
 		}
 		bool operator!=(const Matrix3x3DX& obj) const noexcept { return !(*this == obj); }
-		// æZ
+		// ä¹—ç®—
 		Matrix3x3DX operator*(const Matrix3x3DX& obj)  const noexcept { return M33Mult(this->get(), obj.get()); }
 		void operator*=(const Matrix3x3DX& obj) noexcept { *this = *this * obj; }
 	};
 
-	// “_‚Æ‹éŒ`‚Æ‚Ì2D”»’è
+	// ç‚¹ã¨çŸ©å½¢ã¨ã®2Dåˆ¤å®š
 	static bool HitPointToRectangle(int xp, int yp, int x1, int y1, int x2, int y2) noexcept { return (xp >= x1 && xp <= x2 && yp >= y1 && yp <= y2); }
-	// ‹éŒ`‚Æ‹éŒ`‚Æ‚Ì2D”»’è
+	// çŸ©å½¢ã¨çŸ©å½¢ã¨ã®2Dåˆ¤å®š
 	static bool HitRectangleToRectangle(int xp1, int yp1, int xp2, int yp2, int x1, int y1, int x2, int y2) noexcept { return (xp1 < x2 && x1 < xp2) && (yp1 < y2 && y1 < yp2); }
-	// “_‚ÆlŠpŒ`‚Æ‚Ì2D”»’è
+	// ç‚¹ã¨å››è§’å½¢ã¨ã®2Dåˆ¤å®š
 	static bool HitPointToSquare(int xp, int yp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) noexcept {
 		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x2 - x1), static_cast<float>(y2 - y1)), Vector2DX::vget(static_cast<float>(xp - x1), static_cast<float>(yp - y1)))) { return false; }
 		if (0 > Vector2DX::Cross(Vector2DX::vget(static_cast<float>(x3 - x2), static_cast<float>(y3 - y2)), Vector2DX::vget(static_cast<float>(xp - x2), static_cast<float>(yp - y2)))) { return false; }
@@ -681,37 +681,37 @@ namespace DXLibRef {
 		return true;
 	}
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ‰‰Z•â•
+	// æ¼”ç®—è£œåŠ©
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// ‹…‚ÆOŠp‚Æ‚Ì”»’è
+	// çƒã¨ä¸‰è§’ã¨ã®åˆ¤å®š
 	static bool GetHitSphereToTriangle(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Sphere_Triangle(pos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
-	// OŠp‚ÆƒJƒvƒZƒ‹‚Æ‚Ì”»’è
+	// ä¸‰è§’ã¨ã‚«ãƒ—ã‚»ãƒ«ã¨ã®åˆ¤å®š
 	static bool GetHitCapsuleToTriangle(const Vector3DX& startpos, const Vector3DX& endpos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, const Vector3DX& tri_p3) noexcept {
 		return HitCheck_Capsule_Triangle(startpos.get(), endpos.get(), size, tri_p1.get(), tri_p2.get(), tri_p3.get()) == TRUE;
 	}
-	// ‹…‚ÆƒJƒvƒZƒ‹‚Æ‚Ì”»’è
+	// çƒã¨ã‚«ãƒ—ã‚»ãƒ«ã¨ã®åˆ¤å®š
 	static bool GetHitSphereToCapsule(const Vector3DX& pos, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, float size2) noexcept {
 		return HitCheck_Sphere_Capsule(pos.get(), size, tri_p1.get(), tri_p2.get(), size2) == TRUE;
 	}
-	// ƒJƒvƒZƒ‹‚ÆƒJƒvƒZƒ‹‚Æ‚Ì”»’è
+	// ã‚«ãƒ—ã‚»ãƒ«ã¨ã‚«ãƒ—ã‚»ãƒ«ã¨ã®åˆ¤å®š
 	static bool GetHitCheckToCapsule(const Vector3DX& pos1, const Vector3DX& pos2, float size, const Vector3DX& tri_p1, const Vector3DX& tri_p2, float size2) noexcept {
 		return HitCheck_Capsule_Capsule(pos1.get(), pos2.get(), size, tri_p1.get(), tri_p2.get(), size2) == TRUE;
 	}
-	// ’¼ü‚Æ’¼ü‚Ìˆê”Ô‹ß‚¢‹——£
+	// ç›´ç·šã¨ç›´ç·šã®ä¸€ç•ªè¿‘ã„è·é›¢
 	static float GetMinLenSegmentToSegment(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgtstartpos, const Vector3DX& tgtendpos) noexcept {
 		return Segment_Segment_MinLength(startpos.get(), endpos.get(), tgtstartpos.get(), tgtendpos.get());
 	}
-	// ’¼ü‚Æ“_‚Ìˆê”Ô‹ß‚¢“_
+	// ç›´ç·šã¨ç‚¹ã®ä¸€ç•ªè¿‘ã„ç‚¹
 	static float GetMinLenSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) noexcept {
 		return Segment_Point_MinLength(startpos.get(), endpos.get(), tgt.get());
 	}
-	// •½–Ê‚Æ“_‚Ìˆê”Ô‹ß‚¢“_
+	// å¹³é¢ã¨ç‚¹ã®ä¸€ç•ªè¿‘ã„ç‚¹
 	static Vector3DX GetMinPosSegmentToPoint(const Vector3DX& startpos, const Vector3DX& endpos, const Vector3DX& tgt) noexcept {
 		return Plane_Point_MinLength_Position(startpos.get(), endpos.get(), tgt.get());
 	}
-	// ü•ª“¯m‚ÌŒğ·”»’è
+	// ç·šåˆ†åŒå£«ã®äº¤å·®åˆ¤å®š
 	static bool GetSegmenttoSegment(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, SEGMENT_SEGMENT_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
@@ -722,7 +722,7 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->SegA_SegB_MinDist_Square <= (len * len));
 	}
-	// ü•ª‚ÆOŠp‚Æ‚ÌŒğ·”»’è
+	// ç·šåˆ†ã¨ä¸‰è§’ã¨ã®äº¤å·®åˆ¤å®š
 	static bool GetSegmenttoTriangle(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& SegmentBPos1, const Vector3DX& SegmentBPos2, const Vector3DX& SegmentBPos3, SEGMENT_TRIANGLE_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
@@ -734,7 +734,7 @@ namespace DXLibRef {
 		float len = 0.001f;
 		return (Result->Seg_Tri_MinDist_Square <= (len * len));
 	}
-	// ü•ª‚Æ“_‚Æ‚ÌŒğ·”»’è
+	// ç·šåˆ†ã¨ç‚¹ã¨ã®äº¤å·®åˆ¤å®š
 	static bool GetSegmenttoPoint(const Vector3DX& SegmentAPos1, const Vector3DX& SegmentAPos2, const Vector3DX& PointPos, SEGMENT_POINT_RESULT* Result) noexcept {
 		VECTOR Pos1t = SegmentAPos1.get();
 		VECTOR Pos2t = SegmentAPos2.get();
@@ -746,9 +746,9 @@ namespace DXLibRef {
 	}
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	/*ƒNƒ‰ƒX																																	*/
+	/*ã‚¯ãƒ©ã‚¹																																	*/
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-	// 2ŸŒ³U‚èq‰‰Z
+	// 2æ¬¡å…ƒæŒ¯ã‚Šå­æ¼”ç®—
 	class Pendulum2D {
 		float	m_PendulumLength = 10.f;
 		float	m_PendulumMass = 2.f;

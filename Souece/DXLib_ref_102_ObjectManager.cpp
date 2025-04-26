@@ -1,4 +1,4 @@
-#include "DXLib_ref_102_ObjectManager.hpp"
+ï»¿#include "DXLib_ref_102_ObjectManager.hpp"
 
 namespace DXLibRef {
 	const ObjectManager* SingletonBase<ObjectManager>::m_Singleton = nullptr;
@@ -66,7 +66,7 @@ namespace DXLibRef {
 		return nullptr;
 	}
 	void ObjectManager::DelObj(const SharedObj& ptr) noexcept {
-		//À‘Ìíœ
+		//å®Ÿä½“å‰Šé™¤
 		for (auto& object : this->m_ObjectList) {
 			if (!object) { continue; }
 			if (object == ptr) {
@@ -78,13 +78,13 @@ namespace DXLibRef {
 	}
 	//
 	void			ObjectManager::UpdateObject(void) noexcept {
-		// ƒIƒuƒWƒFƒNƒg‚ª‘‚¦‚½ê‡‚É”õ‚¦‚Ä”ÍˆÍfor‚Íg‚í‚È‚¢
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒå¢—ãˆãŸå ´åˆã«å‚™ãˆã¦ç¯„å›²forã¯ä½¿ã‚ãªã„
 		for (size_t loop = 0; loop < this->m_ObjectList.size(); ++loop) {
 			auto& object = this->m_ObjectList[loop];
 			if (!object) { continue; }
 			object->FirstUpdate();
 		}
-		// •¨—‚È‚Ç‹¤’Ê€–Ú‚ÌƒAƒbƒvƒf[ƒg
+		// ç‰©ç†ãªã©å…±é€šé …ç›®ã®ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆ
 		//this->m_ResetP.Update(CheckHitKey(KEY_INPUT_P) != 0);
 		for (auto& object : this->m_ObjectList) {
 			if (!object) { continue; }
@@ -96,7 +96,7 @@ namespace DXLibRef {
 			//*/
 			object->UpdateCommon();
 		}
-		// ƒIƒuƒWƒFƒNƒg‚Ì”rœƒ`ƒFƒbƒN
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ’é™¤ãƒã‚§ãƒƒã‚¯
 		for (auto& object : this->m_ObjectList) {
 			if (!object) { continue; }
 			if (!object->GetIsDelete()) { continue; }
@@ -147,6 +147,6 @@ namespace DXLibRef {
 		}
 		this->m_ModelList.clear();
 
-		this->m_LastUniqueID = 0;// ˆê’Uƒ†ƒj[ƒNID‚àƒŠƒZƒbƒg
+		this->m_LastUniqueID = 0;// ä¸€æ—¦ãƒ¦ãƒ‹ãƒ¼ã‚¯IDã‚‚ãƒªã‚»ãƒƒãƒˆ
 	}
 };

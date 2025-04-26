@@ -1,4 +1,4 @@
-#include "DXLib_ref_103_ObjectBase.hpp"
+ï»¿#include "DXLib_ref_103_ObjectBase.hpp"
 
 namespace DXLibRef {
 	void			ResourceModel::LoadModel(PHYSICS_SETUP TYPE, std::string_view filepath, std::string_view objfilename, std::string_view colfilename) noexcept {
@@ -34,7 +34,7 @@ namespace DXLibRef {
 	}
 	void			ResourceModel::LoadModelData(const std::shared_ptr<BaseObject>& pBase) noexcept {
 		if (this->m_IsEndLoadData) { return; }
-		// ƒtƒŒ[ƒ€
+		// ãƒ•ãƒ¬ãƒ¼ãƒ 
 		{
 			this->m_Frames.clear();
 			if (pBase->GetFrameNum() > 0) {
@@ -45,12 +45,12 @@ namespace DXLibRef {
 				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetFrameNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetFrameName(frameNum) == pBase->GetFrameStr(static_cast<int>(count))) {
-						// ‚»‚ÌƒtƒŒ[ƒ€‚ð“o˜^
+						// ãã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç™»éŒ²
 						this->m_Frames[count].first = frameNum;
 						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[count].first).pos());
 					}
 					else if (frameNum < Max - 1) {
-						continue;// ”ò‚Î‚·
+						continue;// é£›ã°ã™
 					}
 					++count;
 					frameNum = 0;
@@ -60,7 +60,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		// ƒtƒŒ[ƒ€
+		// ãƒ•ãƒ¬ãƒ¼ãƒ 
 		{
 			this->m_Materials.clear();
 			if (pBase->GetMaterialNum() > 0) {
@@ -71,11 +71,11 @@ namespace DXLibRef {
 				size_t count = 0;
 				for (int frameNum = 0, Max = this->m_obj.GetMaterialNum(); frameNum < Max; ++frameNum) {
 					if (this->m_obj.GetMaterialName(frameNum) == pBase->GetMaterialStr(static_cast<int>(count))) {
-						// ‚»‚ÌƒtƒŒ[ƒ€‚ð“o˜^
+						// ãã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç™»éŒ²
 						this->m_Materials[count] = frameNum;
 					}
 					else if (frameNum < Max - 1) {
-						continue;// ”ò‚Î‚·
+						continue;// é£›ã°ã™
 					}
 					++count;
 					frameNum = 0;
@@ -85,7 +85,7 @@ namespace DXLibRef {
 				}
 			}
 		}
-		// ƒVƒFƒCƒv
+		// ã‚·ã‚§ã‚¤ãƒ—
 		{
 			this->m_Shapes.clear();
 			if (pBase->GetShapeNum() > 0) {
@@ -115,11 +115,11 @@ namespace DXLibRef {
 					if (obj->GetMaterialNum() > 0) {
 						for (int loop : std::views::iota(0, obj->GetMaterialNum())) {
 							/*
-							// ƒeƒNƒXƒ`ƒƒ’Ç‰Á‘O‚ÌƒeƒNƒXƒ`ƒƒ”‚ðŽæ“¾‚µ‚Ä‚¨‚­
+							// ãƒ†ã‚¯ã‚¹ãƒãƒ£è¿½åŠ å‰ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£æ•°ã‚’å–å¾—ã—ã¦ãŠã
 							int TexIndex = MV1GetTextureNum(obj->get()());
-							// ƒ‚ƒfƒ‹‚ÅŽg—p‚·‚éƒeƒNƒXƒ`ƒƒ‚ð’Ç‰Á‚·‚é
+							// ãƒ¢ãƒ‡ãƒ«ã§ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’è¿½åŠ ã™ã‚‹
 							MV1AddTexture(obj->get()(), "NrmTex", (this->m_FilePath + "NormalMap.png").c_str());
-							// Žw’è‚Ìƒ}ƒeƒŠƒAƒ‹( ‚±‚±‚Å‚Í—á‚Æ‚µ‚Ä3”Ô‚Ìƒ}ƒeƒŠƒAƒ‹ )‚ÅŽg—p‚·‚é–@üƒ}ƒbƒv‚ðÝ’è‚·‚é
+							// æŒ‡å®šã®ãƒžãƒ†ãƒªã‚¢ãƒ«( ã“ã“ã§ã¯ä¾‹ã¨ã—ã¦3ç•ªã®ãƒžãƒ†ãƒªã‚¢ãƒ« )ã§ä½¿ç”¨ã™ã‚‹æ³•ç·šãƒžãƒƒãƒ—ã‚’è¨­å®šã™ã‚‹
 							MV1SetMaterialNormalMapTexture(obj->get()(), loop, TexIndex);
 							//*/
 
@@ -166,7 +166,7 @@ namespace DXLibRef {
 		if (pBase->m_col.IsActive()) {
 			this->m_col.Duplicate(pBase->m_col);
 		}
-		// ƒtƒŒ[ƒ€
+		// ãƒ•ãƒ¬ãƒ¼ãƒ 
 		this->m_Frames.resize(pBase->m_Frames.size());
 		for (size_t index = 0; auto & f : this->m_Frames) {
 			f.first = pBase->m_Frames[index].first;
@@ -175,13 +175,13 @@ namespace DXLibRef {
 			}
 			++index;
 		}
-		// ƒtƒŒ[ƒ€
+		// ãƒ•ãƒ¬ãƒ¼ãƒ 
 		this->m_Materials.resize(pBase->m_Materials.size());
 		for (size_t index = 0; auto & f : this->m_Materials) {
 			f = pBase->m_Materials[index];
 			++index;
 		}
-		// ƒVƒFƒCƒv
+		// ã‚·ã‚§ã‚¤ãƒ—
 		this->m_Shapes.resize(pBase->m_Shapes.size());
 		for (size_t index = 0; auto & f : this->m_Shapes) {
 			f.first = pBase->m_Shapes[index].first;
@@ -228,7 +228,7 @@ namespace DXLibRef {
 		if (this->m_IsFirstLoop) {
 			this->m_PrevMat = GetObj().GetMatrix();
 		}
-		// ƒVƒFƒCƒvXV
+		// ã‚·ã‚§ã‚¤ãƒ—æ›´æ–°
 		for (size_t index = 0; const auto & f : GetShapesList()) {
 			if (index == 0) {
 				continue;
@@ -236,7 +236,7 @@ namespace DXLibRef {
 			GetObj().SetShapeRate(f.first, (1.f - GetShapesList()[0].second) * f.second);
 			++index;
 		}
-		// •¨—XV
+		// ç‰©ç†æ›´æ–°
 		if (GetPhysicsSetup() == PHYSICS_SETUP::REALTIME) {
 			if (this->m_IsResetPhysics) {
 				this->m_IsResetPhysics = false;
@@ -255,7 +255,7 @@ namespace DXLibRef {
 			}
 			this->m_PrevMat = GetObj().GetMatrix();
 		}
-		// Å‰‚Ìƒ‹[ƒvI‚í‚è
+		// æœ€åˆã®ãƒ«ãƒ¼ãƒ—çµ‚ã‚ã‚Š
 		this->m_IsFirstLoop = false;
 		for (auto& d : this->m_IsDraw) {
 			d = false;

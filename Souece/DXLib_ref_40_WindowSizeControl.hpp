@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DXLib_ref.h"
 
 namespace DXLibRef {
@@ -17,20 +17,20 @@ namespace DXLibRef {
 
 		int							m_ScreenXSize{ BaseScreenWidth };
 		int							m_ScreenYSize{ BaseScreenHeight };
-	public:// ƒQƒbƒ^[
-		// UIˆÈŠO‚ÌƒXƒNƒŠ[ƒ“‹óŠÔ
+	public:// ã‚²ãƒƒã‚¿ãƒ¼
+		// UIä»¥å¤–ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ç©ºé–“
 		const auto		GetScreenX(int value) const noexcept { return value * this->m_ScreenXSize / BaseScreenWidth; }
 		const auto		GetScreenY(int value) const noexcept { return value * this->m_ScreenYSize / BaseScreenHeight; }
-		// UIˆÈŠO‚ÌƒXƒNƒŠ[ƒ“‹óŠÔ(1920,1080‚Ìê‡)
+		// UIä»¥å¤–ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ç©ºé–“(1920,1080ã®å ´åˆ)
 		const auto&		GetScreenXMax(void) const noexcept { return this->m_ScreenXSize; }
 		const auto&		GetScreenYMax(void) const noexcept { return this->m_ScreenYSize; }
-		// UI—p
+		// UIç”¨
 		const auto		GetUIX(int value) const noexcept { return value * this->m_DispXSize / BaseScreenWidth; }
 		const auto		GetUIY(int value) const noexcept { return value * this->m_DispYSize / BaseScreenHeight; }
-		// UI—p(1920,1080‚Ìê‡)
+		// UIç”¨(1920,1080ã®å ´åˆ)
 		const auto&		GetUIXMax(void) const noexcept { return this->m_DispXSize; }
 		const auto&		GetUIYMax(void) const noexcept { return this->m_DispYSize; }
-		// UI—p(1920,1080‚Ìê‡)
+		// UIç”¨(1920,1080ã®å ´åˆ)
 		const auto&		GetSizeXMax(void) const noexcept { return this->m_DispXSize_Border; }
 		const auto&		GetSizeYMax(void) const noexcept { return this->m_DispYSize_Border; }
 	public:
@@ -38,7 +38,7 @@ namespace DXLibRef {
 		void			UpdateWindowSize(void) const noexcept {
 			SetWindowSize(this->m_DispXSize * GetDPI() / BaseDPI, this->m_DispYSize * GetDPI() / BaseDPI);
 		}
-	private:// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	private:// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		WindowSizeControl(void) noexcept{}
 		WindowSizeControl(const WindowSizeControl&) = delete;
 		WindowSizeControl(WindowSizeControl&&) = delete;
