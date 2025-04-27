@@ -67,7 +67,7 @@ namespace DXLibRef {
 		int					m_GeometryShaderhandle{ InvalidID };
 		int					m_PixelShaderhandle{ InvalidID };
 		// シェーダーに渡す追加パラメーターを配するハンドル
-		std::array<int, 2>	LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
+		std::array<int, 3>	LightCameraMatrixConstantBufferHandle{};	// 影用の深度記録画像を作成した際のカメラのビュー行列と射影行列を設定するための定数バッファ
 		std::array<int, 4>	m_VertexShadercbhandle{};
 		int					m_GeometryShaderMatcbhandle{ InvalidID };
 		int					m_PixelShaderSendDispSizeHandle{ InvalidID };
