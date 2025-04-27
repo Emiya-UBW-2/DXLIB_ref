@@ -789,12 +789,12 @@ namespace DXLibRef {
 			this->m_ScreenVertex.SetScreenVertex(xsize, ysize);
 			this->m_Shader.SetPixelCameraMatrix(4, PostPassParts->GetCamViewMat().inverse(), PostPassParts->GetCamProjectionMat().inverse());
 			this->m_Shader.SetPixelCameraMatrix(5, PostPassParts->GetShadowDraw()->GetCamViewMatrix(false), PostPassParts->GetShadowDraw()->GetCamProjectionMatrix(false));
-			// this->m_Shader.SetPixelCameraMatrix(6, PostPassParts->GetShadowDraw()->GetCamViewMatrix(true), PostPassParts->GetShadowDraw()->GetCamProjectionMatrix(true));
+			this->m_Shader.SetPixelCameraMatrix(6, PostPassParts->GetShadowDraw()->GetCamViewMatrix(true), PostPassParts->GetShadowDraw()->GetCamProjectionMatrix(true));
 			pScreenBuffer->SetDraw_Screen();
 			{
 				pDepthScreen->SetUseTextureToShader(0);
 				PostPassParts->GetShadowDraw()->GetDepthScreen().SetUseTextureToShader(1);
-				// PostPassParts->GetShadowDraw()->GetDepthFarScreen().SetUseTextureToShader(2);
+				PostPassParts->GetShadowDraw()->GetDepthFarScreen().SetUseTextureToShader(2);
 				{
 					float Power = 1.f;
 					switch (OptionParts->GetParamInt(EnumSaveParam::shadow)) {
@@ -815,7 +815,7 @@ namespace DXLibRef {
 				}
 				SetUseTextureToShader(0, InvalidID);
 				SetUseTextureToShader(1, InvalidID);
-				// SetUseTextureToShader(2, InvalidID);
+				SetUseTextureToShader(2, InvalidID);
 			}
 			GodRayTime += DXLib_refParts->GetDeltaTime();
 			if (GodRayTime > 1.f) {
