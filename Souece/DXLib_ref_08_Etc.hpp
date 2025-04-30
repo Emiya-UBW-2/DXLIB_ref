@@ -298,14 +298,17 @@ namespace DXLibRef {
 		int			m_SendPort{ InvalidID };				// 通信用ポート
 		IPDATA		m_RecvIp{ 127,0,0,1 };			// 受信用ＩＰアドレスデータ
 		int			m_RecvPort{ 0 };				// 受信用ポート
+		bool		m_IsServer{};
 	public:
-		auto			IsActive(void) const noexcept { return (this->m_Handle != InvalidID); }
+		const auto			IsActive(void) const noexcept { return (this->m_Handle != InvalidID); }
+		const auto&			IsServer(void) const noexcept { return this->m_IsServer; }
 	public:
 		void			SetServerIP(const IPDATA& pIP) noexcept { this->m_SendIP = pIP; }// クライアントは必ず行う
 		bool			Init(bool IsServer, int PORT = InvalidID) noexcept {
 			if (!IsActive()) {
 				this->m_SendPort = PORT;
 				this->m_Handle = MakeUDPSocket(IsServer ? this->m_SendPort : InvalidID);
+				this->m_IsServer = IsServer;
 			}
 			return this->m_Handle != InvalidID;
 		}
