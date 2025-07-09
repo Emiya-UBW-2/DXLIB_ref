@@ -34,7 +34,7 @@ namespace DXLibRef {
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::Language)].SetEnumParamType(EnumParamType::Else);// Language
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::AA)].SetEnumParamType(EnumParamType::Boolean);
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::DrawScale)].SetEnumParamType(EnumParamType::Float);
-		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::LoadMovie)].SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::FlatEarth)].SetEnumParamType(EnumParamType::Boolean);
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::GodRay)].SetEnumParamType(EnumParamType::Boolean);
 
 		this->m_ProjectSettingParams[static_cast<size_t>(EnumProjectSettingParam::PBR)].SetEnumParamType(EnumParamType::Boolean);
@@ -81,7 +81,7 @@ namespace DXLibRef {
 					SetParamInt(EnumSaveParam::ControlType, 2);
 					SetParamBoolean(EnumSaveParam::AA, true);
 					SetParamFloat(EnumSaveParam::DrawScale, 1.f);
-					SetParamBoolean(EnumSaveParam::LoadMovie, true);
+					SetParamBoolean(EnumSaveParam::FlatEarth, false);
 					SetParamBoolean(EnumSaveParam::GodRay, true);
 					return;
 				}

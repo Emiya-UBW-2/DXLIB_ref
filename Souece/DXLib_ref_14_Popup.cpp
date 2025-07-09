@@ -902,12 +902,12 @@ namespace DXLibRef {
 			}
 		);
 		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("LoadMovie", 1139,
-			[this]() { BoolChange(EnumSaveParam::LoadMovie); },
-			[this]() { BoolChange(EnumSaveParam::LoadMovie); },
+		this->m_Elements.back().Init("FlatEarth", 1139,
+			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
+			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
 			[]() {},
 			[]() {},
-			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::LoadMovie); }
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::FlatEarth); }
 		);
 	}
 	void OptionPopup::ElseTabsInfo::Init_Sub(void) noexcept {

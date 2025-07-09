@@ -28,7 +28,7 @@ namespace DXLibRef {
 		Language,
 		AA,
 		DrawScale,
-		LoadMovie,
+		FlatEarth,
 		GodRay,
 		Max,
 	};
@@ -58,7 +58,7 @@ namespace DXLibRef {
 		"Language",
 		"AA",
 		"DrawScale",
-		"LoadMovie",
+		"FlatEarth",
 		"GodRay",
 	};
 
@@ -196,7 +196,7 @@ namespace DXLibRef {
 			case EnumSaveParam::ControlType:
 			case EnumSaveParam::Language:
 			case EnumSaveParam::DrawScale:
-			case EnumSaveParam::LoadMovie:
+			case EnumSaveParam::FlatEarth:
 			case EnumSaveParam::Max:
 			default:
 				break;
@@ -243,7 +243,7 @@ namespace DXLibRef {
 			case EnumSaveParam::Language:
 			case EnumSaveParam::AA:
 			case EnumSaveParam::DrawScale:
-			case EnumSaveParam::LoadMovie:
+			case EnumSaveParam::FlatEarth:
 			case EnumSaveParam::Max:
 			default:
 				break;

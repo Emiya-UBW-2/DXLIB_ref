@@ -237,12 +237,30 @@ namespace DXLibRef {
 		auto		CheckPlayEffect(EffectID ID) const noexcept {
 			return GetEffect(ID).second[EffectNum]->GetIsPlaying();
 		}
+		bool		IsPlayLoopEffect(EffectID ID) noexcept {
+			return GetEffect(ID).second[EffectNum]->GetIsPlaying();
+		}
 		void		SetLoop(EffectID ID, const Vector3DX& pos_t) noexcept {
 			GetEffect(ID).second[EffectNum]->SetLoop(EffectResource::Instance()->m_Sorce[ID], pos_t);
 		}
 		void		Update_LoopEffect(EffectID ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			GetEffect(ID).second[EffectNum]->SetParam(pos_t, nomal_t, scale);
 		}
+
+		int 		SetLoopAny(EffectID ID, const Vector3DX& pos_t) noexcept {
+			GetEffect(ID).second[GetEffect(ID).first]->StopEffect();
+			GetEffect(ID).second[GetEffect(ID).first]->SetLoop(EffectResource::Instance()->m_Sorce[ID], pos_t);
+			int UniqueID = (int)GetEffect(ID).first;
+			++GetEffect(ID).first %= EffectNum;
+			return UniqueID;
+		}
+		void		Update_LoopAnyEffect(EffectID ID, int UniqueID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
+			GetEffect(ID).second[UniqueID]->SetParam(pos_t, nomal_t, scale);
+		}
+		void		StopEffectAny(EffectID ID, int UniqueID) noexcept {
+			GetEffect(ID).second[UniqueID]->StopEffect();
+		}
+
 		void		SetOnce(EffectID ID, const Vector3DX& pos_t, const Vector3DX& nomal_t, float scale = 1.f) noexcept {
 			GetEffect(ID).second[EffectNum]->SetOnce(EffectResource::Instance()->m_Sorce[ID], pos_t, nomal_t, scale);
 		}
