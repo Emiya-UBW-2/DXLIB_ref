@@ -47,6 +47,15 @@ namespace DXLibRef {
 			CHECK,
 			Escape,
 
+			ITEMDELETE1,
+			ITEMDELETE2,
+			ITEMDELETE3,
+			ITEMDELETE4,
+			ITEMDELETE5,
+			ITEMDELETE,
+
+			HEALARMOR,
+
 			MAX,
 		};
 		static const char* PADSStr[static_cast<int>(PADS::MAX)] = {
@@ -77,6 +86,13 @@ namespace DXLibRef {
 			"PRONE",
 			"CHECK",
 			"ESCAPE",
+			"ITEMDELETE1",
+			"ITEMDELETE2",
+			"ITEMDELETE3",
+			"ITEMDELETE4",
+			"ITEMDELETE5",
+			"ITEMDELETE",
+			"HEALARMOR",
 		};
 
 		static const size_t KeyNum = 109 + 3;

@@ -901,14 +901,6 @@ namespace DXLibRef {
 				}
 			}
 		);
-		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("FlatEarth", 1139,
-			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
-			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
-			[]() {},
-			[]() {},
-			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::FlatEarth); }
-		);
 	}
 	void OptionPopup::ElseTabsInfo::Init_Sub(void) noexcept {
 		this->m_Elements.emplace_back();
@@ -1082,6 +1074,22 @@ namespace DXLibRef {
 					}
 				}
 			}
+		);
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("FlatEarth", 1139,
+			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
+			[this]() { BoolChange(EnumSaveParam::FlatEarth); },
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::FlatEarth); }
+		);
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("ActiveLockOn", 1146,
+			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
+			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::ActiveLockOn); }
 		);
 	}
 	void OptionPopup::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, Controls::PADS Sel) noexcept {
@@ -1431,6 +1439,118 @@ namespace DXLibRef {
 					}
 				},
 				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::CHECK); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE1).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1172), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE1)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE1); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE2).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1173), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE2)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE2); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE3).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1174), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE3)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE3); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE4).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1175), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE4)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE4); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE5).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1176), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE5)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE5); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::ITEMDELETE).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(1177), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::ITEMDELETE)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::ITEMDELETE); }
+			);
+		}
+		if (Pad->GetPadsInfo(Controls::PADS::HEALARMOR).IsUse()) {
+			this->m_Elements.emplace_back();
+			this->m_Elements.back().Init(LocalizeParts->Get(3000), KeyInfo,
+				[]() {},
+				[]() {},
+				[]() {},
+				[]() {
+					auto* Pad = PadControl::Instance();
+					if (Pad->ChangeConfig(Controls::PADS::HEALARMOR)) {
+						auto* SE = SoundPool::Instance();
+						SE->Get(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_Select))->Play(DX_PLAYTYPE_BACK, TRUE);
+					}
+				},
+				[this](int xpos, int ypos, bool isMine) { KeyDraw(xpos, ypos, isMine, Controls::PADS::HEALARMOR); }
 			);
 		}
 

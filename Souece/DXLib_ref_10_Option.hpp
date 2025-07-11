@@ -30,6 +30,7 @@ namespace DXLibRef {
 		DrawScale,
 		FlatEarth,
 		GodRay,
+		ActiveLockOn,
 		Max,
 	};
 	static const char* OptionStr[static_cast<int>(EnumSaveParam::Max)] = {
@@ -60,6 +61,7 @@ namespace DXLibRef {
 		"DrawScale",
 		"FlatEarth",
 		"GodRay",
+		"ActiveLockOn",
 	};
 
 	enum class EnumProjectSettingParam {
@@ -197,6 +199,7 @@ namespace DXLibRef {
 			case EnumSaveParam::Language:
 			case EnumSaveParam::DrawScale:
 			case EnumSaveParam::FlatEarth:
+			case EnumSaveParam::ActiveLockOn:
 			case EnumSaveParam::Max:
 			default:
 				break;
@@ -244,6 +247,7 @@ namespace DXLibRef {
 			case EnumSaveParam::AA:
 			case EnumSaveParam::DrawScale:
 			case EnumSaveParam::FlatEarth:
+			case EnumSaveParam::ActiveLockOn:
 			case EnumSaveParam::Max:
 			default:
 				break;
