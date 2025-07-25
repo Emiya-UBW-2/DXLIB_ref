@@ -48,6 +48,7 @@ namespace DXLibRef {
 						// そのフレームを登録
 						this->m_Frames[count].first = frameNum;
 						this->m_Frames[count].second = Matrix4x4DX::Mtrans(this->m_obj.GetFrameLocalMatrix(this->m_Frames[count].first).pos());
+						this->m_Frames[count].third = this->m_obj.GetFrameLocalWorldMatrix(this->m_Frames[count].first);
 					}
 					else if (frameNum < Max - 1) {
 						continue;// 飛ばす
@@ -172,6 +173,7 @@ namespace DXLibRef {
 			f.first = pBase->m_Frames[index].first;
 			if (f.first != InvalidID) {
 				f.second = pBase->m_Frames[index].second;
+				f.third = pBase->m_Frames[index].third;
 			}
 			++index;
 		}

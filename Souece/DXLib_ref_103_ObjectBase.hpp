@@ -10,11 +10,16 @@ namespace DXLibRef {
 	class BaseObject;
 
 	class ResourceModel {
+		struct Frames {
+			int first{};
+			Matrix4x4DX second{};
+			Matrix4x4DX third{};
+		};
 	private:
 		PHYSICS_SETUP								m_PHYSICS_SETUP{ PHYSICS_SETUP::DISABLE };
 		MV1											m_obj;
 		MV1											m_col;
-		std::vector<std::pair<int, Matrix4x4DX>>	m_Frames;
+		std::vector<Frames>							m_Frames;
 		std::vector<int>							m_Materials;
 		std::vector<std::pair<int, float>>			m_Shapes;
 		std::string									m_FilePath;
@@ -41,6 +46,7 @@ namespace DXLibRef {
 		bool			HaveFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first != InvalidID; }
 		const auto&		GetFrame(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].first; }
 		const auto&		GetFrameBaseLocalMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].second; }
+		const auto&		GetFrameBaseLocalWorldMat(int frame) const noexcept { return this->m_Frames[static_cast<size_t>(frame)].third; }
 		bool			HaveMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)] != InvalidID; }
 		const auto&		GetMaterial(int frame) const noexcept { return this->m_Materials[static_cast<size_t>(frame)]; }
 		const auto&		GetFilePath(void) const noexcept { return this->m_FilePath; }
