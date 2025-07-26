@@ -147,8 +147,8 @@ namespace DXLibRef {
 				RS_Y = 1000 * RS_Y / 32768;
 
 				if (!SceneParts->IsPause()) {
-					this->m_Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 0.5f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
-					this->m_Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 0.5f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
+					this->m_Look_XradAdd = std::clamp(static_cast<float>(RS_X) / 100.f * 1.5f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing), -180.f, 180.f);
+					this->m_Look_YradAdd = std::clamp(-static_cast<float>(RS_Y) / 100.f * 1.5f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing), -180.f, 180.f);
 				}
 				else {
 					this->m_Look_XradAdd = 0.f;
@@ -196,8 +196,8 @@ namespace DXLibRef {
 					RS_Y = input.Y;
 				}
 				if (!SceneParts->IsPause()) {
-					this->m_Look_XradAdd = static_cast<float>(RS_X) / 100.f * 0.5f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
-					this->m_Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 0.5f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
+					this->m_Look_XradAdd = static_cast<float>(RS_X) / 100.f * 1.5f * OptionParts->GetParamFloat(EnumSaveParam::Xsensing);
+					this->m_Look_YradAdd = -static_cast<float>(RS_Y) / 100.f * 1.5f * OptionParts->GetParamFloat(EnumSaveParam::Ysensing);
 				}
 				else {
 					this->m_Look_XradAdd = 0.f;
