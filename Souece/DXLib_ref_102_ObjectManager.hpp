@@ -46,6 +46,7 @@ namespace DXLibRef {
 		void			LateUpdateObject(void) noexcept;
 		void			Draw(bool IsCheckDraw, int Range) noexcept;
 		void			Draw_Shadow(void) noexcept;
+		void			Draw_Depth(int layer) noexcept;
 		void			DeleteAll(void) noexcept;
 	};
 };

@@ -132,6 +132,13 @@ namespace DXLibRef {
 			object->DrawShadow();
 		}
 	}
+	void ObjectManager::Draw_Depth(int layer) noexcept {
+		for (auto& object : this->m_ObjectList) {
+			if (!object) { continue; }
+			if (!object->IsActive()) { continue; }
+			object->DrawDepth(layer);
+		}
+	}
 	void			ObjectManager::DeleteAll(void) noexcept {
 		for (auto& object : this->m_ObjectList) {
 			if (!object) { continue; }

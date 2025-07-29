@@ -594,6 +594,8 @@ namespace DXLibRef {
 	public:
 		auto& GetBufferScreen(void) noexcept { return this->m_BufferScreen; }
 	public:
+		const auto& GetDepthScreen(void) const noexcept { return this->m_DepthScreen; }
+
 		const auto&		GetCamViewMat(void) const noexcept { return this->m_CamViewMat; }
 		const auto&		GetCamProjectionMat(void) const noexcept { return this->m_CamProjectionMat; }
 		const auto&		GetShadowDraw(void) const noexcept { return this->m_ShadowDraw; }

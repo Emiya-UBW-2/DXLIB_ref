@@ -174,6 +174,7 @@ namespace DXLibRef {
 		void			UpdateCommon(void) noexcept;
 		virtual void	LateUpdate(void) noexcept {}
 		virtual void	DrawShadow(void) noexcept;
+		virtual void	DrawDepth(int) noexcept {}
 		void			CheckDraw(int Range) noexcept;
 		virtual void	Draw(bool isDrawSemiTrans, int Range) noexcept;
 		void			Dispose(void) noexcept;

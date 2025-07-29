@@ -77,6 +77,7 @@ namespace DXLibRef {
 		void DrawUI_In(void) noexcept { DrawUI_In_Sub(); }
 		void ShadowDraw_Far(void) noexcept { ShadowDraw_Far_Sub(); }
 		void ShadowDraw(void) noexcept { ShadowDraw_Sub(); }
+		void DepthDraw(int layer) noexcept { DepthDraw_Sub(layer); }
 	protected:// 継承物
 		virtual void Load_Sub(void) noexcept {}
 		virtual void LoadEnd_Sub(void) noexcept {}
@@ -93,6 +94,7 @@ namespace DXLibRef {
 		virtual void DrawUI_In_Sub(void) const noexcept {}
 		virtual void ShadowDraw_Far_Sub(void) const noexcept {}
 		virtual void ShadowDraw_Sub(void) const noexcept {}
+		virtual void DepthDraw_Sub(int) const noexcept {}
 
 		virtual void Dispose_Sub(void) noexcept {}
 		virtual void Dispose_Load_Sub(void) noexcept {}
@@ -133,6 +135,11 @@ namespace DXLibRef {
 		FPSDrawer					m_FPSDrawer;				// FPS表示用クラスの実体
 		PauseDrawer					m_PauseDrawer;				// ポーズ画面表示用クラスの実体
 		bool						m_IsPauseActive{ false };	// ポーズ中かどうかのフラグ
+
+		void*						m_Shader{ nullptr };		// シェーダー
+		GraphHandle					m_ColorScreen;	// そのまま透過なしにしたスクリーン
+		GraphHandle					m_NormalScreen;	// 法線のGバッファ
+		GraphHandle					m_DepthScreen;	// 深度のGバッファ
 	private:
 		SceneControl(void) noexcept {}
 		SceneControl(const SceneControl&) = delete;
