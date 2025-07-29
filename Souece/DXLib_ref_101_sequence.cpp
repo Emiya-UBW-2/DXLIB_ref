@@ -131,7 +131,7 @@ namespace DXLibRef {
 			// 影
 			PostPassParts->SetDrawShadow(camInfo, [this]() { this->m_NowScenesPtr->SetShadowDraw_Rigid(); }, [this]() { this->m_NowScenesPtr->SetShadowDraw(); });
 			// 
-			{
+			if (GetUseDirect3DVersion() == DX_DIRECT3D_11 && this->m_Shader) {
 				for (int loop = 0; loop < 2; ++loop) {
 					this->m_DepthScreen.SetDraw_Screen();
 					this->m_DepthScreen.FillGraph(0, 0, 0);
@@ -243,15 +243,17 @@ namespace DXLibRef {
 		// FPS表示の初期化
 		this->m_FPSDrawer.Initialize();
 
-		auto* WindowSizeParts = WindowSizeControl::Instance();
-		auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
-		SetCreateDrawValidGraphZBufferBitDepth(24);
-		this->m_ColorScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
-		this->m_NormalScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), false);
-		this->m_DepthScreen.MakeDepth(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
-		SetCreateDrawValidGraphZBufferBitDepth(Prev);
-		this->m_Shader = new ShaderController;
-		((ShaderController*)this->m_Shader)->Init("CommonData/shader/VS_Depth.vso", "CommonData/shader/PS_Depth.pso");
+		if (GetUseDirect3DVersion() == DX_DIRECT3D_11) {
+			auto* WindowSizeParts = WindowSizeControl::Instance();
+			auto Prev = GetCreateDrawValidGraphZBufferBitDepth();
+			SetCreateDrawValidGraphZBufferBitDepth(24);
+			this->m_ColorScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
+			this->m_NormalScreen.Make(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), false);
+			this->m_DepthScreen.MakeDepth(WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax());
+			SetCreateDrawValidGraphZBufferBitDepth(Prev);
+			this->m_Shader = new ShaderController;
+			((ShaderController*)this->m_Shader)->Init("CommonData/shader/VS_Depth.vso", "CommonData/shader/PS_Depth.pso");
+		}
 	}
 	void SceneControl::Update(void) noexcept {
 #if defined(DEBUG)
@@ -423,11 +425,13 @@ namespace DXLibRef {
 		}
 	}
 	void SceneControl::NextMainLoop(void) noexcept {
-		this->m_ColorScreen.Dispose();
-		this->m_NormalScreen.Dispose();
-		this->m_DepthScreen.Dispose();
-		((ShaderController*)this->m_Shader)->Dispose();
-		delete this->m_Shader;
+		if (GetUseDirect3DVersion() == DX_DIRECT3D_11 && this->m_Shader) {
+			this->m_ColorScreen.Dispose();
+			this->m_NormalScreen.Dispose();
+			this->m_DepthScreen.Dispose();
+			((ShaderController*)this->m_Shader)->Dispose();
+			delete this->m_Shader;
+		}
 
 		LightPool::Instance()->Dispose();
 		this->m_NowScenesPtr->Dispose();										// 今のシーンからの解放
