@@ -293,9 +293,12 @@ namespace DXLibRef {
 			this->m_IsFlipGuide = false;
 			Dispose();
 			// 絶対出すガイド
-			auto* LocalizeParts = LocalizePool::Instance();
-			AddGuide(GetPADStoOffset(Controls::PADS::Escape), LocalizeParts->Get(9990));
-			AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));
+			auto* SceneParts = SceneControl::Instance();
+			if (SceneParts->IsPauseEnable()) {
+				auto* LocalizeParts = LocalizePool::Instance();
+				AddGuide(GetPADStoOffset(Controls::PADS::Escape), LocalizeParts->Get(9990));
+				AddGuide(GetPADStoOffset(Controls::PADS::INVENTORY), LocalizeParts->Get(9995));
+			}
 			// 追加のガイド
 			Guide_Pad();
 		}

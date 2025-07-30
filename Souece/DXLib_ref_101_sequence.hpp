@@ -156,6 +156,7 @@ namespace DXLibRef {
 		void	DrawUIFront(void) const noexcept;
 	public:
 		const auto&		IsEndGame(void) const noexcept { return this->m_IsEndGame; }
+		const auto&		IsPauseEnable(void) const noexcept { return this->m_IsPauseEnable; }
 		const auto&		IsPause(void) const noexcept { return this->m_IsPauseActive && this->m_IsPauseEnable; }
 		const auto&		IsExit(void) const noexcept { return this->m_IsExitSelect; }
 		const auto&		IsRestart(void) const noexcept { return this->m_IsRestartSelect; }
