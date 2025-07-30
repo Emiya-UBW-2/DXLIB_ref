@@ -267,7 +267,7 @@ namespace DXLibRef {
 		auto* SideLogParts = SideLog::Instance();
 		auto* CameraParts = Camera3D::Instance();
 		WindowSystem::DrawControl::Instance()->ClearList();
-		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !this->m_IsExitSelect) {
+		if (Pad->GetPadsInfo(Controls::PADS::Escape).GetKey().trigger() && !this->m_IsExitSelect && this->m_IsPauseEnable) {
 			this->m_IsExitSelect = true;
 			PopUpParts->Add(LocalizeParts->Get(100), 480, 240,
 				[this](int xmin, int ymin, int xmax, int ymax, bool) {
