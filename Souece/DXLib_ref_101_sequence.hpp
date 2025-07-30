@@ -135,6 +135,7 @@ namespace DXLibRef {
 		FPSDrawer					m_FPSDrawer;				// FPS表示用クラスの実体
 		PauseDrawer					m_PauseDrawer;				// ポーズ画面表示用クラスの実体
 		bool						m_IsPauseActive{ false };	// ポーズ中かどうかのフラグ
+		bool						m_IsPauseEnable{ true };	// ポーズ中かどうかのフラグ
 
 		void*						m_Shader{ nullptr };		// シェーダー
 		GraphHandle					m_ColorScreen;	// そのまま透過なしにしたスクリーン
@@ -163,6 +164,12 @@ namespace DXLibRef {
 		void			SetEndGame(void) noexcept { this->m_IsEndGame = true; }
 		void			ChangePause(bool value) noexcept;
 		void			SetFirstScene(const std::shared_ptr<TEMPSCENE>& ptr) noexcept { this->m_NowScenesPtr = ptr; }
+		void			SetPauseEnable(bool value) noexcept {
+			m_IsPauseEnable = value;
+			if (!value) {
+				ChangePause(false);
+			}
+		}
 	public:
 		void			Initialize(void) noexcept;
 		void			Update(void) noexcept;

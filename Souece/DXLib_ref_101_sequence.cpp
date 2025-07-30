@@ -212,6 +212,7 @@ namespace DXLibRef {
 	}
 	//
 	void SceneControl::ChangePause(bool value) noexcept {
+		value &= m_IsPauseEnable;
 		auto* PopUpParts = PopUp::Instance();
 		if (this->m_IsPauseActive != value) {
 			this->m_IsPauseActive = value;
