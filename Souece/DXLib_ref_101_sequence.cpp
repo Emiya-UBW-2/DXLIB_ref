@@ -163,7 +163,9 @@ namespace DXLibRef {
 					}
 					PostPassParts->GetBufferScreen().SetDraw_Screen(false);
 					{
+						SetDrawBright(255, 255, 0);
 						this->m_ColorScreen.DrawGraph(0, 0, true);
+						SetDrawBright(255, 255, 255);
 					}
 				}
 			}
