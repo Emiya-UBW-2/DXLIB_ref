@@ -178,7 +178,11 @@ namespace DXLibRef {
 		std::array<std::vector<std::unique_ptr<Soundhave>>, 2>	m_SoundHas;
 	private:
 		// コンストラクタ
-		SoundPool(void) noexcept {}// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
+		SoundPool(void) noexcept {
+			for (auto& hs : this->m_SoundHas) {
+				hs.reserve(128);
+			}
+		}// コピーしてはいけないので通常のコンストラクタ以外をすべてdelete
 		SoundPool(const SoundPool&) = delete;
 		SoundPool(SoundPool&&) = delete;
 		SoundPool& operator=(const SoundPool&) = delete;
