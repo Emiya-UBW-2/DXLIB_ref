@@ -14,6 +14,7 @@ namespace DXLibRef {
 	enum class SoundType {
 		SE,
 		BGM,
+		VOICE,
 	};
 	// 1音声を管理するハンドル
 	class SoundHandle : public DXHandle {
@@ -175,7 +176,7 @@ namespace DXLibRef {
 		friend class SingletonBase<SoundPool>;
 	private:
 		//各種サウンドを保持しておくリスト
-		std::array<std::vector<std::unique_ptr<Soundhave>>, 2>	m_SoundHas;
+		std::array<std::vector<std::unique_ptr<Soundhave>>, 3>	m_SoundHas;
 	private:
 		// コンストラクタ
 		SoundPool(void) noexcept {

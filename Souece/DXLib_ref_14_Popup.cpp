@@ -396,6 +396,30 @@ namespace DXLibRef {
 				}
 			}
 		);
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("VOICE", 1111,
+			[this]() {
+				FloatChange(EnumSaveParam::VOICE, -0.1f, 0.f, 1.f);
+				auto* SE = SoundPool::Instance();
+				SE->FlipVolume();
+				SE->Get(SoundType::VOICE, 0)->Play(DX_PLAYTYPE_BACK, TRUE);
+			},
+			[this]() {
+				FloatChange(EnumSaveParam::VOICE, 0.1f, 0.f, 1.f);
+				auto* SE = SoundPool::Instance();
+				SE->FlipVolume();
+				SE->Get(SoundType::VOICE, 0)->Play(DX_PLAYTYPE_BACK, TRUE);
+			},
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) {
+				if (FloatUpDownBarDraw(xpos, ypos, EnumSaveParam::VOICE, 0.f, 1.f, 100)) {
+					auto* SE = SoundPool::Instance();
+					SE->FlipVolume();
+					SE->Get(SoundType::VOICE,0)->Play(DX_PLAYTYPE_BACK, TRUE);
+				}
+			}
+		);
 	}
 	void OptionPopup::GraphicTabsInfo::Init_Sub(void) noexcept {
 		HDC hdc;

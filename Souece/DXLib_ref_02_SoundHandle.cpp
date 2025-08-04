@@ -9,6 +9,7 @@ namespace DXLibRef {
 		auto* OptionParts = OptionManager::Instance();
 		float Vol = 1.0f;
 		switch (this->m_SoundType) {
+		case SoundType::VOICE:		Vol = OptionParts->GetParamFloat(EnumSaveParam::VOICE);			break;
 		case SoundType::SE:			Vol = OptionParts->GetParamFloat(EnumSaveParam::SE);			break;
 		case SoundType::BGM:		Vol = OptionParts->GetParamFloat(EnumSaveParam::BGM);			break;
 		default:

@@ -69,6 +69,8 @@ namespace DXLibRef {
 		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_OK), 1, "CommonData/Sound/UI/ok.wav", false);
 		SE->Add(SoundType::SE, static_cast<int>(SoundSelectCommon::UI_NG), 1, "CommonData/Sound/UI/ng.wav", false);
 
+		SE->Add(SoundType::VOICE, 0, 1, "data/Sound/VOICE/test.wav", false);
+
 		WindowSystem::DrawControl::Create();
 		//
 		SceneControl::Create();
