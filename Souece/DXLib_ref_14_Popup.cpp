@@ -905,7 +905,7 @@ namespace DXLibRef {
 			}
 		);
 		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("Render Scale", 1138,
+		this->m_Elements.back().Init("Render Scale", 1137,
 			[this]() {
 				FloatChange(EnumSaveParam::DrawScale, -0.1f, 0.25f, 1.f);
 				auto* OptionWindowParts = OptionPopup::Instance();
@@ -1027,9 +1027,11 @@ namespace DXLibRef {
 					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
 					break;
 				case Controls::ControlType::XBox:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PC));
 					break;
 				case Controls::ControlType::PC:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
+					break;
 				default:
 					break;
 				}
@@ -1040,12 +1042,14 @@ namespace DXLibRef {
 				auto* SE = SoundPool::Instance();
 				switch ((Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType)) {
 				case Controls::ControlType::PS4:
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PC));
 					break;
 				case Controls::ControlType::XBox:
 					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
 					break;
 				case Controls::ControlType::PC:
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
+					break;
 				default:
 					break;
 				}
@@ -1056,22 +1060,25 @@ namespace DXLibRef {
 			[](int xpos, int ypos, bool) {
 				auto* OptionParts = OptionManager::Instance();
 				auto* DrawCtrls = WindowSystem::DrawControl::Instance();
-				if (CheckBox(xpos, ypos, (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(Controls::ControlType::PS4)))) {
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PS4));
+				int ret = OptionParts->GetParamInt(EnumSaveParam::ControlType);
+				int value = UpDownBox(xpos, xpos + (200), ypos, ret, static_cast<int>(Controls::ControlType::Max));
+				if (value != ret) {
+					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(value));
 				}
-				else {
-					OptionParts->SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::XBox));
-				}
-				ypos -= LineHeight * 1 / 6;
-				if (OptionParts->GetParamInt(EnumSaveParam::ControlType) == static_cast<int>(Controls::ControlType::XBox)) {
-					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
-						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+				if (value == static_cast<int>(Controls::ControlType::XBox)) {
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos, ypos + LineHeight / 3,
 						White, Black, "XInput");
 				}
-				else {
-					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
-						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos + (125), ypos + LineHeight / 3,
+				else if (value == static_cast<int>(Controls::ControlType::PS4)) {
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos, ypos + LineHeight / 3,
 						White, Black, "DirectInput");
+				}
+				else if (value == static_cast<int>(Controls::ControlType::PC)) {
+					DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+						FontSystem::FontXCenter::MIDDLE, FontSystem::FontYCenter::MIDDLE, xpos, ypos + LineHeight / 3,
+						White, Black, "KeyBoard");
 				}
 
 				if (GetJoypadNum() > 0) {
@@ -1615,7 +1622,7 @@ namespace DXLibRef {
 			this->m_ActiveSwitch = false;
 			this->m_Active = true;
 			auto* PopUpParts = PopUp::Instance();
-			PopUpParts->Add("Option", 720, 720,
+			PopUpParts->Add("Option", 720, 840,
 				[this](int xmin, int ymin, int xmax, int ymax, bool EndSwitch) {
 					auto* OptionParts = OptionManager::Instance();
 					auto* Pad = PadControl::Instance();

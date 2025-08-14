@@ -94,7 +94,7 @@ namespace DXLibRef {
 			PostPassParts->Init();
 
 			int xBase = (1366);
-			int yBase = (768);
+			int yBase = (868);
 
 			// 初期設定画面
 			OptionWindowParts->SetActive();
@@ -115,7 +115,7 @@ namespace DXLibRef {
 				GraphHandle::SetDraw_Screen(static_cast<int>(DX_SCREEN_BACK), true);
 				{
 					int Width = (720);
-					int Height = (720);
+					int Height = (820);
 					int Edge = (16);
 
 					PopUpParts->Draw(Width / 2 + Edge, Height / 2 + Edge);
@@ -126,11 +126,16 @@ namespace DXLibRef {
 
 					int xp = Width + Edge + Edge;
 					int yp = Edge;
-					if (WindowSystem::SetMsgClickBox(xp, yp, xp + (400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
-						this->m_CheckPCSpec.StartSearch();
+					if (!this->m_CheckPCSpec.GetCPUDatas()) {
+						if (WindowSystem::SetMsgClickBox(xp, yp, xp + (400), yp + LineHeight, LineHeight, Gray50, false, true, LocalizeParts->Get(2000))) {
+							this->m_CheckPCSpec.StartSearch();
+						}
+						yp += (24);
+						DrawCtrls->SetStringAutoFit(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
+							xp, yp, xBase - Edge, yBase - Edge,
+							White, DarkGreen, LocalizeParts->Get(2050));
 					}
-					yp += (24);
-					if (this->m_CheckPCSpec.GetCPUDatas()) {
+					else {
 						int MouseOverID = InvalidID;
 						// CPU
 						DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
@@ -189,7 +194,7 @@ namespace DXLibRef {
 								White, DarkGreen, LocalizeParts->Get(2011)); yp += LineHeight;
 
 							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight,
-								FontSystem::FontXCenter::LEFT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
 								White, DarkGreen, "[%4.3lfMB / %4.3lfMB]", this->m_CheckPCSpec.GetFreeMemorySize(), this->m_CheckPCSpec.GetTotalMemorySize());
 							int TextID = 0;
 							unsigned int Color = White;
@@ -214,7 +219,7 @@ namespace DXLibRef {
 								}
 							}
 							DrawCtrls->SetString(WindowSystem::DrawLayer::Normal, FontSystem::FontType::MS_Gothic, LineHeight * 2 / 3,
-								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::TOP, xBase - Edge, yp,
+								FontSystem::FontXCenter::RIGHT, FontSystem::FontYCenter::BOTTOM, xBase - Edge, yp,
 								Color, DarkGreen, "%s", LocalizeParts->Get(TextID)); yp += LineHeight;
 							yp += LineHeight;
 						}

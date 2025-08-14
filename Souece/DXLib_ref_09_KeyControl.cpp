@@ -75,12 +75,11 @@ namespace DXLibRef {
 		auto* KeyGuideParts = KeyGuide::Instance();
 		// コントロールタイプ決定
 		{
-			//基本はPC
-			Controls::ControlType NextControlType = Controls::ControlType::PC;
-			//ゲームパッドを検知したら
-			if (GetJoypadNum() > 0) {
-				//コントロールタイプに合わせた設定を行う
-				NextControlType = (Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
+			//ゲームパッドを検知したらコントロールタイプに合わせた設定を行う
+			Controls::ControlType NextControlType = (Controls::ControlType)OptionParts->GetParamInt(EnumSaveParam::ControlType);
+			//検知しなかったらPC
+			if (GetJoypadNum() == 0) {
+				NextControlType = Controls::ControlType::PC;
 			}
 			//以前の設定と異なる場合は
 			if (this->m_ControlType != NextControlType) {

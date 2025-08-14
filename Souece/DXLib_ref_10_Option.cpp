@@ -79,7 +79,7 @@ namespace DXLibRef {
 					SetParamFloat(EnumSaveParam::Xsensing, 0.5f);
 					SetParamFloat(EnumSaveParam::Ysensing, 0.5f);
 					SetParamBoolean(EnumSaveParam::HeadBobbing, true);
-					SetParamInt(EnumSaveParam::ControlType, 2);
+					SetParamInt(EnumSaveParam::ControlType, static_cast<int>(Controls::ControlType::PC));
 					SetParamBoolean(EnumSaveParam::AA, true);
 					SetParamFloat(EnumSaveParam::DrawScale, 1.f);
 					SetParamBoolean(EnumSaveParam::FlatEarth, false);
