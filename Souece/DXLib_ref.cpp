@@ -300,7 +300,7 @@ namespace DXLibRef {
 
 					xp = Width + Edge + Edge + Edge;
 					yp = Height;
-					if (WindowSystem::SetMsgClickBox(xp, yp, xBase - Edge + Edge, yp + Edge + Edge, LineHeight, Green, false, true, "Start Game!")) {
+					if (WindowSystem::SetMsgClickBox(xp, yp, xBase - Edge, yp + Edge + Edge, LineHeight, Green, false, true, "Start Game!")) {
 						PopUpParts->EndAll();
 					}
 
