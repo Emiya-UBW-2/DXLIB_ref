@@ -12,15 +12,12 @@ namespace DXLibRef {
 		static const int EXTEND = 4;
 	private:
 		ShaderController				m_ShaderSSAO;		// シェーダー
-		ShaderController				m_ShaderBlur;		// シェーダー
 	protected:
 		void		Load_Sub(void) noexcept override {
 			this->m_ShaderSSAO.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_SSAO.pso");
-			this->m_ShaderBlur.Init("CommonData/shader/VS_SSAO.vso", "CommonData/shader/PS_BilateralBlur.pso");
 		}
 		void		Dispose_Sub(void) noexcept override {
 			this->m_ShaderSSAO.Dispose();
-			this->m_ShaderBlur.Dispose();
 		}
 		bool		IsActive_Sub(void) noexcept override {
 			auto* OptionParts = OptionManager::Instance();
@@ -32,7 +29,7 @@ namespace DXLibRef {
 			int xsize = WindowSizeParts->GetScreenXMax() / EXTEND;
 			int ysize = WindowSizeParts->GetScreenYMax() / EXTEND;
 
-			const GraphHandle* pScreenBuffer = PostPassScreenBufferPool::Instance()->PopBlankScreen(xsize, ysize, true, false, 24);
+			const GraphHandle* pScreenBuffer = PostPassScreenBufferPool::Instance()->PopBlankScreen(WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2, true, false, 24);
 			const GraphHandle* pScreenBuffer2 = PostPassScreenBufferPool::Instance()->PopBlankScreen(xsize, ysize, true, false, 24);
 			const GraphHandle* pColorScreen = PostPassScreenBufferPool::Instance()->PopBlankScreen(xsize, ysize, true);
 			const GraphHandle* pNormalScreen = PostPassScreenBufferPool::Instance()->PopBlankScreen(xsize, ysize, true);
@@ -41,8 +38,6 @@ namespace DXLibRef {
 			pColorScreen->GraphFilterBlt(*ColorGraph, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			pNormalScreen->GraphFilterBlt(*NormalPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
 			pDepthScreen->GraphFilterBlt(*DepthPtr, DX_GRAPH_FILTER_DOWN_SCALE, EXTEND);
-			pScreenBuffer->SetDraw_Screen();
-
 			// シェーダーを適用
 			pScreenBuffer2->SetDraw_Screen(false);
 			{
@@ -59,15 +54,14 @@ namespace DXLibRef {
 				SetUseTextureToShader(2, InvalidID);
 			}
 			// ぼかしを入れる
-			pScreenBuffer->SetDraw_Screen(false);
+			pScreenBuffer->SetDraw_Screen();
 			{
-				pScreenBuffer2->SetUseTextureToShader(0);	// 使用するテクスチャをセット
-
-				this->m_ShaderBlur.SetPixelDispSize(xsize, ysize);
-				this->m_ShaderBlur.Draw();
-
-				SetUseTextureToShader(0, InvalidID);
+				auto Prev = GetDrawMode();
+				SetDrawMode(DX_DRAWMODE_BILINEAR);
+				pScreenBuffer2->DrawExtendGraph(0, 0, WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2, true);
+				SetDrawMode(Prev);
 			}
+			pScreenBuffer->GraphFilter(DX_GRAPH_FILTER_BILATERAL_BLUR);
 			// 
 			TargetGraph->SetDraw_Screen(false);
 			{
@@ -75,9 +69,8 @@ namespace DXLibRef {
 				SetDrawBlendMode(DX_BLENDMODE_MULA, 255);
 				pScreenBuffer->DrawExtendGraph(0, 0, WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				// pScreenBuffer2->DrawExtendGraph(0, 0, WindowSizeParts->GetScreenXMax(), WindowSizeParts->GetScreenYMax(), true);
 			}
-			PostPassScreenBufferPool::Instance()->ResetUseCount(xsize, ysize, true, false, 24);
+			PostPassScreenBufferPool::Instance()->ResetUseCount(WindowSizeParts->GetScreenXMax() / 2, WindowSizeParts->GetScreenYMax() / 2, true, false, 24);
 			PostPassScreenBufferPool::Instance()->ResetUseCount(xsize, ysize, true, false, 24);
 			PostPassScreenBufferPool::Instance()->ResetUseCount(xsize, ysize, true);
 			PostPassScreenBufferPool::Instance()->ResetUseCount(xsize, ysize, true);
