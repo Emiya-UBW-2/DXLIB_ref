@@ -115,6 +115,15 @@ namespace DXLibRef {
 		// 除算
 		inline Vector3DX operator/(float p1) const noexcept { return *this * (1.f / p1); }
 		inline void operator/=(float p1) noexcept { *this *= (1.f / p1); }
+
+		//
+		inline bool IsLangeSmaller(float Lange) const noexcept {
+			if (std::abs(this->x) + std::abs(this->y) + std::abs(this->z) > Lange * 3) {
+				return false;
+			}
+
+			return this->sqrMagnitude() < Lange * Lange;
+		}
 	};
 	// ---------------------------------------------------------------------------------------------
 	// Vector3
