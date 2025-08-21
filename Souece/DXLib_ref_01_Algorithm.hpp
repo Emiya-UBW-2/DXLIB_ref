@@ -117,7 +117,7 @@ namespace DXLibRef {
 		inline void operator/=(float p1) noexcept { *this *= (1.f / p1); }
 
 		//
-		inline bool IsLangeSmaller(float Lange) const noexcept {
+		inline bool IsRangeSmaller(float Lange) const noexcept {
 			if (std::abs(this->x) + std::abs(this->y) + std::abs(this->z) > Lange * 3) {
 				return false;
 			}
