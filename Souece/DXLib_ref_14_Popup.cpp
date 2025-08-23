@@ -1115,7 +1115,7 @@ namespace DXLibRef {
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::FlatEarth); }
 		);
 		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("ActiveLockOn", 1147,
+		this->m_Elements.back().Init("ActiveLockOn", 1146,
 			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
 			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
 			[]() {},
@@ -1123,7 +1123,7 @@ namespace DXLibRef {
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::ActiveLockOn); }
 		);
 		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("HardMode", 1148,
+		this->m_Elements.back().Init("HardMode", 1147,
 			[this]() { BoolChange(EnumSaveParam::HardMode); },
 			[this]() { BoolChange(EnumSaveParam::HardMode); },
 			[]() {},
