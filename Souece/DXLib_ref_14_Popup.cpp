@@ -1115,12 +1115,20 @@ namespace DXLibRef {
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::FlatEarth); }
 		);
 		this->m_Elements.emplace_back();
-		this->m_Elements.back().Init("ActiveLockOn", 1146,
+		this->m_Elements.back().Init("ActiveLockOn", 1147,
 			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
 			[this]() { BoolChange(EnumSaveParam::ActiveLockOn); },
 			[]() {},
 			[]() {},
 			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::ActiveLockOn); }
+		);
+		this->m_Elements.emplace_back();
+		this->m_Elements.back().Init("HardMode", 1148,
+			[this]() { BoolChange(EnumSaveParam::HardMode); },
+			[this]() { BoolChange(EnumSaveParam::HardMode); },
+			[]() {},
+			[]() {},
+			[this](int xpos, int ypos, bool) { BoolDraw(xpos, ypos, EnumSaveParam::HardMode); }
 		);
 	}
 	void OptionPopup::ControlTabsInfo::KeyDraw(int xpos, int ypos, bool isMine, Controls::PADS Sel) noexcept {
@@ -1633,7 +1641,9 @@ namespace DXLibRef {
 						t->Draw(xmin + 24, ymin, (xmax - 24) - (xmin + 24), this->m_tabsel == t->GetID(), &this->m_tabsel, &this->m_select);
 					}
 					// ガイド
-					this->m_Tabs[this->m_tabsel]->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, this->m_select);
+					if (this->m_tabsel < this->m_Tabs.size()) {
+						this->m_Tabs[this->m_tabsel]->DrawInfo(xmin + 24, ymax - LineHeight * 3 / 2, this->m_select);
+					}
 					// 
 					if (Pad->GetPadsInfo(Controls::PADS::LEAN_L).GetKey().trigger() && (this->m_tabsel != 3)) {
 						if (this->m_tabsel <= 0) {

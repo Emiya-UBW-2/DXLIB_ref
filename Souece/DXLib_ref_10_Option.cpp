@@ -37,6 +37,7 @@ namespace DXLibRef {
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::FlatEarth)].SetEnumParamType(EnumParamType::Boolean);
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::GodRay)].SetEnumParamType(EnumParamType::Boolean);
 		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::ActiveLockOn)].SetEnumParamType(EnumParamType::Boolean);
+		this->m_SaveParams[static_cast<size_t>(EnumSaveParam::HardMode)].SetEnumParamType(EnumParamType::Boolean);
 		
 		this->m_ProjectSettingParams[static_cast<size_t>(EnumProjectSettingParam::PBR)].SetEnumParamType(EnumParamType::Boolean);
 		this->m_ProjectSettingParams[static_cast<size_t>(EnumProjectSettingParam::Distortion)].SetEnumParamType(EnumParamType::Boolean);
@@ -85,6 +86,7 @@ namespace DXLibRef {
 					SetParamBoolean(EnumSaveParam::FlatEarth, false);
 					SetParamBoolean(EnumSaveParam::GodRay, true);
 					SetParamBoolean(EnumSaveParam::ActiveLockOn, true);
+					SetParamBoolean(EnumSaveParam::HardMode, true);
 					return;
 				}
 			}
