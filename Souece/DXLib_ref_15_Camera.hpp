@@ -28,6 +28,14 @@ namespace DXLibRef {
 			this->m_SendCamShakeTime = time;
 			this->m_SendCamShakePower = power;
 		}
+		void			StopCamShake() noexcept {
+			this->m_SendCamShake = false;
+			this->m_SendCamShakeTime = 1.f;
+			this->m_SendCamShakePower = 1.f;
+			this->m_CamShake = 0.f;
+			this->m_CamShake1 = Vector3DX::zero();
+			this->m_CamShake2 = Vector3DX::zero();
+		}
 	private:
 		Camera3D(void) noexcept {}
 		Camera3D(const Camera3D&) = delete;
